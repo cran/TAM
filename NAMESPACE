@@ -1,0 +1,29 @@
+useDynLib(TAM)
+export(designMatrices, .A.matrix, designMatrices.mfr,
+       tam.fit, 
+#       tam.jml.fit, 
+       tam.jml,
+       tam.mml.fit , 
+       tam.jml.WLE, 
+       tam.jml2, 
+       tam.pv, 
+       tam, tam.mml, tam.mml.2pl, tam.mml.mfr, 
+       tam.se, tam.wle , .A.PCM2 , .A.PCM3 , 
+       tam.threshold , tam ,
+       tam.ctt
+       )
+
+# internal functions; not intended to be visible to users
+# export(calc_exp_TK, calc_posterior.v2, calc_prob.v5, 
+#        mstep.regression, Mstep_slope, Mstep_slope.v2,
+#        print.designMatrices, resp.pattern3, rowcumsums, rowMaxs,
+#        stud_prior.v2, tam.jml.xsi, tam.jml.xsi2, theta.sq)
+
+# S3method(print, designMatrices)
+
+importFrom(utils,packageDescription)
+
+S3method(summary, tam )
+S3method(summary, tam.mml )
+S3method( anova , tam.mml )
+S3method( anova , tam )

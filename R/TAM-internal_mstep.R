@@ -1,0 +1,297 @@
+mstep.regression <-
+function( resp , hwt ,  resp.ind , 
+  pweights , pweightsM , Y , theta , theta2 , YYinv , ndim , 
+  nstud , beta.fixed , variance , Variance.fixed , group , G , 
+  snodes = 0 , thetasamp.density=NULL , nomiss=FALSE){
+	    # calculate item weights
+		variance.fixed <- Variance.fixed
+	#*****
+	# numerical integration	
+	if ( snodes == 0){	
+		# hwt ... N x q matrix
+		
+		if (!nomiss){
+			itemwt <- t( hwt ) %*% ( resp.ind * pweightsM )	
+					}
+		if ( nomiss ){
+			itemwt <- matrix( colSums(hwt*pweights) , nrow=ncol(hwt) , ncol=ncol(resp.ind) )
+					}						 			
+#  a0 <- Sys.time()
+# cat("itemwt (without respind)") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
+		# original implementation without missings
+		#  -- itemwt0 <- matrix(rep(colSums(hwt), nitems), nrow=nnodes, ncol=nitems)
+		thetabar <- hwt%*%theta
+		sumbeta <- Y%t*%( thetabar*pweights )
+		# -- sumsig2 <- sum( (pweights*hwt) %*% theta2 )
+		sumsig2 <- colSums((pweights*hwt) %*% theta2)      
+					}
+	#****
+	# Monte Carlo integration
+	if ( snodes > 0 ){
+	# maybe both if statements can be merged to one
+		hwtS <- hwt / snodes
+#		hwtS <- hwt / outer( rep(1,nrow(hwt) ) , thetasamp.density )
+		hwtS <- hwtS / rowSums( hwtS )
+		# hwt ... N x q matrix
+		itemwt <- t( hwtS ) %*% ( resp.ind * pweightsM )
+		hwtS <- hwt		
+		#  -- itemwt0 <- matrix(rep(colSums(hwt), nitems), nrow=nnodes, ncol=nitems)
+		thetabar <- hwtS%*%theta
+		sumbeta <- Y%t*%( thetabar*pweights )
+		# -- sumsig2 <- sum( (pweights*hwt) %*% theta2 )
+		sumsig2 <- colSums((pweights*hwtS) %*% theta2)      		
+					}	
+# print("s200")					
+	# calculation of variance and regression coefficients					
+    beta <- YYinv%*%sumbeta                     #new beta
+    sumsig2 <- matrix(sumsig2,ndim,ndim)
+    if (G==1){ 
+		variance <- (sumsig2-sumbeta%t*%beta)/nstud  #new variance
+			}
+	# fixed beta coefficients
+	if ( ! is.null( beta.fixed )){ 
+		beta[ beta.fixed[,1:2,drop=FALSE] ] <- beta.fixed[,3] 
+		beta <- as.matrix( beta , ncol=ndim )	
+					}
+	# fixed covariance matrix entries
+	if ( ! is.null(variance.fixed) ){ 
+		variance[ variance.fixed[,1:2,drop=FALSE] ] <- variance.fixed[,3]  	
+		variance[ variance.fixed[,c(2,1),drop=FALSE] ] <- variance.fixed[,3]  		
+				}		
+	if ( G> 1){	# begin multiple groups
+		if ( snodes > 0 ){ 
+				hwt <- hwt / snodes 
+#				hwt <- hwt / outer( rep(1,nrow(hwt) ) , thetasamp.density )	
+				hwt <- hwt / rowSums( hwt )				
+						}
+		for (gg in 1:G){
+			#gg <- 1
+			ind.gg <- which( group == gg )
+			thetabar <- hwt[ind.gg,]%*%theta
+	#		sumbeta <- Y[ind.gg,]%t*%( thetabar*pweights[ind.gg] )
+			sumbeta <- Y[ind.gg,]%t*%( thetabar*pweights[ind.gg] )
+			# -- sumsig2 <- sum( (pweights*hwt) %*% theta2 )
+			sumsig2 <- colSums((pweights[ind.gg]*hwt[ind.gg,]) %*% theta2)   
+			sumsig2 <- matrix(sumsig2,ndim,ndim)
+			variance[ind.gg] <- (sumsig2-sumbeta%t*%beta)/sum(pweights[ind.gg]) #new variance
+				}
+			}		# end multiple groups
+    res <- list( "beta" = beta , "variance" = variance , "itemwt" = itemwt )
+			}
+
+############################################################################
+############################################################################
+############################################################################
+
+Mstep_slope <-
+  function (B_orig, B, B_obs, max.increment, nitems, A, 
+            AXsi, xsi, theta, nnodes, maxK, itemwt, Msteps, ndim, convM
+  ){     
+    # begin loop of slope parameters (items and categories, where B coeff is not zero)
+    for (i in 1:nitems ) {
+      for (k in 1:maxK){
+        if (sum(B_orig[i,k,])==0) {} else  # skip when B[i,k,] is zero for all dimensions - reference category or dummy category
+        {
+          old_increment <- rep(max.increment, ndim)
+          xbar2 <- xxf <- xbar <- array(0,dim=ndim)
+          converge <- FALSE
+          Biter <- 1
+          while (!converge & ( Biter <= Msteps ) ) {  
+            #compute expectation
+            res.p <- calc_prob.v5( iIndex=i:i , A=A , AXsi=AXsi , B=B, 
+                                   xsi=xsi , theta=theta , nnodes=nnodes, maxK=maxK)      		
+            rprobs <- res.p[["rprobs"]]            
+            xbar <- t(theta)%*%(rprobs[1,k,]*itemwt[,i])  # xbar is of dimension ndim
+            xxf <- t(theta^2)%*%(rprobs[1,k,]*itemwt[,i])  
+            xbar2 <- t(theta^2)%*%(rprobs[1,k,]^2*itemwt[,i])  
+            diff <- B_obs[i,k,] - xbar
+            deriv <- xbar2 - xxf
+            increment <- diff*abs(1/( deriv + 10^(-20) ) )
+            #if ( !is.null( B.fixed) ){ increment[ B.fixed[,1] ] <- 0 } 
+            ci <- ceiling( abs(increment) / ( abs( old_increment) + 10^(-10) ) )
+            increment <- ifelse( abs( increment) > abs(old_increment)  , 
+                                 increment/(2*ci) , 
+                                 increment )
+            increment[B_orig[i,k,]==0] <- 0  # B[i,k,] could be zero for some dimensions
+            old_increment <- increment        
+            B[i,k,] <- B[i,k,] + increment   # update B parameter
+            if ( max(abs(increment)) < convM ) { converge <- TRUE }
+            Biter <- Biter + 1
+          }
+        }     
+      } # end k loop
+    } # end i loop
+    return(B) 
+  }
+
+############################################################################
+Mstep_slope.v2 <-
+  function (B_orig, B, B_obs, B.fixed , max.increment, nitems, A, 
+            AXsi, xsi, theta, nnodes, maxK, itemwt, Msteps, ndim, convM ,
+            irtmodel , progress , est.slopegroups , E , basispar , se.B ,
+			equal.categ 
+  ){     
+    # begin loop of slope parameters (items and categories, where B coeff is not zero)
+    #        old_increment <- rep(max.increment, nitems )
+
+    old_increment <- array( max.increment , dim= c(nitems , maxK , ndim) )
+
+    xbar2 <- xxf <- xbar <- array(0,dim=c( nitems , maxK ) )
+    converge <- FALSE
+    Biter <- 1
+    mK <- 1:maxK		
+    items.temp <- 1:nitems
+    items.conv <- NULL
+    if (irtmodel == "GPCM"){
+      old_increment.temp <- matrix( .3 , nrow=nitems , ncol= ndim )	
+    }
+    if (irtmodel == "GPCM.design" ){
+      Nlambda <- ncol(E)	# number of lambda parameters							
+      old_increment.temp <- matrix( .3 , nrow=Nlambda , ncol= ndim )				
+    }	
+    if (irtmodel == "2PL.groups"){
+      ES <- length( unique( est.slopegroups) )
+      old_increment.temp <- array( .3 , dim=c(ES , maxK ,ndim )	)
+    }							
+    while (!converge & ( Biter <= Msteps ) ) {  
+      #compute expectation
+      res.p <- calc_prob.v5( iIndex= items.temp , A=A , AXsi=AXsi , B=B, 
+                             xsi=xsi , theta=theta , nnodes=nnodes, maxK=maxK)    			
+      rprobs <- res.p[["rprobs"]]  
+      #########################################
+      ######     D I M E N S I O N S     ######
+      for (dd in 1:ndim){
+        #***
+        if ( irtmodel %in% c("GPCM","GPCM.design") ){ 
+          xtemp <- matrix(0 , length(items.temp) , nrow(theta) )
+        }
+        if ( irtmodel == "2PL.groups"){ 
+          xtemp <- array(0 , dim=c(length(items.temp) , nrow(theta) , maxK) )
+        }									
+        ###################################
+        ##### C A T E G O R I E S #########	
+		if ( ! equal.categ ){ rprobs[ is.na(rprobs ) ] <- 0 }
+        for ( k in 1:maxK ){	
+          #			k <- 1	
+          xbar[items.temp,k] <- t(theta[,dd]) %*% t( rprobs[,k,]*t(itemwt[,items.temp]) )
+          xxf[items.temp,k] <- t( theta[,dd]^2) %*% t( rprobs[,k,]*t(itemwt[,items.temp]) )
+          if ( irtmodel == "2PL" ){ 	# begin usual 2PL
+            xbar2[items.temp,k] <- 
+              t( theta[,dd]^2 ) %*% t( rprobs[,k,]^2*t(itemwt[,items.temp]) )
+          }
+          if ( irtmodel %in% c("GPCM","GPCM.design") ){ 	# begin GPCM
+            xxf[items.temp,k] <- xxf[items.temp,k] * (k-1)^2	
+            xtemp <- xtemp + matrix(theta[,dd],length(items.temp),nrow(theta),byrow=TRUE) * 
+              rprobs[,k,] * ( k - 1 )  									
+          }
+          if ( irtmodel == "2PL.groups"){ 	# begin 2PL groups
+            #						xtemp[items.temp,,k] <- 
+            #							matrix(theta[,dd],length(items.temp),nrow(theta),byrow=TRUE) * rprobs[,k,]
+            xbar2[items.temp,k] <- 
+              t( theta[,dd]^2 ) %*% t( rprobs[,k,]^2*t(itemwt[,items.temp]) )
+          }
+          
+          if ( ! is.null( items.conv) ){
+            xbar[ items.conv , ] <- 0
+            xxf[ items.conv , ] <- 0
+            xbar2[ items.conv , ] <- 0
+          } 
+        }	# end categories k
+        ###################################
+        if ( irtmodel %in% c("GPCM","GPCM.design")){  # begin GPCM / GPCM.design
+          B_obs.temp <- B_obs
+          B_obs.temp[ items.temp,,dd] <- 
+            matrix( mK-1 , length(items.temp) , maxK , byrow=T ) * B_obs[ items.temp ,,dd]
+		  #***
+		  xbar[ is.na(xbar) ] <- 0		
+          xbar.temp <- matrix( mK-1 , length(items.temp) , maxK , byrow=T ) *xbar					
+          diff.temp <- rowSums(B_obs.temp) - rowSums(xbar.temp)	
+          xbar2.temp <- diag( xtemp^2 %*% itemwt[ , items.temp  ] )
+          xxf.temp <- rowSums( xxf )		
+          if ( ! is.null( items.conv) ){ diff.temp[ items.conv, ] <- 0   }
+  
+          deriv.temp <- xbar2.temp - xxf.temp
+        }
+        if (irtmodel == "GPCM"){	  # begin GPCM
+		  #***
+		  deriv.temp[ is.na(deriv.temp)] <- 10^(45)	
+          increment.temp <- diff.temp*abs(1/( deriv.temp + 10^(-20) ) )
+          ci <- ceiling( abs(increment.temp) / ( abs( old_increment.temp[,dd]) + 10^(-10) ) )
+          increment.temp <- ifelse( abs( increment.temp) > abs(old_increment.temp[,dd])  , 
+                                    increment.temp /(2*ci) , increment.temp )
+          old_increment.temp[,dd] <- increment.temp	
+          increment <- outer( increment.temp , mK - 1) 
+#		  dt1 <- outer( deriv.temp , mK - 1)
+		  if (Biter==1){ 
+					se.B[,,dd]  <- outer( sqrt( 1 / abs( deriv.temp )) , mK-1 ) 
+					}
+        }  # end GPCM
+        if ( irtmodel == "GPCM.design"){						
+          diff.temp <- ( t(E) %*% diff.temp )[,1]
+          deriv.temp <- ( t(E^2) %*% deriv.temp )[,1]
+          increment.temp <- diff.temp*abs(1/( deriv.temp + 10^(-20) ) )  
+          ci <- ceiling( abs(increment.temp) / ( abs( old_increment.temp[,dd]) + 10^(-10) ) )
+          increment.temp <- ifelse( abs( increment.temp) > abs(old_increment.temp[,dd])  , 
+                                    increment.temp /(2*ci) , increment.temp )
+          old_increment.temp[,dd] <- increment.temp	
+          basispar[,dd] <- basispar[,dd] + increment.temp
+          increment.temp <- ( E %*% increment.temp	)[,1]
+          increment <- outer( increment.temp , mK - 1) 
+		  d1 <- outer(  1 / abs( deriv.temp ) , mK-1 ) 		  
+          LL <- ncol(d1)		
+		  for (ll in 1:LL){
+	#		  ll <- 2
+			  m1 <- sqrt( diag( E %*% d1[,ll] %*% t( d1[,ll] ) %*% t(E) ) )
+			  if (Biter==1){ se.B[,ll,dd]  <- m1 }	  
+				}
+        } # end GPCM.design																			
+        
+        #**********
+        if (irtmodel == "2PL.groups"){  # begin 2PL slopegroups
+          a1 <- aggregate( B_obs[,,dd] - xbar  , list(est.slopegroups) , sum )		
+          a2 <- aggregate( xbar2 - xxf  , list(est.slopegroups) , sum )				
+          deriv.temp <- as.matrix(a2[,-1])
+          diff.temp <- as.matrix(a1[,-1])
+          increment.temp <- diff.temp*abs(1/( deriv.temp + 10^(-20) ) )  
+          ci <- ceiling( abs(increment.temp) / ( abs( old_increment.temp[,,dd]) + 10^(-10) ) )
+          increment.temp <- ifelse( abs( increment.temp) > abs(old_increment.temp[,,dd])  , 
+                                    increment.temp /(2*ci) , increment.temp )
+          old_increment.temp[,,dd] <- increment.temp	
+		  ind.match <- match( est.slopegroups , a1[,1] )
+          increment <- increment.temp[ ind.match , ]
+	  
+		  if (Biter==1){ se.B[ ,,dd]  <- sqrt( 1 / abs( deriv.temp[ind.match , ] )) }	  
+        } # end 2PL slope groups
+        #****
+        if (irtmodel == "2PL"){		# begin 2PL					
+          diff <- B_obs[,,dd] - xbar	
+          if ( ! is.null( items.conv) ){  diff[ items.conv, ] <- 0	}
+          deriv <- xbar2 - xxf
+          increment <- diff*abs(1/( deriv + 10^(-20) ) )        
+          ci <- ceiling( abs(increment) / ( abs( old_increment[,,dd]) + 10^(-10) ) )
+          increment <- ifelse( abs( increment) > abs(old_increment[,,dd])  , 
+                               increment/(2*ci) , 
+                               increment )	
+
+		  if (Biter==1){ se.B[,,dd] <- sqrt( 1 / abs( deriv )) }
+        }   # end 2PL
+        ###########################################
+        increment[B_orig[,,dd]==0] <- 0  # B[i,k,] could be zero for some dimensions
+        old_increment[,,dd] <- increment        
+        B[,,dd] <- B[,,dd] + increment   # update B parameter
+      }  # end dimensions
+      ###############################################
+      if ( irtmodel == "2PL" ){
+        items.temp <- which( apply( old_increment , 1 , 
+                                    FUN = function(ll){ ! ( max(abs(ll)) < convM ) } ) )
+        items.conv <- setdiff( 1:nitems , items.temp )	
+      }
+      #          if ( max(abs(increment)) < convM ) { converge <- TRUE }
+      if ( max(abs(old_increment)) < convM ) { converge <- TRUE }
+      Biter <- Biter + 1
+      if (progress){ cat( "-" ) ; flush.console()	}		  
+    }		# end while loop
+	se.B[ B_orig == 0 ] <- 0
+    res <- list( "B" = B , "basispar" = basispar , "se.B" = se.B )
+    return(res) 
+  }
