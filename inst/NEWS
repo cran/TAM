@@ -1,0 +1,60 @@
+*******************************************************
+CHANGES IN TAM PACKAGE VERSIONS
+*******************************************************
+
+----
+Changes in Versions 0.04 (2013-07-01)
+
+x included quasi-Monte Carlo integration as an alternative
+  to stochastic integration
+x multifaceted model completely implemented
+x print warning if there are items in resp with only zeroes
+  (thanks to Ronny Scherer)
+x fixed a bug in tam.wle, tam.pv and tam.se
+x fixed a bug in creating design matrices for faceted designs
+x changed initial xsi values for indetermined parameters
+  (thanks to Sebastian Weirich)
+x included function for calculating Thurstonian thresholds
+x included Rcpp function in M step for calculating item parameters
+x fixed a bug for partial credit models
+x included parametrization of the dispersion model for ordered data
+x included a function tam.ctt for calculating some statistics
+  based on classical test theory
+x fixed a bug in tam.mml.2pl with irtmodel="GPCM" fpr models
+   with differering numbers of item categories
+
+----
+Changes in Versions 0.03 (2013-03-23)
+
+x cleaned Rd manual files a bit
+x included standard errors in tam.mml and tam.mml.2pl
+x included summary.tam and summary.tam.mml
+x included anova.tam for model comparisons
+x fixed a bug in multiple group estimation during tam.mml and
+   summary application
+x fixed a bug in WLE estimation in the multdimensional case
+
+----
+Changes in Versions 0.02 (2013-02-20)
+
+x removed bugs in tam.pv for sampling plausible values
+  with the argument normal.approx=FALSE 
+  (thanks to Sebastian Weirich)
+x included seed for stochastic integration in the tam
+  control argument
+x fixed a bug in stochastic integration
+  (thanks to Steffen Brandt)
+x fixed a bug in the calculation of reliability and person
+  parameter estimates when applying stochastic integration
+  (thanks to Steffen Brandt and Caroline Just)
+x use estimated parameters with minimal deviance in the output
+  (thanks to Ulrich Schroeders and Steffen Brandt)
+
+-----
+Changes in Version 0.01-03 (2012-11-21)
+
+ x 2PL calibration outsourced
+ x designMatrices and tam.mml.mfr method for multifacet rasch model 
+   calibration included. Both highly experimental.
+ x Examples for the calibration included, see help file of sim.mfr
+ 
