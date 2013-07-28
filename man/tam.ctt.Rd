@@ -66,6 +66,7 @@ correlation of an item and a test score (here the WLE).
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 %}
 \examples{
+\dontrun{
 #################################################
 # Example data.mc
 data(data.mc)
@@ -86,7 +87,7 @@ stat2 <- tam.ctt( resp=data.mc$scored , wlescore=w1$theta , pvscores=p1[,-1] )
 # descriptive statistics for different groups
 # define group identifier
 group <- c( rep(1,70) , rep(2,73) )
-stat3 <- tam.ctt( resp=data.mc$raw , wlescore=w1$theta , pvscores=p1[,-1] , group=group)
+stat3 <- tam.ctt( resp=data.mc$raw , wlescore=w1$theta , pvscores=p1[,-1] , group=group)}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

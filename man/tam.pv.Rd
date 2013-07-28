@@ -7,12 +7,11 @@ Plausible Value Imputation
 \description{
 Plausible value imputation for objects of the classes \code{tam} and \code{tam.mml}
 (Adams & Wu, 2007).
-%% Still to come for objects of class \code{tam.jml}.
 }
 
 \usage{
 tam.pv(tamobj, nplausible = 10, ntheta = 2000, normal.approx = FALSE, 
-    samp.regr = FALSE , np.adj=4 )
+    samp.regr = FALSE , np.adj=8 )
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -33,7 +32,7 @@ tam.pv(tamobj, nplausible = 10, ntheta = 2000, normal.approx = FALSE,
 }
   \item{normal.approx}{
      Should individual posterior distributions be approximated by a
-     normal distribution? The default is \code{TRUE}. In this case,
+     normal distribution? The default is \code{FALSE}. In this case,
      the number of ability nodes \code{ntheta} can be substantially
      smaller than 2000, say 200 or 500.
 }

@@ -12,9 +12,9 @@ on 30 items.
 data(data.mc)
 }
 \format{
-  The data set comes as a list with two elements. The entry \code{raw}
+  The data set is a list with two elements. The entry \code{raw}
   contains unscored (raw) item responses and the entry \code{scored}
-  contains the scored (recoded) item responses. The format in detail is: \cr
+  contains the scored (recoded) item responses. The format is: \cr
 \code{List of 2} \cr
 \code{ $ raw   : chr [1:143, 1:30] "A" "A" "A" "A" ...} \cr
 \code{  ..- attr(*, "dimnames")=List of 2} \cr

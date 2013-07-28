@@ -16,6 +16,7 @@ objects of classes \code{tam}, \code{tam.mml} and
 
 \usage{
 tam.fit(tamobj, ...)
+
 tam.mml.fit(tamobj, FitMatrix=NULL, progress=FALSE)
 }
 
@@ -47,10 +48,6 @@ In case of \code{tam.mml.fit} a data frame with four columns:
 \item{Outfit_t}{The \eqn{t} value for the outfit statistic}
 \item{Infit}{Item infit statistic}
 \item{Infit_t}{The \eqn{t} value for the infit statistic}
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
 }
 
 %\references{

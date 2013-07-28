@@ -40,7 +40,7 @@ tam.mml.mfr <-
     s1 <- Sys.time()
     # display
     disp <- "....................................................\n"
-    progress <- nodes <- snodes <- ridge <- xsi.start0 <- QMC <- NULL
+    increment.factor <- progress <- nodes <- snodes <- ridge <- xsi.start0 <- QMC <- NULL
     maxiter <- conv <- convD <- min.variance <- max.increment <- Msteps <- convM <- NULL 
 	
     # attach control elements
@@ -49,7 +49,7 @@ tam.mml.mfr <-
                  convD = .001 ,conv = .0001 , convM = .0001 , Msteps = 4 ,            
                  maxiter = 1000 , max.increment = 1 , 
                  min.variance = .001 , progress = TRUE , ridge=0,seed= NULL ,
-				 xsi.start0=TRUE)  	
+				 xsi.start0=TRUE , increment.factor=1)  	
     con[ names(control) ] <- control  
     Lcon <- length(con)
     con1a <- con1 <- con ; 
@@ -381,7 +381,7 @@ tam.mml.mfr <-
     } else {
     # sampled theta values
 	if (QMC){
-		library(sfsmisc)					
+#		library(sfsmisc)					
 		r1 <- QUnif (n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)						
 		theta0.samp <- qnorm( r1 )
 			} else {
@@ -558,6 +558,10 @@ tam.mml.mfr <-
 			}
       } # end of all parameters loop
       
+	#***
+	# decrease increments in every iteration
+	if( increment.factor > 1){max.increment <-  1 / increment.factor^iter }	  
+	  
 
 # cat("m step item parameters") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		        
       # calculate deviance
@@ -617,7 +621,8 @@ tam.mml.mfr <-
         flush.console()
       }
     } # end of EM loop
-     #******************************************************
+    #############################################################
+	#############################################################
   		xsi.min.deviance -> xsi 
 		beta.min.deviance -> beta
 		variance.min.deviance -> variance	
@@ -667,12 +672,18 @@ tam.mml.mfr <-
     # post ... posterior distribution	
     # create a data frame person	
     person <- data.frame( "pid"=pid , "case" = 1:nstud , "pweight" = pweights )
-		
-    person$score <- rowSums( resp * resp.ind )
-	
+
+
+#    person$score <- rowSums( resp * resp.ind )
+    resp2 <- resp
+	resp2[ is.na(resp2) ] <- 0
+    person$score <- rowSums( resp * resp.ind , na.rm=TRUE)
+
     # use maxKi here; from "design object"
     nstudl <- rep(1,nstud)
-    person$max <- rowSums( outer( nstudl , apply( resp ,2 , max , na.rm=T) ) * resp.ind )
+
+    person$max <- rowSums( outer( nstudl , apply( resp2 ,2 , max , na.rm=T) ) * resp.ind )
+		
     # calculate EAP
     # EAPs are only computed in the unidimensional case for now,
     # but can be easily adapted to the multidimensional case

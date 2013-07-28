@@ -2,7 +2,7 @@ tam.pv <-
 function( tamobj , nplausible = 10 , 
 			ntheta = 2000 , 
 			normal.approx = FALSE , 
-            samp.regr = FALSE , np.adj = 4 ){
+            samp.regr = FALSE , np.adj = 8 ){
     #####################################################
     # INPUT:
     # tamobj ... result from tam analysis
@@ -19,6 +19,7 @@ function( tamobj , nplausible = 10 ,
     ####################################################
 	# 2012-07-28:  person weights included in sampling of regression coefficients
 	require(MASS)
+# a0 <- Sys.time()	
     type <- "nonparm"		# there is no type='normal' up to now implemented
     B <- tamobj$B
     A <- tamobj$A
@@ -56,8 +57,9 @@ function( tamobj , nplausible = 10 ,
 #	if (samp.regr){
 		cat("|")
 		cat( paste( rep("*" , nplausible ) , collapse="") )
-		cat("|\n|")
+		cat("|\n|") ; flush.console()
 #				}
+# cat("start routine") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
 	###################################################
 	# routine for drawing plausible values
 	while ( pp <= NPV ){
@@ -74,19 +76,26 @@ function( tamobj , nplausible = 10 ,
 		  # adapt for multidimensional case here!!
 	      theta <- mvrnorm( ntheta , mu = mu1 , Sigma = Sigma1 )
 					}
+# cat("start prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							
  	    res <- calc_prob.v5( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , xsi=xsi , theta=theta , 
  	                         nnodes=nnodes, maxK=maxK )
 		rprobs <- res[["rprobs"]]
 		AXsi <- res[["AXsi"]]
+# cat("calc prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1			
 		# calculate student's prior distribution    	
 		gwt <- stud_prior.v2( theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
                           nnodes=nnodes , ndim=ndim )
+# cat("stud prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							  
 		# posterior distribution
 		hwt <- calc_posterior.v2( rprobs=rprobs , gwt=gwt , resp=tamobj$resp , nitems=nitems , 
 		                          resp.ind.list=tamobj$resp.ind.list , normalization=TRUE , 
 		                          thetasamp.density=NULL , snodes=0 )$hwt
         hwt1 <- hwt			
-		hwt1 <- rowcumsums( hwt1)
+# cat("posterior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							  		
+#		hwt1 <- rowcumsums( hwt1)
+# cat("rowcumsums orig") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							  				
+		hwt1 <- rowCumsums.TAM(hwt1) # include this function in later versions!!
+# cat("rowcumsums TAM") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							  		
 		if (  samp.regr ){
 			#*****
 			# no normal approximation
@@ -133,7 +142,9 @@ function( tamobj , nplausible = 10 ,
 			 if ( ( ! normal.approx ) | ndim > 1 ){
 				rn1 <- runif( nstud )
 				# Correction ARb 2013-02-11
-				ind <- rowSums( hwt1 < outer( rn1 , nthetal ) ) +1
+#				ind <- rowSums( hwt1 < outer( rn1 , nthetal ) ) +1
+				# acceleration ARb 2013-07-27
+				ind <- interval_index( hwt1 , rn1 )	
 #				ind <- rowSums( hwt1 < outer( rn1 , nthetal ) )				
 #				ind <- rowSums( hwt1 > outer( rn1 , nthetal ) ) +1
 #				ind <- rowSums( hwt1 > outer( rn1 , nthetal ) ) 				
@@ -163,7 +174,7 @@ function( tamobj , nplausible = 10 ,
 			cat("-" ) ; flush.console()
 					}
 			cat("|\n")
-	
+# cat("rest") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							  			
 	# label the pv matrix	
 	colnames(pv) <- paste("PV" , rep(1:nplausible,each=ndim) , 
 					".Dim" , rep(1:ndim,nplausible) , sep="")   

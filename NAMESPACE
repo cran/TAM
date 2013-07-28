@@ -10,7 +10,7 @@ export(designMatrices, .A.matrix, designMatrices.mfr,
        tam, tam.mml, tam.mml.2pl, tam.mml.mfr, 
        tam.se, tam.wle , .A.PCM2 , .A.PCM3 , 
        tam.threshold , tam ,
-       tam.ctt
+       tam.ctt , tam.mml.wle
        )
 
 # internal functions; not intended to be visible to users
@@ -27,3 +27,14 @@ S3method(summary, tam )
 S3method(summary, tam.mml )
 S3method( anova , tam.mml )
 S3method( anova , tam )
+
+
+S3method( plot , tam )
+S3method( plot , tam.mml )
+S3method( plot , tam.jml )
+
+
+# imports
+import(mvtnorm)
+import(tensor)
+import(sfsmisc)

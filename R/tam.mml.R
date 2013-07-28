@@ -41,7 +41,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="1PL" ,
   # display
   disp <- "....................................................\n"
 
-  progress <- nodes <- snodes <- ridge <- xsi.start0 <- QMC <- NULL
+  increment.factor <- progress <- nodes <- snodes <- ridge <- xsi.start0 <- QMC <- NULL
   maxiter <- conv <- convD <- min.variance <- max.increment <- Msteps <- convM <- NULL 
   
   # attach control elements
@@ -50,7 +50,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="1PL" ,
                convD = .001 ,conv = .0001 , convM = .0001 , Msteps = 4 ,            
                maxiter = 1000 , max.increment = 1 , 
 			   min.variance = .001 , progress = TRUE , ridge=0 ,
-			   seed = NULL , xsi.start0=FALSE)  	
+			   seed = NULL , xsi.start0=FALSE , increment.factor=1)  	
 #a0 <- Sys.time()			   
   con[ names(control) ] <- control  
   Lcon <- length(con)
@@ -297,8 +297,8 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="1PL" ,
     thetasamp.density <- NULL
   } else {
     # sampled theta values
-	if (QMC){
-		library(sfsmisc)					
+	if (QMC){	
+#		library(sfsmisc)					
 		r1 <- QUnif (n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)						
 		theta0.samp <- qnorm( r1 )
 			} else {
@@ -524,7 +524,10 @@ se.B <- 0*B
 #       a4 <- max( abs( B - oldB ))  
 #     }
 #     #---end 2PL---
-    
+
+	#***
+	# decrease increments in every iteration
+	if( increment.factor > 1){max.increment <-  1 / increment.factor^iter }    
     
     # calculate deviance
     if ( snodes == 0 ){ 
