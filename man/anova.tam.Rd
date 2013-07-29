@@ -14,6 +14,7 @@ or \code{tam.mml} using a likelihood ratio test.
 }
 \usage{
 \method{anova}{tam}(object,object1,\dots)
+
 \method{anova}{tam.mml}(object,object1,\dots)
 }
 %- maybe also 'usage' for other objects documented here.

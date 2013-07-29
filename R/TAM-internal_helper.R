@@ -19,15 +19,24 @@ rowcumsums <-
     return(g1)
   }
 
+rowCumsums.TAM <- function(matr){ 
+	.Call("rowCumsums2_source", matr , PACKAGE = "TAM")
+					}
+
+#****					
+# 'interval_index' searches an index when a frequency is exceeded
+# -> used in plausible value imputation
+interval_index <- function(matr,rn){ 
+	.Call("interval_index_C", matr , rn , PACKAGE = "TAM")
+					}					
+  
 rowMaxs <-
-  function(mat, na.rm = FALSE){
-    
+  function(mat, na.rm = FALSE){    
     # Call: from designMatrix()
     # Input: 
     # mat: numeric matrix
     # na.rm: logical. Should missing values (including NaN) be omitted from the calculations?
-    # Output: row maxima of input matrix
-    
+    # Output: row maxima of input matrix    
     n <- nrow(mat)
     p <- ncol(mat)
     x <- as.vector(mat)

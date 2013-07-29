@@ -268,10 +268,15 @@ Mstep_slope.v2 <-
           if ( ! is.null( items.conv) ){  diff[ items.conv, ] <- 0	}
           deriv <- xbar2 - xxf
           increment <- diff*abs(1/( deriv + 10^(-20) ) )        
+		  
+		  
           ci <- ceiling( abs(increment) / ( abs( old_increment[,,dd]) + 10^(-10) ) )
           increment <- ifelse( abs( increment) > abs(old_increment[,,dd])  , 
                                increment/(2*ci) , 
                                increment )	
+#          increment <- ifelse( abs( increment) > abs(old_increment[,,dd])  , 
+#                               sign(increment)*abs(old_increment[,,dd] ) , increment )	
+
 
 		  if (Biter==1){ se.B[,,dd] <- sqrt( 1 / abs( deriv )) }
         }   # end 2PL

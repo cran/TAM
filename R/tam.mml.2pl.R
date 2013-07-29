@@ -40,7 +40,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   s1 <- Sys.time()
   # display
   disp <- "....................................................\n"  
-  progress <- nodes <- snodes <- ridge <- xsi.start0 <- QMC <- NULL
+  increment.factor <- progress <- nodes <- snodes <- ridge <- xsi.start0 <- QMC <- NULL
   maxiter <- conv <- convD <- min.variance <- max.increment <- Msteps <- convM <- NULL 
   
   # attach control elements
@@ -49,7 +49,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
                convD = .001 ,conv = .0001 , convM = .0001 , Msteps = 4 ,            
                maxiter = 1000 , max.increment = 1 , 
 			   min.variance = .001 , progress = TRUE , ridge=0,seed=NULL,
-			   xsi.start0=FALSE)  	
+			   xsi.start0=FALSE , increment.factor=1)  	
   con[ names(control) ] <- control  
   Lcon <- length(con)
   con1a <- con1 <- con ; 
@@ -296,7 +296,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   } else {
     # sampled theta values
 	if (QMC){
-		library(sfsmisc)					
+#		library(sfsmisc)					
 		r1 <- QUnif (n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)						
 		theta0.samp <- qnorm( r1 )
 			} else {
@@ -432,6 +432,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
       thetabar <- hwt%*%theta
       cB_obs <- t(cResp*pweights)%*%(thetabar)
       B_obs <- aperm(array(cB_obs,dim=c(maxK, nitems,ndim)),c(2,1,3))
+	  diag(variance) <- diag(variance)+10^(-14)	  
       if ( ! est.variance ){ 
 		if ( G == 1 ){ variance <- cov2cor(variance)  } # fix variance at 1  
 		if ( G > 1 ){ variance[ group == 1 ] <- 1 }     
@@ -514,13 +515,15 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 	  B <- res$B
 	  #**SE (standard error estimate)
 	  se.B <- res$se.B
-	  
-	  
+ #	  max.increment <- max( abs( B - oldB ) )	  
 	  basispar <- res$basispar
       a4 <- max( abs( B - oldB ))  
     }
     #---end 2PL---
-    
+	
+	#***
+	# decrease increments in every iteration
+	if( increment.factor > 1){max.increment <-  1 / increment.factor^iter }
     
     # calculate deviance
     if ( snodes == 0 ){ 

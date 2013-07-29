@@ -1,11 +1,11 @@
-\name{tam}
+\name{tam.mml}
 
 \alias{tam}
 \alias{tam.mml}
 \alias{tam.mml.2pl}
 \alias{tam.mml.mfr}
-%%\alias{tam.jml}
-%%\alias{tam.jml2}
+\alias{summary.tam}
+\alias{summary.tam.mml}
 
 
 \title{
@@ -20,9 +20,12 @@ Modules for psychometric test analysis demonstrated
   models, fit statistic computation, standard error estimation, as 
   well as plausible value imputation and weighted likelihood
   estimation of ability. 
-  Wrapper and outlining methods (S3, wrapper, plot, print, summary) 
-  are still to come.
 }
+
+%  Wrapper and outlining methods (S3, wrapper, plot, print, summary) 
+%  are still to come.
+
+
 \usage{
 tam(resp , irtmodel ="1PL" , formulaA=NULL, ...)
 
@@ -46,6 +49,10 @@ tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
     variance.inits = NULL , est.variance = FALSE , formulaA=~item+item:step, 
     constraint="cases", A=NULL , B=NULL ,  B.fixed = NULL , Q=NULL , 
     facets=NULL, est.slopegroups=NULL , E = NULL , pweights = NULL , control = list())
+    
+\method{summary}{tam}(object,file=NULL,\dots)
+
+\method{summary}{tam.mml}(object,file=NULL,\dots)    
 }
 %% USAGE
 %%tam.jml(resp, group = NULL, disattenuate = FALSE, bias = TRUE, 
@@ -152,8 +159,8 @@ tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
   4th column: fixed value.
 }
   \item{Q}{
-  An optional \eqn{I \times D} matrix which specifies the loading structure
-  of items on dimensions.  
+  An optional \eqn{I \times D} matrix (the Q-matrix) which specifies the 
+  loading structure of items on dimensions.  
 }
   \item{R}{
      Not yet implemented
@@ -174,24 +181,52 @@ tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
     See Example 8.}
 \item{facets}{Data frame with facet entries (only applies to \code{tam.mml.mfr})}
   \item{control}{
-  A list of control arguments for the algorithm: \cr
+  A list of control arguments for the algorithm: \cr\cr
   \code{ list( nodes = seq(-6,6,len=21) , snodes = 0 , QMC=TRUE,}\cr
     \code{        convD = .001 ,conv = .0001 , convM = .0001 , Msteps = 4 ,   }\cr
     \code{        maxiter = 1000 , max.increment = 1 , }\cr
     \code{        min.variance = .001 , progress = TRUE , ridge=0 ,    }\cr
-    \code{        seed = NULL , xsi.start0=FALSE)  } \cr
-\code{nodes}: the discretized \eqn{\theta} nodes for numerical integration \cr
+    \code{        seed = NULL , xsi.start0=FALSE, , increment.factor=1 )  }\cr\cr
+\code{nodes}: the discretized \eqn{\theta} nodes for numerical integration 
+
 \code{snodes}: number of simulated \eqn{\theta} nodes for stochastic integration. 
     If \code{QMC=TRUE}, then quasi Monte Carlo integration (Pan & Thompson, 2007)
     is used which is a nonstochastic integration but prevents the very demanding
     numeric integration using Gaussian quadrature. If \code{QMC=FALSE},
-    then "ordinary" stochastic integration is used.\cr
-    If \code{snodes=0}, numerical integration is used. \cr
+    then "ordinary" stochastic integration is used (see the section
+    \emph{Integration} in Details).
+    If \code{snodes=0}, numerical integration is used. 
+    
+\code{convD}: Convergence criterion for deviance
+
+\code{conv}: Convergence criterion for item parameters and regression
+coefficients
+
+\code{convM}: Convergence criterion for item parameters within each
+M step
+
 \code{xsi.start0}: Should all \eqn{\xi} starting values be initially set to
-   zero? This can be especially useful in complex multifaceted designs. \cr 
+   zero? This can be especially useful in complex multifaceted designs.
+   
+\code{increment.factor}: {A value (larger than one) 
+	which defines the extent of the decrease of the maximum
+	increment of item parameters in every iteration. The maximum increment 
+	in iteration \code{iter} is defined as 
+	\code{max.increment*increment.factor^(-iter)}
+	where \code{max.increment=1}. Using a value larger than 1 helps
+        to reach convergence in some non-converging analyses (see Example 12).} 
+        
 \code{\dots}: EXPLAIN OTHER ARGUMENTS
 }
-\item{\dots}{Further arguments to be passed}
+  \item{object}{
+Object of class \code{tam} or \code{tam.mml}
+}
+\item{file}{
+A file name in which the summary output will be written
+    }
+\item{\dots}{
+	Further arguments to be passed
+	}   
 }
 
 
@@ -213,19 +248,24 @@ vector and can be written as
 \deqn{ 
         P( X_{pi} = k | \theta_p )  \propto exp( b_{ik} \theta_p + a_{ik} \xi ) 
         }
-%%% is this correct???
+The symbol \eqn{\propto } means that response probabilities are normalized such
+that \eqn{ \sum _k P( X_{pi} = k | \theta_p ) = 1 }.
+
 Item category thresholds for item \eqn{i} in category \eqn{k} 
 are written as a linear combination
 \eqn{a_i \xi} where the vector \eqn{\xi} of length \eqn{N_\xi}
-contains generalized item parameters and \eqn{A= ( a_{ik} )_{ik}} is 
+contains generalized item parameters and 
+\eqn{A= ( a_{ik} )_{ik} = ( a_i )_{i} } is 
 a three-dimensional design array (specified in \code{A}).
 
 The scoring vector \eqn{b_{ik}} contains the fixed (in \code{tam.mml})
 or estimated (in \code{tam.mml.2pl}) scores of item \eqn{i} in category \eqn{k}
 on dimension \eqn{d}.
 
-The symbol \eqn{\propto } means that response probabilities are normalized such
-that \eqn{ \sum _k P( X_{pi} = k | \theta_p ) = 1 }.
+For \code{tam.mml.2pl} and \code{irtmodel="GPCM"}, item slopes \eqn{a_i} can be
+written as a linear combination \eqn{a_i = ( E \gamma)_i } 
+of basis item slopes which is an analogue
+of the LLTM for item slopes (see Example 7; Embretson, 1999).
 
 The latent regression model regresses the latent trait \eqn{\theta_p}
 on covariates \eqn{Y} which results in
@@ -238,16 +278,25 @@ on covariates \eqn{Y} which results in
 Where \eqn{\beta} is a \eqn{N_Y} times \eqn{D} matrix of regression
 coefficients for \eqn{N_Y} covariates in \eqn{Y}.
 
-Until now, the multiple group model for groups 
-\eqn{g=1,...,G} works only in unidimensional item
+The multiple group model for groups 
+\eqn{g=1,...,G} is only implemented for unidimensional item
 response models. In this case, variance heterogeneity is allowed
 \deqn{ 
     \theta_p = Y \beta + \epsilon_p , \epsilon_p \sim N ( 0 , \sigma_g^2 )
 }{%
   \theta_p = Y \beta + \epsilon_p , \epsilon_p ~ N( 0 , \sigma_g^2 )
-    }
-
-Wrapper for \code{\link{tam.mml}}, \code{\link{tam.jml}}. 
+    }    
+    
+\bold{Integration}: Uni- and multidimensional integrals are approximated by
+posing a uni- or multivariate normality assumption. The default is Gaussian
+quadrature with nodes defined in \code{control$nodes}. For \eqn{D}-dimensional
+IRT models, the \eqn{D}-dimensional cube consisting of the vector
+\code{control$nodes} in all dimensions is used. If the user specifies 
+\code{control$snodes} with a value larger than zero, then Quasi-Monte Carlo
+integration (Pan & Thomas, 2007) with \code{control$snodes} is used
+(because \code{control$QMC = TRUE} is set by default). If 
+\code{control$QMC=FALSE} is specified, then stochastic (Monte Carlo) integration
+is employed with \code{control$snodes} stochastic nodes.
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -316,7 +365,7 @@ constraints for multifacet models}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \references{
-Adams, R. J., Wilson, M. & Wu, M. (1997).
+Adams, R. J., Wilson, M., & Wu, M. (1997).
 Multilevel item response models: An approach to errors in
 variables regression. \emph{Journal of Educational and Behavioral 
 Statistics}, \bold{22}, 47-76.
@@ -326,7 +375,10 @@ A generalized form of the Rasch model. In M. von Davier & C. H. Carstensen (Eds.
 \emph{Multivariate and mixture distribution Rasch models: Extensions and applications}
 (pp. 55-76). New York: Springer.
 
-Pan, J. & Thompson, R. (2007). Quasi-Monte Carlo estimation in
+Embretson, S. E. (1999). Generating items during testing: 
+Psychometric issues and models. \emph{Psychometrika}, \bold{64}, 407-433.
+
+Pan, J., & Thompson, R. (2007). Quasi-Monte Carlo estimation in
 generalized linear mixed models. \emph{Computational Statistics &
 Data Analysis}, \bold{51}, 5765-5775.
 }
@@ -362,9 +414,10 @@ For model comparisons see \code{\link{anova.tam}}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \examples{
-#####################################
-# Example 1: dichotomous data
+#############################################################################
+# EXAMPLE 1: dichotomous data
 # sim.rasch: 2000 persons, 40 items
+#############################################################################
 data(sim.rasch)
 
 #***
@@ -373,6 +426,7 @@ mod1 <- tam.mml(resp=sim.rasch)
 # extract item parameters
 mod1$item    # item difficulties
 
+\dontrun{
 # WLE estimation
 wle1 <- tam.wle( mod1 )
 # item fit
@@ -382,7 +436,7 @@ pv1 <- tam.pv(mod1)
 # standard errors
 se1 <- tam.se( mod1 )
 # summary
-summary(mod1)
+summary(mod1)}
 
 #***
 # 2PL model
@@ -402,13 +456,13 @@ est.slope <- rep(1,40)
 est.slope[ 11:20 ] <- 2
 est.slope[ 31:40 ] <- 3
 mod3 <- tam.mml.2pl( resp=sim.rasch , irtmodel="2PL.groups" , 
-    est.slopegroups = est.slope )
+               est.slopegroups = est.slope )
 mod3$B
 summary(mod3)
 
-###############################
-# Example 2: Unidimensional calibration with latent regressors
-#   simulated data
+#############################################################################
+# SIMULATED EXAMPLE 2: Unidimensional calibration with latent regressors
+#############################################################################
 
 # (1) simulate data
 set.seed(6778)
@@ -428,8 +482,9 @@ colnames(resp) <- paste("I" , 1:I, sep="")
 mod2_1 <- tam(resp=resp , Y=Y)
 summary(mod2_1)
 
-#################################
-# Example 3: Multiple group estimation
+#############################################################################
+# SIMULATED EXAMPLE 3: Multiple group estimation
+#############################################################################
 
 # (1) simulate data
 set.seed(6778)
@@ -445,12 +500,13 @@ group <- rep(1:2 , each=N/2 )
 mod3_1 <- tam.mml( resp ,  group = group )
 summary(mod3_1)
 
-###########################################################
-# Example 4: Multidimensional estimation
+#############################################################################
+# SIMULATED EXAMPLE 4: Multidimensional estimation
 # with two dimensional theta's - simulate some bivariate data, 
 # and regressors
 # 40 items: first 20 items load on dimension 1, 
 #           second 20 items load on dimension 2
+#############################################################################
 
 # (1) simulate some data
 set.seed(6778)
@@ -487,18 +543,18 @@ mod4_3 <- tam.mml.2pl( resp=resp , Q=Q , irtmodel="2PL" )
 
 # Rasch model with 2000 quasi monte carlo nodes and a maximum of 15 iterations
 # -> nodes are useful for more than 3 or 4 dimensions
-mod4_4 <- tam.mml( resp=resp , Q=Q , 
-        control=list(snodes=2000,maxiter=15) )
+mod4_4 <- tam.mml( resp=resp , Q=Q , control=list(snodes=2000,maxiter=15) )
 
 # Rasch model with 2000 stochastic nodes
 mod4_5 <- tam.mml( resp=resp , Q=Q , 
-        control=list(snodes=2000,QMC=FALSE,maxiter=15) )
+              control=list(snodes=2000,QMC=FALSE,maxiter=15) )
 
 # estimate two dimensional Rasch model with regressors
 mod4_6 <- tam.mml( resp=resp , Y=Y , Q=Q )
 
-#########################################################################
-# Example 5: Two dimensional estimation with within item dimensionality
+#############################################################################
+# SIMULATED EXAMPLE 5: 2-dimensional estimation with within item dimensionality
+#############################################################################
 
 # (1) simulate data
 set.seed(4762)
@@ -523,8 +579,7 @@ colnames(resp) <- paste("I" , 1:(4*I), sep="")
 Q <- cbind(c(rep(1,10),rep(0,10),rep(1,20)), c(rep(0,10),rep(1,10),rep(1,20)))
 
 # (3) model: within item dimensionality and 2PL estimation  
-mod5 <- tam.mml.2pl(resp, Q=Q, irtmodel="2PL" , 
-		control=list(maxiter=20) )
+mod5 <- tam.mml.2pl(resp, Q=Q, irtmodel="2PL" , control=list(maxiter=20) )
 summary(mod5)
 
 # item difficulties
@@ -532,8 +587,9 @@ mod5$item
 # item loadings
 mod5$B
 
-##############################################
-# Example 6: ordered data - Generalized partial credit model
+#############################################################################
+# EXAMPLE 6: ordered data - Generalized partial credit model
+#############################################################################
 data( data.gpcm )
 
 # Ex6.1: 2PL model
@@ -557,12 +613,12 @@ B.fixed[2,] <- c(3,2,1,1.4)
 
 # estimate item parameter with variance fixed (by default)
 mod6_3 <- tam.mml.2pl( resp=data.gpcm , irtmodel="2PL" , B.fixed = B.fixed , 
-            control=list( maxiter=200) )
+                 control=list( maxiter=200) )
 mod6_3$B
 
 # Ex 6.4: estimate the same model, but estimate variance
 mod6_4 <- tam.mml.2pl( resp=data.gpcm , irtmodel="2PL" , B.fixed = B.fixed , 
-            est.variance = TRUE , control=list( maxiter=350) )
+               est.variance = TRUE , control=list( maxiter=350) )
 mod6_4$B
 
 # Ex 6.5: partial credit model
@@ -574,9 +630,10 @@ A1 <- .A.PCM2( resp=data.gpcm)	# create design matrix
 mod6_6 <- tam.mml( resp=data.gpcm , A=A1 )
 summary(mod6_6)
 
-##############################
-# Example 7: design matrix for slopes for the
+#############################################################################
+# SIMULATED EXAMPLE 7: design matrix for slopes for the
 #            generalized partial credit model
+#############################################################################
 
 # (1) simulate data from a model with a design matrix
 set.seed(789)
@@ -615,22 +672,23 @@ lm( mod7$B[,2,1] ~ 0+ as.matrix(E ) )
 ##   as.matrix(E)1  as.matrix(E)2  as.matrix(E)3  as.matrix(E)4  as.matrix(E)5  
 ##          0.9904         1.1896         0.7817         0.9601         1.2132  
 
-###################################################
-# Example 8: Differential item functioning
+#############################################################################
+# EXAMPLE 8: Differential item functioning
 #  A first example of a Multifaceted Rasch Model
+#  Facet is only female; 10 items are studied
+#############################################################################
 data(data.ex08)
-# Facet is only female; 10 items are studied
 
 formulaA <- ~ item+female+item*female
 resp <- data.ex08[["resp"]]
 facets <- as.data.frame( data.ex08[["facets"]] )
 
-mod8 <- tam.mml.mfr( resp= resp , facets= facets , 
-    formulaA = formulaA )    
+mod8 <- tam.mml.mfr( resp= resp , facets= facets , formulaA = formulaA )    
 summary(mod8)          
 
-####################################################
-# Example 9: Multifaceted Rasch Model
+#############################################################################
+# EXAMPLE 9: Multifaceted Rasch Model
+#############################################################################
 data(sim.mfr) ; data(sim.facets)
 
 # two way interaction item and rater
@@ -644,10 +702,11 @@ formulaA <- ~item+item:step + female*rater + female*item*step
 mod9b <- tam.mml.mfr( resp=sim.mfr , facets=sim.facets , formulaA = formulaA )
 summary(mod9b)
 
-####################################################
-# Example 10: Model with raters.
+#############################################################################
+# EXAMPLE 10: Model with raters.
 #   Persons are arranged in multiple rows which is indicated
 #   by multiple person identifiers.
+#############################################################################
 data(data.ex10)
 dat <- data.ex10
 head(dat)
@@ -664,10 +723,62 @@ resp <- dat[ , -c(1:2) ]        # item response data
 formulaA <- ~ item * rater      # formula
 
 mod10 <- tam.mml.mfr( resp=resp , facets=facets , formulaA = formulaA , pid=dat$pid )
-summary(mod10)}
+summary(mod10)
+
+# estimate person parameter with WLE 
+wmod10 <- tam.wle( mod10 )
+
+#############################################################################
+# EXAMPLE 11: Dichotomous data with missing and omitted responses
+#############################################################################
+data(data.ex11) ; dat <- data.ex11
+
+#***
+# Model 11a: Calibration (item parameter estimating) in which omitted
+#            responses (code 9) are set to missing
+dat1 <- dat[,-1]
+dat1[ dat1 == 9 ] <- NA
+# estimate Rasch model
+mod11a <- tam.mml( resp= dat1 )
+summary(mod11a)
+# compute person parameters
+wmod11a <- tam.wle( mod11a )
+
+#***
+# Model 11b: Scaling persons (WLE estimation) setting omitted
+#            responses as incorrect and using fixed
+#            item parameters form Model 11a
+
+# set matrix with fixed item difficulties as the input
+xsi1 <- mod11a$xsi	# xsi output from Model 11a
+xsi.fixed <- cbind( seq(1,nrow(xsi1) ) , xsi1$xsi )
+# recode 9 to 0
+dat2 <- dat[,-1]
+dat2[ dat2 == 9 ] <- 0
+# run Rasch model with fixed item difficulties
+mod11b <- tam.mml( resp= dat2 , xsi.fixed=xsi.fixed )
+summary(mod11b)
+# WLE estimation
+wmod11b <- tam.wle( mod11b )
+
+#############################################################################
+# EXAMPLE 12: Avoiding nonconvergence with argument increment.factor
+#############################################################################
+dat <- data.ex12
+
+# non-convergence without increment.factor
+mod1 <- tam.mml.2pl( resp=data.ex12 , control=list( maxiter=1000) )
+
+# avoiding non-convergence with increment.factor=1.02
+mod2 <- tam.mml.2pl( resp=data.ex12 , 
+            control=list( maxiter=1000 , increment.factor=1.02) )
+summary(mod1)
+summary(mod2)
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{Marginal maximum likelihood estimation (MML)}
 %% \keyword{Joint maximum likelihood estimation (JML)}% __ONLY ONE__ keyword per line
 \keyword{Multidimensional item response model}
+\keyword{summary}

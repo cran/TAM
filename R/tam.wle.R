@@ -30,8 +30,8 @@ function( tamobj, WLE=TRUE , adj=.3 , Msteps=20 ,
   ndim <- tamobj$ndim
   maxK <- tamobj$maxK
   resp <- tamobj$resp
-  resp.ind <- tamobj$resp.ind
-  
+  resp[ is.na(resp) ] <- 0  
+  resp.ind <- tamobj$resp.ind  
   col.index <- rep( 1:nitems , each = maxK )
   cResp <- resp[ , col.index  ]*resp.ind[ , col.index ]
   cResp <- 1 * t( t(cResp) == rep(0:(maxK-1), nitems) )

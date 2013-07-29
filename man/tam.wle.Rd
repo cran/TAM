@@ -16,7 +16,9 @@ Compute weighted likelihood estimator for objects of classes \code{tam},
 
 \usage{
 tam.wle(tamobj, ...)
+
 tam.mml.wle(tamobj, WLE=TRUE, adj=0.3, Msteps=20, convM=1e-04)
+
 tam.jml.WLE(tamobj, resp, resp.ind, A, B, nstud, nitems, maxK, convM, 
     PersonScores, theta, xsi, Msteps, WLE=FALSE)
 }

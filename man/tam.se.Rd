@@ -12,6 +12,7 @@ Still to come for objects of class \code{tam.jml}.
 }
 \usage{
 tam.se(tamobj, ...)
+
 tam.mml.se(tamobj, numdiff.parm = 0.001)
 }
 

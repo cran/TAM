@@ -67,7 +67,7 @@ tam.jml2(resp, group = NULL, disattenuate = FALSE, bias = TRUE,
      abilities \eqn{\theta}.
 }
   \item{Q}{
-     A \eqn{Q} matrix which defines loadings of items on dimensions.
+     A Q-matrix which defines loadings of items on dimensions.
 }
   \item{R}{
      This argument is not yet used.
@@ -79,7 +79,7 @@ tam.jml2(resp, group = NULL, disattenuate = FALSE, bias = TRUE,
    An optional vector of person weights.
 }
   \item{control}{
-     A list of control arguments. See \code{\link{tam}}
+     A list of control arguments. See \code{\link{tam.mml}}
      for more details.
 }
 }
@@ -153,7 +153,7 @@ Chicago: MESA Press.
 
 \seealso{
 For estimating the same class of models with marginal
-maximum likelihood estimation see \code{\link{tam}}.
+maximum likelihood estimation see \code{\link{tam.mml}}.
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
