@@ -70,6 +70,13 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   resp <- as.matrix(resp)
   nullY <- is.null(Y)
   
+  # define design matrix in case of PCM2
+  if (( irtmodel=="PCM2" ) & (is.null(Q)) & ( is.null(A)) ){ 
+			A <- .A.PCM2( resp ) 
+					}  
+  
+  
+  
   nitems <- ncol(resp)       # number of items
   nstud <- nrow(resp)        # number of students
   if ( is.null( pweights) ){
@@ -100,6 +107,26 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   nnodes <- length(nodes)^ndim
   if ( snodes > 0 ){ nnodes <- snodes }
   
+  #****
+  # display number of nodes
+  if (progress ){   
+	l1 <- paste0( "    * ")
+	if (snodes==0){ l1 <- paste0(l1 , "Numerical integration with ")}
+	  else{ 
+	    if (QMC){ 
+			l1 <- paste0(l1 , "Quasi Monte Carlo integration with ")
+				} else {
+				l1 <- paste0(l1 , "Monte Carlo integration with ")					
+						}
+					}
+    cat( paste0( l1 , nnodes , " nodes\n") )
+	if (nnodes > 8000){
+		cat("      @ Are you sure that you want so many nodes?\n")
+		cat("      @ Maybe you want to use Quasi Monte Carlo integration with fewer nodes.\n")		
+				}
+			}
+	#*********  
+  
   # maximum no. of categories per item. Assuming dichotomous
   maxK <- max( resp , na.rm=TRUE ) + 1 
   
@@ -125,7 +152,9 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   
   # xsi inits
   if ( ! is.null(xsi.inits) ){
-    xsi <- xsi.inits 
+#    xsi <- xsi.inits 
+	xsi <- rep(0,np)
+	xsi[ xsi.inits[,1] ] <- xsi.inits[,2]	
   } else { xsi <- rep(0,np)   } 
   if ( ! is.null( xsi.fixed ) ){
     xsi[ xsi.fixed[,1] ] <- xsi.fixed[,2]
@@ -162,9 +191,11 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   if ( ! is.null( formulaY ) ){
     formulaY <- as.formula( formulaY )
     Y <- model.matrix( formulaY , dataY )[,-1]   # remove intercept
+	nullY <- FALSE	
   }
   
-  if ( ! is.null(Y) ){ 
+#  if ( ! is.null(Y) ){ 
+  if (! nullY){  
     Y <- as.matrix(Y)
     nreg <- ncol(Y)
     if ( is.null( colnames(Y) ) ){
@@ -202,11 +233,20 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
         beta.fixed <- rbind( beta.fixed , c( 1 , dd , 0 ) )
   }}}  
   
-  if ( ! is.null( beta.inits ) ){ 
-    beta <- beta.inits 
-  } else {
-		beta <- matrix(0, nrow = nreg+1 , ncol = ndim)        
-			}
+	#****
+	# ARb 2013-08-20: Handling of no beta constraints	
+    # ARb 2013-08-24: correction	
+	if( ! is.matrix(beta.fixed) ){
+      if ( ! is.null(beta.fixed) ){
+		if ( ! beta.fixed   ){ beta.fixed <- NULL }
+							}
+				}
+	#*****
+  
+	beta <- matrix(0, nrow = nreg+1 , ncol = ndim)  
+	if ( ! is.null( beta.inits ) ){ 
+		beta[ beta.inits[,1:2] ] <- beta.inits[,3]
+							}
  
   # define response indicator matrix for missings
   resp.ind <- 1 - is.na(resp)
@@ -277,7 +317,11 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 				(ItemMax[est.xsi.index]-ItemScore[est.xsi.index]+.5) ) )
   # starting values of zero
   if( xsi.start0 ){ xsi <- 0*xsi }				
-  if ( ! is.null(xsi.inits) ){   xsi <- xsi.inits  }
+  if ( ! is.null(xsi.inits) ){   
+#		xsi <- xsi.inits  
+		xsi[ xsi.inits[,1] ] <- xsi.inits[,2]
+print(xsi)		
+			}
   if ( ! is.null( xsi.fixed ) ){   xsi[ xsi.fixed[,1] ] <- xsi.fixed[,2] }
 
   xsi.min.deviance <- xsi
@@ -295,8 +339,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
     thetasamp.density <- NULL
   } else {
     # sampled theta values
-	if (QMC){
-#		library(sfsmisc)					
+	if (QMC){			
 		r1 <- QUnif (n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)						
 		theta0.samp <- qnorm( r1 )
 			} else {
@@ -340,7 +383,10 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   ##**SE
 	se.xsi <- 0*xsi
 	se.B <- 0*B 
-  
+
+	YSD <- max( apply( Y , 2 , sd ) )
+	if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }
+	
   		hwt.min <- 0
 		rprobs.min <- 0
 		AXsi.min <- 0
@@ -382,7 +428,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
    
     # calculate student's prior distribution
     gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
-                         nnodes=nnodes , ndim=ndim)
+                         nnodes=nnodes , ndim=ndim,YSD=YSD)
     
     # calculate student's likelihood
     res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=gwt , resp=resp , nitems=nitems , 
@@ -607,7 +653,14 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 	A1[ is.na(A) ] <- 0
 	se.xsiD <- diag( se.xsi^2 )
 	for (kk in 1:maxK){  # kk <- 1
-	se.AXsi[,kk] <- sqrt( diag( A1[,kk,] %*% se.xsiD %*% t( A1[,kk,]) ) )
+	# se.AXsi[,kk] <- sqrt( diag( A1[,kk,] %*% se.xsiD %*% t( A1[,kk,]) ) )
+	#**** bugfix
+		A1_kk <- A1[,kk,]
+		if ( is.vector(A1_kk) ){
+			A1_kk <- matrix( A1_kk , nrow=1 , ncol=length(A1_kk) )
+						}
+		se.AXsi[,kk] <- sqrt( diag( A1_kk %*% se.xsiD %*% t( A1_kk ) ) )	
+	#****		
 			}
 			
 	##*** Information criteria

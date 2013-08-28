@@ -1,8 +1,8 @@
 Package: TAM
 Type: Package
 Title: Test Analysis Modules
-Version: 0.5-21
-Date: 2013-07-28
+Version: 0.6-26
+Date: 2013-08-28
 Author: Thomas Kiefer, Alexander Robitzsch, Margaret Wu
 Maintainer: Alexander Robitzsch <a.robitzsch@bifie.at>
 Authors@R: c(person("Thomas", "Kiefer", role = c("aut", "cre"), email =
@@ -18,12 +18,13 @@ Description:
   estimation of ability. 
 Depends: R (>= 2.15.1), MASS
 Imports: mvtnorm, tensor, sfsmisc
+Suggests: sirt, CDM
 LinkingTo: Rcpp, RcppArmadillo
 LazyLoad: yes
 LazyData: yes
 License: GPL (>= 2)
 URL: https://sites.google.com/site/irttam1/
-Packaged: 2013-07-28 17:19:55 UTC; robitzsch
+Packaged: 2013-08-28 13:16:56 UTC; robitzsch
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2013-07-29 01:14:02
+Date/Publication: 2013-08-28 16:41:49

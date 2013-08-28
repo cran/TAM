@@ -43,7 +43,14 @@ function( tamobj , numdiff.parm = .001){
     # create result object for item parameters
     se.xsi <- rep( 0 , ip )
     cat("Item parameters\n|")
-	cat(paste( rep("*" , ip) , collapse=""))
+	VP <- min( ip, 10 )
+	cat(paste( rep("*" , VP) , collapse=""))
+	if (VP<10){ disp_progress <- 1:ip } else {
+		disp_progress <- 100* ( 1:ip ) / (ip+1)
+		disp_progress <- sapply( seq(5,95,10) , FUN = function(pp){ # pp <- 5
+				which.min( abs( disp_progress - pp ) )[1] }
+							)
+							}
 	cat("|\n|")    
     # compute likelihood
     # prior distribution for each student (normal density)
@@ -51,6 +58,7 @@ function( tamobj , numdiff.parm = .001){
                           nstud=nstud , nnodes=nnodes , ndim=ndim )
 				  						  
 	ll <- matrix( 0 , nrow=nstud , ncol=3 )	
+	vv <- 1
     for (pp in 1:ip){
         # pp <- 10  # parameter pp
 		if (pp == 1){ vec <- 1:3 } else { vec <- 2:3 }
@@ -72,8 +80,11 @@ function( tamobj , numdiff.parm = .001){
 			ll[,mm] <- log( rowSums( res0b * thetawidth ) )
 				}
 			se.xsi[pp] <- sqrt( - 1 / sum( tamobj$pweights * ( ll[,2] + ll[,3] - 2*ll[,1] )/h^2 ) )
-            cat("-") ; 
-			flush.console()
+            if ( ( pp==disp_progress[vv] ) & ( vv <=10) ){
+				cat("-") ; 
+				flush.console() 
+				vv <- vv+1
+				}
 			}
 	cat("|\n")	
 	##############################################
@@ -83,8 +94,20 @@ function( tamobj , numdiff.parm = .001){
     se.beta <- 0*beta
 	nreg <- nrow(beta)
     cat("Regression parameters\n|")
-	cat(paste( rep("*" , nreg*ndim) , collapse=""))
+#	cat(paste( rep("*" , nreg*ndim) , collapse=""))
+    ip <- nreg*ndim
+	VP <- min( ip, 10 )
+	cat(paste( rep("*" , VP) , collapse=""))
+	if (VP<10){ disp_progress <- 1:ip } else {
+		disp_progress <- 100* ( 1:ip ) / (ip+1)
+		disp_progress <- sapply( seq(5,95,10) , FUN = function(pp){ # pp <- 5
+				which.min( abs( disp_progress - pp ) )[1] }
+							)
+							}
+
 	cat("|\n|")    
+	vv <- 1
+	pp1 <- 1
 	# compute response probabilities
     for (pp in 1:nreg){
 	for (dd in 1:ndim){	
@@ -108,8 +131,12 @@ function( tamobj , numdiff.parm = .001){
 			ll[,mm] <- log( rowSums( res0b *thetawidth ) )
 						}
 			se.beta[pp,dd] <- sqrt( - 1 / sum( tamobj$pweights * ( ll[,2] + ll[,3] - 2*ll[,1] )/h^2 ) )
-			cat("-") ; 
-			flush.console()
+            if ( ( pp1==disp_progress[vv] ) & ( vv <=10) ){
+				cat("-") ; 
+				flush.console() 
+				vv <- vv+1
+				}
+			pp1 <- pp1+1 ;
 				} }
 	#-----------------------------------------------------------
 	# handle fixed parameters
@@ -122,8 +149,16 @@ function( tamobj , numdiff.parm = .001){
 	
 	#-----------------------------------------------------------
 	cat("|\n")	
-    xsi <- data.frame( tamobj$item[,1:2] , 
+    #***
+	# ARb 2013-08-19: big fix for faceted models
+	N1 <- nrow(tamobj$item)
+	if (N1 != length(xsi) ){
+	    xsi <- data.frame( "item" = rownames(tamobj$xsi) , "N"=NA ,
+					"est" = xsi , "se" = se.xsi )
+				} else {
+		xsi <- data.frame( tamobj$item[,1:2] , 
 					"est" = xsi , "se" = se.xsi )		
+						}
 	beta <- data.frame( "beta" = beta , "se" = se.beta )
 	colnames(beta) <- c( paste("est.Dim" , 1:ndim , sep="")	, paste("se.Dim" , 1:ndim , sep="")	)
     flush.console()

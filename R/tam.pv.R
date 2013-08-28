@@ -18,7 +18,6 @@ function( tamobj , nplausible = 10 ,
 	#					approximation of the posterior
     ####################################################
 	# 2012-07-28:  person weights included in sampling of regression coefficients
-	require(MASS)
 # a0 <- Sys.time()	
     type <- "nonparm"		# there is no type='normal' up to now implemented
     B <- tamobj$B

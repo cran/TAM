@@ -82,8 +82,10 @@ tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
 }
   \item{irtmodel}{
      For fixed item slopes (in \code{tam.mml}) 
-     options include \code{PCM} (partial credit model)
-     and \code{RSM} (not yet implemented). \cr
+     options include \code{PCM} (partial credit model), \code{PCM2} 
+     (partial credit model with ConQuest parametrization 
+     \code{'item+item*step'} and \code{RSM} (rating scale model; 
+     the ConQuest parametrization \code{'item+step'}). \cr
      For estimated item slopes (in \code{tam.mml.2pl})
      options are \code{2PL} (all slopes of item categories
      are estimated), \code{GPCM} (generalized partial credit
@@ -120,7 +122,9 @@ tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
   \item{beta.fixed}{
      A matrix with two columns for fixing regression coefficients.
      1st column: Index of \eqn{Y} value, 2nd column: dimension,
-     3rd column: fixed \eqn{\beta} value
+     3rd column: fixed \eqn{\beta} value. \cr
+     If no constraints should be inposed on \eqn{\beta}, then
+     set \code{beta.fixed=FALSE} (see Example 2, Model \code{2_4}).
 }
   \item{beta.inits}{
      A matrix with initial \eqn{\beta} values
@@ -393,10 +397,10 @@ is recommended. Choose in \code{control} a value of \code{snodes} (say, larger t
 See Pan and Thompson (2007) for more details.
 }
 
-\section{Warning}{
-Be cautious when using the number of estimated parameters in \code{ic}.
-Extensive checking of errors has not be done yet.
-}
+%\section{Warning}{
+%Be cautious when using the number of estimated parameters in \code{ic}.
+%Extensive checking of errors has not be done yet.
+%}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
@@ -436,7 +440,22 @@ pv1 <- tam.pv(mod1)
 # standard errors
 se1 <- tam.se( mod1 )
 # summary
-summary(mod1)}
+summary(mod1)
+
+#***
+# Rasch model with fixed item difficulties from 'mod1'
+xsi0 <- mod1$xsi$xsi
+xsi.fixed <- cbind( 1:(length(xsi0)) , xsi0 )   
+        # define vector with fixed item difficulties
+mod1a <- tam.mml( resp=sim.rasch , xsi.fixed=xsi.fixed )
+summary(mod1a)
+
+# Rasch model with initial xsi parameters for items 2 (item difficulty
+# b=-1.8), 4 (b=-1.6) and 40 (b=2)
+xsi.inits <- cbind( c(2,4,40) , c(-1.8,-1.6,2))
+mod1b <- tam.mml( resp=sim.rasch , xsi.inits=xsi.inits )
+}
+
 
 #***
 # 2PL model
@@ -447,6 +466,16 @@ mod2$xsi    # item difficulties
 mod2$B      # item slopes
 
 \dontrun{
+# 2PL with fixed item difficulties and slopes from 'mod2'
+xsi0 <- mod2$xsi$xsi
+xsi.fixed <- cbind( 1:(length(xsi0)) , xsi0 )   
+        # define vector with fixed item difficulties
+mod2a <- tam.mml( resp=sim.rasch , xsi.fixed=xsi.fixed ,
+        B = mod2$B # fix slopes
+            )
+summary(mod2a)
+mod2a$B     # inspect used slope matrix
+
 #****
 # constrained 2PL estimation
 # estimate item parameters in different slope groups
@@ -481,6 +510,28 @@ colnames(resp) <- paste("I" , 1:I, sep="")
 # (2) estimate model
 mod2_1 <- tam(resp=resp , Y=Y)
 summary(mod2_1)
+
+# (3) setting initial values for beta coefficients
+#   beta_2 = .20 , beta_3 = .35 for dimension 1
+beta.inits <- cbind( c(2,3) , 1 , c(.2, .35 ) )
+mod2_2 <- tam(resp=resp , Y=Y , beta.inits=beta.inits)
+
+# (4) fix intercept to zero and third coefficient to .3
+beta.inits <- cbind( c(1,3) , 1 , c(0, .3 ) )
+mod2_3 <- tam(resp=resp , Y=Y , beta.fixed=beta.fixed )
+
+# (5) same model but with R regression formula
+dataY <- data.frame(Y)
+colnames(dataY) <- c("Y1","Y2")
+mod2_4 <- tam(resp=resp , dataY=dataY , formulaY = ~ Y1+Y2 )
+summary(mod2_4)
+
+# (6) model with interaction of regressors
+mod2_5 <- tam(resp=resp , dataY=dataY , formulaY = ~ Y1*Y2 )
+summary(mod2_5)
+
+# (7) no constraint on regressors (removing constraint from intercept)
+mod2_6 <- tam(resp=resp , Y=Y , beta.fixed=FALSE )
 
 #############################################################################
 # SIMULATED EXAMPLE 3: Multiple group estimation
@@ -555,7 +606,7 @@ mod4_6 <- tam.mml( resp=resp , Y=Y , Q=Q )
 #############################################################################
 # SIMULATED EXAMPLE 5: 2-dimensional estimation with within item dimensionality
 #############################################################################
-
+library(mvtnorm)
 # (1) simulate data
 set.seed(4762)
 N <- 2000 # 2000 persons
@@ -625,10 +676,13 @@ mod6_4$B
 mod6_5 <- tam.mml( resp=data.gpcm ,control=list( maxiter=200) )
 mod6_5$B
 
-# Ex 6.6: partial credit model with Conquest parametrization
-A1 <- .A.PCM2( resp=data.gpcm)	# create design matrix
-mod6_6 <- tam.mml( resp=data.gpcm , A=A1 )
+# Ex 6.6: partial credit model: Conquest parametrization 'item+item*step'
+mod6_6 <- tam.mml( resp=data.gpcm , irtmodel="PCM2" )
 summary(mod6_6)
+
+# Ex 6.7: Rating scale model: Conquest parametrization 'item+step'
+mod6_7 <- tam.mml( resp=data.gpcm , irtmodel="RSM" )
+summary(mod6_7)
 
 #############################################################################
 # SIMULATED EXAMPLE 7: design matrix for slopes for the
@@ -651,7 +705,7 @@ E
 # true basis slope parameters
 lambda <- c( 1 , 1.2 , 0.8 , 1 , 1.1 )
 # calculate item slopes
-a <- apply( E , 1 , FUN=function(ll){ sum(ll*lambda) } )
+a <- E \%*\% lambda
 
 N <- 4000
 theta <- rnorm( N )
@@ -762,8 +816,9 @@ summary(mod11b)
 wmod11b <- tam.wle( mod11b )
 
 #############################################################################
-# EXAMPLE 12: Avoiding nonconvergence with argument increment.factor
+# EXAMPLE 12: Avoiding nonconvergence using the argument increment.factor
 #############################################################################
+data(data.ex12)
 dat <- data.ex12
 
 # non-convergence without increment.factor
@@ -774,6 +829,65 @@ mod2 <- tam.mml.2pl( resp=data.ex12 ,
             control=list( maxiter=1000 , increment.factor=1.02) )
 summary(mod1)
 summary(mod2)
+
+#############################################################################
+# EXAMPLE 13: Longitudinal data 'data.long' from sirt package
+#############################################################################
+
+data(data.long, package="sirt")
+dat <- data.long
+##   > colnames(dat)
+##    [1] "idstud" "I1T1"   "I2T1"   "I3T1"   "I4T1"   "I5T1"   "I6T1"  
+##    [8] "I3T2"   "I4T2"   "I5T2"   "I6T2"   "I7T2"   "I8T2"  
+
+## item 1 to 6 administered at T1 and items 3 to 8 at T2
+## items 3 to 6 are anchor items
+
+#***
+# Model 1: 2-dimensional Rasch model
+
+# define matrix loadings
+Q <- matrix(0,12,2)
+colnames(Q) <- c("T1","T2")
+Q[1:6,1] <- 1       # items at T1
+Q[7:12,2] <- 1      # items at T2
+
+# assume equal item difficulty of I3T1 and I3T2, I4T1 and I4T2, ...
+# create draft design matrix and modify it
+A <- designMatrices(resp=data.long[,-1])$A
+dimnames(A)[[1]] <- colnames(data.long)[-1]
+##   > str(A)
+##    num [1:12, 1:2, 1:12] 0 0 0 0 0 0 0 0 0 0 ...
+##    - attr(*, "dimnames")=List of 3
+##     ..$ : chr [1:12] "Item01" "Item02" "Item03" "Item04" ...
+##     ..$ : chr [1:2] "Category0" "Category1"
+##     ..$ : chr [1:12] "I1T1" "I2T1" "I3T1" "I4T1" ...
+A1 <- A[  ,  , c(1:6 , 11:12 ) ]
+A1[7,2,3] <- -1     # difficulty(I3T1) = difficulty(I3T2)
+A1[8,2,4] <- -1     # I4T1 = I4T2
+A1[9,2,5] <- A1[10,2,6] <- -1
+dimnames(A1)[[3]] <- substring( dimnames(A1)[[3]],1,2)
+##   > A1[,2,]
+##        I1 I2 I3 I4 I5 I6 I7 I8
+##   I1T1 -1  0  0  0  0  0  0  0
+##   I2T1  0 -1  0  0  0  0  0  0
+##   I3T1  0  0 -1  0  0  0  0  0
+##   I4T1  0  0  0 -1  0  0  0  0
+##   I5T1  0  0  0  0 -1  0  0  0
+##   I6T1  0  0  0  0  0 -1  0  0
+##   I3T2  0  0 -1  0  0  0  0  0
+##   I4T2  0  0  0 -1  0  0  0  0
+##   I5T2  0  0  0  0 -1  0  0  0
+##   I6T2  0  0  0  0  0 -1  0  0
+##   I7T2  0  0  0  0  0  0 -1  0
+##   I8T2  0  0  0  0  0  0  0 -1
+
+# estimate model
+# set intercept of second dimension (T2) to zero
+beta.fixed <- cbind( 1 , 2 , 0 )
+mod1 <- tam.mml( resp=data.long[,-1] , Q=Q , A=A1 , 
+        beta.fixed=beta.fixed)
+summary(mod1)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

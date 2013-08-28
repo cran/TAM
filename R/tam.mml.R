@@ -68,7 +68,10 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="1PL" ,
     con1a$QMC <- QMC <- FALSE
 	con1a$snodes <- snodes <- 0
 					}
- 
+  # define design matrix in case of PCM2
+  if (( irtmodel=="PCM2" ) & (is.null(Q)) & ( is.null(A)) ){ 
+			A <- .A.PCM2( resp ) 
+					}  
   
   
   if ( !is.null(con$seed)){ set.seed( con$seed )	 }
@@ -108,11 +111,33 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="1PL" ,
   nnodes <- length(nodes)^ndim
   if ( snodes > 0 ){ nnodes <- snodes }
   
+  #****
+  # display number of nodes
+  if (progress ){   
+	l1 <- paste0( "    * ")
+	if (snodes==0){ l1 <- paste0(l1 , "Numerical integration with ")}
+	  else{ 
+	    if (QMC){ 
+			l1 <- paste0(l1 , "Quasi Monte Carlo integration with ")
+				} else {
+				l1 <- paste0(l1 , "Monte Carlo integration with ")					
+						}
+					}
+    cat( paste0( l1 , nnodes , " nodes\n") )
+	if (nnodes > 8000){
+		cat("      @ Are you sure that you want so many nodes?\n")
+		cat("      @ Maybe you want to use Quasi Monte Carlo integration with fewer nodes.\n")		
+				}
+			}
+	#*********
+  
   # maximum no. of categories per item. Assuming dichotomous
   maxK <- max( resp , na.rm=TRUE ) + 1 
 
   # create design matrices
-  design <- designMatrices( modeltype="PCM" , maxKi=NULL , resp=resp , 
+  modeltype <- "PCM"
+  if (irtmodel=="RSM"){  modeltype <- "RSM" }
+  design <- designMatrices( modeltype= modeltype , maxKi=NULL , resp=resp , 
                             A=A , B=B , Q=Q , R=R, ndim=ndim )
   A <- design$A
   B <- design$B
@@ -132,8 +157,12 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="1PL" ,
   np <- dim(A)[[3]]
   # xsi inits
   if ( ! is.null(xsi.inits) ){
-    xsi <- xsi.inits 
+#    xsi <- xsi.inits 
+    xsi <- rep(0,np)
+	xsi[ xsi.inits[,1] ] <- xsi.inits[,2]	
   } else { xsi <- rep(0,np)   } 
+  
+  
   if ( ! is.null( xsi.fixed ) ){
     xsi[ xsi.fixed[,1] ] <- xsi.fixed[,2]
     est.xsi.index <- setdiff( 1:np , xsi.fixed[,1] )
@@ -167,9 +196,12 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="1PL" ,
   if ( ! is.null( formulaY ) ){
     formulaY <- as.formula( formulaY )
     Y <- model.matrix( formulaY , dataY )[,-1]   # remove intercept
+	nullY <- FALSE
   }
   
-  if ( ! is.null(Y) ){ 
+
+#  if ( ! is.null(Y) ){ 
+if (! nullY){
     Y <- as.matrix(Y)
     nreg <- ncol(Y)
     if ( is.null( colnames(Y) ) ){
@@ -180,7 +212,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="1PL" ,
 		colnames(Y)[1] <- "Intercept"
 					}
 		} else 
-			{ 
+			{
     Y <- matrix( 1 , nrow=nstud , ncol=1 ) 
     nreg <- 0
 	}
@@ -191,27 +223,39 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="1PL" ,
 		nreg <- G - 1
 			}
 
-	
-			
   W <- t(Y * pweights) %*% Y
   if (ridge > 0){ diag(W) <- diag(W) + ridge }
   YYinv <- solve( W )
   
-
- 
   #initialise regressors
   if ( is.null(beta.fixed) & (  is.null(xsi.fixed) ) ){
     beta.fixed <- matrix( c(1,1,0) , nrow= 1) 
-    if ( ndim > 1){ 
+    if (  ndim > 1){ 
       for ( dd in 2:ndim){
         beta.fixed <- rbind( beta.fixed , c( 1 , dd , 0 ) )
-  }}}  
-  
-  if ( ! is.null( beta.inits ) ){ 
-    beta <- beta.inits 
-  } else {
-		beta <- matrix(0, nrow = nreg+1 , ncol = ndim)        
-			}
+			}}}
+
+	#****
+	# ARb 2013-08-20: Handling of no beta constraints	
+    # ARb 2013-08-24: correction	
+	if( ! is.matrix(beta.fixed) ){
+      if ( ! is.null(beta.fixed) ){
+		if ( ! beta.fixed   ){ beta.fixed <- NULL }
+							}
+				}
+    #****
+	
+	beta <- matrix(0, nrow = nreg+1 , ncol = ndim)  
+	if ( ! is.null( beta.inits ) ){ 
+		beta[ beta.inits[,1:2] ] <- beta.inits[,3]
+							}	
+#	if ( ! is.null( beta.inits ) ){ 
+#		beta <- beta.inits 
+#  } else {
+#		beta <- matrix(0, nrow = nreg+1 , ncol = ndim)        
+#			}
+
+			
   # define response indicator matrix for missings
   resp.ind <- 1 - is.na(resp)
   nomiss <- sum( is.na(resp) ) == 0
@@ -277,7 +321,10 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="1PL" ,
 	if( xsi.start0 ){ xsi <- 0*xsi }
 				
   #log of odds ratio of raw scores  
-  if ( ! is.null(xsi.inits) ){   xsi <- xsi.inits  }
+  if ( ! is.null(xsi.inits) ){   
+#		xsi <- xsi.inits  
+			xsi[ xsi.inits[,1] ] <- xsi.inits[,2]
+				}
   if ( ! is.null( xsi.fixed ) ){   xsi[ xsi.fixed[,1] ] <- xsi.fixed[,2] }
 
   xsi.min.deviance <- xsi
@@ -297,8 +344,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="1PL" ,
     thetasamp.density <- NULL
   } else {
     # sampled theta values
-	if (QMC){	
-#		library(sfsmisc)					
+	if (QMC){						
 		r1 <- QUnif (n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)						
 		theta0.samp <- qnorm( r1 )
 			} else {
@@ -345,6 +391,9 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="1PL" ,
 se.xsi <- 0*xsi
 se.B <- 0*B
 
+	YSD <- max( apply( Y , 2 , sd ) )
+	if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }
+
   # define progress bar for M step
   mpr <- round( seq( 1 , np , len = 10 ) )
   
@@ -386,7 +435,7 @@ se.B <- 0*B
 	
     # calculate student's prior distribution
     gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
-                         nnodes=nnodes , ndim=ndim)
+                         nnodes=nnodes , ndim=ndim,YSD=YSD)
 
 # cat("stud_prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						 
     # calculate student's likelihood
@@ -594,11 +643,12 @@ se.B <- 0*B
     }
 
 # cat("rest") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
-# stop("here") 
+
 	
 	
 	} # end of EM loop
   #******************************************************
+# stop("here")   
   		xsi.min.deviance -> xsi 
 		beta.min.deviance -> beta
 		variance.min.deviance -> variance	
@@ -620,8 +670,19 @@ se.B <- 0*B
 	A1 <- A
 	A1[ is.na(A) ] <- 0
 	se.xsiD <- diag( se.xsi^2 )
+	#*******
+	# A1 [ items ,categs , params ]  -> xsi design matrix
+	# se.xsiD  [ params , params ]
+	#@@ ARb 2013-08-27: Correction in case of one item
 	for (kk in 1:maxK){  # kk <- 1
-	se.AXsi[,kk] <- sqrt( diag( A1[,kk,] %*% se.xsiD %*% t( A1[,kk,]) ) )
+#	se.AXsi[,kk] <- sqrt( diag( A1[,kk,] %*% se.xsiD %*% t( A1[,kk,]) ) )
+	#**** bugfix
+		A1_kk <- A1[,kk,]
+		if ( is.vector(A1_kk) ){
+			A1_kk <- matrix( A1_kk , nrow=1 , ncol=length(A1_kk) )
+						}
+		se.AXsi[,kk] <- sqrt( diag( A1_kk %*% se.xsiD %*% t( A1_kk ) ) )	
+	#****	
 			}
 # cat("se.axsi") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
 			

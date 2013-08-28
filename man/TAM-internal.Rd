@@ -34,7 +34,7 @@ calc_posterior.v2(rprobs, gwt, resp, nitems, resp.ind.list,
     normalization = TRUE, thetasamp.density = NULL, snodes = 0, resp.ind=NULL)
 calc_prob.v5(iIndex, A, AXsi, B, xsi, theta, nnodes, maxK, 
     recalc = TRUE)
-stud_prior.v2(theta, Y, beta, variance, nstud, nnodes, ndim)
+stud_prior.v2(theta, Y, beta, variance, nstud, nnodes, ndim, YSD)
 tam.jml.xsi(resp, resp.ind, A, B, nstud, nitems, maxK, convM, 
     ItemScore, theta, xsi, Msteps, pweightsM, est.xsi.index)
 tam.jml.xsi2(resp, resp.ind, A, A.0, B, nstud, nitems, maxK, convM, 

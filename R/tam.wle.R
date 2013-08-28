@@ -190,12 +190,14 @@ function( tamobj, WLE=TRUE , adj=.3 , Msteps=20 ,
 				"N.items" = rowSums(resp.ind) , 
 				"PersonScores" = PersonScores, 
 				"PersonMax" = PersonMax, "theta" = theta , error )
+						
   if (ndim==1){ colnames(res)[4:5] <- c("PersonMax" , "theta") }
-  if (ndim>1){ 
-	colnames(res)[ 1:ndim + 1] <- 
+  if (ndim>1){  
+	colnames(res)[ 1:ndim + 2] <- 
 		paste0("PersonScores.Dim" , substring( 100+1:ndim , 2) )	
+	ind <- grep( "theta" , colnames(res) )	
+	colnames(res)[ind] <- 	paste0("theta.Dim" , substring( 100+1:ndim , 2) )	
 		}
-  
   	#***
 	# WLE reliability
 	if ( ndim==1 ){
@@ -214,7 +216,7 @@ function( tamobj, WLE=TRUE , adj=.3 , Msteps=20 ,
 		v2 <- mean( res[,paste0("error.Dim" , substring( 100+1:ndim , 2))[dd] ]^2 )
 #		v2 <- mean( error^2 )
 		res[ ,paste0("WLE.rel.Dim" , substring( 100+ dd , 2)) ]	<- h1 <- 1 - v2 / v1
-	  cat("WLE Reliability (Dimension" , dd , ") =" , round(h1,3) ,"\n" )
+	  cat(paste0("WLE Reliability (Dimension" , dd , ") = " , round(h1,3) ) , "\n" )
 #	  res$WLE.rel <- rep( WLE.rel , nrow(res) )
 					}
 				}
