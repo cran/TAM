@@ -76,7 +76,7 @@ For \code{tam.wle.mml} it is a data frame with following columns:
 \item{PersonMax}{Maximum score of each person}
 \item{theta}{Weighted likelihood estimate (WLE) or MLE}
 \item{error}{Standard error of the WLE or MLE}
-\item{WLE.rel}{WLE reliability (same value for all persons)}
+\item{WLE.rel}{WLE reliability (same value for all persons)} \cr
 
 For \code{tam.jml.WLE} it is a list with following entries:
 \item{theta}{Weighted likelihood estimate (WLE) or MLE}

@@ -1,9 +1,38 @@
 *******************************************************
-CHANGES IN TAM PACKAGE VERSIONS
+***       CHANGES IN TAM PACKAGE VERSIONS           ***
 *******************************************************
 
-----
+-------------------------------------------------------
+Changes in Versions 0.6 (2013-08-28)
+-------------------------------------------------------
+
+x fixed a bug when in latent regression when providing a formula
+  in argument 'formulaY'
+x fixed a bug in output of tam.se (thanks to Sebastian Weirich)
+x included a faster alternative to tam.ctt -> tam.ctt2 is based
+  on a Rcpp function
+x allowed freeing beta constraints by the user by including
+  the possible argument beta.fixed=FALSE
+x removed a bug in data processing for faceted designs
+  (thanks to Michaela Mayr)
+x fixed a bug with varying string lengths of facet levels
+x fixed a bug in tam.ctt2 for numeric input matrices
+x fixed incorrect handling of constraints in regression coefficients
+  which was just included in a recent 0.6 version
+x fixed an output bug in tam.wle in multidimensional models
+  (thanks to Jan Henning-Kahmann)
+x accelerated estimation of multdimensional models (different
+  approach of calculating the prior distribution)
+x fixed a bug when submitting xsi.inits and beta.inits to tam
+x fixed a bug in facet models when a facet contains only one
+  element (twice thanks to Michaela Mayr)
+x included irtmodel='PCM2' (partial credit model with ConQuest
+  parametrization) and irtmodel='RSM' (rating scale model)
+x added a longitudinal data example in 'tam.mml' manual
+
+-------------------------------------------------------
 Changes in Versions 0.5 (2013-07-28)
+-------------------------------------------------------
 
 x included data.ex11 example dataset
 x removed a bug in WLE calculation for multifaceted designs
@@ -19,8 +48,9 @@ x included S3 plot method
 x included data.numeracy and data.timssAusTwn
   datasets
 
-----
+-------------------------------------------------------
 Changes in Versions 0.4 (2013-07-01)
+-------------------------------------------------------
 
 x included quasi-Monte Carlo integration as an alternative
   to stochastic integration
@@ -40,8 +70,9 @@ x included a function tam.ctt for calculating some statistics
 x fixed a bug in tam.mml.2pl with irtmodel="GPCM" for models
    with differering numbers of item categories
 
-----
+-------------------------------------------------------
 Changes in Versions 0.3 (2013-03-23)
+-------------------------------------------------------
 
 x cleaned Rd manual files a bit
 x included standard errors in tam.mml and tam.mml.2pl
@@ -51,8 +82,9 @@ x fixed a bug in multiple group estimation during tam.mml and
    summary application
 x fixed a bug in WLE estimation in the multdimensional case
 
-----
+-------------------------------------------------------
 Changes in Versions 0.2 (2013-02-20)
+-------------------------------------------------------
 
 x removed bugs in tam.pv for sampling plausible values
   with the argument normal.approx=FALSE 
@@ -67,8 +99,9 @@ x fixed a bug in the calculation of reliability and person
 x use estimated parameters with minimal deviance in the output
   (thanks to Ulrich Schroeders and Steffen Brandt)
 
------
+-------------------------------------------------------
 Changes in Version 0.1-03 (2012-11-21)
+-------------------------------------------------------
 
  x 2PL calibration outsourced
  x designMatrices and tam.mml.mfr method for multifacet rasch model 

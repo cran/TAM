@@ -104,7 +104,7 @@ calc_prob.v5 <-
 
 stud_prior.v2 <-
   function(theta , Y , beta , variance , nstud , 
-           nnodes , ndim){
+           nnodes , ndim , YSD ){
     if(ndim == 1) {
       ##################################
       # SINGLE DIMENSION
@@ -120,22 +120,46 @@ stud_prior.v2 <-
       varInverse <- solve(variance)
       coeff <- 1/sqrt( (2*pi)^ndim * det(variance) ) 
       gwt <- matrix( 0 , nrow=nstud , ncol=nnodes )  
-      #	mu.L <- mu[ rep(1:nstud , nnodes ) , ] 
-      #	theta.L <- theta[ rep( 1:nnodes , each=nstud ) , ]
-      #	x1 <- -mu.L + theta.L
-      #	x <- matrix( rowSums( ( x1 %*% varInverse ) * x1 ) , ncol=1 )
-      #	gwt <- matrix( coeff*exp(-0.5*x) , nrow=nstud , ncol=nnodes )
-      #... TK: take a look at that..
-      # Surprisingly, the "long code" is faster than the short one
-      for ( qq in 1:nnodes ) {
-        x1 <- - mu + theta[rep(qq,nstud),]  #x has dimension nstud#  
-        x <- matrix( rowSums( (x1%*%varInverse) * x1 ) , ncol= 1)
-        gwt[,qq] <- coeff*exp(-0.5*x) 
-      }   
+      ###*****
+	  ### ARb 2013-08-27
+	  ### different calculations depend if there are
+	  ### person-specific predictors or not  
+ a0 <- Sys.time()
+##      for ( qq in 1:nnodes ) {
+##        x1 <- - mu + theta[rep(qq,nstud),]  #x has dimension nstud#
+##        x <- matrix( rowSums( (x1%*%varInverse) * x1 ) , ncol= 1)
+##        gwt[,qq] <- coeff*exp(-0.5*x) 		
+##					}
+#  cat(" * prior Ysd") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
+    if ( YSD ){
+		gwt <- prior.normal.density.R( theta_=theta , mu_=mu , 
+			     varInverse_=varInverse ,  coeff_=coeff) 
+			   }	
+#  cat(" * prior nnodes2") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						
+    if ( ! YSD){
+		gwt <- prior.normal.densityALL.R( theta_=theta , mu_=mu , 
+			     varInverse_=varInverse ,  coeff_=coeff) 
+		gwt <- matrix( gwt , nrow=nstud , ncol=nnodes , byrow=TRUE )
+				}
+#  cat(" * prior nnodes3") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						
     }
     return(gwt)
   }
+#*************************
+# auxiliary functions for calculation of prior functions  
+prior.normal.density.R <- 
+function( theta_ , mu_ , varInverse_ , coeff_){
+	.Call("prior_normal_density_C",  theta_ , mu_ , 
+			varInverse_ , coeff_ , PACKAGE = "TAM")
+} 
 
+prior.normal.densityALL.R <- 
+function( theta_ , mu_ , varInverse_ , coeff_){
+	.Call("prior_normal_densityALL_C",  theta_ , mu_ , 
+		varInverse_  , coeff_ , PACKAGE = "TAM")
+} 
+  
+###########################################################################  
 tam.jml.xsi <-
   function ( resp , resp.ind, A, B, nstud, nitems, maxK, convM, 
              ItemScore, theta, xsi, Msteps, pweightsM,

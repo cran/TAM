@@ -36,7 +36,8 @@ tam.mml.mfr <-
     #                   maxiter = 1000 , progress = TRUE) 
     # progress ... if TRUE, then display progress
     #-------------------------------------
-    
+
+a0 <- Sys.time()    
     s1 <- Sys.time()
     # display
     disp <- "....................................................\n"
@@ -71,11 +72,15 @@ tam.mml.mfr <-
     resp <- as.matrix(resp)
     nullY <- is.null(Y)
 
+	if ( ! is.null(facets) ){ facets <- as.data.frame(facets) }
+	
 # cat("read data" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
     # create design matrices
     design <- designMatrices.mfr(resp, formulaA=formulaA, facets=facets,  
                                  constraint=constraint, ndim=ndim,
                                  Q=Q, A=A, B=B , progress=progress)
+# cat("designmatrices schluss\n")								 
+								 
     A <- design$A$A.3d.0
     cA <- design$A$A.flat.0
     B <- design$B$B.3d.0
@@ -94,7 +99,7 @@ tam.mml.mfr <-
 				}    
 	
 	
-# cat("design matrix" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
+#  cat("design matrix" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
 	
 	#***
 	# preprocess data if multiple person IDs do exist
@@ -102,13 +107,15 @@ tam.mml.mfr <-
 	if ( tp > 1){
 		persons <- sort( unique( pid ) )
 		NP <- length( persons )
-		person.ids <- sapply( persons , FUN = function( pp){ which( pid == pp ) } )
+		#****
+		# ARb 2013-08-23: added simplify=TRUE
+		person.ids <- sapply( persons , FUN = function( pp){ which( pid == pp ) } ,
+					simplify=FALSE)
 		PP <- matrix( NA , nrow=NP , ncol=tp)
 		for (pos in 1:tp){
 			#pos <- 1
 			PP[,pos] <- unlist( lapply( person.ids , FUN = function( vv){ vv[pos] } ) )
 					}
-
 		gresp0 <- matrix( NA , nrow=NP , ncol= ncol(gresp) )
 		colnames(gresp0) <- colnames(gresp)
 		gresp0.noStep <- matrix( NA , nrow=NP , ncol= ncol(gresp.noStep) )
@@ -168,6 +175,26 @@ tam.mml.mfr <-
     varConv <- FALSE          #flag of variance convergence
     nnodes <- length(nodes)^ndim
     if ( snodes > 0 ){ nnodes <- snodes }
+
+  #****
+  # display number of nodes
+  if (progress ){   
+	l1 <- paste0( "    * ")
+	if (snodes==0){ l1 <- paste0(l1 , "Numerical integration with ")}
+	  else{ 
+	    if (QMC){ 
+			l1 <- paste0(l1 , "Quasi Monte Carlo integration with ")
+				} else {
+				l1 <- paste0(l1 , "Monte Carlo integration with ")					
+						}
+					}
+    cat( paste0( l1 , nnodes , " nodes\n") )
+	if (nnodes > 8000){
+		cat("      @ Are you sure that you want so many nodes?\n")
+		cat("      @ Maybe you want to use Quasi Monte Carlo integration with fewer nodes.\n")		
+				}
+			}
+	#********* 
     
     # maximum no. of categories per item. Assuming dichotomous
     maxK <- max( resp , na.rm=TRUE ) + 1 
@@ -178,7 +205,9 @@ tam.mml.mfr <-
     
     # xsi inits
     if ( ! is.null(xsi.inits) ){
-      xsi <- xsi.inits 
+#      xsi <- xsi.inits 
+		xsi <- rep(0,np) 
+		xsi[ xsi.inits[,1] ] <- xsi.inits[,2]				
     } else { xsi <- rep(0,np)   } 
     if ( ! is.null( xsi.fixed ) ){
       xsi[ xsi.fixed[,1] ] <- xsi.fixed[,2]
@@ -216,9 +245,11 @@ tam.mml.mfr <-
     if ( ! is.null( formulaY ) ){
       formulaY <- as.formula( formulaY )
       Y <- model.matrix( formulaY , dataY )[,-1]   # remove intercept
+	nullY <- FALSE	  
     }
     
-    if ( ! is.null(Y) ){ 
+#    if ( ! is.null(Y) ){ 
+	if (! nullY){	
       Y <- as.matrix(Y)
       nreg <- ncol(Y)
       if ( is.null( colnames(Y) ) ){
@@ -245,9 +276,7 @@ tam.mml.mfr <-
     W <- t(Y * pweights) %*% Y
     if (ridge > 0){ diag(W) <- diag(W) + ridge }
     YYinv <- solve( W )
-    
-    
-    
+            
     #initialise regressors
     if ( is.null(beta.fixed) & (  is.null(xsi.fixed) ) ){
       beta.fixed <- matrix( c(1,1,0) , nrow= 1) 
@@ -256,11 +285,20 @@ tam.mml.mfr <-
           beta.fixed <- rbind( beta.fixed , c( 1 , dd , 0 ) )
         }}}  
     
-    if ( ! is.null( beta.inits ) ){ 
-      beta <- beta.inits 
-    } else {
-      beta <- matrix(0, nrow = nreg+1 , ncol = ndim)        
-    }
+	#****
+	# ARb 2013-08-20: Handling of no beta constraints	
+    # ARb 2013-08-24: correction	
+	if( ! is.matrix(beta.fixed) ){
+      if ( ! is.null(beta.fixed) ){
+		if ( ! beta.fixed   ){ beta.fixed <- NULL }
+							}
+				}
+	#*****
+	
+	beta <- matrix(0, nrow = nreg+1 , ncol = ndim)  
+	if ( ! is.null( beta.inits ) ){ 
+		beta[ beta.inits[,1:2] ] <- beta.inits[,3]
+							}
 
 
     #***
@@ -362,7 +400,10 @@ tam.mml.mfr <-
 	
 	#log of odds ratio of raw scores  
 	xsi[ is.na(xsi) ] <- 0
-    if ( ! is.null(xsi.inits) ){   xsi <- xsi.inits  }
+    if ( ! is.null(xsi.inits) ){  
+#			xsi <- xsi.inits  
+			xsi[ xsi.inits[,1] ] <- xsi.inits[,2]			
+					}
     if ( ! is.null(xsi.fixed) ){   xsi[ xsi.fixed[,1] ] <- xsi.fixed[,2] }
     
     xsi.min.deviance <- xsi
@@ -380,8 +421,7 @@ tam.mml.mfr <-
       thetasamp.density <- NULL
     } else {
     # sampled theta values
-	if (QMC){
-#		library(sfsmisc)					
+	if (QMC){			
 		r1 <- QUnif (n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)						
 		theta0.samp <- qnorm( r1 )
 			} else {
@@ -414,6 +454,9 @@ tam.mml.mfr <-
 	se.B <- 0*B
 	se.xsi.min <- se.xsi
 	se.B.min <- se.B
+
+	YSD <- max( apply( Y , 2 , sd ) )
+	if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }
 	
     # display
     disp <- "....................................................\n"
@@ -448,7 +491,7 @@ tam.mml.mfr <-
       AXsi <- res[["AXsi"]]
       # calculate student's prior distribution
       gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
-                           nnodes=nnodes , ndim=ndim)
+                           nnodes=nnodes , ndim=ndim,YSD=YSD)
 #print( head(gwt))						   
 
       # calculate student's likelihood
@@ -646,7 +689,14 @@ tam.mml.mfr <-
 	A1[ is.na(A) ] <- 0
 	se.xsiD <- diag( se.xsi^2 )
 	for (kk in 1:maxK){  # kk <- 1
-	se.AXsi[,kk] <- sqrt( diag( A1[,kk,] %*% se.xsiD %*% t( A1[,kk,]) ) )
+#	se.AXsi[,kk] <- sqrt( diag( A1[,kk,] %*% se.xsiD %*% t( A1[,kk,]) ) )
+	#**** bugfix
+		A1_kk <- A1[,kk,]
+		if ( is.vector(A1_kk) ){
+			A1_kk <- matrix( A1_kk , nrow=1 , ncol=length(A1_kk) )
+						}
+		se.AXsi[,kk] <- sqrt( diag( A1_kk %*% se.xsiD %*% t( A1_kk ) ) )	
+	#****		
 			}
 
 	##*** Information criteria
@@ -666,7 +716,8 @@ tam.mml.mfr <-
 	# collect item parameters
 	item1 <- .TAM.itempartable( resp , maxK , AXsi , B , ndim ,
 				 resp.ind , rprobs,n.ik,pi.k)
-		
+
+			 
   
     #####################################################
     # post ... posterior distribution	
@@ -722,10 +773,11 @@ tam.mml.mfr <-
     }
     ############################################################
     s2 <- Sys.time()
-	
+
    item <- data.frame( "xsi.index" = 1:np , 
                         "xsi.label" = dimnames(A)[[3]] , 
                         "est" = xsi )
+						
     if (progress){
       cat(disp)
       cat("Item Parameters\n")
@@ -763,7 +815,7 @@ tam.mml.mfr <-
     
 	####################################
 	# collect xsi parameters
-	
+
 	xsiFacet <- as.data.frame( (xsi.constr$xsi.table)[,1:2]	)
  	obji <- data.frame( "parameter" = dimnames(A)[[3]] , 
 			"xsi"=xsi , "se.xsi"=se.xsi ) 		
@@ -778,7 +830,8 @@ tam.mml.mfr <-
 	rownames(xsi.facets) <- NULL
 	xsi <- obji[,-1]
 	rownames(xsi) <- dimnames(A)[[3]]
-	
+
+
   # Output list
   deviance.history <- deviance.history[ 1:iter , ]
   res <- list( "xsi" = xsi , "xsi.facets" = xsi.facets , 

@@ -43,8 +43,9 @@ columns to item steps.
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 %}
 \examples{
-##############################################
-# Example 1: ordered data - Partial credit model
+#############################################################################
+# EXAMPLE 1: ordered data - Partial credit model
+#############################################################################
 data( data.gpcm )
 
 # Model 1: partial credit model

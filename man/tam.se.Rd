@@ -73,11 +73,11 @@ mod1 <- tam.mml(resp=sim.rasch)
 se1 <- tam.se( mod1 ) 
 
 ##   > print(se1$xsi, digits=3 )
-##      xsi.index xsi.label     est     se
-##   1          1        I1 -1.9590 0.0654
-##   2          2        I2 -1.8570 0.0639
-##   3          3        I3 -1.7444 0.0623
-##   4          4        I4 -1.6407 0.0610
+##      item    N     est     se
+##   1    I1 2000 -1.9590 0.0654
+##   2    I2 2000 -1.8570 0.0639
+##   3    I3 2000 -1.7444 0.0623
+##   4    I4 2000 -1.6407 0.0610
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

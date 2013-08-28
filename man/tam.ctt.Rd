@@ -1,5 +1,7 @@
 \name{tam.ctt}
 \alias{tam.ctt}
+\alias{tam.ctt2}
+
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Classical Test Theory Based Statistics
@@ -10,6 +12,8 @@ theory.
 }
 \usage{
 tam.ctt(resp, wlescore=NULL, pvscores=NULL, group=NULL , progress=TRUE)
+
+tam.ctt2(resp, wlescore=NULL, group=NULL , maxK=30 , progress=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -18,7 +22,9 @@ A data frame with unscored or scored item responses
 }
   \item{wlescore}{
 A vector with person parameter estimates, e.g. weighted likelihood
-estimates obtained from \code{tam.wle}
+estimates obtained from \code{tam.wle}. If \code{wlescore=NULL} is
+chosen in \code{tam.ctt2}, then only a frequency table of all items
+is produced.
 }
   \item{pvscores}{
 A matrix with plausible values, e.g. obtained from \code{tam.pv}
@@ -28,10 +34,15 @@ be groupwise calculated}
   \item{progress}{
 Display progress?
 }
+\item{maxK}{Average number of categories per item. This argument is just
+	used for matrix size allocations. If an error is produced, use
+	a sufficiently higher number.
 }
-%\details{
-%%  ~~ If necessary, more details than the description above ~~
-%}
+}
+\details{
+The function \code{tam.ctt2} uses \pkg{Rcpp} code and is slightly faster.
+}
+
 \value{
 A data frame with following columns:	
 \item{index}{Index variable in this data frame}
@@ -80,6 +91,8 @@ p1 <- tam.pv( mod , ntheta=500 , normal.approx=TRUE )$pv
 
 # CTT results for raw data
 stat1 <- tam.ctt( resp=data.mc$raw , wlescore=w1$theta , pvscores=p1[,-1] )
+stat1a <- tam.ctt2( resp=data.mc$raw , wlescore=w1$theta )  # faster
+stat1b <- tam.ctt2( resp=data.mc$raw )  # only frequencies
 
 # CTT results for scored data
 stat2 <- tam.ctt( resp=data.mc$scored , wlescore=w1$theta , pvscores=p1[,-1] )
@@ -87,7 +100,9 @@ stat2 <- tam.ctt( resp=data.mc$scored , wlescore=w1$theta , pvscores=p1[,-1] )
 # descriptive statistics for different groups
 # define group identifier
 group <- c( rep(1,70) , rep(2,73) )
-stat3 <- tam.ctt( resp=data.mc$raw , wlescore=w1$theta , pvscores=p1[,-1] , group=group)}
+stat3 <- tam.ctt( resp=data.mc$raw , wlescore=w1$theta , pvscores=p1[,-1] , group=group)
+stat3a <- tam.ctt2( resp=data.mc$raw , wlescore=w1$theta ,  group=group)
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

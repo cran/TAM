@@ -17,7 +17,7 @@ Test Analysis Modules
 \tabular{ll}{
 Package: \tab \pkg{TAM}\cr
 Type: \tab Package\cr
-Version: \tab 0.5\cr
+Version: \tab 0.6\cr
 Publication Year: \tab 2013\cr
 License: \tab GPL (>=2.0)\cr
 URL: \tab \url{https://sites.google.com/site/irttam1/},  \cr

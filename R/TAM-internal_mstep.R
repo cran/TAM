@@ -5,43 +5,59 @@ function( resp , hwt ,  resp.ind ,
   snodes = 0 , thetasamp.density=NULL , nomiss=FALSE){
 	    # calculate item weights
 		variance.fixed <- Variance.fixed
+  a0 <- Sys.time()		
 	#*****
 	# numerical integration	
 	if ( snodes == 0){	
 		# hwt ... N x q matrix
 		
 		if (!nomiss){
-			itemwt <- t( hwt ) %*% ( resp.ind * pweightsM )	
+		#	itemwt <- t( hwt ) %*% ( resp.ind * pweightsM )
+			itemwt <- crossprod( hwt , resp.ind * pweightsM  )			
 					}
 		if ( nomiss ){
 			itemwt <- matrix( colSums(hwt*pweights) , nrow=ncol(hwt) , ncol=ncol(resp.ind) )
 					}						 			
-#  a0 <- Sys.time()
-# cat("itemwt (without respind)") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
-		# original implementation without missings
+
+ 		# original implementation without missings
 		#  -- itemwt0 <- matrix(rep(colSums(hwt), nitems), nrow=nnodes, ncol=nitems)
 		thetabar <- hwt%*%theta
 		sumbeta <- Y%t*%( thetabar*pweights )
 		# -- sumsig2 <- sum( (pweights*hwt) %*% theta2 )
-		sumsig2 <- colSums((pweights*hwt) %*% theta2)      
+		# sumsig2 <- colSums((pweights*hwt) %*% theta2)
+        sumsig2 <- as.vector( t( colSums( pweights * hwt ) ) %*% theta2 )		
+ #cat("- sum sig2") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
 					}
+
 	#****
 	# Monte Carlo integration
 	if ( snodes > 0 ){
+# cat("- start monte carlo ") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1								
 	# maybe both if statements can be merged to one
-		hwtS <- hwt / snodes
+#		hwtS <- hwt / snodes
+	 # The division above is not necessary
+		hwtS <- hwt
 #		hwtS <- hwt / outer( rep(1,nrow(hwt) ) , thetasamp.density )
-		hwtS <- hwtS / rowSums( hwtS )
+		hwtS <- hwtS / rowSums( hwtS )   # maybe this can be fastened
+# cat("- pure matrix R ") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1				
+		#*** included		
 		# hwt ... N x q matrix
-		itemwt <- t( hwtS ) %*% ( resp.ind * pweightsM )
+#		itemwt <- t( hwtS ) %*% ( resp.ind * pweightsM )
+		itemwt <- crossprod( hwtS , resp.ind * pweightsM  )
+		# make this formula easier and make some speed checks!!
+# cat("- calc itemwt ") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1				
 		hwtS <- hwt		
 		#  -- itemwt0 <- matrix(rep(colSums(hwt), nitems), nrow=nnodes, ncol=nitems)
+		# This formula is not faster!
 		thetabar <- hwtS%*%theta
+# cat("- thetabar ") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						
 		sumbeta <- Y%t*%( thetabar*pweights )
+# cat("- tensor operation ") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1								
 		# -- sumsig2 <- sum( (pweights*hwt) %*% theta2 )
-		sumsig2 <- colSums((pweights*hwtS) %*% theta2)      		
-					}	
-# print("s200")					
+		# sumsig2 <- colSums((pweights*hwtS) %*% theta2)      		
+		sumsig2 <- as.vector( t( colSums( pweights * hwtS ) ) %*% theta2 )
+# cat("- sum sig2 modified ") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
+					}				
 	# calculation of variance and regression coefficients					
     beta <- YYinv%*%sumbeta                     #new beta
     sumsig2 <- matrix(sumsig2,ndim,ndim)
