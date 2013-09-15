@@ -7,7 +7,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
                  variance.fixed = NULL , variance.inits = NULL , 
 				 est.variance = FALSE , 
                  A=NULL , B=NULL , B.fixed = NULL , 
-				 Q=NULL , R=NULL, est.slopegroups=NULL , E = NULL , 
+				 Q=NULL , est.slopegroups=NULL , E = NULL , 
                  pweights = NULL , control = list() 
                  # control can be specified by the user 
                  ){
@@ -36,20 +36,22 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   #                   maxiter = 1000 , progress = TRUE) 
   # progress ... if TRUE, then display progress
   #-------------------------------------
-  
+   
   s1 <- Sys.time()
   # display
   disp <- "....................................................\n"  
   increment.factor <- progress <- nodes <- snodes <- ridge <- xsi.start0 <- QMC <- NULL
   maxiter <- conv <- convD <- min.variance <- max.increment <- Msteps <- convM <- NULL 
+  R <- NULL
   
+  if ( is.null(A)){ printxsi <- FALSE  } else { printxsi <- TRUE }  
   # attach control elements
   e1 <- environment()
   con <- list( nodes = seq(-6,6,len=21) , snodes = 0 ,QMC=TRUE,
                convD = .001 ,conv = .0001 , convM = .0001 , Msteps = 4 ,            
                maxiter = 1000 , max.increment = 1 , 
 			   min.variance = .001 , progress = TRUE , ridge=0,seed=NULL,
-			   xsi.start0=FALSE , increment.factor=1)  	
+			   xsi.start0=FALSE , increment.factor=1 , fac.oldxsi=0)  	
   con[ names(control) ] <- control  
   Lcon <- length(con)
   con1a <- con1 <- con ; 
@@ -58,7 +60,9 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
     assign( names(con)[cc] , con1[[cc]] , envir = e1 ) 
   }
   if ( !is.null(con$seed)){ set.seed( con$seed )	 }
-   
+  fac.oldxsi <- max( 0 , min( c( fac.oldxsi , .95 ) ) )
+
+  
   if (progress){ 
       cat(disp)	
       cat("Processing Data     ", paste(Sys.time()) , "\n") ; flush.console()
@@ -126,7 +130,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 				}
 			}
 	#*********  
-  
+
   # maximum no. of categories per item. Assuming dichotomous
   maxK <- max( resp , na.rm=TRUE ) + 1 
   
@@ -145,7 +149,6 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   #---2PL---
   B_orig <- B  #keep a record of generated B before estimating it in 2PL model 
   #---end 2PL---
-  
   ################################
   # number of parameters
   np <- dim(A)[[3]]
@@ -222,9 +225,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   W <- t(Y * pweights) %*% Y
   if (ridge > 0){ diag(W) <- diag(W) + ridge }
   YYinv <- solve( W )
-  
-
- 
+   
   #initialise regressors
   if ( is.null(beta.fixed) & (  is.null(xsi.fixed) ) ){
     beta.fixed <- matrix( c(1,1,0) , nrow= 1) 
@@ -273,9 +274,12 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   
   # These sufficient statistics must be changed
   # to make it more general
-  # First extension:  pweights and dependent on A; needs to be further extended (e.g., different number of categories)
-  # Second extension: multiple category option       -> resp \in 0:maxKi (see method definition calc_posterior_TK)
-  #                                                  -> length(ItemScore) = np (see diff computation in M Step)
+  # First extension:  pweights and dependent on A; needs to be further 
+  # extended (e.g., different number of categories)
+  # Second extension: multiple category option    
+  #   -> resp \in 0:maxKi (see method definition calc_posterior_TK)
+  #                                               
+  #   -> length(ItemScore) = np (see diff computation in M Step)
   #                   multiple category option Bugfix
   #                                                  -> dim(cResp) = (nstud, nitems*maxK)
   #                                               -> adapt dim(A) to dim(cResp) 
@@ -308,9 +312,13 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   personMaxA <- resp.ind %*% maxAi
   ItemMax <- personMaxA %t*% pweights  
   
-  # maximum score in resp, equal categories?
+  # maximum score in resp, equal categories?  
   maxscore.resp <- apply( resp , 2 , max )
-  equal.categ <- if( sd( maxscore.resp) > .00001 ){ FALSE } else { TRUE  }
+  if ( ncol(resp)>1){ 
+	sd.maxscore.resp <- sd(maxscore.resp)
+			} else { sd.maxscore.resp <- 0 }
+  
+  equal.categ <- if( sd.maxscore.resp > .00001 ){ FALSE } else { TRUE  }
 #  xsi[est.xsi.index] <- - log(abs(ItemScore[est.xsi.index]/(ItemMax[est.xsi.index]-
 #      ItemScore[est.xsi.index])))  #log of odds ratio of raw scores  
   xsi[est.xsi.index] <- - log(abs(( ItemScore[est.xsi.index]+.5)/
@@ -320,7 +328,6 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   if ( ! is.null(xsi.inits) ){   
 #		xsi <- xsi.inits  
 		xsi[ xsi.inits[,1] ] <- xsi.inits[,2]
-print(xsi)		
 			}
   if ( ! is.null( xsi.fixed ) ){   xsi[ xsi.fixed[,1] ] <- xsi.fixed[,2] }
 
@@ -332,7 +339,8 @@ print(xsi)
   if ( snodes == 0 ){ 
     theta <- as.matrix( expand.grid( as.data.frame( matrix( rep(nodes, ndim) , ncol = ndim ) ) ) )
     #we need this to compute sumsig2 for the variance
-    theta2 <- matrix(theta.sq(theta), nrow=nrow(theta),ncol=ncol(theta)^2)            
+#    theta2 <- matrix(theta.sq(theta), nrow=nrow(theta),ncol=ncol(theta)^2)            
+    theta2 <- matrix(theta.sq2(theta), nrow=nrow(theta),ncol=ncol(theta)^2)            
     # grid width for calculating the deviance
     thetawidth <- diff(theta[,1] )
     thetawidth <- ( ( thetawidth[ thetawidth > 0 ])[1] )^ndim 
@@ -350,7 +358,8 @@ print(xsi)
     thetawidth <- NULL
   }
   
-  
+
+ 
   deviance <- 0  
   deviance.history <- matrix( 0 , nrow=maxiter , ncol = 2)
   colnames(deviance.history) <- c("iter" , "deviance")
@@ -386,7 +395,7 @@ print(xsi)
 
 	YSD <- max( apply( Y , 2 , sd ) )
 	if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }
-	
+
   		hwt.min <- 0
 		rprobs.min <- 0
 		AXsi.min <- 0
@@ -404,7 +413,9 @@ print(xsi)
   ##############################################################   
   #Start EM loop here
   while ( ( (!betaConv | !varConv)  | ((a1 > conv) | (a4 > conv) | (a02 > convD)) )  & (iter < maxiter) ) { 
- 
+
+# a0 <- Sys.time()
+  
     iter <- iter + 1
     if (progress){ 
       cat(disp)	
@@ -413,11 +424,15 @@ print(xsi)
     }
     # calculate nodes for Monte Carlo integration	
     if ( snodes > 0){
-      theta <- beta[ rep(1,snodes) , ] +  t ( t(chol(variance)) %*% t(theta0.samp) )
+#      theta <- beta[ rep(1,snodes) , ] +  
+#				t ( t(chol(variance)) %*% t(theta0.samp) )
+      theta <- beta[ rep(1,snodes) , ] + theta0.samp %*% chol(variance) 
+
       # calculate density for all nodes
       thetasamp.density <- dmvnorm( theta , mean = as.vector(beta[1,]) , sigma = variance )
       # recalculate theta^2
-      theta2 <- matrix( theta.sq(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
+#      theta2 <- matrix( theta.sq(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
+      theta2 <- matrix( theta.sq2(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
     }			
     olddeviance <- deviance
     # calculation of probabilities
@@ -425,17 +440,21 @@ print(xsi)
                         nnodes=nnodes , maxK=maxK , recalc=TRUE )	
     rprobs <- res[["rprobs"]]
     AXsi <- res[["AXsi"]]
-   
+# cat("calc_prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
+	
     # calculate student's prior distribution
     gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
                          nnodes=nnodes , ndim=ndim,YSD=YSD)
-    
+# cat("stud prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
+						 
     # calculate student's likelihood
     res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=gwt , resp=resp , nitems=nitems , 
                                  resp.ind.list=resp.ind.list , normalization=TRUE , 
                                  thetasamp.density=thetasamp.density , snodes=snodes ,
 						resp.ind=resp.ind	)	
     hwt <- res.hwt[["hwt"]]   
+
+# cat("posterior v2") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
     
     if (progress){ cat("M Step Intercepts   |"); flush.console() }
     # collect old values for convergence indication
@@ -451,6 +470,7 @@ print(xsi)
 							  thetasamp.density=thetasamp.density,nomiss=nomiss)
       
     beta <- resr$beta
+# cat("m step regression") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
 	
     variance <- resr$variance	
 	if( ndim == 1 ){  # prevent negative variance
@@ -476,7 +496,8 @@ print(xsi)
     #compute sufficient statistics for 2PL slope parameters
     if (irtmodel %in% c("2PL","GPCM","GPCM.design","2PL.groups")) {
       thetabar <- hwt%*%theta
-      cB_obs <- t(cResp*pweights)%*%(thetabar)
+#      cB_obs <- t(cResp*pweights)%*%(thetabar)
+      cB_obs <- crossprod( cResp*pweights , thetabar)
       B_obs <- aperm(array(cB_obs,dim=c(maxK, nitems,ndim)),c(2,1,3))
 	  diag(variance) <- diag(variance)+10^(-14)	  
       if ( ! est.variance ){ 
@@ -485,7 +506,10 @@ print(xsi)
 				# fix variance of first group to 1
 							}
     }
+	
     #---end 2PL---
+# stop("er")
+# cat("sufficient statistics 2PL") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
     
 	if (max(abs(variance-oldvariance)) < conv) varConv <- TRUE
     
@@ -531,6 +555,7 @@ print(xsi)
 
 	  old_increment <- increment
 	  
+	  
 	##**SE
      se.xsi <- sqrt( 1 / abs(deriv) )
      if ( ! is.null( xsi.fixed) ){ se.xsi[ xsi.fixed[,1] ] <- 0 } 
@@ -541,6 +566,10 @@ print(xsi)
       if ( max(abs(increment)) < convM ) { converge <- TRUE }
       Miter <- Miter + 1						
 
+		# stabilizing the algorithm | ARb 2013-09-10
+		if (fac.oldxsi > 0 ){
+				xsi <-  (1-fac.oldxsi) * xsi + fac.oldxsi *oldxsi
+							}	  	  
       
       # progress bar
       if (progress){ 
@@ -549,6 +578,8 @@ print(xsi)
       }
     } # end of all parameters loop
 
+	
+# cat("M steps intercepts") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
     
     #---2PL---
     if (irtmodel %in% c("2PL","GPCM","GPCM.design","2PL.groups") ) {
@@ -565,7 +596,10 @@ print(xsi)
 	  basispar <- res$basispar
       a4 <- max( abs( B - oldB ))  
     }
+	
     #---end 2PL---
+
+# cat("M steps slopes") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
 	
 	#***
 	# decrease increments in every iteration
@@ -615,7 +649,10 @@ print(xsi)
       cat( paste( "\n  Deviance =" , round( deviance , 4 ) ))
       devch <- -( deviance - olddeviance )
 	  cat( " | Deviance change:", round( devch  , 4 ) )
-	  if ( devch < 0 & iter > 1 ){ cat ("   Deviance increases!") }
+	  if ( devch < 0 & iter > 1 ){ 
+			cat ("\n!!! Deviance increases!                                        !!!!") 
+			cat ("\n!!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!") 			
+					}
       cat( "\n  Maximum intercept parameter change:" , round( a1 , 6 ) )
 	  if (irtmodel %in% c("GPCM","2PL","2PL.group") ){
 		cat( "\n  Maximum slope parameter change:" , round( a4 , 6 ) )
@@ -633,6 +670,8 @@ print(xsi)
     }
   } # end of EM loop
   #******************************************************
+# stop("check here")  
+  
   		xsi.min.deviance -> xsi 
 		beta.min.deviance -> beta
 		variance.min.deviance -> variance	
@@ -644,14 +683,19 @@ print(xsi)
 		se.xsi.min -> se.xsi	
 		se.B.min -> se.B		
   #******
-
     ##**SE  
   # standard errors of AXsi parameters
   # check for missing entries in A
 	se.AXsi <- 0*AXsi
 	A1 <- A
 	A1[ is.na(A) ] <- 0
-	se.xsiD <- diag( se.xsi^2 )
+#	se.xsiD <- diag( se.xsi^2 )
+	if ( length( se.xsi) > 1){
+			se.xsiD <- diag( se.xsi^2 )
+				} else {
+			se.xsiD <- matrix( se.xsi^2,1,1)
+						}	
+	
 	for (kk in 1:maxK){  # kk <- 1
 	# se.AXsi[,kk] <- sqrt( diag( A1[,kk,] %*% se.xsiD %*% t( A1[,kk,]) ) )
 	#**** bugfix
@@ -662,7 +706,7 @@ print(xsi)
 		se.AXsi[,kk] <- sqrt( diag( A1_kk %*% se.xsiD %*% t( A1_kk ) ) )	
 	#****		
 			}
-			
+
 	##*** Information criteria
 	ic <- .TAM.ic( nstud , deviance , xsi , xsi.fixed ,
 		beta , beta.fixed , ndim , variance.fixed , G ,
@@ -675,13 +719,12 @@ print(xsi)
 		group , maxK , pweights , hwt )
 	n.ik <- res$n.ik
 	pi.k <- res$pi.k 
-		
+
 	#****
 	# collect item parameters
 	item1 <- .TAM.itempartable( resp , maxK , AXsi , B , ndim ,
 				 resp.ind , rprobs,n.ik,pi.k)
 	  
- 
   #####################################################
   # post ... posterior distribution	
   # create a data frame person	
@@ -801,7 +844,9 @@ print(xsi)
 			   "ic" = ic , 
                "deviance.history" = deviance.history ,
                "control" = con1a , "irtmodel" = irtmodel ,
-			   "iter" = iter
+			   "iter" = iter ,
+				"printxsi"=printxsi 	, "YSD"=YSD		,
+			   "design"=design				
 #			   "xsi.min.deviance" = xsi.min.deviance ,
 #			   "beta.min.deviance" = beta.min.deviance , 
 # "variance.min.deviance" = variance.min.deviance 

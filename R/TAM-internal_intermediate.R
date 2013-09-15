@@ -18,6 +18,9 @@ function(rprobs , A , itemwt , p , ip ,
   
   return(list("xbar" = xbar, "xxf" = xxf, "xbar2" = xbar2))
 }
+# This function is not used anymore.
+###########################################################
+
 ###########################################################
 # faster version of calc_exp_TP3
 calc_exp_TK3 <- function( rprobs , A , np , est.xsi.index , itemwt ,
@@ -45,6 +48,8 @@ calc_posterior.v2 <-
   function(rprobs , gwt , resp , nitems , 
            resp.ind.list , normalization = TRUE , 
            thetasamp.density = NULL , snodes = 0 , resp.ind=NULL){   
+
+# a0 <- Sys.time()		   
     if ( snodes == 0 ){ 
       fx <- gwt  
     } else {
@@ -56,7 +61,9 @@ calc_posterior.v2 <-
     nstud <- nrow(fx)
     # using c Code here
     storage.mode(resp) <- "integer"
+# cat("vor calcfx") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
     fx <- .Call("calcfx", fx, rprobs, resp.ind.list, resp)
+# cat("nach calcfx") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1			
     # numerical integration
     if ( snodes == 0 ){ 
       rfx <- rowSums(fx)
@@ -76,10 +83,14 @@ calc_posterior.v2 <-
 		
 		res[["swt" ]] <- fx
 				}
-    
+# cat(" in  posterior rest") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	    
     return(res)
   }
+#####################################################################
 
+#####################################################################
+# calc_prob
+# Calculation of probabilities
 calc_prob.v5 <-
   function(iIndex, A, AXsi, B, xsi, theta, 
            nnodes, maxK, recalc=TRUE){
@@ -96,12 +107,13 @@ calc_prob.v5 <-
     for( dd in 1:ncol(theta) ) 
       Btheta <- Btheta + array(B[iIndex,,dd ,drop = FALSE] %o% theta[,dd] , dim = dim(Btheta))
     
-    rprobs <- ( rr <- exp(Btheta+AXsi.tmp) )/aperm( array( rep( colSums( aperm( rr , c(2,1,3) ) , dims=1 , na.rm = TRUE) , 
-                                                                maxK ), dim=dim(rr)[c(1,3,2)] ) , c(1,3,2) )
-    
+    rprobs <- ( rr <- exp(Btheta+AXsi.tmp) )/aperm( array( rep( colSums( aperm( rr , c(2,1,3) ) ,
+					dims=1 , na.rm = TRUE) ,                                                           maxK ), dim=dim(rr)[c(1,3,2)] ) , c(1,3,2) )
     return(list("rprobs" = rprobs, "AXsi" = AXsi))
   }
 
+#############################################################
+#############################################################
 stud_prior.v2 <-
   function(theta , Y , beta , variance , nstud , 
            nnodes , ndim , YSD ){
@@ -124,7 +136,7 @@ stud_prior.v2 <-
 	  ### ARb 2013-08-27
 	  ### different calculations depend if there are
 	  ### person-specific predictors or not  
- a0 <- Sys.time()
+# a0 <- Sys.time()
 ##      for ( qq in 1:nnodes ) {
 ##        x1 <- - mu + theta[rep(qq,nstud),]  #x has dimension nstud#
 ##        x <- matrix( rowSums( (x1%*%varInverse) * x1 ) , ncol= 1)
@@ -145,6 +157,8 @@ stud_prior.v2 <-
     }
     return(gwt)
   }
+#####################################################################  
+  
 #*************************
 # auxiliary functions for calculation of prior functions  
 prior.normal.density.R <- 
@@ -239,6 +253,9 @@ tam.jml.xsi <-
     return (res)  
   }
 
+######################################################################  
+######################################################################
+  
 tam.jml.xsi2 <-
   function ( resp , resp.ind, A, A.0 , B, nstud, nitems, maxK, convM, 
              ItemScore, theta, xsi, Msteps, pweightsM,

@@ -1,7 +1,6 @@
 
-
 // includes from the plugin
-
+#include <RcppArmadillo.h>
 #include <Rcpp.h>
 
 
@@ -17,6 +16,46 @@ using namespace Rcpp;
 
 
 // user includes
+
+
+// declarations
+extern "C" {
+SEXP theta_sq_cpp( SEXP theta_) ;
+}
+
+// definition
+
+SEXP theta_sq_cpp( SEXP theta_ ){
+BEGIN_RCPP
+  
+       
+     Rcpp::NumericMatrix theta(theta_) ;  
+       
+     int N = theta.nrow() ;  
+     int D = theta.ncol() ;   
+       
+     arma::cube thetasq(N,D,D) ;  
+       
+     ////////////////////////////////////////  
+     // calculation of squared theta matrix  
+       
+     // int nn = 0 ;  
+     for (int nn=0;nn<N;nn++){  
+         for (int dd1=0;dd1<D;dd1++){  
+         thetasq(nn,dd1, dd1 ) = pow( theta(nn,dd1) , 2 ) ;   
+         for (int dd2=dd1+1;dd2<D;dd2++){  
+             thetasq(nn,dd1, dd2 ) = theta(nn,dd1) * theta(nn,dd2 ) ;   
+             thetasq(nn,dd2 , dd1 ) = thetasq(nn,dd1,dd2) ;  
+             }      
+         }  
+     }  
+       
+     //// OUTPUT  
+     return ( wrap(thetasq) ) ;
+END_RCPP
+}
+
+
 
 
 // declarations
@@ -58,6 +97,8 @@ BEGIN_RCPP
      
 END_RCPP
 }
+
+
 
 
 

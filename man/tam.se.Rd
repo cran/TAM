@@ -7,8 +7,8 @@
 Standard Error Estimation
 }
 \description{
-Standard error computation for objects of the classes \code{tam} and \code{tam.mml}. 
-Still to come for objects of class \code{tam.jml}.
+Standard error computation for objects of the classes \code{tam} 
+and \code{tam.mml}. 
 }
 \usage{
 tam.se(tamobj, ...)
@@ -23,7 +23,8 @@ tam.mml.se(tamobj, numdiff.parm = 0.001)
 \item{numdiff.parm}{Step width parameter for numerical
   differentiation
     }
-\item{\dots}{Further arguments to be passed
+\item{\dots}{
+    Further arguments to be passed
     }    
 }
 
@@ -37,7 +38,7 @@ differentiation.
 A list with following entries:
 \item{xsi}{
     Data frame with \eqn{\xi} parameters (\code{est}) 
-    an their corresponding standard errors (\code{se})
+    and their corresponding standard errors (\code{se})
         }
 \item{beta}{
     Data frame with \eqn{\beta} regression parameters and 
@@ -55,7 +56,7 @@ A list with following entries:
 
 \note{
 Standard error estimation for estimated slope parameters
-in the matrix \eqn{B} is not yet implemented. The same
+(entries of the matrix \eqn{B}) is not yet implemented. The same
 applies to standard errors for variances and covariances.
 }
 
@@ -66,18 +67,59 @@ applies to standard errors for variances and covariances.
 %}
 
 \examples{
+#############################################################################
+# EXAMPLE 1: 1PL model, sim.rasch data
+#############################################################################
+	
 data(sim.rasch)
 # estimate Rasch model
-mod1 <- tam.mml(resp=sim.rasch) 
+mod1 <- tam.mml(resp=sim.rasch[1:500,1:10]) 
 # standard error estimation
 se1 <- tam.se( mod1 ) 
+# proportion of standard errors estimated by 'tam.se' and 'tam.mml'
+prop1 <- se1$xsi$se / mod1$xsi$se
+##   > summary( prop1 )
+##      Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##     1.030   1.034   1.035   1.036   1.039   1.042 
+## => standard errors estimated by tam.se are a bit larger
 
-##   > print(se1$xsi, digits=3 )
-##      item    N     est     se
-##   1    I1 2000 -1.9590 0.0654
-##   2    I2 2000 -1.8570 0.0639
-##   3    I3 2000 -1.7444 0.0623
-##   4    I4 2000 -1.6407 0.0610
+\dontrun{
+#############################################################################
+# EXAMPLE 2: Standard errors differential item functioning
+#############################################################################
+data(data.ex08)
+
+formulaA <- ~ item*female
+resp <- data.ex08[["resp"]]
+facets <- as.data.frame( data.ex08[["facets"]] )
+# investigate DIF
+mod <- tam.mml.mfr( resp= resp , facets= facets , formulaA = formulaA )    
+summary(mod)          
+# estimate standard errors
+semod <- tam.se(mod)
+prop1 <- semod$xsi$se / mod$xsi$se
+summary(prop1)
+# plot differences in standard errors
+plot( mod$xsi$se , semod$xsi$se , pch=16 , xlim=c(0,.15) , ylim=c(0,.15) ,
+    xlab="Standard error 'tam.mml'" , ylab="Standard error 'tam.se'" )
+lines( c(-6,6) , c(-6,6) , col="gray")
+
+round( cbind( mod$xsi , semod$xsi[,-1] ) , 3 )
+##   > round( cbind( mod$xsi , semod$xsi[,-1] ) , 3 )
+##                    xsi se.xsi   N    est    se
+##   I0001         -1.956  0.092 500 -1.956 0.095
+##   I0002         -1.669  0.085 500 -1.669 0.088
+##   [...]
+##   I0010          2.515  0.108 500  2.515 0.110
+##   female1       -0.091  0.025 500 -0.091 0.041
+##   I0001:female1 -0.051  0.070 500 -0.051 0.071
+##   I0002:female1  0.085  0.067 500  0.085 0.068
+##   [...]
+##   I0009:female1 -0.019  0.068 500 -0.019 0.068
+##
+## => the largest discrepancy in standard errors is observed for the
+##    main female effect (.041 in 'tam.se' instead of .025 in 'tam.mml')
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

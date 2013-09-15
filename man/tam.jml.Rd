@@ -16,11 +16,11 @@ item response models with joint maximum likelihood (JML,
 \usage{
 tam.jml(resp, group = NULL, disattenuate = FALSE, bias = TRUE, 
     xsi.fixed = NULL, xsi.inits = NULL, A = NULL, B = NULL, Q = NULL, 
-    R = NULL, ndim = 1, pweights = NULL, control = list())
+    ndim = 1, pweights = NULL, control = list())
 
 tam.jml2(resp, group = NULL, disattenuate = FALSE, bias = TRUE, 
     xsi.fixed = NULL, xsi.inits = NULL, A = NULL, B = NULL, Q = NULL, 
-    R = NULL, ndim = 1, pweights = NULL, control = list())
+    ndim = 1, pweights = NULL, control = list())
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -38,12 +38,12 @@ tam.jml2(resp, group = NULL, disattenuate = FALSE, bias = TRUE,
      An optional vector of group identifier
 }
   \item{disattenuate}{
-    Should the person parameters disattenuated due to
-    unreliability? The disattenuation is conducted by applying
-    the Kelley formula.
+    An optional logical indicating whether the person parameters 
+    should be disattenuated due to unreliability? 
+    The disattenuation is conducted by applying the Kelley formula.
 }
   \item{bias}{
-     A logical which indicates if JML bias shold be reduced
+     A logical which indicates if JML bias should be reduced
      by multiplying item parameters by the adjustment factor
      of \eqn{(I-1)/I}
 }
@@ -54,12 +54,14 @@ tam.jml2(resp, group = NULL, disattenuate = FALSE, bias = TRUE,
      Fixed value of \eqn{\xi} parameter
 }
   \item{xsi.inits}{
-     An optional vector of initial \eqn{\xi} parameters
+     An optional vector of initial \eqn{\xi} parameters. Note that
+     all parameters must be specified and the vector is not of the
+     same format as \code{xsi.fixed}.
 }
   \item{A}{
      A design array \eqn{A} for item category intercepts.
      For item \eqn{i} and category \eqn{k}, the threshold is
-     specified is \eqn{ \sum _j a_{ikj}   \xi_j}.
+     specified as \eqn{ \sum _j a_{ikj}   \xi_j}.
 }
   \item{B}{
      A design array for scoring item category responses.
@@ -69,9 +71,7 @@ tam.jml2(resp, group = NULL, disattenuate = FALSE, bias = TRUE,
   \item{Q}{
      A Q-matrix which defines loadings of items on dimensions.
 }
-  \item{R}{
-     This argument is not yet used.
-}
+
   \item{ndim}{
    Number of dimensions in the model. The default is 1.
 }
@@ -85,9 +85,8 @@ tam.jml2(resp, group = NULL, disattenuate = FALSE, bias = TRUE,
 }
 
 \details{
-The function \code{tam.jml2} is just a faster
-implementation of \code{tam.jml}. It is in general
-recommended to use \code{tam.jml2}.
+The function \code{tam.jml2} is just a bit more efficient (for most
+applications) implementation than \code{tam.jml}. 
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -161,9 +160,67 @@ maximum likelihood estimation see \code{\link{tam.mml}}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \examples{
+#############################################################################
+# EXAMPLE 1: Dichotomous data
+#############################################################################
 data(sim.rasch)
-# estimate the Rasch model with JML
-mod <- tam.jml2(resp=sim.rasch) 
+resp <- sim.rasch[1:700 , seq( 1 , 40 , len=10)  ]  # subsample
+# estimate the Rasch model with JML (function 'tam.jml')
+mod1a <- tam.jml(resp=resp) 
+# the same model but using function 'tam.jml2'
+mod1b <- tam.jml2(resp=resp)
+
+# compare results with Rasch model estimated by MML
+mod1c <- tam.mml(resp=resp )
+# plot estimated parameters
+plot( mod1b$xsi , mod1c$xsi$xsi , pch=16 ,
+    xlab= expression( paste( xi[i] , " (JML)" )) ,
+    ylab= expression( paste( xi[i] , " (MML)" )) ,
+    main="Item Parameter Estimate Comparison")
+lines( c(-5,5) , c(-5,5) , col="gray" )
+
+\dontrun{
+#############################################################################
+# EXAMPLE 2: Partial credit model
+#############################################################################
+
+data(data.gpcm)
+# the same model but using function 'tam.jml2'
+mod2 <- tam.jml2(resp=data.gpcm)
+mod2$xsi     # extract item parameters
+
+#############################################################################
+# EXAMPLE 3: Facet model estimation using joint maximum likelihood
+#            data.ex10; see also Example 10 in tam.mml
+#############################################################################
+
+data(data.ex10)
+dat <- data.ex10
+## > head(dat)
+##  pid rater I0001 I0002 I0003 I0004 I0005
+##    1     1     0     1     1     0     0
+##    1     2     1     1     1     1     0
+##    1     3     1     1     1     0     1
+##    2     2     1     1     1     0     1
+##    2     3     1     1     0     1     1
+
+facets <- dat[ , "rater" , drop=FALSE ] # define facet (rater)
+pid <- dat$pid      # define person identifier (a person occurs multiple times)
+resp <- dat[ , -c(1:2) ]        # item response data
+formulaA <- ~ item * rater      # formula
+
+# use MML function only to restructure data and input obtained design matrices
+# and processed response data to tam.jml (-> therefore use only 2 iterations) 
+mod3a <- tam.mml.mfr( resp=resp , facets=facets , formulaA = formulaA , 
+             pid=dat$pid ,  control=list(maxiter=2) )
+
+# use modified response data mod3a$resp and design matrix mod3a$A
+resp1 <- mod3a$resp
+# JML with 'tam.jml'
+mod3b <- tam.jml( resp=resp1 , A=mod3a$A , control=list(maxiter=200) )
+# 'tam.jml2'
+mod3c <- tam.jml2( resp=resp1 , A=mod3a$A , control=list(maxiter=200) )	
+}
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

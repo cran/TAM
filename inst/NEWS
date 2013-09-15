@@ -1,6 +1,77 @@
-*******************************************************
-***       CHANGES IN TAM PACKAGE VERSIONS           ***
-*******************************************************
+********************************************************
+****       CHANGES IN TAM PACKAGE VERSIONS          ****
+********************************************************
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Test Analysis Modules (TAM)
+T. Kiefer, A. Robitzsch, & M. Wu
+
+                  ___           ___     
+      ___        /  /\         /__/\    
+     /  /\      /  /::\       |  |::\   
+    /  /:/     /  /:/\:\      |  |:|:\  
+   /  /:/     /  /:/~/::\   __|__|:|\:\ 
+  /  /::\    /__/:/ /:/\:\ /__/::::| \:\
+ /__/:/\:\   \  \:\/:/__\/ \  \:\~~\__\/
+ \__\/  \:\   \  \::/       \  \:\      
+      \  \:\   \  \:\        \  \:\     
+       \__\/    \  \:\        \  \:\    
+                 \__\/         \__\/    
+
+
+mailto:
+-------
+a.robitzsch /-\ bifie.at
+
+URL:
+----
+https://sites.google.com/site/irttam1/
+https://sites.google.com/site/alexanderrobitzsch/software
+http://www.edmeasurementsurveys.com/TAM/Tutorials/
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+-------------------------------------------------------
+Changes in Versions 0.7 (2013-09-15)
+-------------------------------------------------------
+
+x include crossprod in some functions
+x fixed a bug for using latent regression models in
+  facet model function 'tam.mml.mfr'
+  (thanks to Jonathan Williams)
+x included another facet example (Example 14)
+x fixed a bug in tam.mml.mfr if all facets possess
+  the same number of levels
+x fixed a bug in multidimensional generalized partial
+  credit model estimation and speeded 2PL estimation a bit
+x included bifactor model and exploratory factor analysis
+  -> function 'tam.fa' with arguments irtmodel='efa','bifactor'
+x now printing progress in tam.ctt2 correctly
+x fixed a bug in data processing in tam.mml.mfr for factor
+  or string input of facets
+x included more examples in tam.fit, anova.tam.mml, tam.pv,
+  tam.jml, tam.se, tam.wle 
+x avoided inversion of singular matrices in multidimensional
+  WLE estimation tam.wle (thanks to Iasonas Lamprianou)
+x removed bugs for item response datasets with only one item
+  in tam.mml and tam.mml.2pl
+x fixed a bug in tam.ctt2: multiple groups were not displayed 
+x included an option for deleting redundant generalized items
+  which sometimes improves computation speed
+x cleaned the TAM manual (thanks to Michaela Mayr)
+x changed output structure of tam.fa and included rotation
+  examples in tam.fa.Rd
+x included additional convergence stabilizing approach which
+  can be activated using the argument 'fac.oldxsi' in control
+  -> See Example 15 for such a non-converging model where
+     changing algorithmic defaults seems necessary
+   (problem addressed thanks to Sebastian Weirich) 
+x substituted internal 'theta.sq' function by Rcpp based
+  function 'theta.sq2'
+x started with including examples similar to the ones in
+  the ConQuest 2.0 manual (see data.cqc.Rd)
 
 -------------------------------------------------------
 Changes in Versions 0.6 (2013-08-28)
@@ -49,7 +120,8 @@ x included data.numeracy and data.timssAusTwn
   datasets
 
 -------------------------------------------------------
-Changes in Versions 0.4 (2013-07-01)
+Changes in Versions 0.4 (2013-07-01) 
+    [*** First CRAN Release ***]
 -------------------------------------------------------
 
 x included quasi-Monte Carlo integration as an alternative
@@ -103,8 +175,8 @@ x use estimated parameters with minimal deviance in the output
 Changes in Version 0.1-03 (2012-11-21)
 -------------------------------------------------------
 
- x 2PL calibration outsourced
- x designMatrices and tam.mml.mfr method for multifacet rasch model 
-   calibration included. Both highly experimental.
- x Examples for the calibration included, see help file of sim.mfr
+x 2PL calibration outsourced
+x designMatrices and tam.mml.mfr method for multifacet rasch model 
+  calibration included. Both highly experimental.
+x Examples for the calibration included, see help file of sim.mfr
  

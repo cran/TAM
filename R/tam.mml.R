@@ -7,7 +7,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="1PL" ,
                  variance.fixed = NULL , variance.inits = NULL , 
 				 est.variance = FALSE , 
                  A=NULL , B=NULL , B.fixed = NULL , 
-				 Q=NULL , R=NULL, est.slopegroups=NULL , E = NULL , 
+				 Q=NULL , est.slopegroups=NULL , E = NULL , 
                  pweights = NULL , control = list() 
                  # control can be specified by the user 
                  ){
@@ -43,14 +43,16 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="1PL" ,
 
   increment.factor <- progress <- nodes <- snodes <- ridge <- xsi.start0 <- QMC <- NULL
   maxiter <- conv <- convD <- min.variance <- max.increment <- Msteps <- convM <- NULL 
+  R <- NULL
   
+  if ( is.null(A)){ printxsi <- FALSE  } else { printxsi <- TRUE }
   # attach control elements
   e1 <- environment()
   con <- list( nodes = seq(-6,6,len=21) , snodes = 0 , QMC=TRUE , 
                convD = .001 ,conv = .0001 , convM = .0001 , Msteps = 4 ,            
                maxiter = 1000 , max.increment = 1 , 
 			   min.variance = .001 , progress = TRUE , ridge=0 ,
-			   seed = NULL , xsi.start0=FALSE , increment.factor=1)  	
+			   seed = NULL , xsi.start0=FALSE , increment.factor=1 , fac.oldxsi=0)  	
 #a0 <- Sys.time()			   
   con[ names(control) ] <- control  
   Lcon <- length(con)
@@ -59,6 +61,8 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="1PL" ,
   for (cc in 1:Lcon ){
     assign( names(con)[cc] , con1[[cc]] , envir = e1 ) 
   }
+  fac.oldxsi <- max( 0 , min( c( fac.oldxsi , .95 ) ) )  
+  
   if (progress){ 
       cat(disp)	
       cat("Processing Data     ", paste(Sys.time()) , "\n") ; flush.console()
@@ -337,7 +341,8 @@ if (! nullY){
   if ( snodes == 0 ){ 
     theta <- as.matrix( expand.grid( as.data.frame( matrix( rep(nodes, ndim) , ncol = ndim ) ) ) )
     #we need this to compute sumsig2 for the variance
-    theta2 <- matrix(theta.sq(theta), nrow=nrow(theta),ncol=ncol(theta)^2)            
+#    theta2 <- matrix(theta.sq(theta), nrow=nrow(theta),ncol=ncol(theta)^2)            
+    theta2 <- matrix(theta.sq2(theta), nrow=nrow(theta),ncol=ncol(theta)^2)            
     # grid width for calculating the deviance
     thetawidth <- diff(theta[,1] )
     thetawidth <- ( ( thetawidth[ thetawidth > 0 ])[1] )^ndim 
@@ -418,11 +423,13 @@ se.B <- 0*B
     }
     # calculate nodes for Monte Carlo integration	
     if ( snodes > 0){
-      theta <- beta[ rep(1,snodes) , ] +  t ( t(chol(variance)) %*% t(theta0.samp) )
+#      theta <- beta[ rep(1,snodes) , ] +  t ( t(chol(variance)) %*% t(theta0.samp) )
+      theta <- beta[ rep(1,snodes) , ] + theta0.samp %*% chol(variance) 
       # calculate density for all nodes
       thetasamp.density <- dmvnorm( theta , mean = as.vector(beta[1,]) , sigma = variance )
       # recalculate theta^2
-      theta2 <- matrix( theta.sq(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
+#      theta2 <- matrix( theta.sq(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
+      theta2 <- matrix( theta.sq2(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
     }			
     olddeviance <- deviance
 # a0 <- Sys.time()	
@@ -442,7 +449,7 @@ se.B <- 0*B
     res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=gwt , resp=resp , nitems=nitems , 
                                  resp.ind.list=resp.ind.list , normalization=TRUE , 
                                  thetasamp.density=thetasamp.density , snodes=snodes ,
-			resp.ind=resp.ind	)	
+								resp.ind=resp.ind	)	
     hwt <- res.hwt[["hwt"]]   
 # cat("calc_posterior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						 
 
@@ -550,7 +557,11 @@ se.B <- 0*B
     if ( max(abs(increment)) < convM ) { converge <- TRUE }
     Miter <- Miter + 1						
 
-      
+		# stabilizing the algorithm | ARb 2013-09-10
+		if (fac.oldxsi > 0 ){
+				xsi <-  (1-fac.oldxsi) * xsi + fac.oldxsi *oldxsi
+							}	
+	
       # progress bar
       if (progress){ 
 #        cat( paste( rep("-" , sum( mpr == p ) ) , collapse="" ) )
@@ -623,7 +634,10 @@ se.B <- 0*B
       cat( paste( "\n  Deviance =" , round( deviance , 4 ) ))
       devch <- -( deviance - olddeviance )
 	  cat( " | Deviance change:", round( devch  , 4 ) )
-	  if ( devch < 0 & iter > 1 ){ cat ("   Deviance increases!") }
+	  	  if ( devch < 0 & iter > 1 ){ 
+			cat ("\n!!! Deviance increases!                                        !!!!") 
+			cat ("\n!!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!") 			
+					}
 	  
 	  
       cat( "\n  Maximum intercept parameter change:" , round( a1 , 6 ) )
@@ -669,7 +683,13 @@ se.B <- 0*B
 	se.AXsi <- 0*AXsi
 	A1 <- A
 	A1[ is.na(A) ] <- 0
-	se.xsiD <- diag( se.xsi^2 )
+	if ( length( se.xsi) > 1){
+			se.xsiD <- diag( se.xsi^2 )
+				} else {
+			se.xsiD <- matrix( se.xsi^2,1,1)
+						}
+# Reval("print(se.xsi)")
+# Reval( "print(se.xsiD)") 
 	#*******
 	# A1 [ items ,categs , params ]  -> xsi design matrix
 	# se.xsiD  [ params , params ]
@@ -823,7 +843,10 @@ se.B <- 0*B
 			   "ic" = ic , 
                "deviance.history" = deviance.history ,
                "control" = con1a , "irtmodel" = irtmodel ,
-			   "iter" = iter
+			   "iter" = iter ,
+			   "printxsi" = printxsi ,
+			   "YSD"=YSD ,
+			   "design"=design
 #			   "xsi.min.deviance" = xsi.min.deviance ,
 #			   "beta.min.deviance" = beta.min.deviance , 
 # "variance.min.deviance" = variance.min.deviance 

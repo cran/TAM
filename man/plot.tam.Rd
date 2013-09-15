@@ -44,15 +44,15 @@ six groups.
 Use WLE estimate for displaying observed scores.
 }
   \item{export}{
-Export all graphics separately in png format in
-the subfolder \code{'Plots'} of the working directory?
+A logical which indicates whether all graphics should be separately 
+exported in png format in a subfolder \code{'Plots'} of the working directory.
 }
   \item{observed}{
-A logical which indicates if observed response curve should
-be displayed?
+A logical which indicates whether observed response curve should
+be displayed
 }
   \item{overlay}{
-Overlay expected score functions
+A logical indicating whether expected score functions should overlay.
 }
   \item{ask}{
 A logical which asks for changing the graphic from item to item.
@@ -63,9 +63,10 @@ Further arguments to be passed
 }
 }
 
-%\details{
-%%  ~~ If necessary, more details than the description above ~~
-%}
+\details{
+This plot method does not work for multidimensional item response
+models.
+}
 
 %\value{
 %%  ~Describe the value returned

@@ -23,6 +23,7 @@ function( tamobj , nplausible = 10 ,
     B <- tamobj$B
     A <- tamobj$A
     Y <- tamobj$Y
+	YSD <- tamobj$YSD
     nitems <- tamobj$nitems
     xsi <- ( tamobj$xsi )[,1]
     beta <- tamobj$beta
@@ -62,6 +63,9 @@ function( tamobj , nplausible = 10 ,
 	###################################################
 	# routine for drawing plausible values
 	while ( pp <= NPV ){
+	
+	   #***************************
+       # 1-dimensional PV imputation	   
 	   if (ndim == 1){
 			# unidimensional theta simulation
 			if ( ! normal.approx){			
@@ -72,6 +76,8 @@ function( tamobj , nplausible = 10 ,
 				 theta <- matrix( SDEAP * seq( - 5 , 5 , len=ntheta ) + MEAP , ncol=1 )		 
 							}
 				} else {
+		#*****************************
+        # multidimensional PV imputation		
 		  # adapt for multidimensional case here!!
 	      theta <- mvrnorm( ntheta , mu = mu1 , Sigma = Sigma1 )
 					}
@@ -83,7 +89,7 @@ function( tamobj , nplausible = 10 ,
 # cat("calc prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1			
 		# calculate student's prior distribution    	
 		gwt <- stud_prior.v2( theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
-                          nnodes=nnodes , ndim=ndim )
+                          nnodes=nnodes , ndim=ndim , YSD=YSD)
 # cat("stud prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							  
 		# posterior distribution
 		hwt <- calc_posterior.v2( rprobs=rprobs , gwt=gwt , resp=tamobj$resp , nitems=nitems , 
@@ -92,22 +98,22 @@ function( tamobj , nplausible = 10 ,
         hwt1 <- hwt			
 # cat("posterior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							  		
 #		hwt1 <- rowcumsums( hwt1)
-# cat("rowcumsums orig") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							  				
+# cat("rowcumsums orig") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							  		
 		hwt1 <- rowCumsums.TAM(hwt1) # include this function in later versions!!
 # cat("rowcumsums TAM") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							  		
 		if (  samp.regr ){
 			#*****
 			# no normal approximation
-			if ( !normal.approx){			
+			if ( ! normal.approx){			
 				rn1 <- runif( nstud )
 				ind <- rowSums( hwt1 < outer( rn1 , nthetal ) ) +1
 #				ind <- rowSums( hwt1 < outer( rn1 , nthetal ) )
 #				ind <- ifelse( ind > ntheta , ntheta , ind )
 #				ind <- ifelse( ind == 0 , 1 , ind )
-				pv[,pp] <- theta1 <- theta[ind]
+				pv[,pp] <- theta1 <- theta[ind]				
 									}
 			#*****
-			# normal approximation
+			# normal approximation in unidimensional case
 			if ( normal.approx){
 				thetaM <- matrix( theta[,1] , nstud , ntheta , byrow=TRUE )
 				EAP <- rowSums( thetaM * hwt )
@@ -132,28 +138,18 @@ function( tamobj , nplausible = 10 ,
 				beta <- mvrnorm( 1 , mu = beta , Sigma = vcovmod )
 				beta <- matrix( beta , ncol=1 )
 				# no sampling of residual variance from the posterior
-								}                       
-
+								}                  
+			#********************								
+			# no sampling of regression cofficients
      		if ( ! samp.regr ){
 			for ( pp in 1:nplausible ){
 			 #****
 			 # no normal approximation
 			 if ( ( ! normal.approx ) | ndim > 1 ){
 				rn1 <- runif( nstud )
-				# Correction ARb 2013-02-11
-#				ind <- rowSums( hwt1 < outer( rn1 , nthetal ) ) +1
-				# acceleration ARb 2013-07-27
 				ind <- interval_index( hwt1 , rn1 )	
-#				ind <- rowSums( hwt1 < outer( rn1 , nthetal ) )				
-#				ind <- rowSums( hwt1 > outer( rn1 , nthetal ) ) +1
-#				ind <- rowSums( hwt1 > outer( rn1 , nthetal ) ) 				
-#				ind <- ifelse( ind > nnodes , nnodes , ind )
-#				ind <- ifelse( ind == 0 , 1 , ind )				
-#				ind[ ind > nthetal ] <- nthetal
-#				ind <- rowSums( hwt1 < outer( rn1 , nthetal ) )
-#				ind <- ifelse( ind == 0 , 1 , ind )
 				# Correction MWu 2012-09-18
-                pv[ , (pp-1)*(ndim) + 1:ndim ] <- theta[ind , ]	
+                pv[ , (pp-1)*(ndim) + 1:ndim ] <- theta[ind , ]			
 									}
               #****									 
 			  # normal approximation
@@ -182,3 +178,7 @@ function( tamobj , nplausible = 10 ,
                 "theta" = theta  )
     return(res)
     }
+
+	
+##################################################################
+##################################################################

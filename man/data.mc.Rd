@@ -2,19 +2,20 @@
 \alias{data.mc}
 \docType{data}
 \title{
-Data Set with Raw and Scored Responses from Multiple Choice Items
+Dataset with Raw and Scored Responses from Multiple Choice Items
 }
 \description{
-Data set of responses from multiple choice items, containing 143 students
+Dataset of responses from multiple choice items, containing 143 students
 on 30 items.
 }
 \usage{
 data(data.mc)
 }
 \format{
-  The data set is a list with two elements. The entry \code{raw}
+  The dataset is a list with two elements. The entry \code{raw}
   contains unscored (raw) item responses and the entry \code{scored}
-  contains the scored (recoded) item responses. The format is: \cr
+  contains the scored (recoded) item responses. The format is:
+  
 \code{List of 2} \cr
 \code{ $ raw   : chr [1:143, 1:30] "A" "A" "A" "A" ...} \cr
 \code{  ..- attr(*, "dimnames")=List of 2} \cr

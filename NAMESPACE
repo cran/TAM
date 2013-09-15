@@ -11,7 +11,7 @@ export(designMatrices, .A.matrix, designMatrices.mfr,
        tam.se, tam.wle , .A.PCM2 , .A.PCM3 , 
        tam.threshold , tam ,
        tam.ctt , tam.mml.wle ,
-       tam.ctt2
+       tam.ctt2 , tam.fa
        )
 
 # internal functions; not intended to be visible to users
@@ -39,5 +39,8 @@ S3method( plot , tam.jml )
 import(mvtnorm)
 import(tensor)
 import(MASS)
+import(GPArotation)
+# importFrom(sirt,reliability.nonlinearSEM)
 # import(sfsmisc)
 importFrom( sfsmisc , QUnif  )
+importFrom( psych , schmid)
