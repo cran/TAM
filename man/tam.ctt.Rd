@@ -13,7 +13,7 @@ theory.
 \usage{
 tam.ctt(resp, wlescore=NULL, pvscores=NULL, group=NULL , progress=TRUE)
 
-tam.ctt2(resp, wlescore=NULL, group=NULL , maxK=30 , progress=TRUE)
+tam.ctt2(resp, wlescore=NULL, group=NULL , allocate=30 , progress=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -32,15 +32,18 @@ A matrix with plausible values, e.g. obtained from \code{tam.pv}
 \item{group}{Vector of group identifiers if descriptive statistics shall
 be groupwise calculated}
   \item{progress}{
-Display progress?
+An optional logical indicating whether computation progress
+should be displayed.
 }
-\item{maxK}{Average number of categories per item. This argument is just
+\item{allocate}{Average number of categories per item. This argument is just
 	used for matrix size allocations. If an error is produced, use
 	a sufficiently higher number.
 }
 }
 \details{
 The function \code{tam.ctt2} uses \pkg{Rcpp} code and is slightly faster.
+However, \code{tam.ctt2} only allows the input of \code{wlescore} and
+not \code{pvscores}.
 }
 
 \value{
@@ -78,8 +81,10 @@ correlation of an item and a test score (here the WLE).
 %}
 \examples{
 \dontrun{
-#################################################
-# Example data.mc
+#############################################################################
+# EXAMPLE 1: Multiple choice data data.mc
+#############################################################################
+
 data(data.mc)
 # estimate Rasch model for scored data.mc data
 mod <- tam.mml( resp=data.mc$scored )

@@ -1,3 +1,5 @@
+###################################################################
+# Function for defining different response patterns
 resp.pattern3 <-
 function( x ){
     n <- nrow(x)
@@ -8,7 +10,7 @@ function( x ){
                 "mp.index" = match( mdp[,1] , sort( unique(mdp[,1] ) ) ) )
     return( misspattern )
         }
-
+####################################################################
 rowcumsums <-
   function(m1){
     g1 <- 0*m1
@@ -19,17 +21,19 @@ rowcumsums <-
     return(g1)
   }
 
+###################################################################
 rowCumsums.TAM <- function(matr){ 
 	.Call("rowCumsums2_source", matr , PACKAGE = "TAM")
 					}
-
+###################################################################					
 #****					
 # 'interval_index' searches an index when a frequency is exceeded
 # -> used in plausible value imputation
 interval_index <- function(matr,rn){ 
 	.Call("interval_index_C", matr , rn , PACKAGE = "TAM")
 					}					
-  
+#############################################################
+# search the maximum in each matrix row
 rowMaxs <-
   function(mat, na.rm = FALSE){    
     # Call: from designMatrix()
@@ -44,13 +48,28 @@ rowMaxs <-
     x[p , ]
   }
 
+#############################################################
+# rewrite theta.sq function into Rcpp
 theta.sq <-
   function(theta){
     theta2 <- array(,dim = c(nrow(theta), ncol(theta) , ncol(theta) ) )
-    for( qq in 1:nrow(theta) ) theta2[qq,,] <- theta[qq,] %*% t(theta[qq,])  
+    for( qq in 1:nrow(theta) ){
+#		theta2[qq,,] <- theta[qq,] %*% t(theta[qq,])  
+		theta2[qq,,] <- tcrossprod( theta[qq,] )  		
+				}
     return("theta2" = theta2)
   }
+#*******************************
+# faster Rcpp function  
+theta.sq2 <- function(theta){
+	theta2 <- .Call("theta_sq_cpp", theta , PACKAGE = "TAM")
+    return("theta2" = theta2)
+  }  
+  
+#############################################################
 
 add.lead <- function(x, width=max(nchar(x))){
   sprintf(paste('%0', width, 'i', sep=''), x) 
 }
+
+##############################################################

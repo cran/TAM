@@ -7,12 +7,12 @@
  \alias{stud_prior.v2}
 
  \alias{mstep.regression}
- \alias{Mstep_slope}
  \alias{Mstep_slope.v2}
 
  \alias{resp.pattern3}
  \alias{theta.sq}
-
+ \alias{theta.sq2}
+ 
  \alias{rowcumsums}
  \alias{rowMaxs}
 
@@ -26,7 +26,8 @@
 Computation of intermediate information
 }
 \description{
-Listing of all the intermediate calculation methods currently aktiv in TAM. Not to be called by user.
+Listing of all the intermediate calculation methods currently 
+active in TAM. Not to be called by user.
 }
 \usage{
 calc_exp_TK(rprobs, A, itemwt, p, ip, nitems, resp.ind)
@@ -44,15 +45,14 @@ tam.jml.xsi2(resp, resp.ind, A, A.0, B, nstud, nitems, maxK, convM,
 mstep.regression(resp, hwt, resp.ind, pweights, pweightsM, Y, 
     theta, theta2, YYinv, ndim, nstud, beta.fixed, variance, Variance.fixed, 
     group, G, snodes = 0 , thetasamp.density = NULL , nomiss=FALSE)
-Mstep_slope(B_orig, B, B_obs, max.increment, nitems, A, AXsi, 
-    xsi, theta, nnodes, maxK, itemwt, Msteps, ndim, convM)
 Mstep_slope.v2(B_orig, B, B_obs, B.fixed, max.increment, nitems, 
     A, AXsi, xsi, theta, nnodes, maxK, itemwt, Msteps, ndim, 
     convM, irtmodel, progress, est.slopegroups, E, basispar,se.B,
     equal.categ)
 
 resp.pattern3(x)
-theta.sq(theta)
+theta.sq(theta)     # R version
+theta.sq2(theta)    # Rcpp version
 
 rowcumsums(m1)
 rowMaxs(mat, na.rm = FALSE)

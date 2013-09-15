@@ -8,7 +8,8 @@ tam.mml.mfr <-
             est.variance = FALSE , formulaA=~item+item:step, constraint="cases",
             A=NULL , B=NULL , B.fixed = NULL , 
             Q=NULL , facets=NULL, est.slopegroups=NULL , E = NULL , 
-            pweights = NULL , control = list() 
+            pweights = NULL , control = list() ,
+			delete.red.items=TRUE
             # control can be specified by the user 
   ){
     
@@ -43,14 +44,15 @@ a0 <- Sys.time()
     disp <- "....................................................\n"
     increment.factor <- progress <- nodes <- snodes <- ridge <- xsi.start0 <- QMC <- NULL
     maxiter <- conv <- convD <- min.variance <- max.increment <- Msteps <- convM <- NULL 
-	
+	resp_orig <- resp
+
     # attach control elements
     e1 <- environment()
     con <- list( nodes = seq(-6,6,len=21) , snodes = 0 , QMC=TRUE , 
                  convD = .001 ,conv = .0001 , convM = .0001 , Msteps = 4 ,            
                  maxiter = 1000 , max.increment = 1 , 
                  min.variance = .001 , progress = TRUE , ridge=0,seed= NULL ,
-				 xsi.start0=TRUE , increment.factor=1)  	
+				 xsi.start0= FALSE , increment.factor=1 , fac.oldxsi=0)  	
     con[ names(control) ] <- control  
     Lcon <- length(con)
     con1a <- con1 <- con ; 
@@ -59,7 +61,11 @@ a0 <- Sys.time()
       assign( names(con)[cc] , con1[[cc]] , envir = e1 ) 
     }
   if ( !is.null(con$seed)){ set.seed( con$seed )	 }
+  #***
+  fac.oldxsi <- max( 0 , min( c( fac.oldxsi , .95 ) ) )
   
+  
+  pid0 <- pid
   if (progress){ 
       cat(disp)	
       cat("Processing Data     ", paste(Sys.time()) , "\n") ; flush.console()
@@ -79,7 +85,8 @@ a0 <- Sys.time()
     design <- designMatrices.mfr(resp, formulaA=formulaA, facets=facets,  
                                  constraint=constraint, ndim=ndim,
                                  Q=Q, A=A, B=B , progress=progress)
-# cat("designmatrices schluss\n")								 
+
+# cat("design matrices  " ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1								 
 								 
     A <- design$A$A.3d.0
     cA <- design$A$A.flat.0
@@ -98,8 +105,7 @@ a0 <- Sys.time()
 			paste(Sys.time()) , ")\n") ; flush.console()	  
 				}    
 	
-	
-#  cat("design matrix" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
+#cat("design matrix ready" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
 	
 	#***
 	# preprocess data if multiple person IDs do exist
@@ -107,34 +113,47 @@ a0 <- Sys.time()
 	if ( tp > 1){
 		persons <- sort( unique( pid ) )
 		NP <- length( persons )
+#cat("*** multiple persons start" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1		
 		#****
 		# ARb 2013-08-23: added simplify=TRUE
 		person.ids <- sapply( persons , FUN = function( pp){ which( pid == pp ) } ,
 					simplify=FALSE)
+#cat("*** multiple persons sapply function" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1				
 		PP <- matrix( NA , nrow=NP , ncol=tp)
 		for (pos in 1:tp){
 			#pos <- 1
 			PP[,pos] <- unlist( lapply( person.ids , FUN = function( vv){ vv[pos] } ) )
 					}
+#cat("*** multiple persons lapply function" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1				
 		gresp0 <- matrix( NA , nrow=NP , ncol= ncol(gresp) )
 		colnames(gresp0) <- colnames(gresp)
 		gresp0.noStep <- matrix( NA , nrow=NP , ncol= ncol(gresp.noStep) )
 		colnames(gresp0.noStep) <- colnames(gresp.noStep)
+		grespNA <- ( ! is.na( gresp ) )
+		grespnoStepNA <- ( ! is.na( gresp.noStep ) )		
+#cat("*** multiple persons start pos" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1				
 		for (pos in 1:tp){
-			# pos <- 2
+#			pos <- 3
 			ind.pos <- which( ! is.na( PP[,pos]  ) )
 			PP.pos <- PP[ind.pos,pos]
-			
 			g1 <- gresp[ PP.pos , ]
 			g0 <- gresp0[ ind.pos , ]
-			g0[ ! is.na(g1) ] <- g1[ ! is.na(g1) ]
+#			ig1 <- ( ! is.na(g1) )
+			ig1 <- grespNA[ PP.pos , ]
+			# * this check is time-consuming! release it to rcpp
+			g0[ ig1 ] <- g1[ ig1 ]
 			gresp0[ ind.pos , ] <- g0
-			
+			# why not using just the following formula?
+			#	gresp0[ ind.pos , ] <- gresp[ PP.pos , ]			
+			#   => obtained different results
 			g1 <- gresp.noStep[ PP.pos , ]
 			g0 <- gresp0.noStep[ ind.pos , ]
-			g0[ ! is.na(g1) ] <- g1[ ! is.na(g1) ]
+#			ig1 <- ( ! is.na(g1) )
+			ig1 <- grespnoStepNA[ PP.pos , ]
+			g0[ ig1 ] <- g1[ ig1 ]
 			gresp0.noStep[ ind.pos , ] <- g0
 					}
+#cat("*** multiple persons loop over pos" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1				
 		gresp0 -> gresp
 		gresp0.noStep -> gresp.noStep
 		pid <- persons	
@@ -145,7 +164,8 @@ a0 <- Sys.time()
 				}
 	###################################################
 
-	
+
+#  cat("process data in case of multiple persons" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
     nitems <- nrow( X.red )
     nstud <- nrow(gresp)        # number of students
     if ( is.null( pweights) ){
@@ -154,7 +174,7 @@ a0 <- Sys.time()
     
 	if (progress){ 
 	  cat("    * Response Data:" , nstud , "Persons and " , 
-			ncol(gresp.noStep) , "Generalised Items \n" )  ;
+			ncol(gresp.noStep) , "Generalized Items (" , paste(Sys.time()) ,")\n" )  ;
 	  flush.console()	  
 					}  	
 	
@@ -188,7 +208,7 @@ a0 <- Sys.time()
 				l1 <- paste0(l1 , "Monte Carlo integration with ")					
 						}
 					}
-    cat( paste0( l1 , nnodes , " nodes\n") )
+ #   cat( paste0( l1 , nnodes , " nodes\n") )
 	if (nnodes > 8000){
 		cat("      @ Are you sure that you want so many nodes?\n")
 		cat("      @ Maybe you want to use Quasi Monte Carlo integration with fewer nodes.\n")		
@@ -270,10 +290,20 @@ a0 <- Sys.time()
       for (gg in 1:G){ Y[,gg] <- 1*(group==gg) }
       nreg <- G - 1
     }
+    # redefine Y in case of multiple persons
+	if (tp>1){
+		if ( nrow(gresp) != nrow(Y) ){
+			Ypid <- rowsum( Y , pid0 )
+			Y <- Ypid / Ypid[,1]
+					}
+				}
+
+	
     
-    
-    
-    W <- t(Y * pweights) %*% Y
+#    W <- t(Y * pweights) %*% Y
+    W <- crossprod(Y * pweights ,  Y )
+	
+	
     if (ridge > 0){ diag(W) <- diag(W) + ridge }
     YYinv <- solve( W )
             
@@ -313,9 +343,12 @@ a0 <- Sys.time()
 #	nomiss <- sum( is.na(gresp.noStep) == 0 )  	#*** included nomiss in M step regression
 	resp.ind <- gresp.noStep.ind
 	nomiss <- mean( gresp.noStep.ind ) == 1
+	#***
+	miss.items <- rep(0,nitems)
     for (i in 1:nitems){ 
 #      resp.ind.list[[i]] <- which( resp.ind[,resp.col.ind[i]] == 1)  
        resp.ind.list[[i]] <- which( gresp.noStep.ind[,i] == 1)  
+	   miss.items[i] <- i * ( length(resp.ind.list[[i]]) == 0 )
     }
 #    resp[ is.na(resp) ] <- 0 	# set all missings to zero
 	 gresp0.noStep <- gresp.noStep
@@ -323,7 +356,39 @@ a0 <- Sys.time()
 	 gresp.noStep[ is.na( gresp.noStep) ] <- 0
 #    gresp.noStep.ind <- resp.ind[ ,resp.col.ind]
 #    gresp.ind <- resp.ind[ ,as.numeric(X[,ifelse("item" %in% colnames(X), "item", 1)])]
+	 
+	 
+	 #*****
+	 # ARb 2013-09-09: deletion of items
+	 miss.items <- miss.items[ miss.items > 0 ]
+	 if ( length(miss.items) == 0 ){ delete.red.items <- FALSE }
+	 if (delete.red.items){					
+		miss.itemsK <- NULL
+		for (kk in 1:maxK ){
+			miss.itemsK <- c( miss.itemsK , ( miss.items - 1 )* maxK + kk )
+							}
+		
+		miss.itemsK <- sort(miss.itemsK)
+		gresp <- gresp[ , - miss.itemsK ]
+		gresp.noStep <- gresp.noStep[ , - miss.items ]
+		gresp.noStep.ind <- gresp.noStep.ind[ , - miss.items ]		
+		A <- A[ - miss.items , , , drop=FALSE]
+		B <- B[ - miss.items , , ,drop=FALSE]	
+		resp.ind.list <- resp.ind.list[ - miss.items ]
+		resp.ind <- resp.ind[ , - miss.items ]
+		nitems <- ncol(gresp.noStep)
+		pweightsM <- outer( pweights , rep(1,nitems) )
+		
+		if (progress){ 
+		  cat("    * Reduced Response Data:" , nstud , "Persons and " , 
+				ncol(gresp.noStep) , "Generalized Items (" , paste(Sys.time()) ,")\n" )  ;
+		  flush.console()	  
+						} 		
+		
+				}
     
+	#****
+	
     #@@ ARb:Include Starting values for xsi??
     #       xsi <- - qnorm( colMeans( resp ) )
     AXsi <- matrix(0,nrow=nitems,ncol=maxK )  #A times xsi
@@ -340,36 +405,21 @@ a0 <- Sys.time()
 	indexIP.no <- as.matrix( cbind( c(1 , lipl[-length(lipl)]+1 ) , lipl ) )
 	
 	
-	#******** addition ARb 2013-05-03
-	
-	
-    # These sufficient statistics must be changed
-    # to make it more general
-    # First extension:  pweights and dependent on A; needs to be further extended (e.g., different number of categories)
-    # Second extension: multiple category option       -> resp \in 0:maxKi (see method definition calc_posterior_TK)
-    #                                                  -> length(ItemScore) = np (see diff computation in M Step)
-    #                   multiple category option Bugfix
-    #                                                  -> dim(cResp) = (nstud, nitems*maxK)
-    #                                                  -> adapt dim(A) to dim(cResp) for sufficient statistic (cf. print.designMatrices)
-
-# cat("before item score" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1		
-	#*********************** 
-#	  col.index <- rep( 1:nitems , each = maxK )
-#	  cResp <- gresp.noStep[ , col.index  ]*gresp.noStep.ind[ , col.index ]
-#	  cResp <- 1 * t( t(cResp) == rep(0:(maxK-1), nitems) )
-	  ##@@@## missings should be taken into account
-#	  cResp <- cResp * gresp.noStep.ind[ , col.index ] 
 	#***********************	
     #...TK - 24.08.2012:  cA returned from designMatrices
     # sufficient statistics
 #    ItemScore <- (cResp %*% cA) %t*% pweights
 	col.index <- rep( 1:nitems , each = maxK )
-	cResp <- (gresp.noStep+1)*gresp.noStep.ind
+
+	cResp <- (gresp.noStep+1)*gresp.noStep.ind	
     cResp <- cResp[ , col.index  ]
+
+
     cResp <- 1 * ( cResp == matrix( rep(1:(maxK), nitems) , nrow(cResp) , 
 		    		ncol(cResp) , byrow=TRUE ) )
+										
     cA <- t( matrix( aperm( A , c(2,1,3) ) , nrow = dim(A)[3] , byrow = TRUE ) )
-    cA[is.na(cA)] <- 0					
+    cA[is.na(cA)] <- 0		
   if ( sd(pweights) > 0 ){ 
 	ItemScore <- as.vector( t( colSums( cResp * pweights ) ) %*% cA )
 			} else { 
@@ -377,6 +427,8 @@ a0 <- Sys.time()
 				   }
 				   
 # cat("calc ItemScore" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
+ 
+
     if (progress){ 
         cat("    * Calculated Sufficient Statistics   (", 
 			paste(Sys.time()) , ")\n") ; flush.console()	  
@@ -388,10 +440,11 @@ a0 <- Sys.time()
 	ItemMax <- as.vector( t( colSums( gresp.ind.tmp * pweights ) ) %*% cA )    
 
 	
-	# cat("calc ItemMax" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
+# cat("calc ItemMax" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
 
-	
-#    xsi[est.xsi.index] <- - log(abs(ItemScore[est.xsi.index]/(ItemMax[est.xsi.index]-ItemScore[est.xsi.index])))  
+
+#    xsi[est.xsi.index] <- - 
+#  log(abs(ItemScore[est.xsi.index]/(ItemMax[est.xsi.index]-ItemScore[est.xsi.index])))  
     xsi[est.xsi.index] <- - log(abs(( ItemScore[est.xsi.index]+.5)/
 				(ItemMax[est.xsi.index]-ItemScore[est.xsi.index]+.5) ) )
 	# starting values of zero
@@ -414,7 +467,8 @@ a0 <- Sys.time()
     if ( snodes == 0 ){ 
       theta <- as.matrix( expand.grid( as.data.frame( matrix( rep(nodes, ndim) , ncol = ndim ) ) ) )
       #we need this to compute sumsig2 for the variance
-      theta2 <- matrix(theta.sq(theta), nrow=nrow(theta),ncol=ncol(theta)^2)            
+#      theta2 <- matrix(theta.sq(theta), nrow=nrow(theta),ncol=ncol(theta)^2)            
+      theta2 <- matrix(theta.sq2(theta), nrow=nrow(theta),ncol=ncol(theta)^2)            
       # grid width for calculating the deviance
       thetawidth <- diff(theta[,1] )
       thetawidth <- ( ( thetawidth[ thetawidth > 0 ])[1] )^ndim 
@@ -461,10 +515,14 @@ a0 <- Sys.time()
     # display
     disp <- "....................................................\n"
     # define progress bar for M step    
+
+# cat("rest  " ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1								 
+# stop("HERE")
 	
     ##############################################################   
     #Start EM loop here
-    while ( ( (!betaConv | !varConv)  | ((a1 > conv) | (a4 > conv) | (a02 > convD)) )  & (iter < maxiter) ) { 
+    while ( ( (!betaConv | !varConv)  | ((a1 > conv) | (a4 > conv) | (a02 > convD)) )  & 
+			(iter < maxiter) ) { 
 
 # a0 <- Sys.time()	
       iter <- iter + 1
@@ -475,11 +533,13 @@ a0 <- Sys.time()
       }
       # calculate nodes for Monte Carlo integration	
       if ( snodes > 0){
-        theta <- beta[ rep(1,snodes) , ] +  t ( t(chol(variance)) %*% t(theta0.samp) )
+#        theta <- beta[ rep(1,snodes) , ] +  t ( t(chol(variance)) %*% t(theta0.samp) )
+        theta <- beta[ rep(1,snodes) , ] + theta0.samp %*% chol(variance) 
         # calculate density for all nodes
         thetasamp.density <- dmvnorm( theta , mean = as.vector(beta[1,]) , sigma = variance )
         # recalculate theta^2
-        theta2 <- matrix( theta.sq(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
+#        theta2 <- matrix( theta.sq(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
+        theta2 <- matrix( theta.sq2(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
       }			
       olddeviance <- deviance
       # calculation of probabilities
@@ -500,9 +560,7 @@ a0 <- Sys.time()
                                    thetasamp.density=thetasamp.density , snodes=snodes ,
 						resp.ind=resp.ind	)	
       hwt <- res.hwt[["hwt"]]  
-# print( head(hwt))
-
-	  
+ 	  
 # cat("calc posterior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		  
       if (progress){ cat("M Step Intercepts   |"); flush.console() }
       # collect old values for convergence indication
@@ -510,11 +568,12 @@ a0 <- Sys.time()
       oldbeta <- beta
       oldvariance <- variance 
       # M step: estimation of beta and variance
-      resr <- mstep.regression( resp=gresp.noStep , hwt=hwt , resp.ind=gresp.noStep.ind , pweights=pweights , 
-                                pweightsM=pweightsM , Y=Y , theta=theta , theta2=theta2 , YYinv=YYinv , 
-                                ndim=ndim , nstud=nstud , beta.fixed=beta.fixed , variance=variance , 
-                                Variance.fixed=variance.fixed , group=group ,  G=G , snodes = snodes ,
-								nomiss=nomiss)
+      resr <- mstep.regression( resp=gresp.noStep , hwt=hwt , resp.ind=gresp.noStep.ind , 
+			pweights=pweights ,  pweightsM=pweightsM , Y=Y , theta=theta , 
+			theta2=theta2 , YYinv=YYinv , 
+            ndim=ndim , nstud=nstud , beta.fixed=beta.fixed , variance=variance , 
+            Variance.fixed=variance.fixed , group=group ,  G=G , snodes = snodes ,
+			nomiss=nomiss)
       
       beta <- resr$beta
 #cat("m step regression") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		        
@@ -543,6 +602,10 @@ a0 <- Sys.time()
       converge <- FALSE
       Miter <- 1
       old_increment <- rep( max.increment , np )
+#	  if (TRUE & (iter>1) ){
+#	     old_increment <- xsi.change
+#				}
+	  
 	  est.xsi.index <- est.xsi.index0
       while (!converge & ( Miter <= Msteps ) ) {	
         # Only compute probabilities for items contributing to param p
@@ -572,17 +635,25 @@ a0 <- Sys.time()
         #!!!	  necesessary to include statement to control increment?
         ci <- ceiling( abs(increment) / ( abs( old_increment) + 10^(-10) ) )
         increment <- ifelse( abs( increment) > abs(old_increment)  , 
-                             increment/(2*ci) , 
-                             increment )
-        # Code from Margaret
-        #    	for (p in est.xsi.index ) {
-        #			 while (abs(increment[p]) > abs(old_increment[p])){
-        #				increment[p] <- increment[p] / 2.0  #damping the increment
-        #						}
-        #						}
-        
+                             increment/(2*ci) , increment )
+		#****
+		# inclusion
+		#        increment <- ifelse( abs( increment) > max.increment  , 
+		#                             sign(increment)*max.increment , increment )
+		#		max.increment <- max( abs(increment) )
+		#****
+							 
         old_increment <- increment
+
+		
         xsi <- xsi+increment   # update parameter p
+
+		# stabilizing the algorithm | ARb 2013-09-10
+		if (fac.oldxsi > 0 ){
+				xsi <-  (1-fac.oldxsi) * xsi + fac.oldxsi *oldxsi
+							}
+							
+							
 #		est.xsi.index <- which( abs(increment) > convM )		
         if ( max(abs(increment)) < convM ) { 
 				converge <- TRUE 
@@ -600,6 +671,9 @@ a0 <- Sys.time()
           flush.console()
 			}
       } # end of all parameters loop
+
+
+		
       
 	#***
 	# decrease increments in every iteration
@@ -643,14 +717,19 @@ a0 <- Sys.time()
 		se.B.min <- se.B
 				}
       
-      a1 <- max( abs( xsi - oldxsi ))	
+      a1 <- max( abs( xsi - oldxsi ))
+# xsi.change <- abs( xsi - oldxsi )
+  
       a2 <- max( abs( beta - oldbeta ))	
       a3 <- max( abs( variance - oldvariance ))
       if (progress){ 
         cat( paste( "\n  Deviance =" , round( deviance , 4 ) ))
       devch <- -( deviance - olddeviance )
 	  cat( " | Deviance change:", round( devch  , 4 ) )
-	  if ( devch < 0 & iter > 1 ){ cat ("   Deviance increases!") }
+	  if ( devch < 0 & iter > 1 ){ 
+			cat ("\n!!! Deviance increases!                                        !!!!") 
+			cat ("\n!!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!") 			
+					}
         cat( "\n  Maximum intercept parameter change:" , round( a1 , 6 ) )
         cat( "\n  Maximum regression parameter change:" , round( a2 , 6 ) )  
         if ( G == 1 ){ 
@@ -663,6 +742,9 @@ a0 <- Sys.time()
         cat( "\n" )
         flush.console()
       }
+	  
+	  
+	  
     } # end of EM loop
     #############################################################
 	#############################################################
@@ -698,13 +780,13 @@ a0 <- Sys.time()
 		se.AXsi[,kk] <- sqrt( diag( A1_kk %*% se.xsiD %*% t( A1_kk ) ) )	
 	#****		
 			}
-
+		
 	##*** Information criteria
 	ic <- .TAM.ic( nstud , deviance , xsi , xsi.fixed ,
 		beta , beta.fixed , ndim , variance.fixed , G ,
 		irtmodel , B_orig=NULL , B.fixed , E , est.variance =TRUE ,
 		resp )
-		
+	
 	#***
 	# calculate counts
 	res <- .tam.calc.counts( resp, theta , resp.ind , 
@@ -712,29 +794,34 @@ a0 <- Sys.time()
 	n.ik <- res$n.ik
 	pi.k <- res$pi.k 
 
+
 	#****
 	# collect item parameters
-	item1 <- .TAM.itempartable( resp , maxK , AXsi , B , ndim ,
-				 resp.ind , rprobs,n.ik,pi.k)
 
-			 
-  
+#	item1 <- .TAM.itempartable( resp , maxK , AXsi , B , ndim ,
+#				 resp.ind , rprobs,n.ik,pi.k)
+	item1 <- .TAM.itempartable( resp=gresp.noStep , maxK , AXsi , B , ndim ,
+				 resp.ind=gresp.noStep.ind , rprobs,n.ik,pi.k)
+
+				  
     #####################################################
     # post ... posterior distribution	
     # create a data frame person	
     person <- data.frame( "pid"=pid , "case" = 1:nstud , "pweight" = pweights )
 
-
 #    person$score <- rowSums( resp * resp.ind )
-    resp2 <- resp
+#    resp2 <- resp
+    resp2 <- gresp.noStep
 	resp2[ is.na(resp2) ] <- 0
-    person$score <- rowSums( resp * resp.ind , na.rm=TRUE)
+#    person$score <- rowSums( resp * resp.ind , na.rm=TRUE)
+    person$score <- rowSums( gresp.noStep * gresp.noStep.ind , na.rm=TRUE)
 
     # use maxKi here; from "design object"
     nstudl <- rep(1,nstud)
 
-    person$max <- rowSums( outer( nstudl , apply( resp2 ,2 , max , na.rm=T) ) * resp.ind )
-		
+#    person$max <- rowSums( outer( nstudl , apply( resp2 ,2 , max , na.rm=T) ) * resp.ind )
+    person$max <- rowSums( outer( nstudl , apply( resp2 ,2 , max , na.rm=T) ) * gresp.noStep.ind )
+
     # calculate EAP
     # EAPs are only computed in the unidimensional case for now,
     # but can be easily adapted to the multidimensional case
@@ -750,7 +837,8 @@ a0 <- Sys.time()
       #***
       # calculate EAP reliability
       # EAP variance
-      EAP.variance <- weighted.mean( person$EAP^2 , pweights ) - ( weighted.mean( person$EAP , pweights ) )^2
+      EAP.variance <- weighted.mean( person$EAP^2 , pweights ) - 
+	                 ( weighted.mean( person$EAP , pweights ) )^2
       EAP.error <- weighted.mean( person$SD.EAP^2 , pweights )
       EAP.rel <- EAP.variance / ( EAP.variance + EAP.error )	
     } else { 
@@ -859,7 +947,9 @@ a0 <- Sys.time()
 			   "ic" = ic , 
                "deviance.history" = deviance.history ,
                "control" = con1a , "irtmodel" = irtmodel ,
-			   "iter" = iter
+			   "iter" = iter , "resp_orig" = resp_orig ,
+			   "printxsi"=TRUE , "YSD"=YSD ,
+			   "design"=design
 #			   "xsi.min.deviance" = xsi.min.deviance ,
 #			   "beta.min.deviance" = beta.min.deviance , 
 # "variance.min.deviance" = variance.min.deviance 

@@ -2,10 +2,10 @@
 \alias{data.gpcm}
 \docType{data}
 \title{
-Data set with ordered indicators
+Dataset with Ordered Indicators
 }
 \description{
-Data set with ordered values of 3 indicators
+Dataset with ordered values of 3 indicators
 }
 \usage{data(data.gpcm)}
 \format{

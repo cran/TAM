@@ -5,24 +5,31 @@
 \alias{data.ex10}
 \alias{data.ex11}
 \alias{data.ex12}
+\alias{data.ex14}
+\alias{data.ex15}
+
 
 \docType{data}
 
 \title{
-Data Examples in \pkg{TAM} Package
+Datasets \code{data.ex} in \pkg{TAM} Package
 }
 \description{
-Data examples included in the \pkg{TAM} package
+Datasets included in the \pkg{TAM} package
 }
 \usage{
 data(data.ex08)
 data(data.ex10)
 data(data.ex11)
 data(data.ex12)
+data(data.ex14)
+data(data.ex15)
 }
 
 \format{
-Data \code{data.ex08} for Example 8 in \code{\link{tam.mml}} 
+\itemize{
+%% Example data.ex08
+\item Data \code{data.ex08} for Example 8 in \code{\link{tam.mml}} 
 has the following format:
 
 \code{List of 2} \cr
@@ -33,7 +40,7 @@ has the following format:
 \code{  .. ..$ : NULL} \cr
 \code{  .. ..$ : chr [1:10] "I0001" "I0002" "I0003" "I0004" ...} \cr
 
-Data \code{data.ex10} for Example 10 in \code{\link{tam.mml}} 
+\item Data \code{data.ex10} for Example 10 in \code{\link{tam.mml}} 
 has the following format:
 
 \code{'data.frame':   675 obs. of  7 variables:} \cr
@@ -45,7 +52,8 @@ has the following format:
 \code{ $ I0004: num  0 1 0 0 1 0 1 0 1 0 ...} \cr
 \code{ $ I0005: num  0 0 1 1 1 0 0 1 0 1 ...} \cr
 
-Data \code{data.ex11} for Example 11 in \code{\link{tam.mml}} 
+% Example 11
+\item Data \code{data.ex11} for Example 11 in \code{\link{tam.mml}} 
 has the following format: 
 
 \code{'data.frame':   3400 obs. of  13 variables:} \cr
@@ -66,13 +74,51 @@ has the following format:
 Missing responses by design are coded as \code{NA}, omitted
 responses are coded as \code{9}. \cr
 
-Data \code{data.ex12} for Example 12 in \code{\link{tam.mml}} 
+% Example 12
+\item Data \code{data.ex12} for Example 12 in \code{\link{tam.mml}} 
 has the following format:
 
 \code{ num [1:100, 1:10] 1 1 1 1 1 1 1 1 1 1 ...} \cr
 \code{ - attr(*, "dimnames")=List of 2} \cr
 \code{  ..$ : NULL} \cr
 \code{  ..$ : chr [1:10] "I0001" "I0002" "I0003" "I0004" ...} \cr
+
+% Example 14
+\item Data \code{data.ex14} for Example 14 in \code{\link{tam.mml}} 
+has the following format:
+
+\code{'data.frame':   1110 obs. of  11 variables:} \cr
+\code{ $ pid  : num  1001 1001 1001 1001 1001 ...} \cr
+\code{ $ X1   : num  1 1 1 1 1 1 0 0 0 0 ...} \cr
+\code{ $ X2   : int  1 1 1 1 1 1 1 1 1 1 ...} \cr
+\code{ $ rater: int  4 4 4 4 4 4 4 4 4 4 ...} \cr
+\code{ $ crit1: int  0 0 2 1 1 2 0 0 0 0 ...} \cr
+\code{ $ crit2: int  0 0 0 0 0 0 0 0 0 0 ...} \cr
+\code{ $ crit3: int  0 1 1 0 0 1 0 0 1 0 ...} \cr
+\code{ $ crit4: int  0 0 0 1 0 0 0 0 0 0 ...} \cr
+\code{ $ crit5: int  0 0 0 0 1 1 0 0 0 0 ...} \cr
+\code{ $ crit6: int  0 0 0 0 1 0 0 0 0 0 ...} \cr
+\code{ $ crit7: int  1 0 2 0 0 0 0 0 0 0 ...} \cr
+
+% Example 15
+\item Data \code{data.ex15} for Example 15 in \code{\link{tam.mml}} 
+has the following format: 
+
+\code{'data.frame':   2155 obs. of  182 variables:} \cr
+\code{ $ pid    : num  10001 10002 10003 10004 10005 ...} \cr
+\code{ $ group  : num  1 1 0 0 1 0 1 0 1 1 ...} \cr
+\code{ $ Item001: num  0 NA NA 0 NA NA NA 0 0 NA ...} \cr
+\code{ $ Item002: num  1 NA NA 1 NA NA NA NA 1 NA ...} \cr
+\code{ $ Item003: num  NA NA NA NA 1 NA NA NA NA 1 ...} \cr
+\code{ $ Item004: num  NA NA 0 NA NA NA NA NA NA NA ...} \cr
+\code{ $ Item005: num  NA NA 1 NA NA NA NA NA NA NA ...} \cr
+\code{[...]} 
+
+This dataset shows an atypical convergence behavior. Look at Example 15
+to fix convergence problems using arguments \code{increment.factor} and
+\code{fac.oldxsi}. \cr
+
+} %% end itemize
 }
 %\details{
 %%  ~~ If necessary, more details than the __description__ above ~~

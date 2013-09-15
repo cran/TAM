@@ -17,7 +17,9 @@ or \code{tam.mml} using a likelihood ratio test.
 
 \method{anova}{tam.mml}(object,object1,\dots)
 }
-%- maybe also 'usage' for other objects documented here.
+
+
+
 \arguments{
   \item{object}{
 Object of class \code{tam} or \code{tam.mml} 
@@ -27,16 +29,19 @@ Object of class \code{tam} or \code{tam.mml}
 }
 \item{\dots}{Further arguments to be passed}
 }
+
+
 %\details{
 %%  ~~ If necessary, more details than the description above ~~
 %}
-%\value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-%}
+
+
+\value{
+A data frame containing the likelihood ratio test statistic and
+information criteria.
+}
+
+
 %\references{
 %% ~put references to the literature/web site here ~
 %}
@@ -52,7 +57,12 @@ Object of class \code{tam} or \code{tam.mml}
 %\seealso{
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 %}
+
 \examples{
+#############################################################################
+# EXAMPLE 1: dichotomous data sim.rasch - 1PL vs. 2PL model
+#############################################################################
+	
 data(sim.rasch)
 # 1PL estimation
 mod1 <- tam.mml(resp=sim.rasch) 
@@ -64,7 +74,29 @@ anova( mod1 , mod2 )
 ##     Model   loglike Deviance Npars      AIC      BIC    Chisq df       p
 ## 1 Model 1 -42077.88 84155.77    41 84237.77 84467.40 54.05078 39 0.05508
 ## 2 Model 2 -42050.86 84101.72    80 84261.72 84709.79       NA NA      NA
+
+\dontrun{
+#############################################################################
+# EXAMPLE 2: Dataset reading (sirt package): 1- vs. 2-dimensional model
+#############################################################################
+
+data(data.read,package="sirt")
+
+# 1-dimensional model
+mod1 <- tam.mml.2pl(resp= data.read ) 
+# 2-dimensional model
+mod2 <- tam.fa(resp= data.read , irtmodel="efa" , nfactors=2 ,
+        control=list(maxiter=150) ) 
+
+# Model comparison
+anova( mod1 , mod2 )
+##       Model   loglike Deviance Npars      AIC      BIC    Chisq df  p
+##   1 Model 1 -1954.888 3909.777    24 3957.777 4048.809 76.66491 11  0
+##   2 Model 2 -1916.556 3833.112    35 3903.112 4035.867       NA NA NA
 }
+}
+
+
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{Likelihood ratio test}

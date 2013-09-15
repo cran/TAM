@@ -1,9 +1,11 @@
 tam.ctt2 <-
-function( resp , wlescore=NULL , group=NULL , maxK=30 , progress=TRUE){
+function( resp , wlescore=NULL , group=NULL , allocate=30 , 
+	progress=TRUE){
     I <- ncol(resp)
 	resp <- cbind( "_h" = "h" , resp )
 	resp <- as.matrix(resp)
 	resp0 <- resp
+	maxK <- allocate
 	if ( is.null(wlescore) ){ 
 		est_wle <- 0 
 		wlescore <- rep(1 , nrow(resp) )
@@ -15,6 +17,7 @@ function( resp , wlescore=NULL , group=NULL , maxK=30 , progress=TRUE){
 	if ( is.null(group) ){ group = rep(1 , nrow(resp) ) }
     groups <- sort( unique( group )	)
     G <- length(groups)
+	I <- ncol(resp)	
     dfr <- NULL
 	for (gg in 1:G){
 		ind.gg <- which( group == groups[gg] )
@@ -23,13 +26,27 @@ function( resp , wlescore=NULL , group=NULL , maxK=30 , progress=TRUE){
 #		resp <- as.matrix(resp)
 #		res <- tam.ctt2(tdat= t(resp) , wle=wlescore , maxK=maxK)
 # resp <- as.matrix( paste( t(resp) ))
+
+		prg <- round( seq( 1 , I , len=10 ) )
+		prg[ prg == I ] <- I-1
+	    if (progress){
+			cat("|")
+			cat( paste( rep("*" , 10 ) , collapse="") )
+			cat("| Group" , groups[gg] , "\n|")
+			prg <- round( seq( 1 , I , len=10 ) )
+			prg[ prg == I ] <- I-1
+            }	
+		
+		if ( ! progress ){ prg <- 1 }
 	    resp <- as.matrix( t(resp) )
 	    res <- .Call("tam_ctt_C", 
 				tdat= resp , wle=wlescore , maxK=maxK , est_wle=est_wle ,
-				PACKAGE = "TAM")        
+				prg_=prg , PACKAGE = "TAM")        
 		ind <- which( paste(res$desV) !="" )
 		res1 <- res$des[ ind , ]
-		dfr.gg <- data.frame( "itemno" = res1[,1]-1 , "item" = colnames(resp0)[res1[,1]])
+		dfr.gg <- data.frame( "group"=groups[gg] , 
+				"groupindex" = gg , 
+				"itemno" = res1[,1]-1 , "item" = colnames(resp0)[res1[,1]])
 		dfr.gg$N <- res1[,2]
 		dfr.gg$Categ <- res$desV[ ind ]
 		dfr.gg$AbsFreq <- res1[,4]
@@ -40,11 +57,10 @@ function( resp , wlescore=NULL , group=NULL , maxK=30 , progress=TRUE){
 		dfr.gg <- dfr.gg[ ! is.na( dfr.gg$Categ ) , ]
 		dfr <- rbind( dfr , dfr.gg )				
 	    if (progress){
-#			cat("|")
-			cat( paste( rep("*" , 10 ) , collapse="") )
-			cat("| Group" , groups[gg] , "\n")
-			prg <- round( seq( 1 , I , len=10 ) )
-			prg[ prg == I ] <- I-1
+#			cat( paste( rep("*" , 10 ) , collapse="") )
+			cat("|\n")
+#			prg <- round( seq( 1 , I , len=10 ) )
+#			prg[ prg == I ] <- I-1
             }	
 			} # end group
 	dfr <- dfr[ dfr$item != "_h" , ]

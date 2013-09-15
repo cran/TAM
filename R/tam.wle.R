@@ -96,7 +96,7 @@ function( tamobj, WLE=TRUE , adj=.3 , Msteps=20 ,
       }
       BBB_bari[,,d1] <- sapply(1:nitems, function(i) colSums(BBB[i,,d1] * rprobsWLE[i,,] , na.rm = TRUE)) *resp.ind  
     }
-    
+ 
     B_Sq <- array(0,dim=c(nstud, nitems, ndim, ndim))
     B2_B <- array(0,dim=c(nstud, nitems, ndim))
     B_Cube <- array(0,dim=c(nstud, nitems, ndim))
@@ -115,19 +115,18 @@ function( tamobj, WLE=TRUE , adj=.3 , Msteps=20 ,
 #      err_inv <- apply(err,1,function(x) 1/x )
       err_inv <- 1 / err
     } else {
-      err_inv <- aperm(apply(err,1,solve),c(2,1))   
-#      err_inv <- aperm(apply(err,1,function(ee){
-#						ee1 <- ee
-#						ee1[ diag(ee1) ] <- diag(ee1) + 10^(-7)
-#						solve(ee1)	
-#							}
-#					),c(2,1))            
+      #err_inv <- aperm(apply(err,1,solve),c(2,1))   
+      err_inv <- aperm(apply(err,1,function(ee){
+						ee1 <- ee		
+						diag(ee1) <- diag(ee1) + 10^(-15)
+						solve(ee1)	
+							}
+					),c(2,1))            
     }
     err_inv <- array(abs(err_inv),dim=c(nstud,ndim,ndim))
     warm <- -3*B2_B + 2*B_Cube + BBB_bari
     warmadd <- colSums(aperm(warm,c(2,1,3)))  #sum over the items
     scores <- PersonScores - expected
-    
     if (WLE) {
       warmaddon <- array(0,dim=c(nstud,ndim))
       for (d1 in 1:ndim) {
@@ -138,7 +137,6 @@ function( tamobj, WLE=TRUE , adj=.3 , Msteps=20 ,
       }
       scores <- scores + warmaddon/2.0      
     }
-    
     increment <- array(0, dim=c(nstud,ndim))
     for (d1 in 1:ndim) {
       increment[,d1] <- 0
@@ -169,7 +167,6 @@ function( tamobj, WLE=TRUE , adj=.3 , Msteps=20 ,
     flush.console()
   }  # end of Newton-Raphson
   
-  
   #standard errors of theta estimates
   if (ndim == 1) {
     error <- apply(err_inv,1,sqrt) 
@@ -179,7 +176,8 @@ function( tamobj, WLE=TRUE , adj=.3 , Msteps=20 ,
   
   # The output contains 
   #   Person Scores on the test, by dimension
-  #   Person possible maximum score, by dimension (Each person could take different items, so possible maximum could vary)
+  #   Person possible maximum score, by dimension (Each person could take 
+  #    different items, so possible maximum could vary)
   #   WLE or MLE estimate, by dimension
   #   Standard errors of WLE/MLE estimates, by dimension
   
@@ -190,20 +188,34 @@ function( tamobj, WLE=TRUE , adj=.3 , Msteps=20 ,
 				"N.items" = rowSums(resp.ind) , 
 				"PersonScores" = PersonScores, 
 				"PersonMax" = PersonMax, "theta" = theta , error )
-						
+					
   if (ndim==1){ colnames(res)[4:5] <- c("PersonMax" , "theta") }
   if (ndim>1){  
-	colnames(res)[ 1:ndim + 2] <- 
-		paste0("PersonScores.Dim" , substring( 100+1:ndim , 2) )	
+	colnames(res)[ 1:ndim + 2] <- paste0("PersonScores.Dim" , substring( 100+1:ndim , 2) )	
 	ind <- grep( "theta" , colnames(res) )	
 	colnames(res)[ind] <- 	paste0("theta.Dim" , substring( 100+1:ndim , 2) )	
 		}
+	####################
+	# correct personMax set theta and standard error to missing		
+	# if there are no observations on one dimension
+	ind1 <- grep("PersonMax" , colnames(res))
+    check1 <- ( res[ , ind1 , drop=FALSE] == 2*adj )
+	ind2 <- grep("theta" , colnames(res))
+	D <- length(ind1)
+    for (ii in 1:D){
+		res[ check1[,ii] , ind2[ii] ] <- NA
+					}
+	ind2 <- grep("error" , colnames(res))
+	    for (ii in 1:D){
+		res[ check1[,ii] , ind2[ii] ] <- NA
+					}
   	#***
 	# WLE reliability
 	if ( ndim==1 ){
 		ind <- which( res$N.items > 0 )
 		v1 <- var( theta[ind] , na.rm=TRUE )	
 		v2 <- mean( error[ind]^2 , na.rm=TRUE)
+		# WLE_Rel = ( v1 - v2 ) / v1 = 1 - v2 / v1
 		WLE.rel <- 1 - v2 / v1
 	  cat("----\nWLE Reliability =" , round(WLE.rel,3) ,"\n" )
 	  res$WLE.rel <- rep( WLE.rel , nrow(res) )
@@ -212,8 +224,8 @@ function( tamobj, WLE=TRUE , adj=.3 , Msteps=20 ,
 		cat("\n-------\n")
 		for (dd in 1:ndim){
 #	dd <- 1
-		v1 <- var( res[,paste0("theta.Dim" , substring( 100+1:ndim , 2))[dd] ] )	
-		v2 <- mean( res[,paste0("error.Dim" , substring( 100+1:ndim , 2))[dd] ]^2 )
+		v1 <- var( res[,paste0("theta.Dim" , substring( 100+1:ndim , 2))[dd] ] , na.rm=TRUE)
+		v2 <- mean( res[,paste0("error.Dim" , substring( 100+1:ndim , 2))[dd] ]^2 , na.rm=TRUE)
 #		v2 <- mean( error^2 )
 		res[ ,paste0("WLE.rel.Dim" , substring( 100+ dd , 2)) ]	<- h1 <- 1 - v2 / v1
 	  cat(paste0("WLE Reliability (Dimension" , dd , ") = " , round(h1,3) ) , "\n" )
