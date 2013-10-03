@@ -438,6 +438,12 @@ se.B <- 0*B
                         nnodes=nnodes , maxK=maxK , recalc=TRUE )	
     rprobs <- res[["rprobs"]]
     AXsi <- res[["AXsi"]]
+
+#***	
+# print(AXsi)	
+# AXsi[ is.na(AXsi) ] <- 0
+# print(AXsi)	
+
 # cat("calc_prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
 	
     # calculate student's prior distribution

@@ -1,4 +1,4 @@
-tam.ctt2 <-
+tam.ctt3 <-
 function( resp , wlescore=NULL , group=NULL , allocate=30 , 
 	progress=TRUE){
     I <- ncol(resp)
@@ -39,12 +39,11 @@ function( resp , wlescore=NULL , group=NULL , allocate=30 ,
 		
 		if ( ! progress ){ prg <- 1 }
 	    resp <- as.matrix( t(resp) )
-	    res <- .Call("tam_ctt_C", 
+	    res <- .Call("tamctt3csource", 
 				tdat= resp , wle=wlescore , maxK=maxK , est_wle=est_wle ,
 				prg_=prg , PACKAGE = "TAM")        
 		ind <- which( paste(res$desV) !="" )
 		res1 <- res$des[ ind , ]
-				
 		dfr.gg <- data.frame( "group"=groups[gg] , 
 				"groupindex" = gg , 
 				"itemno" = res1[,1]-1 , "item" = colnames(resp0)[res1[,1]])
