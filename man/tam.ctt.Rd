@@ -1,6 +1,7 @@
 \name{tam.ctt}
 \alias{tam.ctt}
 \alias{tam.ctt2}
+\alias{tam.ctt3}
 
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
@@ -14,6 +15,8 @@ theory.
 tam.ctt(resp, wlescore=NULL, pvscores=NULL, group=NULL , progress=TRUE)
 
 tam.ctt2(resp, wlescore=NULL, group=NULL , allocate=30 , progress=TRUE)
+
+tam.ctt3(resp, wlescore=NULL, group=NULL , allocate=30 , progress=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -41,9 +44,10 @@ should be displayed.
 }
 }
 \details{
-The function \code{tam.ctt2} uses \pkg{Rcpp} code and is slightly faster.
-However, \code{tam.ctt2} only allows the input of \code{wlescore} and
-not \code{pvscores}.
+The functions \code{tam.ctt2} and \code{tam.ctt3} use \pkg{Rcpp} code 
+and are slightly faster.
+However, only \code{tam.ctt} allows the input of \code{wlescore} and
+\code{pvscores}.
 }
 
 \value{
@@ -98,6 +102,7 @@ p1 <- tam.pv( mod , ntheta=500 , normal.approx=TRUE )$pv
 stat1 <- tam.ctt( resp=data.mc$raw , wlescore=w1$theta , pvscores=p1[,-1] )
 stat1a <- tam.ctt2( resp=data.mc$raw , wlescore=w1$theta )  # faster
 stat1b <- tam.ctt2( resp=data.mc$raw )  # only frequencies
+stat1c <- tam.ctt3( resp=data.mc$raw , wlescore=w1$theta )  # faster
 
 # CTT results for scored data
 stat2 <- tam.ctt( resp=data.mc$scored , wlescore=w1$theta , pvscores=p1[,-1] )

@@ -129,10 +129,11 @@ designMatrices <-
 							}
 		vv <- vv+1
 					}
+	Kitem2 <- maxK+1 + 0*Kitem					
     for (ii in 1:I){					
-	  if ( Kitem[ii] > 2 ){
-		for (kk in 1:(Kitem[ii] - 2) ){
-			A[ ii , 1 + ( kk:(Kitem[ii]-2) ) , I+kk ] <- - 1
+	  if ( Kitem2[ii] > 2 ){
+		for (kk in 1:(Kitem2[ii] - 2) ){
+			A[ ii , 1 + ( kk:(Kitem2[ii]-2) ) , I+kk ] <- - 1
 						}
 					}
 				}

@@ -33,6 +33,20 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
+-------------------------------------------------------
+Changes in Versions 0.8 (2013-10-02)
+-------------------------------------------------------
+
+x changed rating scale parametrization for unequal
+  number categories per item
+x included a warning in tam.ctt2 if memory allocation is
+  reached
+x included deviance plot 'plotDevianceTAM' 
+  (thanks to Sebastian Weirich)
+x included tam.ctt3
+
+
 -------------------------------------------------------
 Changes in Versions 0.7 (2013-09-15)
 -------------------------------------------------------

@@ -102,13 +102,19 @@ calc_prob.v5 <-
     } else {
       AXsi.tmp <- array( AXsi, dim = c( length(iIndex) , maxK , nnodes ) )
     }
+
+#cat("-----")	
+#print(AXsi.tmp[,,1])
     
     Btheta <- array(0, dim = c(length(iIndex) , maxK , nnodes) )
     for( dd in 1:ncol(theta) ) 
       Btheta <- Btheta + array(B[iIndex,,dd ,drop = FALSE] %o% theta[,dd] , dim = dim(Btheta))
     
     rprobs <- ( rr <- exp(Btheta+AXsi.tmp) )/aperm( array( rep( colSums( aperm( rr , c(2,1,3) ) ,
-					dims=1 , na.rm = TRUE) ,                                                           maxK ), dim=dim(rr)[c(1,3,2)] ) , c(1,3,2) )
+					dims=1 , na.rm = TRUE) ,    maxK ), dim=dim(rr)[c(1,3,2)] ) , c(1,3,2) )
+#cat("****")	
+#rprobs[ is.na(rprobs) ] <- 0
+#print(round(rprobs,3))
     return(list("rprobs" = rprobs, "AXsi" = AXsi))
   }
 
