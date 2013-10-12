@@ -45,7 +45,6 @@ designMatrices.mfr <-
 						}
 				}
 			}
-
 #cat(" ---  z50" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     				
 			
 	#********************************	
@@ -66,7 +65,7 @@ designMatrices.mfr <-
 			progress=progress)
 	  
       A <- AX$A; X <- AX$X; otherFacets <- AX$otherFacets
-	  
+ 
   
 	  xsi.constr <- AX$xsi.constr
 	  facet.design <- AX$facet.design

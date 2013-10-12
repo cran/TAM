@@ -66,6 +66,7 @@ calc_posterior.v2 <-
 # cat("nach calcfx") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1			
     # numerical integration
     if ( snodes == 0 ){ 
+#      rfx <- rowSums(fx)
       rfx <- rowSums(fx)
       if (normalization ){
         hwt <- fx / rfx } else {   hwt <- fx }
@@ -78,6 +79,8 @@ calc_posterior.v2 <-
 		 hwt <- fx / rfx 	
 			} else { hwt <- fx }
     }
+# print( rowSums(hwt))	
+#print( cbind( rfx , rowSums(hwt ))[1:100,] )
     res <-  list("hwt" = hwt , "rfx" = rfx )
     if ( snodes > 0 ){ 
 		

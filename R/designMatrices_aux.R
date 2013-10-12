@@ -42,12 +42,12 @@ rownames.design2 <- function(X){
 .A.matrix <-
   function( resp, formulaA = ~ item + item*step, facets = NULL,  
             constraint = c("cases", "items") , progress=FALSE ){
-#z0 <- Sys.time()			
+z0 <- Sys.time()			
 	### redefine facets matrix
 	facets0 <- facets
 	NF <- length(facets)
 	facet.list <- as.list( 1:NF )
-	names(facet.list) <- colnames(facets)
+	names(facet.list) <- colnames(facets)	
 	if (NF==0){ facet.list <- NULL }
 	if (NF>0){
 	for (ff in 1:NF){
@@ -101,8 +101,8 @@ rownames.design2 <- function(X){
 					# Bug for equal numbers of levels within facets
 					# Correction 2013-09-03
                       sapply( otherFacets , FUN = function(ff){
-						    ff <- facets[, otherFacets]
-							as.factor(1:max(ff)) 
+						    fff <- facets[, ff]
+							as.factor(1:max(fff)) 
 									} , simplify=FALSE )
                     }                     
       ) )
@@ -185,15 +185,15 @@ rownames.design2 <- function(X){
 				vv <- vv+1			
 					}
 				}
-      }
+			}
 	  if ( progress ){
 				cat("|\n") ; flush.console()
 				}
-#cat(" +++  v160" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     				  	  		      
+# cat(" +++  v160" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     				  	  		      
     } else 
       # model.matrix _ case: step not in fvars
     {
-      
+  
       rownames(mm) <- paste( rownames(X) , "-step1", sep = "")
       A <- mm
       

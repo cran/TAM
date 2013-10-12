@@ -152,6 +152,8 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="1PL" ,
 			paste(Sys.time()) , ")\n") ; flush.console()	  
 				}    
 
+	design <- NULL				
+				
 #   #---2PL---
 #   B_orig <- B  #keep a record of generated B before estimating it in 2PL model 
 #   #---end 2PL---
@@ -186,15 +188,19 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="1PL" ,
   if ( ! is.null(group) ){ 
     groups <- sort(unique(group))
     G <- length(groups)
+	group <- match( group , groups )
     # user must label groups from 1, ... , G
-    if ( length( setdiff( 1:G , groups)  ) > 0 ){
-      stop("Label groups from 1, ...,G\n")
-				}
+#    if ( length( setdiff( 1:G , groups)  ) > 0 ){
+#      stop("Label groups from 1, ...,G\n")
+#				}							
 	var.indices <- rep(1,G)
 	for (gg in 1:G){
        var.indices[gg] <- which( group == gg )[1]				
 				}
-				  } else { G <- 1 }  
+				  } else { 
+				  G <- 1 
+				  groups <- NULL
+				  }  
   # beta inits
   # (Y'Y)
   if ( ! is.null( formulaY ) ){
@@ -222,11 +228,12 @@ if (! nullY){
 	}
 	if ( G > 1 & nullY ){	
 		Y <- matrix( 0 , nstud , G )
-		colnames(Y) <- paste("group" , 1:G , sep="")
+#		colnames(Y) <- paste("group" , 1:G , sep="")
+		colnames(Y) <- paste("group" , groups , sep="")
 		for (gg in 1:G){ Y[,gg] <- 1*(group==gg) }
 		nreg <- G - 1
 			}
-
+	
   W <- t(Y * pweights) %*% Y
   if (ridge > 0){ diag(W) <- diag(W) + ridge }
   YYinv <- solve( W )
@@ -665,7 +672,6 @@ se.B <- 0*B
 # cat("rest") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
 
 	
-	
 	} # end of EM loop
   #******************************************************
 # stop("here")   
@@ -835,6 +841,7 @@ se.B <- 0*B
 			   "Y" = Y , "resp" = resp , 
                "resp.ind" = resp.ind , "group" = group , 
 			   "G" = if ( is.null(group)){1} else { length(unique( group ) )} , 
+			   "groups" = if ( is.null(group)){1} else { groups } , 			   
                "formulaY" = formulaY , "dataY" = dataY , 
                "pweights" = pweights , 
                "time" = c(s1,s2,s2-s1) , "A" = A , "B" = B  ,
@@ -851,8 +858,8 @@ se.B <- 0*B
                "control" = con1a , "irtmodel" = irtmodel ,
 			   "iter" = iter ,
 			   "printxsi" = printxsi ,
-			   "YSD"=YSD ,
-			   "design"=design
+			   "YSD"=YSD 
+#			   "design"=design
 #			   "xsi.min.deviance" = xsi.min.deviance ,
 #			   "beta.min.deviance" = beta.min.deviance , 
 # "variance.min.deviance" = variance.min.deviance 

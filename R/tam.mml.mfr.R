@@ -99,13 +99,14 @@ a0 <- Sys.time()
 	xsi.constr <- design$xsi.constr
     if ( is.null( pid ) ){ pid <- 1:(nrow(gresp) ) }
 
+	design <- NULL
 	
   if (progress){ 
       cat("    * Created Design Matrices   (", 
 			paste(Sys.time()) , ")\n") ; flush.console()	  
 				}    
 	
-#cat("design matrix ready" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
+# cat("design matrix ready" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
 	
 	#***
 	# preprocess data if multiple person IDs do exist
@@ -118,12 +119,20 @@ a0 <- Sys.time()
 		# ARb 2013-08-23: added simplify=TRUE
 		person.ids <- sapply( persons , FUN = function( pp){ which( pid == pp ) } ,
 					simplify=FALSE)
+#print(person.ids[[5]] )					
 #cat("*** multiple persons sapply function" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1				
 		PP <- matrix( NA , nrow=NP , ncol=tp)
 		for (pos in 1:tp){
 			#pos <- 1
 			PP[,pos] <- unlist( lapply( person.ids , FUN = function( vv){ vv[pos] } ) )
 					}
+#print(PP[1:5,])
+#iii <- c(988 ,1888, 1895)
+#print( gresp.noStep[  iii , ] )
+#print( facets[ iii , ] )
+#print( resp[ iii , ] )
+
+		
 #cat("*** multiple persons lapply function" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1				
 		gresp0 <- matrix( NA , nrow=NP , ncol= ncol(gresp) )
 		colnames(gresp0) <- colnames(gresp)
@@ -143,15 +152,12 @@ a0 <- Sys.time()
 			# * this check is time-consuming! release it to rcpp
 			g0[ ig1 ] <- g1[ ig1 ]
 			gresp0[ ind.pos , ] <- g0
-			# why not using just the following formula?
-			#	gresp0[ ind.pos , ] <- gresp[ PP.pos , ]			
-			#   => obtained different results
 			g1 <- gresp.noStep[ PP.pos , ]
 			g0 <- gresp0.noStep[ ind.pos , ]
 #			ig1 <- ( ! is.na(g1) )
 			ig1 <- grespnoStepNA[ PP.pos , ]
 			g0[ ig1 ] <- g1[ ig1 ]
-			gresp0.noStep[ ind.pos , ] <- g0
+			gresp0.noStep[ ind.pos , ] <- g0	
 					}
 #cat("*** multiple persons loop over pos" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1				
 		gresp0 -> gresp
@@ -164,8 +170,9 @@ a0 <- Sys.time()
 				}
 	###################################################
 
+	# print(beta)
 
-#  cat("process data in case of multiple persons" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
+# cat("process data in case of multiple persons" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
     nitems <- nrow( X.red )
     nstud <- nrow(gresp)        # number of students
     if ( is.null( pweights) ){
@@ -181,7 +188,6 @@ a0 <- Sys.time()
     #!! check dim of person ID pid
     if ( is.null(pid) ){ pid <- seq(1,nstud) }
    
-    
     # normalize person weights to sum up to nstud
     pweights <- nstud * pweights / sum(pweights)
     # a matrix version of person weights
@@ -245,19 +251,23 @@ a0 <- Sys.time()
       variance[ variance.fixed[,c(2,1) ,drop=FALSE] ] <- variance.fixed[,3]	
     }
     
-    # group indicators for variance matrix
-    if ( ! is.null(group) ){ 
-      groups <- sort(unique(group))
-      G <- length(groups)
-      # user must label groups from 1, ... , G
-      if ( length( setdiff( 1:G , groups)  ) > 0 ){
-        stop("Label groups from 1, ...,G\n")
-      }
-      var.indices <- rep(1,G)
-      for (gg in 1:G){
-        var.indices[gg] <- which( group == gg )[1]				
-      }
-    } else { G <- 1 }
+  # group indicators for variance matrix
+  if ( ! is.null(group) ){ 
+    groups <- sort(unique(group))
+    G <- length(groups)
+	group <- match( group , groups )
+    # user must label groups from 1, ... , G
+#    if ( length( setdiff( 1:G , groups)  ) > 0 ){
+#      stop("Label groups from 1, ...,G\n")
+#				}							
+	var.indices <- rep(1,G)
+	for (gg in 1:G){
+       var.indices[gg] <- which( group == gg )[1]				
+				}
+				  } else { 
+				  G <- 1 
+				  groups <- NULL
+				  } 
     
     
     # beta inits
@@ -286,7 +296,7 @@ a0 <- Sys.time()
     }
     if ( G > 1 & nullY ){	
       Y <- matrix( 0 , nstud , G )
-      colnames(Y) <- paste("group" , 1:G , sep="")
+      colnames(Y) <- paste("group" , groups , sep="")
       for (gg in 1:G){ Y[,gg] <- 1*(group==gg) }
       nreg <- G - 1
     }
@@ -303,10 +313,9 @@ a0 <- Sys.time()
 #    W <- t(Y * pweights) %*% Y
     W <- crossprod(Y * pweights ,  Y )
 	
-	
     if (ridge > 0){ diag(W) <- diag(W) + ridge }
     YYinv <- solve( W )
-            
+	
     #initialise regressors
     if ( is.null(beta.fixed) & (  is.null(xsi.fixed) ) ){
       beta.fixed <- matrix( c(1,1,0) , nrow= 1) 
@@ -511,14 +520,15 @@ a0 <- Sys.time()
 
 	YSD <- max( apply( Y , 2 , sd ) )
 	if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }
-	
-    # display
+
+
+    
+	# display
     disp <- "....................................................\n"
     # define progress bar for M step    
 
 # cat("rest  " ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1								 
-# stop("HERE")
-	
+ 	
     ##############################################################   
     #Start EM loop here
     while ( ( (!betaConv | !varConv)  | ((a1 > conv) | (a4 > conv) | (a02 > convD)) )  & 
@@ -560,7 +570,6 @@ a0 <- Sys.time()
                                    thetasamp.density=thetasamp.density , snodes=snodes ,
 						resp.ind=resp.ind	)	
       hwt <- res.hwt[["hwt"]]  
- 	  
 # cat("calc posterior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		  
       if (progress){ cat("M Step Intercepts   |"); flush.console() }
       # collect old values for convergence indication
@@ -582,7 +591,7 @@ a0 <- Sys.time()
         variance[ variance < min.variance ] <- min.variance 
       }
       itemwt <- resr$itemwt
-      
+     
       # constraint cases (the design matrix A has no constraint on items)
       if ( max(abs(beta-oldbeta)) < conv){    
         betaConv <- TRUE       # not include the constant as it is constrained
@@ -932,6 +941,7 @@ a0 <- Sys.time()
 			   "Y" = Y , "resp" = resp , 
                "resp.ind" = resp.ind , "group" = group , 
 			   "G" = if ( is.null(group)){1} else { length(unique( group ) )} , 
+			   "groups" = if ( is.null(group)){1} else { groups } , 			   			   
                "formulaY" = formulaY , "dataY" = dataY , 
                "pweights" = pweights , 
                "time" = c(s1,s2,s2-s1) , "A" = A , "B" = B  ,
@@ -948,8 +958,8 @@ a0 <- Sys.time()
                "deviance.history" = deviance.history ,
                "control" = con1a , "irtmodel" = irtmodel ,
 			   "iter" = iter , "resp_orig" = resp_orig ,
-			   "printxsi"=TRUE , "YSD"=YSD ,
-			   "design"=design
+			   "printxsi"=TRUE , "YSD"=YSD 
+#			   "design"=design
 #			   "xsi.min.deviance" = xsi.min.deviance ,
 #			   "beta.min.deviance" = beta.min.deviance , 
 # "variance.min.deviance" = variance.min.deviance 
