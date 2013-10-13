@@ -5,7 +5,9 @@ function( resp , hwt ,  resp.ind ,
   snodes = 0 , thetasamp.density=NULL , nomiss=FALSE){
 	    # calculate item weights
 		variance.fixed <- Variance.fixed
-#  a0 <- Sys.time()		
+#  a0 <- Sys.time()	
+
+
 	#*****
 	# numerical integration	
 	if ( snodes == 0){	
@@ -18,7 +20,6 @@ function( resp , hwt ,  resp.ind ,
 		if ( nomiss ){
 			itemwt <- matrix( colSums(hwt*pweights) , nrow=ncol(hwt) , ncol=ncol(resp.ind) )
 					}						 			
-
  		# original implementation without missings
 		#  -- itemwt0 <- matrix(rep(colSums(hwt), nitems), nrow=nnodes, ncol=nitems)
 		thetabar <- hwt %*% theta

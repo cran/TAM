@@ -409,8 +409,8 @@ item \eqn{\times} category \eqn{\times} group}
 \item{ic}{Vector with information criteria}
 \item{deviance.history}{Deviance history in iterations}
 \item{control}{List of control arguments}
-\item{design}{Output produced by \code{designMatrices} or
-\code{designMatrices.mfr}}
+% \item{design}{Output produced by \code{designMatrices} or
+% \code{designMatrices.mfr}}
 \item{\dots}{Further values}
 }
 

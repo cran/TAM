@@ -64,6 +64,7 @@ function( resp , wlescore=NULL , group=NULL , allocate=30 ,
             }	
 			} # end group
 	dfr <- dfr[ dfr$item != "_h" , ]
+	dfr$Categ <- gsub( " " , "" , dfr$Categ  )
     dfr <- dfr[ order( paste0( 10000+ dfr$itemno , dfr$group , dfr$Categ ) ) , ]
 	ind <- grep( "WLE" , colnames(dfr) )	
 	if ( est_wle == 0 ){ dfr <- dfr[ , - ind ] }

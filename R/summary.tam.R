@@ -73,7 +73,8 @@ summary.tam.mml <- summary.tam.2pl <-
 					}
 		obji <- round( object$variance , 3 )
 		if ( object$G >1){
-			names(obji) <- paste0("Group" , seq(1,object$G) )
+#			names(obji) <- paste0("Group" , seq(1,object$G) )
+			names(obji) <- paste0("Group" , object$groups )
 					}		
 		print( obji )
 	cat("------------------------------------------------------------\n")
@@ -85,7 +86,8 @@ summary.tam.mml <- summary.tam.2pl <-
 		diag(obji) <- sqrt( diag( object$variance) )
 					}
 		if ( object$G >1){
-			names(obji) <- paste0("Group" , seq(1,object$G) )
+# 		names(obji) <- paste0("Group" , seq(1,object$G) )
+			names(obji) <- paste0("Group" , object$groups )			
 					}		
 		obji <- round( obji, 3 )
 		print( obji )
