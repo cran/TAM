@@ -27,13 +27,29 @@ a.robitzsch /-\ bifie.at
 
 URL:
 ----
-https://sites.google.com/site/irttam1/
-https://sites.google.com/site/alexanderrobitzsch/software
 http://www.edmeasurementsurveys.com/TAM/Tutorials/
+https://sites.google.com/site/alexanderrobitzsch/software
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
+-------------------------------------------------------
+Changes in Versions 0.91/0.99 (2013-11-02)
+-------------------------------------------------------
+
+x added 'AXsi_' as value in tam.mml, tam.mml.2pl and tam.mml.mfr
+x cleaned labels in 'tam.mml.mfr' for faceted models
+x included the argument 'score.resp' in tam.wle for scoring
+  a new dataset different than the one which is used for item
+  calibration in tam (requested by Jan Böhnke)
+x added examples for applying a sum constraint of item
+  parameters in 'tam.mml' (request by Kelvin Gregory)
+x included argument 'adj' in tam.jml/tam.jml2 for modifying 
+  the adjustment in case of perfect scores (thanks to Courtney Castle)
+x included dataset 'data.timssAusTwn.scored'
+x included summary for tam.jml
+x use plausible values for calculation in item fit (in tam.mml.fit)
+x included an example for creation of user-defined fit statistics
 
 -------------------------------------------------------
 Changes in Versions 0.9 (2013-10-13)

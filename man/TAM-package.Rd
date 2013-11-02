@@ -17,13 +17,12 @@ Test Analysis Modules
 \tabular{ll}{
 Package: \tab \pkg{TAM}\cr
 Type: \tab Package\cr
-Version: \tab 0.9\cr
+Version: \tab 0.99\cr
 Publication Year: \tab 2013\cr
 License: \tab GPL (>=2.0)\cr
-URL: \tab \url{https://sites.google.com/site/irttam1/},  \cr
-\tab \url{https://sites.google.com/site/alexanderrobitzsch/software} \cr
-\tab \url{http://www.edmeasurementsurveys.com/TAM/Tutorials/}  
-}
+URL: \tab \url{http://www.edmeasurementsurveys.com/TAM/Tutorials/} \cr
+\tab \url{https://sites.google.com/site/alexanderrobitzsch/software} 
+  }
 
 See \url{http://www.edmeasurementsurveys.com/TAM/Tutorials/} for 
 tutorials of the \pkg{TAM} package.
@@ -33,6 +32,8 @@ Download the latest \pkg{TAM} development version at
 }
 \author{
 Thomas Kiefer [aut], Alexander Robitzsch [aut, cre], Margaret Wu [aut]
+
+Maintainer: Alexander Robitzsch <a.robitzsch@bifie.at>
 }
 \references{
 Adams, R. J., Wilson, M., & Wu, M. (1997).
@@ -45,7 +46,7 @@ A generalized form of the Rasch model. In M. von Davier & C. H. Carstensen (Eds.
 \emph{Multivariate and mixture distribution Rasch models: Extensions and applications}
 (pp. 55-76). New York: Springer.
 }
-\keyword{ package }
+\keyword{package}
 %\seealso{
 %%~~ Optional links to other man pages, e.g. ~~
 %%~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~

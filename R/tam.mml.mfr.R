@@ -64,6 +64,7 @@ a0 <- Sys.time()
   #***
   fac.oldxsi <- max( 0 , min( c( fac.oldxsi , .95 ) ) )
   
+  if ( constraint=="items" ){ beta.fixed <- FALSE }
   
   pid0 <- pid
   if (progress){ 
@@ -114,7 +115,7 @@ a0 <- Sys.time()
 	if ( tp > 1){
 		persons <- sort( unique( pid ) )
 		NP <- length( persons )
-#cat("*** multiple persons start" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1		
+# cat("*** multiple persons start" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1		
 		#****
 		# ARb 2013-08-23: added simplify=TRUE
 		person.ids <- sapply( persons , FUN = function( pp){ which( pid == pp ) } ,
@@ -925,10 +926,16 @@ a0 <- Sys.time()
 	xsi1 <- xsi1[ match( xsiFacet$parameter , xsi1$parameter) , ]
     xsi.facets <- xsi1
 	rownames(xsi.facets) <- NULL
+	
+	i1 <- grep( "Intercept" , xsi.facets$parameter)
+	if ( length(i1) > 0 ){
+		xsi.facets <-  xsi.facets[ - i1 , ] 
+					}
+	
 	xsi <- obji[,-1]
 	rownames(xsi) <- dimnames(A)[[3]]
-
-
+	colnames(resp) <- dimnames(A)[[1]]
+	
   # Output list
   deviance.history <- deviance.history[ 1:iter , ]
   res <- list( "xsi" = xsi , "xsi.facets" = xsi.facets , 
@@ -947,6 +954,7 @@ a0 <- Sys.time()
                "time" = c(s1,s2,s2-s1) , "A" = A , "B" = B  ,
 			   "se.B" = se.B , 
                "nitems" = nitems , "maxK" = maxK , "AXsi" = AXsi ,
+			   "AXsi_" = - AXsi ,			   
 			   "se.AXsi" = se.AXsi , 
                "nstud" = nstud , "resp.ind.list" = resp.ind.list ,
                "hwt" = hwt , "ndim" = ndim ,

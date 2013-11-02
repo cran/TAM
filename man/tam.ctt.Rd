@@ -80,9 +80,11 @@ correlation of an item and a test score (here the WLE).
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-%\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-%}
+\seealso{
+\url{http://www.edmeasurementsurveys.com/TAM/Tutorials/4CTT.htm}
+}
+
+
 \examples{
 \dontrun{
 #############################################################################

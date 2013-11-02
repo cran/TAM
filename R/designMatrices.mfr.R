@@ -24,8 +24,8 @@ designMatrices.mfr <-
 	if (progress){ 
 		cat( "        o Check facets (" , paste(Sys.time()) , ")\n") ; flush.console();
 			}
-
-		
+	if ( is.null(FF) ){ FF <- 0 }
+	if (FF>0){	
 	for (ff in 1:FF){			
 		# ff <- 1
 		#**** inclusion ARb 2013-09-07
@@ -44,6 +44,7 @@ designMatrices.mfr <-
 				cat(p1, "\n")
 						}
 				}
+			}
 			}
 #cat(" ---  z50" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     				
 			
@@ -177,6 +178,11 @@ designMatrices.mfr <-
 # cat(".....\nbefore rename A" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1	
 # print("g100")	
 	A <- .rename.items( matr=A , itemren )
+# print( dimnames(A) )
+# print(facet.list)
+	dimnames(A)[[1]] <- .rename.items2aa( vec=dimnames(A)[[1]] ,
+				facet.list=facet.list , I=I )
+
 # cat(".rename.items (A)" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1		
     xsi.table <- xsi.constr$xsi.table
 #	A <- .rename.items3( matr=A , facet.list , I )	

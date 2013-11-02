@@ -10,7 +10,7 @@ tam.wle <- function( tamobj, ... ){
 }
 
 tam.mml.wle <-
-function( tamobj, WLE=TRUE , adj=.3 , Msteps=20 , 
+function( tamobj, score.resp=NULL , WLE=TRUE , adj=.3 , Msteps=20 , 
 				convM = .0001 ){
   #########################################################
   # INPUT:
@@ -30,6 +30,12 @@ function( tamobj, WLE=TRUE , adj=.3 , Msteps=20 ,
   ndim <- tamobj$ndim
   maxK <- tamobj$maxK
   resp <- tamobj$resp
+  if ( ! is.null( score.resp) ){
+	resp <- score.resp
+	nstud <- nrow(resp)
+	tamobj$resp.ind <- 1 - is.na(resp)
+	tamobj$pid <- 1:nstud
+			}  
   resp[ is.na(resp) ] <- 0  
   resp.ind <- tamobj$resp.ind  
   col.index <- rep( 1:nitems , each = maxK )
@@ -231,9 +237,7 @@ function( tamobj, WLE=TRUE , adj=.3 , Msteps=20 ,
 	  cat(paste0("WLE Reliability (Dimension" , dd , ") = " , round(h1,3) ) , "\n" )
 #	  res$WLE.rel <- rep( WLE.rel , nrow(res) )
 					}
-				}
-
-				
+				}				
 #  res <- list( "PersonScores" = PersonScores, "PersonMax" = PersonMax, "theta" = theta , "error" =  error )
   return(res)
 }

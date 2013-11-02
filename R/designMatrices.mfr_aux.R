@@ -269,7 +269,35 @@
 			}
 	return(cM)
 		}
-		
+#############################################################
+.rename.items2aa <- function( vec , facet.list , I ){
+### check for equalities!!!
+	cM <- vec
+	FF <- length(facet.list)
+	rM <- cM
+    if ( ! is.null(rM) ){ 
+		rMsplit <- strsplit( rM , split="-" )	
+		RR <- length(rMsplit)
+		FF <- length(facet.list)
+		for (rr in 1:RR){
+			rr1 <- rMsplit[[rr]]
+			if (FF>0){
+			for (ff in 1:FF){
+				itemren <- facet.list[[ff]]
+    			I <- nrow(itemren)
+					for (ii in 1:I ){ 
+						rr1[ rr1 == itemren[ii,2] ] <- paste(itemren[ii,1])
+						rMsplit[[rr]] <- rr1
+									}
+								}
+							}
+						}	
+		rM <- unlist( lapply( rMsplit , FUN = function(ll){ paste( ll , collapse="-") } )	)
+		cM <- rM
+			}
+	return(cM)
+		}
+			
 		
 #############################################################		
 #############################################################

@@ -4,7 +4,7 @@
 ##################################################################
 
 tam.jml2 <-
-  function( resp , group = NULL , disattenuate = FALSE ,
+  function( resp , group = NULL , adj=.3 , disattenuate = FALSE ,
             bias = TRUE, xsi.fixed=NULL ,  xsi.inits = NULL ,  
             A=NULL , B=NULL , Q=NULL , ndim=1 ,
             pweights = NULL , control = list() 
@@ -23,7 +23,7 @@ tam.jml2 <-
 	maxiter <- conv <- progress <- tamobj <- convM <- Msteps <- NULL 
     R <- NULL	
 	
-    adj <- 0.3   # adjustment for perfect and zero scores
+#    adj <- 0.3   # adjustment for perfect and zero scores
     s11 <- Sys.time()
     # attach control elements
     e1 <- environment()
@@ -303,6 +303,12 @@ tam.jml2 <-
       xsi[est.xsi.index] <- (nitems - 1)/nitems * xsi[est.xsi.index]     #Check this for more complex models
     }
     
+  # collect item statistics
+  item <- data.frame( "xsi.label" = dimnames(A)[[3]] ,
+		"xsi.index" = 1:( length(xsi) ) , "xsi" = xsi ,
+		"se.xsi" = errorP , "outfit" = outfitItem ,
+		"infit"=infitItem )
+	
     ############################################################
     s2 <- Sys.time()
     if (progress){
@@ -315,7 +321,7 @@ tam.jml2 <-
     
     # Output list
     deviance.history <- deviance.history[ 1:iter , ]
-    res <- list( "xsi" = xsi ,  "errorP" = errorP , 
+    res <- list( "item"=item , "xsi" = xsi ,  "errorP" = errorP , 
                  "theta" = theta[,1] ,"errorWLE" = errorWLE , "WLE" = thetaWLE , 
                  "WLEreliability" = WLEreliability ,
                  "PersonScores" = PersonScores , "ItemScore" = ItemScore ,             
@@ -331,7 +337,8 @@ tam.jml2 <-
                  "nstud" = nstud , "resp.ind.list" = resp.ind.list ,
                  "xsi.fixed" = xsi.fixed , "deviance" = deviance ,
                  "deviance.history" = deviance.history ,
-                 "control" = con1a )
+                 "control" = con1a , "iter"=iter)
+    res$time <-  c(s1,s2,s2-s1)
     class(res) <- "tam.jml"
     return(res)
   }

@@ -847,6 +847,7 @@ se.B <- 0*B
                "time" = c(s1,s2,s2-s1) , "A" = A , "B" = B  ,
 			   "se.B" = se.B , 
                "nitems" = nitems , "maxK" = maxK , "AXsi" = AXsi ,
+			   "AXsi_" = - AXsi ,
 			   "se.AXsi" = se.AXsi , 
                "nstud" = nstud , "resp.ind.list" = resp.ind.list ,
                "hwt" = hwt , "ndim" = ndim ,
