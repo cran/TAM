@@ -394,6 +394,10 @@ item \eqn{\times} category \eqn{\times} group}
 \item{nitems}{Number of items}
 \item{maxK}{Maximum number of categories}
 \item{AXsi}{Estimated item intercepts \eqn{ a_{ik} \xi}}
+\item{AXsi_}{Estimated item intercepts -\eqn{ a_{ik} \xi}.
+Note that in \code{summary.tam}, the parameters \code{AXsi_}
+are displayed.
+}
 \item{se.AXsi}{Standard errors of \eqn{a_{ik} \xi} parameters}
 \item{nstud}{Number of persons}
 \item{resp.ind.list}{List of response indicator vectors}
@@ -435,6 +439,10 @@ Psychometric issues and models. \emph{Psychometrika}, \bold{64}, 407-433.
 Pan, J., & Thompson, R. (2007). Quasi-Monte Carlo estimation in
 generalized linear mixed models. \emph{Computational Statistics &
 Data Analysis}, \bold{51}, 5765-5775.
+
+Wu, M. L., Adams, R. J., Wilson, M. R. & Haldane, S. (2007).
+\emph{ACER ConQuest Version 2.0}. Mulgrave.
+\url{https://shop.acer.edu.au/acer-shop/group/CON3}
 }
 
 %\author{
@@ -457,7 +465,10 @@ the number of quasi Monte Carlo or stochastic nodes \code{snodes}
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-See also \code{\link{tam.mml}}, \code{\link{tam.jml}}.
+See \code{\link{data.cqc01}} for more examples which is are similar to the ones
+in the ConQuest manual (Wu, Adams, Wilson & Haldane, 2007).
+
+See \code{\link{tam.jml}} for joint maximum likelihood estimation.
 
 Standard errors are estimated by a rather crude (but quick) approximation.
 Use \code{\link{tam.se}} for improved standard errors.
@@ -506,6 +517,23 @@ summary(mod1a)
 # item 4 (b=-1.6) and item 40 (b=2)
 xsi.inits <- cbind( c(2,4,40) , c(-1.8,-1.6,2))
 mod1b <- tam.mml( resp=sim.rasch , xsi.inits=xsi.inits )
+
+# 1PL estimtaion with sum constraint on item difficulties
+dat <- sim.rasch
+# modify A design matrix to include the sum constraint
+des <- designMatrices(resp=dat)
+A1 <- des$A[ , , - ncol(dat) ]
+A1[ ncol(dat) ,2 , ] <- 1
+A1[,2,]
+# estimate model
+mod1c <- tam.mml( resp=dat , A=A1 , beta.fixed=FALSE , 
+           control=list(fac.oldxsi=.1) ) 
+summary(mod1c)
+
+# estimate constraint='items' using tam.mml.mfr
+mod1d <- tam.mml.mfr( resp=dat , formulaA= ~ 0 + item , control=list(fac.oldxsi=.1) ,
+        constraint="items") 
+summary(mod1d)
 }
 
 #***
@@ -729,6 +757,21 @@ mod6_5$B
 # Ex 6.6: partial credit model: Conquest parametrization 'item+item*step'
 mod6_6 <- tam.mml( resp=data.gpcm , irtmodel="PCM2" )
 summary(mod6_6)
+
+# estimate mod6_6 applying the sum constraint of item difficulties
+# modify design matrix of xsi paramters
+A1 <- .A.PCM2(resp=data.gpcm )
+A1[3,2:4,"Comfort"] <- 1:3
+A1[3,2:4,"Work"] <- 1:3
+A1 <- A1[ , , -3] # remove Benefit xsi item parameter
+# estimate model
+mod6_6b <- tam.mml( resp=data.gpcm , A=A1 , beta.fixed=FALSE )
+summary(mod6_6b)
+
+# estimate mod6_6 using tam.mml.mfr
+mod6_6c <- tam.mml.mfr( resp=data.gpcm , formulaA= ~ 0 + item + item:step , 
+    control=list(fac.oldxsi=.1)  , constraint="items" ) 
+summary(mod6_6c)
 
 # Ex 6.7: Rating scale model: Conquest parametrization 'item+step'
 mod6_7 <- tam.mml( resp=data.gpcm , irtmodel="RSM" )

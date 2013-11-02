@@ -65,42 +65,63 @@ function( tamobj, FitMatrix=NULL , progress = FALSE ){
     #... TK: multiple category option -> na.rm = TRUE
     xxfi <- sapply( ip, function(i) colSums(FitMatrix[i,,p]^2 * rprobs[i,,] , na.rm = TRUE ))
     vari <- xxfi - xbari^2
-    
+	  xxxfi <- sapply( ip, function(i) colSums((FitMatrix[i,,p])^3 * rprobs[i,,] , na.rm = TRUE ))
+	  xxxxfi <- sapply( ip, function(i) colSums(FitMatrix[i,,p]^4 * rprobs[i,,] , na.rm = TRUE ))
+	  C4i <- xxxxfi - 4*xbari*xxxfi + 6*(xbari^2)*xxfi - 3*(xbari^4)
+    Vz2i <- C4i - vari^2
+    Uz2i <- C4i/(vari^2) - 1
+	
     xbar <- resp.ind[,ip]%*%t( xbari )
     var1 <- resp.ind[,ip]%*%t( vari )
+	  Vz2 <- resp.ind[,ip]%*%t( Vz2i )
+	  Uz2 <- resp.ind[,ip]%*%t( Uz2i )
+
     Ax <- matrix(rep(ParamScore[,p],nnodes),nrow=nstud, ncol=nnodes)
-    z2 <- ( Ax - xbar )^2/var1 * hwt 
-	  wt_numer <- ( Ax - xbar )^2 * hwt
-    wt_denom <- var1 * hwt
-    
-    #Outfit MNSQ (unweighted fit)
-	# calculate number of students per item parameter	
-	  nstud.ip <- sum( rowMeans( resp.ind[ , ip , drop=FALSE] ) )
-    Outf <- rowSums( z2 , na.rm=TRUE)
-    Outf[Outf > 10*sd(Outf)] <- 10*sd(Outf)  #Trim extreme values
-#    Outfit[p] <- sum( Outf*pweights ) / nstud
-     Outfit[p] <- sum( Outf*pweights ) / nstud.ip
+	N <- nrow(hwt)
+#	c_hwt<- aperm(apply (hwt,1,cumsum),c(2,1))
+	c_hwt <- rowCumsums.TAM(hwt)
+
 	
-    #Infit MNSQ (weighted fit)
-    Infit_numer <- rowSums( wt_numer )
-    Infit_denom <- rowSums( wt_denom )
-    Infit[p] <- sum( Infit_numer*pweights)/sum(Infit_denom*pweights )
+	rn1 <- runif(N)
+	nthetal <- rep(1,ncol(c_hwt))
+	
+#    j <- apply(c_hwt,1, function (x) {findInterval(runif(1),x)})
+#    j <- sapply(1:N, function (ii) {findInterval(rn1[ii],c_hwt[ii,])})
+	j <- rowSums( c_hwt < outer( rn1 , nthetal ) )
+	j <- rowSums( c_hwt < rn1)
+	j[ j == 0 ] <- 1
+	NW <- ncol(c_hwt)
+    j <- j + 1
+    j[ j > NW ] <- NW	
+    s <- cbind(seq(1:N),j)
+    wt_numer <- ( Ax[s] - xbar[s] )^2
+    wt_denom <- var1[s]
+    z2 <- wt_numer/wt_denom
+    varz2 <- Uz2[s]
+    wt_var <- Vz2[s]
+
+  #Outfit MNSQ (unweighted fit)
+  #calculate number of students per item parameter	
+    nstud.ip <- sum( rowMeans( resp.ind[ , ip , drop=FALSE],na.rm = TRUE ), na.rm=TRUE )
+#	  z2[z2 > 10*sd(z2)] <- 10*sd(z2)  #Trim extreme values
+	  Outfit[p] <- sum( z2*pweights, na.rm = TRUE  ) / nstud.ip
+	
+  #Infit MNSQ (weighted fit)
+    Infit[p] <- sum( wt_numer*pweights,na.rm = TRUE )/sum(wt_denom*pweights,na.rm = TRUE  )
+	
+  #Infit t
+	  vf <- sum(wt_var*pweights,na.rm = TRUE )/(sum(wt_denom*pweights,na.rm = TRUE)^2 ) 
+	  Infit_t[p] <- (Infit[p]^(1/3)-1) * 3/sqrt(vf) + sqrt(vf)/3   
     
-    #Infit t
-    E4 <- rowSums( ( Ax - xbar )^4 * hwt )
-    var2 <- rowSums( var1^2 * hwt )
-    vf <- (1/sum(Infit_denom*pweights))^2 * (sum(E4*pweights) - sum(var2*pweights))
-    Infit_t[p] <- (Infit[p]^(1/3)-1) * 3/sqrt(vf) + sqrt(vf)/3   
-    
-    #Outfit t
-#    Outfit_t[p] <- (Outfit[p]^(1/3)-1+2/(9*nstud))/sqrt(2/(9*nstud))
-    Outfit_t[p] <- (Outfit[p]^(1/3)-1+2/(9*nstud.ip))/sqrt(2/(9*nstud.ip))
+  #Outfit t
+	  vf2 <- sum(varz2*pweights,na.rm = TRUE )/(nstud.ip^2)
+    Outfit_t[p] <- (Outfit[p]^(1/3)-1) * 3/sqrt(vf2) + sqrt(vf2)/3
   }
   if (progress){ cat("|\n") ; flush.console() }
   res <- data.frame("Outfit" = Outfit , 
 				"Outfit_t" = Outfit_t, "Infit" = Infit , 
-				"Infit_t" = Infit_t,   row.names = dimnames(tamobj$A)[[3]])
-  #data.frame( "Outfit" = round(Outfit,2) , "Outfit_t" = round(Outfit_t,1), "Infit" = round(Infit,2), Infit_t = round(Infit_t,1) )    
+				"Infit_t" = Infit_t,   row.names = dimnames(FitMatrix)[[3]])
+#data.frame( "Outfit" = round(Outfit,2) , "Outfit_t" = round(Outfit_t,1), "Infit" = round(Infit,2), Infit_t = round(Infit_t,1) )    
   return ( res )
 }
 

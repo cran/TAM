@@ -1,8 +1,8 @@
 Package: TAM
 Type: Package
 Title: Test Analysis Modules
-Version: 0.9-9
-Date: 2013-10-12
+Version: 0.99-7
+Date: 2013-11-02
 Author: Thomas Kiefer [aut], Alexander Robitzsch [aut, cre], Margaret Wu [aut]
 Maintainer: Alexander Robitzsch <a.robitzsch@bifie.at>
 Authors@R: c(person("Thomas", "Kiefer", role = c("aut"), email =
@@ -23,10 +23,9 @@ LinkingTo: Rcpp, RcppArmadillo
 LazyLoad: yes
 LazyData: yes
 License: GPL (>= 2)
-URL: https://sites.google.com/site/irttam1/,
-        https://sites.google.com/site/alexanderrobitzsch/software,
-        http://www.edmeasurementsurveys.com/TAM/Tutorials/
-Packaged: 2013-10-13 07:58:06 UTC; robitzsch
+URL: http://www.edmeasurementsurveys.com/TAM/Tutorials/,
+        https://sites.google.com/site/alexanderrobitzsch/software
+Packaged: 2013-11-02 12:55:22 UTC; robitzsch
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2013-10-13 15:02:09
+Date/Publication: 2013-11-02 17:51:48

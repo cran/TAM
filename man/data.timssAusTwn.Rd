@@ -1,14 +1,21 @@
 \name{data.timssAusTwn}
 \alias{data.timssAusTwn}
+\alias{data.timssAusTwn.scored}
+
 \docType{data}
 \title{
 Dataset TIMSS 2011 of Australian and Taiwanese Students 
 }
 \description{
 Mathematics items of TIMSS 2011 of 1773 Australian and
-Taiwanese students.
+Taiwanese students. The dataset \code{data.timssAusTwn} contains raw
+responses while \code{data.timssAusTwn.scored} contains scored item
+responses.
 }
-\usage{data(data.timssAusTwn)}
+\usage{
+data(data.timssAusTwn)
+data(data.timssAusTwn.scored)
+}
 \format{
   A data frame with 1773 observations on the following 14 variables.
   \describe{
@@ -39,6 +46,11 @@ Taiwanese students.
 %%  ~~ possibly secondary sources and usages ~~
 %}
 
+\seealso{
+\url{http://www.edmeasurementsurveys.com/TAM/Tutorials/5PartialCredit.htm}
+
+\url{http://www.edmeasurementsurveys.com/TAM/Tutorials/6Population.htm}
+}
 
 \examples{
 data(data.timssAusTwn)

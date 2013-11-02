@@ -60,7 +60,7 @@ information criteria.
 
 \examples{
 #############################################################################
-# EXAMPLE 1: dichotomous data sim.rasch - 1PL vs. 2PL model
+# EXAMPLE 1: Dichotomous data sim.rasch - 1PL vs. 2PL model
 #############################################################################
 	
 data(sim.rasch)

@@ -2,6 +2,7 @@
 
 \alias{tam.jml}
 \alias{tam.jml2}
+\alias{summary.tam.jml}
 
 \title{
 Joint Maximum Likelihood Estimation
@@ -14,13 +15,15 @@ item response models with joint maximum likelihood (JML,
 }
 
 \usage{
-tam.jml(resp, group = NULL, disattenuate = FALSE, bias = TRUE, 
+tam.jml(resp, group = NULL, adj = .3, disattenuate = FALSE, bias = TRUE, 
     xsi.fixed = NULL, xsi.inits = NULL, A = NULL, B = NULL, Q = NULL, 
     ndim = 1, pweights = NULL, control = list())
 
-tam.jml2(resp, group = NULL, disattenuate = FALSE, bias = TRUE, 
+tam.jml2(resp, group = NULL, adj = .3 , disattenuate = FALSE, bias = TRUE, 
     xsi.fixed = NULL, xsi.inits = NULL, A = NULL, B = NULL, Q = NULL, 
     ndim = 1, pweights = NULL, control = list())
+
+\method{summary}{tam.jml}(object,file=NULL,\dots)   
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -42,6 +45,8 @@ tam.jml2(resp, group = NULL, disattenuate = FALSE, bias = TRUE,
     should be disattenuated due to unreliability? 
     The disattenuation is conducted by applying the Kelley formula.
 }
+\item{adj}{Adjustment constant which is subtracted or added to extreme
+scores (score of zero or maximum score. The default is a value of 0.3}
   \item{bias}{
      A logical which indicates if JML bias should be reduced
      by multiplying item parameters by the adjustment factor
@@ -82,6 +87,18 @@ tam.jml2(resp, group = NULL, disattenuate = FALSE, bias = TRUE,
      A list of control arguments. See \code{\link{tam.mml}}
      for more details.
 }
+  \item{object}{
+Object of class \code{tam.jml} (only for \code{summary.tam}
+function)
+}
+\item{file}{
+A file name in which the summary output will be written 
+(only for \code{summary.tam.jml} function)
+    }
+\item{\dots}{
+	Further arguments to be passed
+	}   
+
 }
 
 \details{
@@ -95,6 +112,7 @@ applications) implementation than \code{tam.jml}.
 
 \value{
 A list with following entries
+\item{item}{Data frame with item parameters and item fit statistics}
 \item{xsi}{Vector of item parameters \eqn{\xi}}
 \item{errorP}{Standard error of item parameters \eqn{\xi}}
 \item{theta}{WLE in final step}
@@ -167,8 +185,10 @@ data(sim.rasch)
 resp <- sim.rasch[1:700 , seq( 1 , 40 , len=10)  ]  # subsample
 # estimate the Rasch model with JML (function 'tam.jml')
 mod1a <- tam.jml(resp=resp) 
+summary(mod1a)
 # the same model but using function 'tam.jml2'
 mod1b <- tam.jml2(resp=resp)
+summary(mod1b)
 
 # compare results with Rasch model estimated by MML
 mod1c <- tam.mml(resp=resp )
@@ -179,6 +199,23 @@ plot( mod1b$xsi , mod1c$xsi$xsi , pch=16 ,
     main="Item Parameter Estimate Comparison")
 lines( c(-5,5) , c(-5,5) , col="gray" )
 
+# Now, the adjustment pf .05 instead of the default .3 is used.
+mod1d <- tam.jml2(resp=resp , adj=.05)
+# compare item parameters
+round( rbind( mod1b$xsi , mod1d$xsi ) , 3 )
+##          [,1]   [,2]   [,3]   [,4]   [,5]  [,6]  [,7]  [,8]  [,9] [,10]
+##   [1,] -2.076 -1.743 -1.217 -0.733 -0.338 0.147 0.593 1.158 1.570 2.091
+##   [2,] -2.105 -1.766 -1.233 -0.746 -0.349 0.139 0.587 1.156 1.574 2.108
+
+# person parameters for persons with a score 0, 5 and 10
+pers1 <- data.frame( "score_adj0.3"= mod1b$PersonScore , "theta_adj0.3"= mod1b$theta , 
+           "score_adj0.05"= mod1d$PersonScore , "theta_adj0.05"= mod1d$theta  )
+round( pers1[ c(698, 683, 608) , ] ,3  )
+##       score_adj0.3 theta_adj0.3 score_adj0.05 theta_adj0.05
+##   698          0.3       -4.404          0.05        -6.283
+##   683          5.0       -0.070          5.00        -0.081
+##   608          9.7        4.315          9.95         6.179
+
 \dontrun{
 #############################################################################
 # EXAMPLE 2: Partial credit model
@@ -188,6 +225,7 @@ data(data.gpcm)
 # the same model but using function 'tam.jml2'
 mod2 <- tam.jml2(resp=data.gpcm)
 mod2$xsi     # extract item parameters
+summary(mod2)
 
 #############################################################################
 # EXAMPLE 3: Facet model estimation using joint maximum likelihood
@@ -226,4 +264,5 @@ mod3c <- tam.jml2( resp=resp1 , A=mod3a$A , control=list(maxiter=200) )
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{Joint maximum likelihood estimation (JML)}
+\keyword{summary}
 %% \keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

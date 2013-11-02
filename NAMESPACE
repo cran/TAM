@@ -29,7 +29,7 @@ S3method(summary, tam )
 S3method(summary, tam.mml )
 S3method( anova , tam.mml )
 S3method( anova , tam )
-
+S3method(summary, tam.jml )
 
 S3method( plot , tam )
 S3method( plot , tam.mml )

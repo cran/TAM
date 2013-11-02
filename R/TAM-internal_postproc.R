@@ -56,6 +56,7 @@
         ic$CAIC <- dev + ( log(ic$n) + 1 )*ic$np
 		# corrected AIC
         ic$AICc <- ic$AIC + 2*ic$np * ( ic$np + 1 ) / ( ic$n - ic$np - 1 )	  
+		
 	return(ic)
 	}
 ##################################################
@@ -63,10 +64,10 @@
 .TAM.itempartable <- function( resp , maxK , AXsi , B , ndim ,
 			resp.ind , rprobs,n.ik,pi.k){
 				
-	item1 <- data.frame( "item" = colnames(resp) )
+#	item1 <- data.frame( "item" = colnames(resp) )
+	item1 <- data.frame( "item" = dimnames(B)[[1]] )
 	item1$N <- colSums(resp.ind )
 	item1$M <- colSums( resp.ind * resp , na.rm=TRUE) / colSums( resp.ind )
-	
 	#****
 	# Item fit
 	# probs ... [ classes , items , categories ]
@@ -85,7 +86,9 @@
 			item1[ , paste0("B.Cat" , kk,".Dim",dd) ] <- B[,kk+1,dd]
 							}
 					}				
-    item1 <- item1[ item1$N > 0 , ]					
+    item1 <- item1[ item1$N > 0 , ]	
+	item1 <- item1[ order( paste( item1$item)) , ]		
+	rownames(item1) <- NULL
 	return(item1)
 		}
 #######################################################

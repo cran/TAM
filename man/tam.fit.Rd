@@ -29,10 +29,9 @@ tam.mml.fit(tamobj, FitMatrix=NULL, progress=FALSE)
   An object of class \code{tam}, \code{tam.mml} or \code{tam.jml}
 }
  \item{FitMatrix}{
- A fit matrix for a specific hypothesis of fit 
- 
- EXPLAIN IT IN DETAIL
-}
+ A fit matrix \eqn{F} for a specific hypothesis of fit of the linear function
+\eqn{F \xi } (see Simulated Example 3 and Adams & Wu 2007).
+  }
  \item{progress}{
     An optional logical indicating whether computation progress should
     be displayed at console.
@@ -53,9 +52,12 @@ In case of \code{tam.mml.fit} a data frame with four columns:
 \item{Infit_t}{The \eqn{t} value for the infit statistic}
 }
 
-%\references{
-%% ~put references to the literature/web site here ~
-%}
+\references{
+Adams, R. J., & Wu, M. L. (2007). The mixed-coefficients multinomial logit model.
+A generalized form of the Rasch model. In M. von Davier & C. H. Carstensen (Eds.):
+\emph{Multivariate and mixture distribution Rasch models: Extensions and applications}
+(pp. 55-76). New York: Springer.
+}
 
 %\author{
 %%  ~~who you are~~
@@ -73,7 +75,7 @@ In case of \code{tam.mml.fit} a data frame with four columns:
 
 \examples{
 #############################################################################
-# EXAMPLE 1: dichotomous data sim.rasch
+# EXAMPLE 1: Dichotomous data sim.rasch
 #############################################################################
 
 data(sim.rasch)
@@ -90,11 +92,11 @@ fit1 <- tam.fit( mod1 )
 
 \dontrun{
 #############################################################################
-# EXAMPLE 2: partial credit model data.gpcm
+# EXAMPLE 2: Partial credit model data.gpcm
 #############################################################################
 
 data( data.gpcm )
-# estimate partial credit model in ConQuest parametrization 'item+iten*step'
+# estimate partial credit model in ConQuest parametrization 'item+item*step'
 mod2 <- tam.mml( resp=data.gpcm , irtmodel="PCM2" )
 summary(mod2)
 # estimate item fit
@@ -108,6 +110,45 @@ fit2 <- tam.fit(mod2)
 ##   [...]
 ##  => The first three rows of the data frame correspond to the fit statistics
 #      of first three items Comfort, Work and Benefit.
+
+#############################################################################
+# SIMULATED EXAMPLE 3: Fit statistic testing for local independence
+#############################################################################
+
+#generate data with local DEPENDENCE and User-defined fit statistics
+set.seed(4888)
+I <- 40		# 40 items
+N <- 1000       # 1000 persons
+
+delta <- seq(-2,2, len=I)
+theta <- rnorm(N, 0, 1)
+# simulate data
+prob <- plogis(outer(theta, delta, "-"))
+rand <- matrix(runif(N*I), nrow=N, ncol=I)
+resp <- 1*(rand < prob)
+colnames(resp) <- paste("I" , 1:I, sep="")
+  
+#Introduce some local dependence
+for (item in c(10, 20, 30)){ 
+ #  20% of the item responses for items 11, 21 and 31
+ #are made equal to the previous item 
+  row <- round(runif(0.2*N)*N + 0.5)     
+  resp[row, item+1] <- resp[row, item]
+}
+  
+#run TAM
+mod1 <- tam(resp)
+  
+#User-defined fit design matrix
+F <- array(0, dim=c(dim(mod1$A)[1], dim(mod1$A)[2], 6))
+F[,,1] <- mod1$A[,,10] + mod1$A[,,11]
+F[,,2] <- mod1$A[,,12] + mod1$A[,,13]
+F[,,3] <- mod1$A[,,20] + mod1$A[,,21]
+F[,,4] <- mod1$A[,,22] + mod1$A[,,23]
+F[,,5] <- mod1$A[,,30] + mod1$A[,,31]
+F[,,6] <- mod1$A[,,32] + mod1$A[,,33]
+fit <- tam.fit(mod1, FitMatrix=F)
+fit
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
