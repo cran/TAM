@@ -17,7 +17,7 @@ function( tamobj , numdiff.parm = .001){
     A <- tamobj$A
     Y <- tamobj$Y
     nitems <- tamobj$nitems
-    xsi <- ( tamobj$xsi )[,1]
+    xsi <- ( tamobj$xsi )[,1]	
     beta <- tamobj$beta
     variance <- tamobj$variance
     nstud <- tamobj$nstud
@@ -156,8 +156,11 @@ function( tamobj , numdiff.parm = .001){
 	    xsi <- data.frame( "item" = rownames(tamobj$xsi) , "N"=NA ,
 					"est" = xsi , "se" = se.xsi )
 				} else {
-		xsi <- data.frame( tamobj$item[,1:2] , 
+#		xsi <- data.frame( tamobj$item[,1:2] , 
+#					"est" = xsi , "se" = se.xsi )		
+		xsi <- data.frame( "item" = rownames(tamobj$xsi)  , 
 					"est" = xsi , "se" = se.xsi )		
+
 						}
 	beta <- data.frame( "beta" = beta , "se" = se.beta )
 	colnames(beta) <- c( paste("est.Dim" , 1:ndim , sep="")	, paste("se.Dim" , 1:ndim , sep="")	)

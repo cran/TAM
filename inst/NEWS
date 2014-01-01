@@ -23,15 +23,26 @@ T. Kiefer, A. Robitzsch, & M. Wu
 
 mailto:
 -------
-a.robitzsch /-\ bifie.at
+t.kiefer@bifie.at
 
 URL:
 ----
 http://www.edmeasurementsurveys.com/TAM/Tutorials/
-https://sites.google.com/site/alexanderrobitzsch/software
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
+-------------------------------------------------------
+Changes in Versions 1.0 (2013-12-20)
+-------------------------------------------------------
+
+x change in package maintenance: now Thomas Kiefer is
+  the package maintainer
+x fixed a bug in item labeling in tam.se
+  (thanks to Sebastian Weirich)
+x fixed a bug in labeling of reduced reponse matrices in 
+  tam.mml.mfr
+x fixed some examples in .Rd files
 
 -------------------------------------------------------
 Changes in Versions 0.91/0.99 (2013-11-02)

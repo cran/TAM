@@ -25,12 +25,13 @@ designMatrices.mfr(resp, formulaA = ~ item + item:step, facets = NULL,
     constraint = c("cases", "items"), ndim = 1, Q=NULL, A=NULL, B=NULL ,
     progress=FALSE)
 .A.matrix(resp, formulaA = ~ item + item*step, facets = NULL, 
-    constraint = c("cases", "items") , progress=FALSE )
+    constraint = c("cases", "items") , progress=FALSE , maxKi=NULL)
 rownames.design(X)
 
-.A.PCM2( resp )     # generates ConQuest parametrization of partial credit model
+.A.PCM2( resp, Kitem=NULL) 
+   # generates ConQuest parametrization of partial credit model
 
-.A.PCM3( resp )     # parametrization for A matrix in the dispersion model
+.A.PCM3( resp, Kitem=NULL ) # parametrization for A matrix in the dispersion model
 }
 
 \arguments{
@@ -82,7 +83,8 @@ rownames.design(X)
     of trait distributions and \code{items} a sum constraint of
     zero of item parameters 
         }
-\item{progress}{Display progress for creation of design matrices}        
+\item{Kitem}{Maximum number of categories per item}
+\item{progress}{Display progress for creation of design matrices}
   \item{\dots}{
      Further arguments
 }

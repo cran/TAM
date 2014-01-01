@@ -596,7 +596,7 @@ beta.inits <- cbind( c(2,3) , 1 , c(.2, .35 ) )
 mod2_2 <- tam(resp=resp , Y=Y , beta.inits=beta.inits)
 
 # (4) fix intercept to zero and third coefficient to .3
-beta.inits <- cbind( c(1,3) , 1 , c(0, .3 ) )
+beta.fixed <- cbind( c(1,3) , 1 , c(0, .3 ) )
 mod2_3 <- tam(resp=resp , Y=Y , beta.fixed=beta.fixed )
 
 # (5) same model but with R regression formula for Y
@@ -1025,7 +1025,7 @@ A1[7,2,3] <- -1     # difficulty(I3T1) = difficulty(I3T2)
 A1[8,2,4] <- -1     # I4T1 = I4T2
 A1[9,2,5] <- -1
 A1[6,2,3] <- A1[6,2,4] <- A1[6,2,5] <- 1  # I6T1=-(I3T1+I4T1+I5T1)
-A1[10,2,3] <- A1[10,2,4] <- A1[10,2,5] <- 1  # I6T2=-(I3T1+I4T1+I5T1)
+A1[10,2,3] <- A1[10,2,4] <- A1[10,2,5] <- 1  # I6T2=-(I3T2+I4T2+I5T2)
 A1[,2,]
 ##      I1 I2 I3 I4 I5 I7 I8
 ## I1T1 -1  0  0  0  0  0  0

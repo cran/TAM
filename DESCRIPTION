@@ -1,13 +1,13 @@
 Package: TAM
 Type: Package
 Title: Test Analysis Modules
-Version: 0.99-7
-Date: 2013-11-02
-Author: Thomas Kiefer [aut], Alexander Robitzsch [aut, cre], Margaret Wu [aut]
-Maintainer: Alexander Robitzsch <a.robitzsch@bifie.at>
-Authors@R: c(person("Thomas", "Kiefer", role = c("aut"), email =
+Version: 1.0-0
+Date: 2014-01-01
+Author: Thomas Kiefer [aut, cre], Alexander Robitzsch [aut], Margaret Wu [aut]
+Maintainer: Thomas Kiefer <t.kiefer@bifie.at>
+Authors@R: c(person("Thomas", "Kiefer", role = c("aut","cre"), email =
         "t.kiefer@bifie.at"), person("Alexander", "Robitzsch", role =
-        c("aut","cre"), email = "a.robitzsch@bifie.at"),
+        c("aut"), email = "a.robitzsch@bifie.at"),
         person("Margaret", "Wu", role = "aut"))
 Description: 
   The package includes marginal and joint maximum likelihood
@@ -23,9 +23,8 @@ LinkingTo: Rcpp, RcppArmadillo
 LazyLoad: yes
 LazyData: yes
 License: GPL (>= 2)
-URL: http://www.edmeasurementsurveys.com/TAM/Tutorials/,
-        https://sites.google.com/site/alexanderrobitzsch/software
-Packaged: 2013-11-02 12:55:22 UTC; robitzsch
+URL: http://www.edmeasurementsurveys.com/TAM/Tutorials/
+Packaged: 2014-01-01 18:20:00 UTC; t.kiefer
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2013-11-02 17:51:48
+Date/Publication: 2014-01-01 20:02:20

@@ -41,7 +41,8 @@ rownames.design2 <- function(X){
 ## function .A.matrix
 .A.matrix <-
   function( resp, formulaA = ~ item + item*step, facets = NULL,  
-            constraint = c("cases", "items") , progress=FALSE ){
+            constraint = c("cases", "items") , progress=FALSE ,
+			maxKi = NULL ){
 z0 <- Sys.time()			
 	### redefine facets matrix
 	facets0 <- facets
@@ -62,8 +63,9 @@ z0 <- Sys.time()
 #cat(" +++  v62" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						
     ### Basic Information and Initializations
     constraint <- match.arg(constraint)
-    
-    maxKi <- apply( resp , 2 , max , na.rm=TRUE )
+    if ( is.null(maxKi) ){
+		maxKi <- apply( resp , 2 , max , na.rm=TRUE )
+					}
     maxK <- max( maxKi )
     nI <- ncol( resp )
 #cat(" +++  v70" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						
@@ -225,8 +227,10 @@ z0 <- Sys.time()
 ####################################################
 # create ConQuest parametrization for 
 # partial credit model
-.A.PCM2 <- function( resp ){
-	Kitem <- apply( resp , 2 , max , na.rm=T ) + 1
+.A.PCM2 <- function( resp , Kitem=NULL){
+	if ( is.null(Kitem) ){ 
+		Kitem <- apply( resp , 2 , max , na.rm=T ) + 1
+				}
 	maxK <- max(Kitem)
 	I <- ncol(resp)
 	Nxsi <- sum(Kitem) - I
@@ -261,8 +265,10 @@ z0 <- Sys.time()
 ####################################################
 # create ConQuest parametrization for 
 # partial credit model
-.A.PCM3 <- function( resp ){
+.A.PCM3 <- function( resp , Kitem =NULL ){
+if ( is.null(Kitem) ){
 	Kitem <- apply( resp , 2 , max , na.rm=T ) + 1
+	}
 	maxK <- max(Kitem)
 	I <- ncol(resp)	
 	Nxsi <- I + sum( Kitem > 2 )
