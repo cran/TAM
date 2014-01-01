@@ -113,6 +113,7 @@ Wu, M. L., Adams, R. J., Wilson, M. R. & Haldane, S. (2007).
 # EXAMPLE 01: Rasch model data.cqc01
 #############################################################################
 data(data.cqc01)
+dat <- data.cqc01
 
 #*** Model 01: Estimate Rasch model
 mod01 <- tam.mml( dat )
@@ -122,6 +123,7 @@ summary( mod01 )
 # EXAMPLE 02: Partial credit model and rating scale model data.cqc02
 #############################################################################
 data(data.cqc02)
+dat <- data.cqc02
 
 # Model 02a: Partial credit model in ConQuest parametrization 'item+item*step'
 mod02a <- tam.mml( dat , irtmodel="PCM2" )
@@ -173,7 +175,7 @@ for (rr in raters){
 
 # estimate model 03c
 mod03c <- tam.mml( dat1[,-1] , pid = dat1$pid )
-summary( mod03c , file=name )
+summary( mod03c )
 
 #############################################################################
 # EXAMPLE 04: Faceted Rasch model for rating data data.cqc04

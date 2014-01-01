@@ -78,7 +78,7 @@ sd(PersonAbility)
 \dontrun{
 #Extension
 #plot histograms of ability and item parameters in the same graph
-oldpar <- par()	      # save default graphic settings
+oldpar <- par(no.readonly = TRUE)	      # save writable default graphic settings
 windows (width=4.45, height=4.45, pointsize=12)
 layout(matrix(c(1,1,2),3,byrow=TRUE))
 layout.show(2)
@@ -115,7 +115,8 @@ Fit <- tam.fit(mod1)
 Fit
 
 # plot expected response curves
-plot( mod1 , ask=TRUE ) }
+plot( mod1 , ask=TRUE ) 
+}
 }
 
 
