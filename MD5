@@ -1,5 +1,5 @@
-33eb7045b56ededea3d38cc105e372d6 *DESCRIPTION
-ac233092f64be4485be522efb17f1f55 *NAMESPACE
+78dfc6e4c5d86ea0c8003bb7cf549c63 *DESCRIPTION
+8e7bdac3b3d7393047cebbb2559859f1 *NAMESPACE
 6844b3a298d864ebbc5e52b63ca7a13b *R/TAM-internal_helper.R
 490737199110f4e6c4d5da50919f1252 *R/TAM-internal_intermediate.R
 0c6fddde14c4cc86b5c3403b3f9b15a6 *R/TAM-internal_mstep.R
@@ -53,7 +53,7 @@ b1a3e150becb32850f3af46f5512aaca *data/data.numeracy.rda
 133ae23d02573c7c60a2899005863746 *data/sim.rasch.missing.rda
 508ca50b85dbbdb13d42f1fee59bbb74 *data/sim.rasch.pweights.rda
 5c4889b38e5b607d7622999d04fc0f02 *data/sim.rasch.rda
-5be3dfb14513fdc1610a8109f0b9cfb6 *inst/NEWS
+f3e53b0e3f5d17086b03b2ba1aab66e2 *inst/NEWS
 5313e6a55309e3890fd4042b8bbb29f7 *inst/sim.facets.R
 60fa46f50fad3832bc1380d8a5638b86 *inst/sim.mfr.R
 4902fb2078721faf6df46a1a479c4eaa *inst/sim.rasch.R

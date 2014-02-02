@@ -33,9 +33,10 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 
 -------------------------------------------------------
-Changes in Versions 1.0 (2013-12-20)
+Changes in Versions 1.0 (2014-02-02)
 -------------------------------------------------------
 
+x updated DESCRIPTION and NAMESPACE due to changes in Rcpp
 x change in package maintenance: now Thomas Kiefer is
   the package maintainer
 x fixed a bug in item labeling in tam.se
