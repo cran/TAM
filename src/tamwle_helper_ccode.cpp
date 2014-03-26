@@ -104,7 +104,7 @@ SEXP tam_wle_errinv( SEXP errl, SEXP ndim, SEXP nstud ){
 BEGIN_RCPP
 	/////////////////////////////////////
 	// INPUT
-	Rcpp::NumericMatrix ERR(errl);
+	Rcpp::NumericMatrix myERR(errl);
 	
 	///////////////////////////////////////////////////////////
 	// INPUT indices
@@ -122,7 +122,7 @@ BEGIN_RCPP
 	for(int jj=0; jj<cnstud; jj++){// item loop
 		for(int dd1=0; dd1<cndim; dd1++){// dimension loop 1
 			for(int dd2=0; dd2<cndim; dd2++){// dimension loop 2
-				ERR_j(dd1,dd2) = ERR(jj, dd1+dd2*cndim);
+				ERR_j(dd1,dd2) = myERR(jj, dd1+dd2*cndim);
 			}
 		}
 		

@@ -1,4 +1,4 @@
-954aa545beef73075a6cddec0c89def8 *DESCRIPTION
+0e39c0d4dd8b8d3290f8f30272f57247 *DESCRIPTION
 accab9ea10df9361ef2ccb1510e4b744 *NAMESPACE
 6844b3a298d864ebbc5e52b63ca7a13b *R/TAM-internal_helper.R
 490737199110f4e6c4d5da50919f1252 *R/TAM-internal_intermediate.R
@@ -91,4 +91,4 @@ e23cd224694da0bad4d2cca99a9d1722 *src/tam_calcexp.cpp
 16624a737fceb51d8a649fa856e474cc *src/tam_caux__3-04.04.c
 5c954977ad3f72424881ac180c136f4c *src/tam_ctt_c.cpp
 de76d9a202cc0f9a18ef58bfb1b65ed0 *src/tam_helper_ccode.cpp
-18c6f19bdd8e8bccca77cf970f8edb6d *src/tamwle_helper_ccode.cpp
+5cc0db4a9a94dc5f7646667955f1a05a *src/tamwle_helper_ccode.cpp
