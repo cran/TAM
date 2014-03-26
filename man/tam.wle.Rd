@@ -2,6 +2,7 @@
 
 \alias{tam.wle}
 \alias{tam.mml.wle}
+\alias{tam.mml.wle2}
 \alias{tam.jml.WLE}
 
 \title{
@@ -19,6 +20,8 @@ respectively.
 tam.wle(tamobj, ...)
 
 tam.mml.wle(tamobj, score.resp=NULL, WLE=TRUE, adj=0.3, Msteps=20, convM=1e-04)
+
+tam.mml.wle2(tamobj, score.resp=NULL, WLE=TRUE, adj=0.3, Msteps=20, convM=1e-04)
 
 tam.jml.WLE(tamobj, resp, resp.ind, A, B, nstud, nitems, maxK, convM, 
     PersonScores, theta, xsi, Msteps, WLE=FALSE)
@@ -78,7 +81,8 @@ tam.jml.WLE(tamobj, resp, resp.ind, A, B, nstud, nitems, maxK, convM,
 %}
 
 \value{
-For \code{tam.wle.mml}, it is a data frame with following columns:
+For \code{tam.wle.mml} and \code{tam.wle.mml2}, it is a data frame with following 
+columns:
 \item{pid}{Person identifier}
 \item{PersonScores}{Score of each person}
 \item{PersonMax}{Maximum score of each person}
@@ -129,6 +133,10 @@ wle1 <- tam.wle( mod1 )
 wle2 <- tam.wle( mod1 , score.resp=sim.rasch[1:10,])
 
 \dontrun{
+# compare results to earlier wle-implementation
+wle3 <- tam.mml.wle( mod1 )
+stopifnot( all(wle3==wle1) )
+
 #############################################################################
 # EXAMPLE 2: 3-dimensional Rasch model | data.read from sirt package
 #############################################################################
@@ -156,7 +164,7 @@ summary(mod)
 
 # WLE estimates
 wmod <- tam.wle(mod , Msteps=3)
-summary(mod)
+summary(wmod)
 ##   head(round(wmod,2))
 ##      pid N.items PersonScores.Dim01 PersonScores.Dim02 PersonScores.Dim03
 ##   2    1       4                3.7                0.3                0.3

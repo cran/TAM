@@ -31,6 +31,22 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+-------------------------------------------------------
+Changes in Version 1.0-2 (2014-03-26)
+-------------------------------------------------------
+
+x fixed a Bug in the optional specification of a B matrix
+  in tam.mml.mfr
+x new faster tam.mml.wle2; included Rcpp helper functions for 
+  tam.mml.wle2 for fast computation; tam.mml.wle2 new 
+  reference in tam.wle for objects of class tam.mml, rd-file
+  adapted
+x tam.mml.mfr now accepts polytomous data with more than 
+  ten categories per item
+x specification of response matrix in 'long format' fixed,
+  see example section (thanks to Takuya Yanagida)
+x some minor changes in usability (eg., pid can be specified as 
+  vector, one-column matrix or data.frame)
 
 -------------------------------------------------------
 Changes in Versions 1.0 (2014-02-02)

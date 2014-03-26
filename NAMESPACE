@@ -10,7 +10,7 @@ export(designMatrices, .A.matrix, designMatrices.mfr,
        tam, tam.mml, tam.mml.2pl, tam.mml.mfr, 
        tam.se, tam.wle , .A.PCM2 , .A.PCM3 , 
        tam.threshold , tam ,
-       tam.ctt , tam.mml.wle ,
+       tam.ctt , tam.mml.wle , tam.mml.wle2 ,
        tam.ctt2 , tam.fa ,
        plotDevianceTAM , tam.ctt3
        )

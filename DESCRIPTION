@@ -1,8 +1,8 @@
 Package: TAM
 Type: Package
 Title: Test Analysis Modules
-Version: 1.0-1
-Date: 2014-02-02
+Version: 1.0-2
+Date: 2014-03-26
 Author: Thomas Kiefer [aut, cre], Alexander Robitzsch [aut], Margaret Wu [aut]
 Maintainer: Thomas Kiefer <t.kiefer@bifie.at>
 Authors@R: c(person("Thomas", "Kiefer", role = c("aut","cre"), email =
@@ -24,7 +24,7 @@ LazyLoad: yes
 LazyData: yes
 License: GPL (>= 2)
 URL: http://www.edmeasurementsurveys.com/TAM/Tutorials/
-Packaged: 2014-02-02 17:29:12 UTC; t.kiefer
+Packaged: 2014-03-26 14:08:01 UTC; t.kiefer
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2014-02-02 19:01:52
+Date/Publication: 2014-04-02 11:29:09

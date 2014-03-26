@@ -66,7 +66,7 @@ tam.mml.mfr <-
     
     if ( constraint=="items" ){ beta.fixed <- FALSE }
     
-    pid0 <- pid
+    pid0 <- pid <- unname(c(unlist(pid)))
     if (progress){ 
       cat(disp)	
       cat("Processing Data     ", paste(Sys.time()) , "\n") ; flush.console()
