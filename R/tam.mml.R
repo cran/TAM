@@ -97,7 +97,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="1PL" ,
 					}  	  
   
   #!! check dim of person ID pid
-  if ( is.null(pid) ){ pid <- seq(1,nstud) }
+  if ( is.null(pid) ){ pid <- seq(1,nstud) }else{ pid <- unname(c(unlist(pid))) }
 
 # print( colSums( is.na(resp)) )
   

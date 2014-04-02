@@ -9,7 +9,8 @@
 				length(grep( vv , paste(formulaA) )) } )
 	h1 <- colnames(d1)[ h1 == 0 ]
 	d0 <- d0[ , ! ( colnames(d1) %in% h1 ) , drop=FALSE]
-	M2 <- model.matrix( object= formulaA , data= d1 , 
+	M2 <- model.matrix( #object= 
+    formulaA , data= d1 , 
 			contrasts.arg = lapply( d0 , contrasts, contrasts=FALSE) )
 	h2 <- colnames(M2)
 	h1 <- colnames(mm)

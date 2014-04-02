@@ -518,6 +518,7 @@ summary(mod1a)
 xsi.inits <- cbind( c(2,4,40) , c(-1.8,-1.6,2))
 mod1b <- tam.mml( resp=sim.rasch , xsi.inits=xsi.inits )
 
+#***
 # 1PL estimtaion with sum constraint on item difficulties
 dat <- sim.rasch
 # modify A design matrix to include the sum constraint
@@ -531,10 +532,29 @@ mod1c <- tam.mml( resp=dat , A=A1 , beta.fixed=FALSE ,
 summary(mod1c)
 
 # estimate constraint='items' using tam.mml.mfr
-mod1d <- tam.mml.mfr( resp=dat , formulaA= ~ 0 + item , control=list(fac.oldxsi=.1) ,
-        constraint="items") 
+formulaA= ~ 0 + item
+mod1d <- tam.mml.mfr( resp=dat , formulaA=formulaA , 
+                     control=list(fac.oldxsi=.1) , constraint="items") 
 summary(mod1d)
+
+# estimate constraint='items' using tam.mml.mfr
+# long format response data
+resp.long <- c(dat)
+
+# pid and item facet specifications are necessary
+#     Note, that we recommend the facet labels to be sortable in the same order that the
+#     results are desired. 
+#     compare to: facets <- data.frame( "item"=rep(colnames(dat), each=nrow(dat)) )
+pid <- rep(1:nrow(dat), ncol(dat))
+itemnames <- paste0("I", sprintf(paste('\%0', max(nchar(1:ncol(dat))), 'i', sep='' ), 
+                    c(1:ncol(dat)) ) )
+facets   <- data.frame( "item"=rep(itemnames, each=nrow(dat)) )
+
+mod1d2 <- tam.mml.mfr( resp=resp.long , formulaA=formulaA , control=list(fac.oldxsi=.1) ,
+                       constraint="items" , facets=facets , pid=pid) 
+stopifnot( all(mod1d$xsi.facets$xsi == mod1d2$xsi.facets$xsi) )
 }
+
 
 #***
 # 2PL model
@@ -837,12 +857,24 @@ mod8a <- tam.mml.mfr( resp= resp , facets= facets , formulaA = formulaA )
 summary(mod8a)          
 
 #***
+# Model 8a 2: specification with long format response data
+resp.long <- c( data.ex08[["resp"]] )
+pid <- rep( 1:nrow(data.ex08[["resp"]]), ncol(data.ex08[["resp"]]) )
+
+itemnames <- rep(colnames(data.ex08[["resp"]]), each=nrow(data.ex08[["resp"]]))
+facets.long <- cbind( data.frame( "item"=itemnames ),
+                 data.ex08[["facets"]][pid,,drop=F] )
+                 
+mod8a_2 <- tam.mml.mfr( resp=resp.long , facets=facets.long , formulaA=formulaA, pid= pid )    
+stopifnot( all(mod8a$xsi.facets$xsi==mod8a_2$xsi.facets$xsi) )
+
+#***
 # Model 8b: Differential bundle functioning (DBF)
 #   - investigate differential item functioning in item groups
 
 # modify pre-specified design matrix to define 'appropriate' DBF effects
 formulaA <- ~ item*female
-des <- designMatrices.mfr( resp = resp , facets = facets , formulaA=formulaA)
+des <- designMatrices.mfr( resp=resp , facets=facets , formulaA=formulaA)
 A1 <- des$A$A.3d
 # item group A: items 1-5
 # item group B: items 6-8
@@ -906,6 +938,23 @@ summary(mod10)
 
 # estimate person parameter with WLE 
 wmod10 <- tam.wle( mod10 )
+
+#***
+# Model 10 2: specification with long format response data
+resp.long=c(unlist( dat[ , -c(1:2) ] ))
+
+pid <- rep( dat$pid, ncol(dat[ , -c(1:2) ]) )
+itemnames <- rep(colnames(dat[ , -c(1:2) ]), each=nrow(dat[ , -c(1:2) ]))
+
+# quick note: the 'trick' to use pid as the row index of the facet  (cf., used in Ex 8a_2)
+# is not working here, since pid already occures multiple times in the original response data
+facets <- cbind( data.frame("item"=itemnames),
+                 dat[ rep(1:nrow(dat), ncol(dat[,-c(1:2)])), "rater" ,drop=F]
+)
+
+mod10_2 <- tam.mml.mfr( resp=resp.long , facets= facets , formulaA = formulaA, pid= pid )    
+
+stopifnot( all(mod10$xsi.facets$xsi==mod10_2$xsi.facets$xsi) )
 
 #############################################################################
 # EXAMPLE 11: Dichotomous data with missing and omitted responses
