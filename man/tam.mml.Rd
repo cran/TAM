@@ -180,11 +180,11 @@ tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
   parameters of item groups. This function only applies to
   the generalized partial credit model \cr (\code{irtmodel="2PL.groups"}).
 }
-  \item{E}{
-     An optional design matrix for estimating item slopes
-     in the generalized partial credit model (\code{irtmodel="GPCM"})
+\item{E}{
+  An optional design matrix for estimating item slopes
+  in the generalized partial credit model (\code{irtmodel="GPCM.design"})
 }
-  \item{pweights}{
+\item{pweights}{
      An optional vector of person weights
 }
 \item{formulaA}{Design formula (only applies to \code{tam.mml.mfr}). 
@@ -312,8 +312,8 @@ The scoring vector \eqn{b_{ik}} contains the fixed (in \code{tam.mml})
 or estimated (in \code{tam.mml.2pl}) scores of item \eqn{i} in category \eqn{k}
 on dimension \eqn{d}.
 
-For \code{tam.mml.2pl} and \code{irtmodel="GPCM"}, item slopes \eqn{a_i} can be
-written as a linear combination \eqn{a_i = ( E \gamma)_i } 
+For \code{tam.mml.2pl} and \code{irtmodel="GPCM.design"}, item slopes \eqn{a_i}
+can be written as a linear combination \eqn{a_i = ( E \gamma)_i } 
 of basis item slopes which is an analogue
 of the LLTM for item slopes (see Example 7; Embretson, 1999).
 
@@ -404,9 +404,19 @@ are displayed.
 \item{hwt}{Individual posterior distribution}
 \item{ndim}{Number of dimensions}
 \item{xsi.fixed}{Fixed \eqn{\xi} parameters}
-\item{beta.fixed}{Fixed \eqn{\beta} parameters}
+\item{B.fixed}{Fixed loading parameters (only applies to \code{tam.mml.2pl})}
+\item{est.slopegroups}{An index vector of item groups of common slope 
+parameters (only applies to \code{tam.mml.2pl})}
+\item{E}{Design matrix for estimated item slopes in the generalized partial 
+credit model (only applies to \code{tam.mml.2pl} in case of 
+\code{irtmodel="GPCM.design"})}
+\item{basispar}{Vector of \eqn{\gamma} parameters of the linear combination 
+\eqn{a_i = ( E \gamma)_i } for item slopes (only applies to 
+\code{tam.mml.2pl} in case of \code{irtmodel='GPCM.design'})}
 \item{formulaA}{Design formula (only applies to \code{tam.mml.mfr})}
-\item{facets}{Data frame with facet entries (only applies to \code{tam.mml.mfr})}
+\item{facets}{Data frame with facet entries (only applies to 
+  \code{tam.mml.mfr})
+}
 \item{variance.fixed}{Fixed covariance matrix}
 \item{nnodes}{Number of theta nodes}
 \item{deviance}{Final deviance}
@@ -455,6 +465,9 @@ is recommended because otherwise problems in memory allocation and large
 computation time will result. Choose in \code{control} a suitable value of 
 the number of quasi Monte Carlo or stochastic nodes \code{snodes} 
 (say, larger than 1000). See Pan and Thompson (2007) for more details.
+
+In faceted models (\code{tam.mml.mfr}), parameters which cannot be estimated
+are fixed to \code{99}.
 }
 
 %\section{Warning}{
@@ -797,6 +810,41 @@ summary(mod6_6c)
 mod6_7 <- tam.mml( resp=data.gpcm , irtmodel="RSM" )
 summary(mod6_7)
 
+#***
+# Ex 6.8: sum constraint on item difficulties 
+#         partial credit model: ConQuest parametrization 'item+item*step' 
+#         polytomous scored TIMMS data
+#         compare to Example 16
+#
+
+data(data.timssAusTwn.scored)
+dat <- data.timssAusTwn.scored[,1:11]
+
+## > tail(sort(names(dat)),1) # constrained item
+## [1] "M032761"
+
+# modify design matrix of xsi paramters
+A1 <- .A.PCM2( resp=dat )
+# constrained item loads on every other main item parameter
+# with opposing margin it had been loaded on its own main item parameter
+A1["M032761",,setdiff(colnames(dat), "M032761")] <- -A1["M032761",,"M032761"]
+# remove main item parameter for constrained item
+A1 <- A1[ , , setdiff(dimnames(A1)[[3]],"M032761")] 
+
+# estimate model
+mod6_8a <- tam.mml( resp=dat , A=A1 , beta.fixed=FALSE )
+summary(mod6_8a)
+# extract fixed item parameter for item M032761
+## - sum(mod6_8a$xsi[setdiff(colnames(dat), "M032761"),"xsi"])
+
+# estimate mod6_8a using tam.mml.mfr
+## fixed a bug in 'tam.mml.mfr' for differing number of categories
+## per item -> now a xsi vector with parameter fixings to values 
+## of 99 is used 
+mod6_8b <- tam.mml.mfr( resp=dat , formulaA= ~ 0 + item + item:step , 
+                        control=list(fac.oldxsi=.1), constraint="items" ) 
+summary(mod6_8b)
+
 #############################################################################
 # SIMULATED EXAMPLE 7: design matrix for slopes for the
 #            generalized partial credit model
@@ -1093,6 +1141,70 @@ A1[,2,]
 mod13b <- tam.mml( resp=data.long[,-1] , Q=Q , A=A1 , beta.fixed=FALSE)
 summary(mod13b)
 
+#***
+# Model 13c: longitudinal polytomous data 
+#
+
+# modifiy Items I1T1, I4T1, I4T2 in order to be trichotomous (codes: 0,1,2)
+set.seed(42)
+dat <- data.long
+dat[(1:50),2] <- sample(c(0,1,2), 50, replace = TRUE)
+dat[(1:50),5] <- sample(c(0,1,2), 50, replace = TRUE)
+dat[(1:50),9] <- sample(c(0,1,2), 50, replace = TRUE)
+
+##   > colnames(dat)
+##    [1] "idstud" "I1T1"   "I2T1"   "I3T1"   "I4T1"   "I5T1"   "I6T1"  
+##    [8] "I3T2"   "I4T2"   "I5T2"   "I6T2"   "I7T2"   "I8T2"  
+
+## item 1 to 6 administered at T1, items 3 to 8 at T2
+## items 3 to 6 are anchor items
+
+# (1) define matrix loadings
+Q <- matrix(0,12,2)
+colnames(Q) <- c("T1","T2")
+Q[1:6,1] <- 1       # items at T1
+Q[7:12,2] <- 1      # items at T2
+
+# (2) assume equal item difficulty of anchor items
+#     create draft design matrix and modify it
+A <- designMatrices(resp=dat[,-1])$A
+dimnames(A)[[1]] <- colnames(dat)[-1]
+## > str(A)
+## num [1:12, 1:3, 1:15] 0 0 0 0 0 0 0 0 0 0 ...
+## - attr(*, "dimnames")=List of 3
+## ..$ : chr [1:12] "I1T1" "I2T1" "I3T1" "I4T1" ...
+## ..$ : chr [1:3] "Category0" "Category1" "Category2"
+## ..$ : chr [1:15] "I1T1_Cat1" "I1T1_Cat2" "I2T1_Cat1" "I3T1_Cat1" ...
+
+# define matrix A
+# Items 1 to 3 administered at T1, Items 3 to 6 are anchor items
+# Item 7 to 8 administered at T2
+# Item I1T1, I4T1, I4T2 are trichotomous (codes: 0,1,2)
+A1 <- A[  ,  , c(1:8, 14:15) ]
+dimnames(A1)[[3]] <- gsub("T1|T2", "",  dimnames(A1)[[3]])
+
+# Modifications are shortened compared to Model 13 a, but are still valid
+A1[7,,] <- A1[3,,]  # item 7, i.e. I3T2, loads on same parameters as 
+                    # item 3, I3T1 
+A1[8,,] <- A1[4,,]  # same for item 8 and item 4 
+A1[9,,] <- A1[5,,]  # same for item 9 and item 5
+A1[10,,] <- A1[6,,] # same for item 10 and item 6
+
+## > A1[8,,]
+##           I1_Cat1 I1_Cat2 I2_Cat1 I3_Cat1 I4_Cat1 I4_Cat2 I5_Cat1 ...
+## Category0       0       0       0       0       0       0       0 
+## Category1       0       0       0       0      -1       0       0
+## Category2       0       0       0       0      -1      -1       0 
+
+# (3) estimate model
+#     set intercept of second dimension (T2) to zero
+beta.fixed <- cbind( 1 , 2 , 0 )
+mod13c <- tam.mml( resp=dat[,-1] , Q=Q , A=A1 , beta.fixed=beta.fixed, 
+                   irtmodel = "PCM")
+summary(mod13c)
+wle.mod13c <- tam.wle(mod13c) # WLEs of dimension T1 and T2
+
+
 #############################################################################
 # EXAMPLE 14: Facet model with latent regression
 #############################################################################
@@ -1167,6 +1279,39 @@ mod15a <- tam.mml.mfr(resp = data[,-c(1:2)],facets=data[,"group",drop=FALSE],
 mod15b <- tam.mml.mfr(resp = data[,-c(1:2)],facets=data[,"group",drop=FALSE], 
             formulaA = ~ group*item , pid = data$pid ,
             control=list(maxiter= 50 , increment.factor=1.03 , fac.oldxsi=.4 ) )
+            
+#############################################################################
+# EXAMPLE 16: Differential item function for polytomous items and
+#       differing number of response options per item
+#############################################################################            
+
+data(data.timssAusTwn.scored)
+dat <- data.timssAusTwn.scored
+# extract item response data
+resp <- dat[ , sort(grep("M" , colnames(data.timssAusTwn.scored) , value=TRUE)) ]
+# some descriptives
+psych::describe(resp)   
+# define facets: 'cnt' is group identifier
+facets <- data.frame( "cnt" = dat$IDCNTRY)
+# create design matrices
+des2 <- designMatrices.mfr2( resp=resp , facets=facets , formulaA = ~item*step + item*cnt) 
+# restructured data set: pseudoitem = item x country
+resp2 <- des2$gresp$gresp.noStep
+# A design matrix
+A <- des2$A$A.3d
+	# redundant xsi parameters to be eliminated from design matrix
+xsi.elim <- des2$xsi.elim
+A <- A[ , , - xsi.elim[,2] ]
+# extract loading matrix B
+B <- des2$B$B.3d
+# estimate model
+mod1 <- tam.mml( resp=resp2 , A = A , B= B , control=list(maxiter=100) )
+summary(mod1)
+# The sum of all DIF parameters is set to zero. The DIF parameter for the last
+# item is therefore obtained 
+xsi1 <- mod1$xsi
+difxsi <- xsi1[ intersect( grep("cnt",rownames(xsi1)),grep("M03" ,rownames(xsi1))) , ]
+- colSums(difxsi)		# this is the DIF effect of the remaining item
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

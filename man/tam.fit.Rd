@@ -2,7 +2,7 @@
 
 \alias{tam.fit}
 \alias{tam.mml.fit}
-%% \alias{tam.jml.fit}
+\alias{tam.jml.fit}
 
 \title{
 Item Infit and Outfit Statistic
@@ -18,6 +18,8 @@ objects of classes \code{tam}, \code{tam.mml} and
 tam.fit(tamobj, ...)
 
 tam.mml.fit(tamobj, FitMatrix=NULL, progress=FALSE)
+
+tam.jml.fit(tamobj)
 }
 
 %% tam.jml.fit(tamobj, resp, resp.ind, A, B, nstud, nitems, maxK, ItemScore, 

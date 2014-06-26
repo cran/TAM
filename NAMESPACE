@@ -12,7 +12,9 @@ export(designMatrices, .A.matrix, designMatrices.mfr,
        tam.threshold , tam ,
        tam.ctt , tam.mml.wle , tam.mml.wle2 ,
        tam.ctt2 , tam.fa ,
-       plotDevianceTAM , tam.ctt3
+       plotDevianceTAM , tam.ctt3 , tam.mml.3pl ,
+       designMatrices.mfr2 ,
+       tam.modelfit
        )
 
 # internal functions; not intended to be visible to users
@@ -30,6 +32,9 @@ S3method(summary, tam.mml )
 S3method( anova , tam.mml )
 S3method( anova , tam )
 S3method(summary, tam.jml )
+S3method( summary, tam.mml.3pl)
+S3method(summary, tam.modelfit )
+
 
 S3method( plot , tam )
 S3method( plot , tam.mml )

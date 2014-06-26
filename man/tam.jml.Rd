@@ -112,10 +112,10 @@ applications) implementation than \code{tam.jml}.
 
 \value{
 A list with following entries
-\item{item}{Data frame with item parameters and item fit statistics}
+\item{item}{Data frame with item parameters}
 \item{xsi}{Vector of item parameters \eqn{\xi}}
 \item{errorP}{Standard error of item parameters \eqn{\xi}}
-\item{theta}{WLE in final step}
+\item{theta}{MLE in final step}
 \item{errorWLE}{Standard error of WLE}
 \item{WLE}{WLE in last iteration}
 \item{WLEreliability}{WLE reliability}
@@ -123,14 +123,14 @@ A list with following entries
 \item{ItemScore}{Sufficient statistic for each item parameter}
 \item{PersonMax}{Maximum person score}
 \item{ItemMax}{Maximum item score}
-\item{outfitPerson}{Person outfit statistic}
-\item{outfitItem}{Item outfit statistic}
-\item{infitPerson}{Person infit statistic}
-\item{infitItem}{Item infit statistic}
-\item{outfitPerson_t}{The \eqn{t} value of person outfit}
-\item{outfitItem_t}{The \eqn{t} value of item outfit}
-\item{infitPerson_t}{The \eqn{t} value of person infit}
-\item{infitItem_t}{The \eqn{t} value of item infit}
+%\item{outfitPerson}{Person outfit statistic}
+%\item{outfitItem}{Item outfit statistic}
+%\item{infitPerson}{Person infit statistic}
+%\item{infitItem}{Item infit statistic}
+%\item{outfitPerson_t}{The \eqn{t} value of person outfit}
+%\item{outfitItem_t}{The \eqn{t} value of item outfit}
+%\item{infitPerson_t}{The \eqn{t} value of person infit}
+%\item{infitItem_t}{The \eqn{t} value of item infit}
 \item{deviance}{Deviance}
 \item{deviance.history}{Deviance history in iterations}
 \item{resp}{Original data frame}
@@ -186,9 +186,12 @@ resp <- sim.rasch[1:700 , seq( 1 , 40 , len=10)  ]  # subsample
 # estimate the Rasch model with JML (function 'tam.jml')
 mod1a <- tam.jml(resp=resp) 
 summary(mod1a)
+itemfit <- tam.fit(mod1a)$fit.item
+
 # the same model but using function 'tam.jml2'
 mod1b <- tam.jml2(resp=resp)
 summary(mod1b)
+itemfit <- tam.fit(mod1b)$fit.item
 
 # compare results with Rasch model estimated by MML
 mod1c <- tam.mml(resp=resp )

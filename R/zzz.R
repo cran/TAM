@@ -20,7 +20,7 @@ version <- function(pkg="TAM"){
   d <- packageDescription("TAM")
   packageStartupMessage("::...........................::\n",
 		paste(":: " , d$Package," " , d$Version," (",d$Date,")", 
-          paste0(rep(" ", 8-nchar(d$Version)), collapse=""), " ::",sep="") ,
+          paste0(rep(" ", max(8-nchar(d$Version),0)), collapse=""), " ::",sep="") ,
 		paste("\n:: Test Analysis Modules     ::") ,
 		"\n::...........................::\n" )
 }

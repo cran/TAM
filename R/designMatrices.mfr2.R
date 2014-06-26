@@ -1,19 +1,30 @@
 
 
 #########################################################################
-designMatrices.mfr <-
+designMatrices.mfr2 <-
   function( resp, formulaA = ~ item + item:step, facets = NULL,  
             constraint = c("cases", "items"), ndim = 1,
             Q=NULL, A=NULL, B=NULL , progress=FALSE ){
     z0 <- Sys.time()
+	# sort items according alpha numeric sorting
+	cn <- colnames(resp)
+	if ( ! is.null(cn) ){
+		cns <- sort( cn , index.return=TRUE )$ix
+		resp <- resp[ , cns ]
+		if ( !is.null(A) ){ A <- A[ cns ,, ] }
+		if ( !is.null(B) ){ B <- B[ cns ,, ] }		
+		if ( !is.null(Q) ){ Q <- Q[ cns , ] }				
+	
+		}
+
+
     ### Basic Information and Initializations
     constraint <- match.arg(constraint)
     ## restructure formulaA
     t1 <- attr( terms( formulaA ) , "term.labels" )
     t2 <- intersect( c("item" , "step" , "item:step") , t1 )
-    
-    
-    # cat(" ---  z20" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     	
+        
+# cat(" ---  z20" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     	
     formulaA <- paste(  paste( c(t2 , setdiff(t1 , t2 ) ) , collapse= " + " ) )
     formulaA <- as.formula( paste( " ~ " , formulaA ) )	
     
@@ -46,7 +57,7 @@ designMatrices.mfr <-
         }
       }
     }
-    #cat(" ---  z50" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     				
+# cat(" ---  z50" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     				
     
     #********************************	
     #    resp[ is.na(resp) ] <- 0
@@ -54,41 +65,47 @@ designMatrices.mfr <-
     maxK <- max( maxKi )
     I <- nI <- ncol( resp )
     item <- rep( 1:nI , maxKi+1 )
+	
     if ( is.null( colnames(resp) ) ){
       colnames(resp) <- paste0( "item" , 1:nI )
     }
     
-    # cat(" ---  before .A.matrix" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						
+# cat(" ---  before .A.matrix" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						
     
     # A Matrix
     if( is.null(A) ){
-      AX <- .A.matrix( resp, formulaA = formulaA, facets = facets, constraint = constraint ,
-                       progress=progress)
-      
+      AX <- .A.matrix2( resp, formulaA = formulaA, facets = facets, constraint = constraint ,
+                       progress=progress , Q = Q)					   
       A <- AX$A; X <- AX$X; otherFacets <- AX$otherFacets
+	  xsi.elim <- AX$xsi.elim  
       xsi.constr <- AX$xsi.constr
       facet.design <- AX$facet.design
       facet.list <- facet.design$facet.list
-      facets <- facet.design$facets
-      X.noStep <- unique(X[,- grep("step", colnames(X)), drop = FALSE ])  
-      rownames(X.noStep) <- gsub("-step([[:digit:]])*", "", rownames(X.noStep))      
-    } 	
-# Revalprstr("X.noStep")
-# Revalpr("X.noStep")
+      facets <- facet.design$facets	  
+      X.noStep <- unique(X[,- grep("step", colnames(X)), drop = FALSE ])   
+	## bug
+		# Fehler in `row.names<-.data.frame`(`*tmp*`, value = value) : 
+		#   duplicate 'row.names' are not allowed  
+#      rownames(X.noStep) <- gsub("-step([[:digit:]])*", "", rownames(X.noStep))
+		Xnames.noStep <- gsub("-step([[:digit:]])*", "", rownames(X.noStep))
+
+    }
+#Revalprstr("X.noStep") 	
+# cat(" ---  created A matrix (I) " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     					
     # TK: 2014-03-12
     # Consider long vector response matrix
     if( "item" %in% colnames(facets) & "item" %in% t2 ) otherFacets <-  c("item", otherFacets)
     X.ind <-  if( "item" %in% colnames(facets) | nI==1) rep(1,nrow(X)) else as.numeric(X[,"item"])
-    X.noStep.ind <-  if( "item" %in% colnames(facets) | nI==1)
-         	rep(1,nrow(X.noStep)) else as.numeric(X.noStep[,"item"])
+    X.noStep.ind <-  if( "item" %in% colnames(facets) | nI==1) 
+			rep(1,nrow(X.noStep)) else as.numeric(X.noStep[,"item"])
     
     if (progress){ 
       cat( "        o Created A Matrix (" , paste(Sys.time()) , ")\n") ; flush.console();
     }
-
 # Revalpr("X.noStep.ind")
+
     
-    # cat(" ---  created A matrix" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     					
+# cat(" ---  created A matrix (II) " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     					
     # Q Matrix
     
     if( is.null(Q) ){
@@ -116,29 +133,32 @@ designMatrices.mfr <-
       cat( "        o Created B Matrix (" , paste(Sys.time()) , ")\n") ; flush.console();
     }	
 
+# cat(" ---  created B matrix " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						
+	
     # gresp
     ind.resp.cols <- as.numeric(X.ind)
-    # cat(" ---  before gresp   " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    
+# cat(" ---  before gresp   " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    
     gresp <- resp[,ind.resp.cols]	
-    # cat(" ---  after gresp selection   " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    	
+# cat(" ---  after gresp selection   " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    	
     #    gresp <- 1* ( gresp == t(array( X[, "step"], dim = dim(t(gresp)) )) )	
-        
 #    gresp <- 1*(gresp==matrix( as.numeric(X[,"step"]) , nrow(gresp) , ncol(gresp) , byrow=TRUE ))
+#     cat(" ---  after gresp   " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    
+    # This step is time-consuming!!	
+	#**** ARb 2014-05-30
+	gresp <- .Call("gresp_extend" ,  as.matrix(gresp) , as.numeric( X[,"step"] ) ,
+				PACKAGE="TAM")
     # cat(" ---  after gresp   " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    
     # This step is time-consuming!!
-	#**** ARb 2014-05-30
-	gresp <- .Call("gresp_extend" , as.matrix(gresp) , as.numeric( X[,"step"] ) ,
-					PACKAGE="TAM")    
-    
-    
+#cat(" ---  after gresp (2) " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     					    
+  
     ind.resp.cols <- as.numeric(X.noStep.ind)
     gresp.noStep <- resp[,ind.resp.cols]
-    # cat(" ---  gresp no step    " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1
+#cat(" ---  gresp no step    " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1
     if( length(otherFacets) > 0 ){
       rnFacets <- rownames( rownames.design2( as.matrix(facets[,otherFacets]) ))
       rnX <-      rownames( rownames.design2( as.matrix(X[,otherFacets]) ))
       rnX.noStep <-      rownames( rownames.design2( as.matrix(X.noStep[,otherFacets]) ))   
-      # cat("rownames.design2  X" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1		  
+# cat("rownames.design2  X" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1		  
       #*** ARb 2013-03-26:
       #*** Set all entries in gresp and gresp.noStep to missing
       #*** if they are not observed.
@@ -146,14 +166,16 @@ designMatrices.mfr <-
 #      gresp[ outer(rnFacets, rnX, "!=") ] <- NA
       #      gresp.noStep <- gresp.noStep * (1* outer(rnFacets, rnX.noStep, "=="))
 #      gresp.noStep[ outer(rnFacets, rnX.noStep, "!=") ] <- NA
-	  gresp <- .Call("gresp_na_facets" ,  as.matrix(gresp) , rnFacets , rnX ,
-				PACKAGE="TAM")
-	  gresp.noStep <- .Call("gresp_na_facets", as.matrix(gresp.noStep ) , rnFacets , rnX.noStep ,
-				PACKAGE="TAM"	  )	
-      # cat("gresp NA " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1	
-      
+# cat("gresp NA " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1	
+		#**** ARb 2014-05-30
+	  gresp <- .Call("gresp_na_facets" , as.matrix(gresp) , rnFacets , rnX ,
+					PACKAGE="TAM")
+	  gresp.noStep <- .Call("gresp_na_facets" , as.matrix(gresp.noStep ) , rnFacets , rnX.noStep ,
+					PACKAGE="TAM")	  
+#cat("gresp NA2 " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1	
     }
-    #cat(" ---  after other facets" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    	
+
+#cat(" ---  after other facets" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    	
     colnames(gresp) <- rownames(X)
     X$empty <- 1* (colSums( gresp, na.rm=TRUE ) == 0)
     colnames(gresp.noStep) <- rownames(X.noStep)
@@ -189,7 +211,7 @@ designMatrices.mfr <-
       x2 <- aperm( x2 , c(2,1,3) )
       return(x2)
     }    
-    # cat(" ---  before item rename" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    
+#cat(" ---  before item rename" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    
     #***
     # debugging ind manually
     ind <- FALSE * ind
@@ -201,11 +223,10 @@ designMatrices.mfr <-
     } else {
       itemren <- data.frame( "item" =  colnames(resp) , "itemren" = paste0( "item" , 1:nI ) )
     }
-    # cat(".....\nbefore rename A" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1	
+#cat(".....\nbefore rename A" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1	
     # print("g100")	
     A <- .rename.items( matr=A , itemren )
-    # print( dimnames(A) )
-    # print(facet.list)
+
     dimnames(A)[[1]] <- .rename.items2aa( vec=dimnames(A)[[1]] ,
                                           facet.list=facet.list , I=I )
     
@@ -230,11 +251,12 @@ designMatrices.mfr <-
                                         xsi.table )	)		
     #cat(".rename.items (gresp.noStep)" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1					
     Q <- .rename.items( matr=Q , itemren , cols=FALSE)
+
     dimnames(Q)[[1]] <- dimnames(A)[[1]]
     # cat(".rename.items (Q)" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1						
     # 	Q <- .rename.items3( matr=Q , facet.list , cols=FALSE)
     X <- .rename.items( matr=X , itemren , cols=FALSE)
-    dimnames(X)[[1]] <- dimnames(A)[[1]]
+    dimnames(X)[[1]] <- dimnames(A)[[1]]		
     #	X <- .rename.items3( matr=X , facet.list , cols=FALSE)	
     # cat(".rename.items (Q,X)" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1					
     X.noStep <- .rename.items( matr=X.noStep , itemren , cols=FALSE)
@@ -257,13 +279,13 @@ designMatrices.mfr <-
     rownames(G1) <- .rename.items2b( rownames(G1) , facet.list , I , xsi.table , sel1=2) 		
     #cat(".rename.items2a (colnames(G1))  " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1					
     G1 -> xsi.constr$xsi.constraints
-    # cat("rename items" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1
-    
+#cat("rename items" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1
+	    
     if (progress){ 
       cat( "        o Relabeled Variable Names (" , paste(Sys.time()) , ")\n") ; flush.console();
     }
     
-    # cat(" ---  after all item renames" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    			
+#cat(" ---  after all item renames" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    			
     
     # A
     A.flat.0 <- A.flat <- A; A.flat.0[ind,] <- 0
@@ -282,7 +304,7 @@ designMatrices.mfr <-
     Q.3d <- .generateB.3d( Q.flat )
     Q.flat <- Q.flat[!ind,]
     Q.3d.0 <- .generateB.3d( Q.flat.0 )     
-    # cat(" ---  output mfr" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    			
+#cat(" ---  output mfr" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    			
     # out
     out <- list( "gresp" = list("gresp"=gresp, "gresp.noStep"=gresp.noStep), 
                  "A" = list("A.flat"=A.flat, "A.flat.0"=A.flat.0, 
@@ -292,7 +314,7 @@ designMatrices.mfr <-
                  "Q" = list("Q.flat"=Q.flat, "Q.flat.0"=Q.flat.0,
                             "Q.3d"=Q.3d, "Q.3d.0"=Q.3d.0), 
                  "X" = list("X"=X, "X.noStep"=X.noStep) ,
-                 "xsi.constr" = xsi.constr 
+                 "xsi.constr" = xsi.constr  , "xsi.elim"=xsi.elim
     )
     class(out) <- "designMatrices.mfr"
     return(out)

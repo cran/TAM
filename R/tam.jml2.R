@@ -278,19 +278,19 @@ tam.jml2 <-
     WLEreliability <- (varWLE - mean(errorWLE^2)) / varWLE
     
     if (progress){ cat("\n Item fit calculation \n") }  
-    #Compute fit statistics
-    fit <- tam.jml.fit ( tamobj , resp , resp.ind, A, B, nstud, nitems, maxK, 
-                         ItemScore, theta, xsi, Msteps, pweightsM,
-                         est.xsi.index)
-    # cat("\n fit \n"); s2 <- Sys.time(); print(s2-s1) ; s1 <- s2    					   
-    outfitPerson <- fit$outfitPerson
-    outfitItem <- fit$outfitItem
-    infitPerson <- fit$infitPerson
-    infitItem <- fit$infitItem
-    outfitPerson_t <- fit$outfitPerson_t
-    outfitItem_t <- fit$outfitItem_t
-    infitPerson_t <- fit$infitPerson_t
-    infitItem_t <- fit$infitItem_t 
+#     #Compute fit statistics
+#     fit <- tam.jml.fit ( tamobj , resp , resp.ind, A, B, nstud, nitems, maxK, 
+#                          ItemScore, theta, xsi, Msteps, pweightsM,
+#                          est.xsi.index)
+#     # cat("\n fit \n"); s2 <- Sys.time(); print(s2-s1) ; s1 <- s2    					   
+#     outfitPerson <- fit$outfitPerson
+#     outfitItem <- fit$outfitItem
+#     infitPerson <- fit$infitPerson
+#     infitItem <- fit$infitItem
+#     outfitPerson_t <- fit$outfitPerson_t
+#     outfitItem_t <- fit$outfitItem_t
+#     infitPerson_t <- fit$infitPerson_t
+#     infitItem_t <- fit$infitItem_t 
     
     #disattenuate
     if (disattenuate == TRUE) {
@@ -306,8 +306,9 @@ tam.jml2 <-
   # collect item statistics
   item <- data.frame( "xsi.label" = dimnames(A)[[3]] ,
 		"xsi.index" = 1:( length(xsi) ) , "xsi" = xsi ,
-		"se.xsi" = errorP , "outfit" = outfitItem ,
-		"infit"=infitItem )
+		"se.xsi" = errorP 
+#     , "outfit" = outfitItem ,		"infit"=infitItem 
+    )
 	
     ############################################################
     s2 <- Sys.time()
@@ -326,10 +327,10 @@ tam.jml2 <-
                  "WLEreliability" = WLEreliability ,
                  "PersonScores" = PersonScores , "ItemScore" = ItemScore ,             
                  "PersonMax" = PersonMaxB , "ItemMax" = ItemMax , 
-                 "outfitPerson" = outfitPerson , "outfitItem" = outfitItem, 
-                 "infitPerson" = infitPerson , "infitItem" = infitItem, 
-                 "outfitPerson_t" = outfitPerson_t , "outfitItem_t" = outfitItem_t, 
-                 "infitPerson_t" = infitPerson_t , "infitItem_t" = infitItem_t,
+#                  "outfitPerson" = outfitPerson , "outfitItem" = outfitItem, 
+#                  "infitPerson" = infitPerson , "infitItem" = infitItem, 
+#                  "outfitPerson_t" = outfitPerson_t , "outfitItem_t" = outfitItem_t, 
+#                  "infitPerson_t" = infitPerson_t , "infitItem_t" = infitItem_t,
                  "deviance" = deviance, "deviance.history" = deviance.history, 
                  "resp" = resp , "resp.ind" = resp.ind , "group" = group ,
                  "pweights" = pweights , "A" = A , "B" = B  ,               

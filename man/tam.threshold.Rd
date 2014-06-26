@@ -9,12 +9,16 @@ This function estimates Thurstonian thresholds for item category
 parameters of (generalized) partial credit models (see Details).
 }
 \usage{
-tam.threshold(tamobj)
+tam.threshold(tamobj, prob.lvl=0.5)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{tamobj}{
 Object of class \code{tam}
+}
+\item{prob.lvl}{
+A numeric specifying the probability level of the threshold. 
+The default is \code{prob.lvl=0.5}.  
 }
 }
 %\details{

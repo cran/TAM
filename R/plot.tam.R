@@ -1,8 +1,19 @@
 ###########################################################
 # plotting tam expected scores curves
 #..........................................................
-plot.tam <- function(x, low=-3, high=3, ngroups=6, wle=NULL, export=TRUE, 
-                       observed=TRUE, overlay=FALSE , ask=FALSE , ... ) {
+plot.tam <- function(x, items=1:x$nitems, low=-3, high=3, ngroups=6, 
+                     wle=NULL, export=TRUE, export.type="png", 
+                     export.args=list(), observed=TRUE, overlay=FALSE , 
+                     ask=FALSE, ...) {
+  
+  old.opt.dev <- getOption("device")
+  old.opt.err <- c(getOption("show.error.messages"))
+  old.par.ask <- par("ask")
+  
+  on.exit(options("device"=old.opt.dev))
+  on.exit(options("show.error.messages"=old.opt.err), add=TRUE)
+  on.exit(par("ask"=old.par.ask), add=TRUE)
+  
   tamobj <- x
   ndim <- tamobj$ndim
   tammodel <- "mml"
@@ -41,12 +52,12 @@ plot.tam <- function(x, low=-3, high=3, ngroups=6, wle=NULL, export=TRUE,
     if (tammodel == "mml") {
       wleobj <- tam.wle(tamobj)
       wle <- wleobj$theta
-      } 
+    } 
     else {
       wle <- tamobj$WLE    # model is jml
     }
   }
-  wleSorted <- sort(wle)
+  wleSorted <- sort(wle, na.last=FALSE)
   ncases <- length(wleSorted)
   groupnumber <- round(seq(1:ncases) / (ncases/ngroups) + 0.5)
   
@@ -58,40 +69,82 @@ plot.tam <- function(x, low=-3, high=3, ngroups=6, wle=NULL, export=TRUE,
   d2 <- d1[-1]
   obScore <- apply(d2,2, function(x) aggregate(x, list(groupnumber), mean, na.rm=TRUE))
   
-  for (i in 1:nitems) {
+  for (i in (1:nitems)[items]) {
     if (i==1 || !overlay) {
-	  ylim2 <- c(0,max( tamobj$resp[,i] , na.rm=TRUE ) )
+      ylim2 <- c(0,max( tamobj$resp[,i] , na.rm=TRUE ) )
       plot(theta, expScore[,i], ,col=12, type="l", lwd=3, las=1, ylab="Score", xlab="Ability",
-#         main=paste("Expected Scores Curve - Item ", i)
-		 main=paste("Expected Scores Curve - Item ", colnames(tamobj$resp)[i] )	 ,
-			ylim=ylim2 , ...
-				)
+           #         main=paste("Expected Scores Curve - Item ", i)
+           main=paste("Expected Scores Curve - Item ", colnames(tamobj$resp)[i] )	 ,
+           ylim=ylim2 , ...
+      )
     } else {
       lines(theta, expScore[,i],type="l", col=i, lwd=3, pch=1) 
     }
     if (observed) {
       lines(theta2,obScore[[i]]$x, type="o", lwd=2, pch=1)
-      }
-	  par(ask=ask)	
+    }
+    par(ask=ask)	
   }
+  
   #*****
   # export item plots
-  dir.create( "Plots" )
   if (export) {
-    for (i in 1:nitems) {
-	  itemlab <- colnames(tamobj$resp)[i]
-	  ylim2 <- c(0,max( tamobj$resp[,i] , na.rm=TRUE ) )	  
-      png(filename=paste("Plots\\Item_", itemlab ,".png", sep=""))  
-      plot(theta, expScore[,i], ,col=12, type="l", lwd=3, las=1, ylab="Score", xlab="Ability", 
-          main=paste("Expected Scores Curve - Item ", colnames(tamobj$resp)[i] ) ,
-				ylim=ylim2 , ... )
-      if (observed ) {
-        lines(theta2,obScore[[i]]$x, type="o", lwd=2, pch=1)
+    
+    if(!file.exists("Plots")) dir.create( "Plots" )
+    export.type.dev <- switch(export.type,
+                              "ps"="postscript",
+                              "emf"=if (.Platform$OS.type == "windows") "win.metafile" else "x11",
+                              "wmf"=if (.Platform$OS.type == "windows") "win.metafile" else "x11",
+                              export.type)
+    export.type.ff <- switch(export.type,
+                             "postscript"="ps",
+                             "win.metafile"="wmf",
+                             "x11"="wmf",
+                             export.type)
+    
+    
+    options(show.error.messages = FALSE)
+    options("device"=export.type.dev)
+    
+    for (i in (1:nitems)[items]) {
+      
+      
+      itemlab <- colnames(tamobj$resp)[i]
+      dev.err <- try({ 
+        do.call("dev.new", 
+                args=list("filename"=file.path("Plots", paste("Item_", itemlab, ".", export.type.ff, sep="")), 
+                          export.args))
+      })
+      
+      if(!is.null(dev.err)){
+        warning( dev.err[1], "  --> No file created."  )
+      }else{
+        
+        ylim2 <- c(0,max( tamobj$resp[,i] , na.rm=TRUE ) )
+        
+        plot(theta, expScore[,i], ,col=12, type="l", lwd=3, las=1, ylab="Score", xlab="Ability", 
+             main=paste("Expected Scores Curve - Item ", colnames(tamobj$resp)[i] ) ,
+             ylim=ylim2 , ... )
+        
+        if (observed ) {
+          lines(theta2,obScore[[i]]$x, type="o", lwd=2, pch=1)
         }
-#      Sys.sleep(0.01)
+        
+        dev.off(dev.cur())
+        
+      }
+      
+      #       options("device"=old.opt.dev)
+      #       options(show.error.messages = as.character(old.opt.err))        
     }
-    for (dv in dev.list()) if(!(is.null(dv)) && (dv!=2)) dev.off(dv)
+    
+    #*****
+    # Print path
+    if(is.null(dev.err)){ cat("....................................................\n",
+                              "Plots exported in", export.type, "format into folder:\n", 
+                              file.path(getwd(), "Plots")) ; flush.console() }
   }
+  
 }
 
 plot.tam.mml <- plot.tam

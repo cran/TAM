@@ -1,7 +1,7 @@
 ####################################################################
 # Thurstonian thresholds (gammas)
 #...................................................................
-tam.threshold <- function (tamobj)
+tam.threshold <- function (tamobj, prob.lvl=0.5)
 {
   resp <- tamobj$resp
   nitems <- tamobj$nitems
@@ -29,8 +29,8 @@ tam.threshold <- function (tamobj)
       for (k in 1:mc) {
         cprobs [k] <- sum(rprobs[1,(k+1):(mc+1),k], na.rm=TRUE)
       }
-      lowhigh[cprobs<0.5,1] <- thresh[cprobs<0.5]
-      lowhigh[cprobs>0.5,2] <- thresh[cprobs>0.5]
+      lowhigh[cprobs<prob.lvl,1] <- thresh[cprobs<prob.lvl]
+      lowhigh[cprobs>prob.lvl,2] <- thresh[cprobs>prob.lvl]
       oldthresh <- thresh
       thresh <- rowMeans(lowhigh)
       #      lowhigh[abs(thresh-initlow)<0.005,1] <- lowhigh[abs(thresh-initlow)<0.005,1] - 12

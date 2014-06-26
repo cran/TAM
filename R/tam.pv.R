@@ -20,6 +20,9 @@ function( tamobj , nplausible = 10 ,
 	# 2012-07-28:  person weights included in sampling of regression coefficients
 # a0 <- Sys.time()	
     type <- "nonparm"		# there is no type='normal' up to now implemented
+	if (class(tamobj)!= "tam.mml.3pl"){
+		guess <- rep( 0 , dim(tamobj$B)[1] )		
+		} else { guess <- tamobj$guess }	
     B <- tamobj$B
     A <- tamobj$A
     Y <- tamobj$Y
@@ -81,9 +84,12 @@ function( tamobj , nplausible = 10 ,
 		  # adapt for multidimensional case here!!
 	      theta <- mvrnorm( ntheta , mu = mu1 , Sigma = Sigma1 )
 					}
-# cat("start prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							
- 	    res <- calc_prob.v5( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , xsi=xsi , theta=theta , 
- 	                         nnodes=nnodes, maxK=maxK )
+# cat("start prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
+		# .mml.3pl.calc_prob.v5 <-
+		#   function(iIndex, A, AXsi, B, xsi, theta, 
+		#            nnodes, maxK, recalc=TRUE , guess)					
+ 	    res <- .mml.3pl.calc_prob.v5( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , xsi=xsi , theta=theta , 
+ 	                         nnodes=nnodes, maxK=maxK , recalc=TRUE , guess=guess)
 		rprobs <- res[["rprobs"]]
 		AXsi <- res[["AXsi"]]
 # cat("calc prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1			

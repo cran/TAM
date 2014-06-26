@@ -3,6 +3,7 @@
 \alias{designMatrices}
 \alias{print.designMatrices}
 \alias{designMatrices.mfr}
+\alias{designMatrices.mfr2}
 \alias{.A.matrix}
 \alias{rownames.design}
 \alias{.A.PCM2}
@@ -24,6 +25,10 @@ print.designMatrices(X, ...)
 designMatrices.mfr(resp, formulaA = ~ item + item:step, facets = NULL, 
     constraint = c("cases", "items"), ndim = 1, Q=NULL, A=NULL, B=NULL ,
     progress=FALSE)
+designMatrices.mfr2(resp, formulaA = ~ item + item:step, facets = NULL, 
+    constraint = c("cases", "items"), ndim = 1, Q=NULL, A=NULL, B=NULL ,
+    progress=FALSE)    
+    
 .A.matrix(resp, formulaA = ~ item + item*step, facets = NULL, 
     constraint = c("cases", "items") , progress=FALSE , maxKi=NULL)
 rownames.design(X)
@@ -118,9 +123,10 @@ both location and dispersion parameters. \emph{Psychometrika}, \bold{47},
 %%  ~~who you are~~
 %}
 
-%\note{
-%%  ~~further notes~~
-%}
+\note{
+The function \code{designMatrices.mfr2} handles multi-faceted design for
+items with differing number of response options.
+}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 

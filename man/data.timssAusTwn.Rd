@@ -92,6 +92,10 @@ dotchart(t(tthresh), pch=19)
 # plot expected response curves
 plot( mod1 , ask=TRUE)
 
+#Re-run IRT analysis in JML
+mod1.2 <- tam.jml2(Scored)
+var(mod1.2$WLE)
+
 #Re-run the model with "not-reached" coded as incorrect.
 Scored2 <- Scored
 Scored2[is.na(Scored2)] <- 0
@@ -126,7 +130,8 @@ dummy[lower.tri(dummy)] <- 1
 dummy[12:16,c(3,4,7,8)][lower.tri(dummy[12:16,c(3,4,7,8)])]<-2
 
 mod3 <- tam(dummy, xsi.fixed=anchor)
-wle3 <- tam.wle(mod3) }
+wle3 <- tam.wle(mod3) 
+}
 }
 
 
