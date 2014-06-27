@@ -239,18 +239,18 @@ function( resp , group = NULL , adj=.3 , disattenuate = FALSE ,
   WLEreliability <- (varWLE - mean(errorWLE^2)) / varWLE
   
 
-  #Compute fit statistics
-  fit <- tam.jml.fit ( tamobj , resp , resp.ind, A, B, nstud, nitems, maxK, 
-                       ItemScore, theta, xsi, Msteps, pweightsM,
-                       est.xsi.index)
-  outfitPerson <- fit$outfitPerson
-  outfitItem <- fit$outfitItem
-  infitPerson <- fit$infitPerson
-  infitItem <- fit$infitItem
-  outfitPerson_t <- fit$outfitPerson_t
-  outfitItem_t <- fit$outfitItem_t
-  infitPerson_t <- fit$infitPerson_t
-  infitItem_t <- fit$infitItem_t 
+#   #Compute fit statistics
+#   fit <- tam.jml.fit ( tamobj=NULL, resp , resp.ind, A, B, nstud, nitems, maxK, 
+#                        ItemScore, theta, xsi, Msteps, pweightsM,
+#                        est.xsi.index )
+#   outfitPerson <- fit$outfitPerson
+#   outfitItem <- fit$outfitItem
+#   infitPerson <- fit$infitPerson
+#   infitItem <- fit$infitItem
+#   outfitPerson_t <- fit$outfitPerson_t
+#   outfitItem_t <- fit$outfitItem_t
+#   infitPerson_t <- fit$infitPerson_t
+#   infitItem_t <- fit$infitItem_t 
   
   #disattenuate
   if (disattenuate) {
@@ -267,8 +267,10 @@ function( resp , group = NULL , adj=.3 , disattenuate = FALSE ,
   # collect item statistics
   item <- data.frame( "xsi.label" = dimnames(A)[[3]] ,
 		"xsi.index" = 1:( length(xsi) ) , "xsi" = xsi ,
-		"se.xsi" = errorP , "outfit" = outfitItem ,
-		"infit"=infitItem )
+		"se.xsi" = errorP
+#     , "outfit" = outfitItem ,
+# 		"infit"=infitItem 
+    )
   
   
  
@@ -289,10 +291,10 @@ function( resp , group = NULL , adj=.3 , disattenuate = FALSE ,
                "WLEreliability" = WLEreliability ,
                "PersonScores" = PersonScores , "ItemScore" = ItemScore ,             
                "PersonMax" = PersonMaxB , "ItemMax" = ItemMax , 
-               "outfitPerson" = outfitPerson , "outfitItem" = outfitItem, 
-               "infitPerson" = infitPerson , "infitItem" = infitItem, 
-               "outfitPerson_t" = outfitPerson_t , "outfitItem_t" = outfitItem_t, 
-               "infitPerson_t" = infitPerson_t , "infitItem_t" = infitItem_t,
+#                "outfitPerson" = outfitPerson , "outfitItem" = outfitItem, 
+#                "infitPerson" = infitPerson , "infitItem" = infitItem, 
+#                "outfitPerson_t" = outfitPerson_t , "outfitItem_t" = outfitItem_t, 
+#                "infitPerson_t" = infitPerson_t , "infitItem_t" = infitItem_t,
                "deviance" = deviance, "deviance.history" = deviance.history, 
                "resp" = resp , "resp.ind" = resp.ind , "group" = group ,
                "pweights" = pweights , "A" = A , "B" = B  ,               

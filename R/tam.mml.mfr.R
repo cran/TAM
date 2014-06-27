@@ -83,14 +83,43 @@ tam.mml.mfr <-
     
     # cat("read data" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
     # create design matrices
-    design <- designMatrices.mfr(resp, formulaA=formulaA, facets=facets,  
+    if(ncol(resp)>1){
+      maxKi <- apply( resp , 2 , max , na.rm=TRUE )
+    } else if(ncol(resp)==1){
+      item.ind <- grep("Item", names(facets), ignore.case=TRUE)
+      if(!is.null(item.ind)){ 
+        maxKi <- aggregate( resp , facets[,item.ind,drop=FALSE] , 
+                            max, na.rm=TRUE )[,2]
+      }else{
+        maxKi <- aggregate( resp , facets[,1,drop=FALSE] , 
+                            max, na.rm=TRUE )
+        
+      }
+    } 
+	diffKi <- FALSE
+	if ( var( maxKi ) > .001 ){ 
+	     diffKi <- TRUE
+		 design <- designMatrices.mfr2(resp, formulaA=formulaA, facets=facets,  
                                  constraint=constraint, ndim=ndim,
                                  Q=Q, A=A, B=B , progress=progress)
-    
-    # cat("design matrices  " ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1								 
-    
-    A <- design$A$A.3d.0
-    cA <- design$A$A.flat.0
+		 xsi.elim <- design$xsi.elim
+		 if ( nrow(xsi.elim) > 0 ){
+			 xsi.elim2 <- cbind( xsi.elim[,2] , 99 )		 
+			 xsi.fixed <- rbind( xsi.fixed , xsi.elim2 )
+									}								
+			# set first beta coefficient to zero
+			if ( is.null( beta.fixed ) ){
+				dimB <- dim(design$B$B.3d.0	)	
+			    beta.fixed <- cbind( 1 , 1:dimB[3] , 0)
+							}
+					} else {
+         design <- designMatrices.mfr(resp, formulaA=formulaA, facets=facets,  
+                                 constraint=constraint, ndim=ndim,
+                                 Q=Q, A=A, B=B , progress=progress)
+							}	 
+	
+    A <- design$A$A.3d.0	
+    cA <- design$A$A.flat.0	
     B <- design$B$B.3d.0
     Q <- design$Q$Q.flat.0
     X <- design$X$X
@@ -185,7 +214,6 @@ tam.mml.mfr <-
           ncol(gresp.noStep) , "Generalized Items (" , paste(Sys.time()) ,")\n" )  ;
       flush.console()	  
     }  	
-    
     #!! check dim of person ID pid
     if ( is.null(pid) ){ pid <- seq(1,nstud) }
     
@@ -202,7 +230,6 @@ tam.mml.mfr <-
     varConv <- FALSE          #flag of variance convergence
     nnodes <- length(nodes)^ndim
     if ( snodes > 0 ){ nnodes <- snodes }
-    
     #****
     # display number of nodes
     if (progress ){   
@@ -222,7 +249,6 @@ tam.mml.mfr <-
       }
     }
     #********* 
-    
     # maximum no. of categories per item. Assuming dichotomous
     maxK <- max( resp , na.rm=TRUE ) + 1 
     
@@ -308,9 +334,7 @@ tam.mml.mfr <-
         Y <- Ypid / Ypid[,1]
       }
     }
-    
-    
-    
+       
     #    W <- t(Y * pweights) %*% Y
     W <- crossprod(Y * pweights ,  Y )
     
@@ -339,8 +363,7 @@ tam.mml.mfr <-
     if ( ! is.null( beta.inits ) ){ 
       beta[ beta.inits[,1:2] ] <- beta.inits[,3]
     }
-    
-    
+       
     #***
     #*** ARb 2013-03-26   o Change setup of calculation
     
@@ -366,11 +389,10 @@ tam.mml.mfr <-
     gresp.noStep[ is.na( gresp.noStep) ] <- 0
     #    gresp.noStep.ind <- resp.ind[ ,resp.col.ind]
     #    gresp.ind <- resp.ind[ ,as.numeric(X[,ifelse("item" %in% colnames(X), "item", 1)])]
-    
-    
+        
     #*****
     # ARb 2013-09-09: deletion of items
-    miss.items <- miss.items[ miss.items > 0 ]
+    miss.items <- miss.items[ miss.items > 0 ]	
     if ( length(miss.items) == 0 ){ delete.red.items <- FALSE }
     if (delete.red.items){					
       miss.itemsK <- NULL
@@ -398,7 +420,6 @@ tam.mml.mfr <-
     }
     
     #****
-    
     #@@ ARb:Include Starting values for xsi??
     #       xsi <- - qnorm( colMeans( resp ) )
     AXsi <- matrix(0,nrow=nitems,ncol=maxK )  #A times xsi
@@ -413,8 +434,7 @@ tam.mml.mfr <-
     lipl <- cumsum( sapply( indexIP.list , FUN = function(ll){ length(ll) } ) )
     indexIP.list2 <- unlist(indexIP.list)
     indexIP.no <- as.matrix( cbind( c(1 , lipl[-length(lipl)]+1 ) , lipl ) )
-    
-    
+        
     #***********************	
     #...TK - 24.08.2012:  cA returned from designMatrices
     # sufficient statistics
@@ -427,7 +447,7 @@ tam.mml.mfr <-
     
     cResp <- 1 * ( cResp == matrix( rep(1:(maxK), nitems) , nrow(cResp) , 
                                     ncol(cResp) , byrow=TRUE ) )
-    
+									
     cA <- t( matrix( aperm( A , c(2,1,3) ) , nrow = dim(A)[3] , byrow = TRUE ) )
     cA[is.na(cA)] <- 0		
     if ( sd(pweights) > 0 ){ 
@@ -437,8 +457,7 @@ tam.mml.mfr <-
     }
     
     # cat("calc ItemScore" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
-    
-    
+       
     if (progress){ 
       cat("    * Calculated Sufficient Statistics   (", 
           paste(Sys.time()) , ")\n") ; flush.console()	  
@@ -456,7 +475,7 @@ tam.mml.mfr <-
     #    xsi[est.xsi.index] <- - 
     #  log(abs(ItemScore[est.xsi.index]/(ItemMax[est.xsi.index]-ItemScore[est.xsi.index])))  
     xsi[est.xsi.index] <- - log(abs(( ItemScore[est.xsi.index]+.5)/
-                                      (ItemMax[est.xsi.index]-ItemScore[est.xsi.index]+.5) ) )
+                                      (ItemMax[est.xsi.index]-ItemScore[est.xsi.index]+.5) ) )							  
     # starting values of zero
     if( xsi.start0 ){ xsi <- 0*xsi }
     
@@ -526,15 +545,15 @@ tam.mml.mfr <-
     
     # display
     disp <- "....................................................\n"
-    # define progress bar for M step    
-    
-    # cat("rest  " ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1								 
-    
+    # define progress bar for M step        
+# cat("rest  " ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1								 
+
+   
     ##############################################################   
     #Start EM loop here
     while ( ( (!betaConv | !varConv)  | ((a1 > conv) | (a4 > conv) | (a02 > convD)) )  & 
               (iter < maxiter) ) { 
-      
+
       # a0 <- Sys.time()	
       iter <- iter + 1
       if (progress){ 
@@ -557,9 +576,10 @@ tam.mml.mfr <-
       res <- calc_prob.v5(iIndex=1:nitems , A=A , AXsi=AXsi , B=B , xsi=xsi , theta=theta , 
                           nnodes=nnodes , maxK=maxK , recalc=TRUE )	
       # cat("calc prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							  
-      
+
       rprobs <- res[["rprobs"]]
       AXsi <- res[["AXsi"]]
+	  	 
       # calculate student's prior distribution
       gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
                            nnodes=nnodes , ndim=ndim,YSD=YSD)
@@ -570,7 +590,9 @@ tam.mml.mfr <-
                                    resp.ind.list= resp.ind.list , normalization=TRUE , 
                                    thetasamp.density=thetasamp.density , snodes=snodes ,
                                    resp.ind=resp.ind	)	
-      hwt <- res.hwt[["hwt"]]  
+      hwt <- res.hwt[["hwt"]] 
+
+	  
       # cat("calc posterior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		  
       if (progress){ cat("M Step Intercepts   |"); flush.console() }
       # collect old values for convergence indication
@@ -615,8 +637,9 @@ tam.mml.mfr <-
       #	  if (TRUE & (iter>1) ){
       #	     old_increment <- xsi.change
       #				}
-      
-      est.xsi.index <- est.xsi.index0
+
+     
+      est.xsi.index <- est.xsi.index0	  
       while (!converge & ( Miter <= Msteps ) ) {	
         # Only compute probabilities for items contributing to param p
         if (Miter > 1){ 
@@ -653,8 +676,7 @@ tam.mml.mfr <-
         #		max.increment <- max( abs(increment) )
         #****
         
-        old_increment <- increment
-        
+        old_increment <- increment        
         
         xsi <- xsi+increment   # update parameter p
         
@@ -681,8 +703,6 @@ tam.mml.mfr <-
           flush.console()
         }
       } # end of all parameters loop
-      
-      
       
       
       #***
@@ -773,6 +793,11 @@ tam.mml.mfr <-
     resp <- gresp0.noStep
     resp.ind <- gresp.noStep.ind
     
+	#****
+	# look for non-estimable xsi parameters
+#    xsi[ xsi == 99 ] <- NA	
+	
+	
     ##**SE  
     # standard errors of AXsi parameters
     # check for missing entries in A
@@ -867,7 +892,7 @@ tam.mml.mfr <-
         colnames(person)[ which( colnames(person) == "EAP" ) ] <- paste("EAP.Dim" , dd , sep="")
         colnames(person)[ which( colnames(person) == "SD.EAP" ) ] <- paste("SD.EAP.Dim" , dd , sep="")				
       }
-      person <- data.frame( "pid" = pid , person )
+#      person <- data.frame( "pid" = pid , person )
     }
     ############################################################
     s2 <- Sys.time()
@@ -960,7 +985,7 @@ tam.mml.mfr <-
                  "se.AXsi" = se.AXsi , 
                  "nstud" = nstud , "resp.ind.list" = resp.ind.list ,
                  "hwt" = hwt , "ndim" = ndim ,
-                 "xsi.fixed" = xsi.fixed , "beta.fixed" = beta.fixed ,
+                 "xsi.fixed" = xsi.fixed , "beta.fixed" = beta.fixed , "Q"=Q,
                  "formulaA"=formulaA , "facets"=facets ,
                  "variance.fixed" = variance.fixed ,
                  "nnodes" = nnodes , "deviance" = deviance ,

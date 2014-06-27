@@ -106,6 +106,11 @@ summary.tam.mml <- summary.tam.2pl <-
 		cat("\nItem Facet Parameters Xsi\n")
 #		cat("   Item difficulties -A*Xsi are displayed in 'AXsi_'! \n\n")
 		obji <- object$xsi.facets
+		xsi99 <- sum( object$xsi == 99 )
+		if ( xsi99 > 0 ){
+		  cat("\nSome item xsi parameters are not estimable ")
+		  cat(" which is indicated by values of 99\n\n")	
+						}
 		for (vv in seq(3,ncol(obji) ) ){ obji[,vv] <- round( obji[,vv] , 3) }
 		print(obji)
 					}				

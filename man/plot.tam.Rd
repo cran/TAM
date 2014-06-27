@@ -14,14 +14,20 @@ or \code{tam.mml}.
 }
 
 \usage{
-\method{plot}{tam}(x, low = -3, high = 3, ngroups = 6, wle = NULL, 
-     export = TRUE, observed = TRUE, overlay = FALSE, ask = FALSE, ...)
+\method{plot}{tam}(x, items=1:x$nitems, low=-3, high=3, ngroups=6, 
+                   wle=NULL, export=TRUE, export.type="png", 
+                   export.args=list(), observed=TRUE, overlay=FALSE , 
+                   ask=FALSE, ...)
 	
-\method{plot}{tam.mml}(x, low = -3, high = 3, ngroups = 6, wle = NULL, 
-     export = TRUE, observed = TRUE, overlay = FALSE, ask = FALSE, ...)
+\method{plot}{tam.mml}(x, items=1:x$nitems, low=-3, high=3, ngroups=6, 
+                       wle=NULL, export=TRUE, export.type="png", 
+                       export.args=list(), observed=TRUE, overlay=FALSE , 
+                       ask=FALSE, ...)
      
-\method{plot}{tam.jml}(x, low = -3, high = 3, ngroups = 6, wle = NULL,      
-     export = TRUE, observed = TRUE, overlay = FALSE, ask = FALSE, ...)
+\method{plot}{tam.jml}(x, items=1:x$nitems, low=-3, high=3, ngroups=6, 
+                       wle=NULL, export=TRUE, export.type="png", 
+                       export.args=list(), observed=TRUE, overlay=FALSE , 
+                       ask=FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 
@@ -29,6 +35,9 @@ or \code{tam.mml}.
   \item{x}{
 Object of class \code{tam}, \code{tam.mml}
 or \code{tam.mml}.
+}
+\item{items}{
+  An index vector giving the items to be visualized.
 }
   \item{low}{
 Lowest \eqn{\theta} value to be displayed
@@ -45,21 +54,30 @@ Use WLE estimate for displaying observed scores.
 }
   \item{export}{
 A logical which indicates whether all graphics should be separately 
-exported in png format in a subfolder \code{'Plots'} of the working directory.
+exported in files of type \code{export.type} in a subfolder \code{'Plots'}
+of the working directory.
 }
-  \item{observed}{
-A logical which indicates whether observed response curve should
-be displayed
+\item{export.type}{
+  A string which indicates the type of the graphics export. For currently 
+  supported file types, see \code{\link{dev.new}}.  
 }
-  \item{overlay}{
-A logical indicating whether expected score functions should overlay.
+\item{export.args}{
+  A list of arguments that are passed to the export method can be specified. 
+  See the respective export device method for supported usage.  
 }
-  \item{ask}{
-A logical which asks for changing the graphic from item to item.
-The default is \code{FALSE}.
+\item{observed}{
+  A logical which indicates whether observed response curve should
+  be displayed
 }
-  \item{\dots}{
-Further arguments to be passed
+\item{overlay}{
+  A logical indicating whether expected score functions should overlay.
+}
+\item{ask}{
+  A logical which asks for changing the graphic from item to item.
+  The default is \code{FALSE}.
+}
+\item{\dots}{
+  Further arguments to be passed
 }
 }
 
@@ -94,7 +112,7 @@ models.
 \examples{
 data(sim.rasch)
 mod <- tam.mml(sim.rasch)
-plot(mod)
+plot(mod, items=1:5, export=FALSE)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

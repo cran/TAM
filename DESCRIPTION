@@ -1,8 +1,8 @@
 Package: TAM
 Type: Package
 Title: Test Analysis Modules
-Version: 1.0-2.1
-Date: 2014-03-26
+Version: 1.0-3
+Date: 2014-06-26
 Author: Thomas Kiefer [aut, cre], Alexander Robitzsch [aut], Margaret Wu [aut]
 Maintainer: Thomas Kiefer <t.kiefer@bifie.at>
 Authors@R: c(person("Thomas", "Kiefer", role = c("aut","cre"), email =
@@ -12,7 +12,8 @@ Authors@R: c(person("Thomas", "Kiefer", role = c("aut","cre"), email =
 Description: 
   The package includes marginal and joint maximum likelihood
   estimation of uni- and multidimensional item response models 
-  (Rasch,  2PL, Generalized Partial Credit, Rating Scale, Multi Facets),
+  (Rasch,  2PL, 3PL, Generalized Partial Credit, Multi Facets,
+  Structured Latent Class Analysis),
   fit statistics, standard error estimation, as 
   well as plausible value imputation and weighted likelihood
   estimation of ability. 
@@ -24,7 +25,7 @@ LazyLoad: yes
 LazyData: yes
 License: GPL (>= 2)
 URL: http://www.edmeasurementsurveys.com/TAM/Tutorials/
-Packaged: 2014-05-02 09:56:34 UTC; ripley
 NeedsCompilation: yes
+Packaged: 2014-06-27 09:24:30 UTC; t.kiefer
 Repository: CRAN
-Date/Publication: 2014-05-02 11:58:03
+Date/Publication: 2014-06-27 13:56:20

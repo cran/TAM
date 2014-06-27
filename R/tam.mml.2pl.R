@@ -193,7 +193,6 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 				  groups <- NULL
 				  } 
   
-  
   # beta inits
   # (Y'Y)
   if ( ! is.null( formulaY ) ){
@@ -414,7 +413,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   disp <- "....................................................\n"
   # define progress bar for M step
   mpr <- round( seq( 1 , np , len = 10 ) )
-  
+
   ##############################################################   
   #Start EM loop here
   while ( ( (!betaConv | !varConv)  | ((a1 > conv) | (a4 > conv) | (a02 > convD)) )  & (iter < maxiter) ) { 
@@ -504,16 +503,18 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 #      cB_obs <- t(cResp*pweights)%*%(thetabar)
       cB_obs <- crossprod( cResp*pweights , thetabar)
       B_obs <- aperm(array(cB_obs,dim=c(maxK, nitems,ndim)),c(2,1,3))
-	  diag(variance) <- diag(variance)+10^(-14)	  
+      if ( ( is.matrix(variance) )  ){
+	    if (  ncol(variance) > 1 ){
+		diag(variance) <- diag(variance)+10^(-14)	  
+							}
+						}
       if ( ! est.variance ){ 
 		if ( G == 1 ){ variance <- cov2cor(variance)  } # fix variance at 1  
 		if ( G > 1 ){ variance[ group == 1 ] <- 1 }     
 				# fix variance of first group to 1
 							}
     }
-	
     #---end 2PL---
-# stop("er")
 # cat("sufficient statistics 2PL") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
     
 	if (max(abs(variance-oldvariance)) < conv) varConv <- TRUE
@@ -772,7 +773,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
       colnames(person)[ which( colnames(person) == "EAP" ) ] <- paste("EAP.Dim" , dd , sep="")
       colnames(person)[ which( colnames(person) == "SD.EAP" ) ] <- paste("SD.EAP.Dim" , dd , sep="")				
     }
-	person <- data.frame( "pid" = pid , person )
+#	person <- data.frame( "pid" = pid , person )
   }
   ############################################################
   s2 <- Sys.time()
@@ -845,7 +846,8 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 			   "se.AXsi" = se.AXsi , 
                "nstud" = nstud , "resp.ind.list" = resp.ind.list ,
                "hwt" = hwt , "ndim" = ndim ,
-               "xsi.fixed" = xsi.fixed , "beta.fixed" = beta.fixed ,
+               "xsi.fixed" = xsi.fixed , "beta.fixed" = beta.fixed, "Q" = Q, 
+			   "B.fixed" = B.fixed , "est.slopegroups" = est.slopegroups , "E" = E , "basispar" = basispar,
                "variance.fixed" = variance.fixed ,
                "nnodes" = nnodes , "deviance" = deviance ,
 			   "ic" = ic , 

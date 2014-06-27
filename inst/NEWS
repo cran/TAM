@@ -32,6 +32,69 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 -------------------------------------------------------
+Changes in Version 1.0-3 (2014-06-27)
+-------------------------------------------------------
+
+Features:
+x included model fit statistics (Q3, SRMR, MADRESIDCOV): 'tam.modelfit'
+x included 'tam.mml.3pl' for 3PL estimation, general design
+  matrices for item slopes and options for discrete 
+  latent variables (estimation of latent class models,
+  located latent class model, skew distributions,
+  mixed IRT models, cognitive diagnosis models, ...
+  is now possible)
+x extended tam.pv for objects of class 'tam.mml.3pl'
+x speeded data preparation of faceted models a bit
+x tam.se now computes standard errors for estimated slope parameters, B 
+  (for irtmodel in c("2PL", "GPCM", "2PL.groups")); highly experimental 
+  for irtmodel="GPCM.design"). 
+x plot.tam now prints a message about the location of the exported graphics.
+x plot.tam has a new argument 'items' for selecting the items to
+  be displayed. RD-file adjusted.
+x plot.tam has new arguments 'export.type="png"' and "export.args=list()" for 
+  selecting the file type for the graphics export. The supported file types 
+  are those supported by ?dev.new. The argument 'export.args=list()' is 
+  for specifying a list of arguments for the export device method.
+x tam.threshold has a new argument prob.lvl to set the probability level of 
+  the thresholds.
+
+Bug fixes:
+x fixed a bug in pid output in object 'person' for multidimensional models
+  (thanks to Sebastian Weirich)
+x fixed a bug in variance estimation for multiple group 2PL models
+x included 'designMatrices.mfr2' for a provisional bug fix
+  for multifaceted models with differing number of categories
+  per item (see Example 16 in tam.mml; thanks to Christoph Duchhardt)
+x fixed a bug in 'tam.mml.mfr' for differing number of categories
+  per item -> now a xsi vector with parameter fixings to values 
+  of 99 is used 
+x plot.tam is debugged regarding the case of missing WLEs for some 
+  person (thanks to Florian Buchwald). 
+x plot.tam now doesn't throw a warning when the 'Plots' directory 
+  already exists.
+x fixed a bug in plot.tam for cross-platform accordance (thanks to Uli Keller).
+x fixed a bug in tam.fit with missing item scores
+x fixed a bug in tam.jml so that ../Tutorials/6Population.htm now runs without 
+  error.
+
+Notes:
+x tam.fit is experimental for objects obtained from tam.mml.mfr.
+x changed convergence behavior in tam.wle (thanks to Peter Harych)
+x changed item sorting in output object 'item'
+x tam.mml(/.2pl/.mfr) methods now return Q, tam.mml.2pl additionaly returns
+  B.fixed, basispar, E, and est.slopegroups objects. RD-file adjusted.
+x tam.jml(/.jml2) do not return fit statistics anymore. Item and person fit can
+  be obtained by a call to tam.fit (/.jml.fit).
+x in case of multidimensional analyses, we recommend an update of 
+  the R-package mvtnorm to version 0.9-99992 or higher.
+x extended example 13 in tam.mml.Rd to the case of polytomous longitudinal 
+  data (requested by and thanks to Florian Buchwald)
+x extended example 6 in tam.mml.Rd to the specification of sum constraints 
+  on the item parameters in a PCM model for differing number of categories.
+x Some minor changes in RD-files (eg., irtmodel for argument 'E' in 
+  tam.mml.2pl is "GPCM.design", theta value in tam.jml is "MLE in final step").
+
+-------------------------------------------------------
 Changes in Version 1.0-2 (2014-03-26)
 -------------------------------------------------------
 

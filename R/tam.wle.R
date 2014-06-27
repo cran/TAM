@@ -393,7 +393,8 @@ tam.mml.wle2 <-
         increment[,d1] <- ifelse( abs( increment[,d1]) > abs(old_increment[,d1])  , 
                                   increment[,d1]/(2*ci) , 
                                   increment[,d1] )	   
-        old_increment[,d1] <- increment[,d1] 
+#        old_increment[,d1] <- increment[,d1] 
+		old_increment[,d1] <- .95 * old_increment[,d1]
         #***
         # avoid NaNs in increment
         increment[,d1] <- ifelse( is.na(increment[,d1] ) , 0 , increment[,d1] )

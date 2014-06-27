@@ -87,7 +87,7 @@
 							}
 					}				
     item1 <- item1[ item1$N > 0 , ]	
-	item1 <- item1[ order( paste( item1$item)) , ]		
+#	item1 <- item1[ order( paste( item1$item)) , ]		
 	rownames(item1) <- NULL
 	return(item1)
 		}
