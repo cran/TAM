@@ -21,9 +21,11 @@ A numeric specifying the probability level of the threshold.
 The default is \code{prob.lvl=0.5}.  
 }
 }
-%\details{
-%%  ~~ If necessary, more details than the description above ~~
-%}
+
+\details{
+This function only supports unidimensional models.
+}
+
 \value{
 A data frame with Thurstonian thresholds. Rows correspond to items and
 columns to item steps.

@@ -17,7 +17,7 @@ objects of classes \code{tam}, \code{tam.mml} and
 \usage{
 tam.fit(tamobj, ...)
 
-tam.mml.fit(tamobj, FitMatrix=NULL, progress=FALSE)
+tam.mml.fit(tamobj, FitMatrix=NULL, Nsimul=NULL,progress=FALSE)
 
 tam.jml.fit(tamobj)
 }
@@ -34,6 +34,9 @@ tam.jml.fit(tamobj)
  A fit matrix \eqn{F} for a specific hypothesis of fit of the linear function
 \eqn{F \xi } (see Simulated Example 3 and Adams & Wu 2007).
   }
+\item{Nsimul}{Number of simulations used for fit calculation.
+The default is 100 (less than 400 students), 40 (less than 1000 students),
+15 (less than 3000 students) and 5 (more than 3000 students)}
  \item{progress}{
     An optional logical indicating whether computation progress should
     be displayed at console.
@@ -151,6 +154,31 @@ F[,,5] <- mod1$A[,,30] + mod1$A[,,31]
 F[,,6] <- mod1$A[,,32] + mod1$A[,,33]
 fit <- tam.fit(mod1, FitMatrix=F)
 fit
+
+#############################################################################
+# SIMULATED EXAMPLE 4: Fit statistic testing for items with differing slopes
+#############################################################################
+
+#*** simulate data
+library(sirt)
+set.seed(9875)
+N <- 2000
+I <- 20
+b <- sample( seq( -2 , 2 , length=I ) )
+a <- rep( 1, I )
+# create some misfitting items
+a[c(1,3)] <- c(.5 , 1.5 )
+# simulate data
+dat <- sirt::sim.raschtype( rnorm(N) , b=b , fixed.a=a )
+#*** estimate Rasch model
+mod1 <- tam.mml(resp=dat) 
+#*** assess item fit by infit and outfit statistic
+fit1 <- tam.fit( mod1 )
+round( cbind( "b"=mod1$item$AXsi_.Cat1 , fit1 )[1:7,], 3 ) 
+
+# S-X2 item fit statistic  
+sx2mod1 <- CDM::itemfit.sx2( mod1 )
+summary(sx2mod1)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

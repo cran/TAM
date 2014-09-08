@@ -10,6 +10,9 @@ tam.threshold <- function (tamobj, prob.lvl=0.5)
   xsi <- ( tamobj$xsi )[,1]
   A <- tamobj$A
   B <- tamobj$B
+  if ( dim(B)[3] > 1){
+	stop("Thurstonian thresholds are only calculated for unidimensional models.")
+					}
   
   maxKi <- apply( resp , 2 , max , na.rm=TRUE )
   
