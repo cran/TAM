@@ -28,9 +28,9 @@ tutorials of the \pkg{TAM} package.
 
 }
 \author{
-Thomas Kiefer [aut, cre], Alexander Robitzsch [aut], Margaret Wu [aut]
+Thomas Kiefer [aut], Alexander Robitzsch [aut, cre], Margaret Wu [aut]
 
-Maintainer: Thomas Kiefer <t.kiefer@bifie.at>
+Maintainer: Alexander Robitzsch <a.robitzsch@bifie.at>
 }
 \references{
 Adams, R. J., Wilson, M., & Wu, M. (1997).

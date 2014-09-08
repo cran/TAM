@@ -91,11 +91,12 @@ tam.modelfit <- function( tamobj , progress=TRUE ){
 
     srmr <- mean( abs( res2$cor_ij - res2e$cor_ij ) )
 #    srmr_jack <- colMeans( abs( res3$cor_ij_jack - res3e$cor_ij_jack ) )
-
-	fitstat <- c( residcov , srmr )
+    srmsr <- sqrt( mean( ( res2$cor_ij - res2e$cor_ij )^2 ) )
+	
+	fitstat <- c( residcov , srmr , srmsr )
 #	fitstat_jack <- rbind( residcov_jack , srmr_jack )
 #	resjj <- .tam.q3.jackknife2( fitstat , fitstat_jack )	
-	names(fitstat) <- c("100*MADCOV" , "SRMR")
+	names(fitstat) <- c("100*MADCOV" , "SRMR","SRMSR")
 # cat("calccov") ; zz1 <- Sys.time(); print(zz1-zz0) ; zz0 <- zz1							
 	
 	# create matrix of Q3 and adjusted Q3 statistics

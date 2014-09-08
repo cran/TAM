@@ -487,6 +487,10 @@ Standard errors are estimated by a rather crude (but quick) approximation.
 Use \code{\link{tam.se}} for improved standard errors.
 
 For model comparisons see \code{\link{anova.tam}}.
+
+See \code{\link[sirt:tam2mirt]{tam2mirt}} (\pkg{sirt}) for converting
+\code{tam} objects into objects of class 
+\code{\link[mirt:mirt]{mirt}} in the \pkg{mirt} package.
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

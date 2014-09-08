@@ -58,6 +58,9 @@ Maydeu-Olivaras, 2013) is based on comparing residual correlations
 of item pairs
 \deqn{ SRMSR = \sqrt{ \frac{1}{ J(J-1)/2 } \sum_{i < j} 
 	( r_{ij} - \hat{r}_{ij} )^2 } }
+Additionally, the SRMR is computed as	
+\deqn{ SRMR = \frac{1}{ J(J-1)/2 } \sum_{i < j} 
+	 | r_{ij} - \hat{r}_{ij} | } 
 
 The \eqn{MADRESIDCOV} statistic (McDonald & Mok, 1995) is based on comparing 
 residual covariances of item pairs
@@ -74,8 +77,8 @@ A list with following entries
   by Holm adjustment}
   \item{chi2.stat}{Data frame with chi square tests of condional independence
      for every item pair (Chen & Thissen, 1997)}
-  \item{fitstat}{Model fit statistics \eqn{100 \cdot MADRESIDCOV} and
-      \eqn{SRMR}}
+  \item{fitstat}{Model fit statistics \eqn{100 \cdot MADRESIDCOV},
+      \eqn{SRMR} and \eqn{SRMSR}}
   \item{modelfit.test}{Test statistic of global fit based on multiple
   testing correction of \eqn{\chi^2} statistics
   		}

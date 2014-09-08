@@ -23,13 +23,33 @@ T. Kiefer, A. Robitzsch, & M. Wu
 
 mailto:
 -------
-t.kiefer@bifie.at
+Alexander Robitzsch
+a.robitzsch@bifie.at
 
 URL:
 ----
 http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+-------------------------------------------------------
+Changes in Version 1.0-3.18 (2014-09-08)
+-------------------------------------------------------
+
+Features:
+x ...
+
+Bug fixes:
+x modified incorrectly calculated thresholds with 'tam.threshold'
+  for multidimensional models (reported by Janine Buchholz and
+  Jörg-Henrik Heine)
+
+Notes:
+x included SRMSR fit statistic in tam.modelfit
+x included argument "Nsimul" in "tam.fit" which improves
+  calculation of fit statistics
 
 -------------------------------------------------------
 Changes in Version 1.0-3 (2014-06-27)
