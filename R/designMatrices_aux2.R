@@ -155,7 +155,8 @@
 				xsi.elim.index <- c( xsi.elim.index , 
 							which( colnames(mm.sg.temp ) %in% i3 ) )
 #				mm.sg.temp[  , i3 ] <- NA
-				mm.sg.temp[ ! ( is.na( mm.sg.temp[  , i3 ] ) ) , i3 ] <- 0
+        # modified indexing
+				mm.sg.temp[ , i3 ][ ! ( is.na( mm.sg.temp[  , i3 ] ) )] <- 0
 							}
 						}
 					}	
