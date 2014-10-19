@@ -32,6 +32,7 @@ function( resp , hwt ,  resp.ind ,
 
 	#****
 	# Monte Carlo integration
+
 	if ( snodes > 0 ){
 # cat("- start monte carlo ") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1								
 	# maybe both if statements can be merged to one
@@ -65,6 +66,8 @@ function( resp , hwt ,  resp.ind ,
     if (G==1){ 
 		variance <- (sumsig2-sumbeta%t*%beta)/nstud  #new variance
 			}
+			
+			
 	# fixed beta coefficients
 	if ( ! is.null( beta.fixed )){ 
 		beta[ beta.fixed[,1:2,drop=FALSE] ] <- beta.fixed[,3] 

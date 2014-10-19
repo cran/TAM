@@ -14,7 +14,8 @@ export(designMatrices, .A.matrix, designMatrices.mfr,
        tam.ctt2 , tam.fa ,
        plotDevianceTAM , tam.ctt3 , tam.mml.3pl ,
        designMatrices.mfr2 ,
-       tam.modelfit
+       tam.modelfit ,
+       plotctt
        )
 
 # internal functions; not intended to be visible to users
@@ -46,9 +47,9 @@ import(mvtnorm)
 import(tensor)
 import(MASS)
 import(GPArotation)
-# importFrom(sirt,reliability.nonlinearSEM)
-# import(sfsmisc)
 importFrom( sfsmisc , QUnif  )
 importFrom( psych , schmid )
 importFrom( Rcpp , evalCpp )
 import(CDM)
+importFrom(lattice,xyplot)
+import(mirt)

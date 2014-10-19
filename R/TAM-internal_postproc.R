@@ -3,7 +3,7 @@
 .TAM.ic <- function( nstud , deviance , xsi , xsi.fixed ,
 	beta , beta.fixed , ndim , variance.fixed , G , irtmodel ,
 	B_orig=NULL , B.fixed , E , est.variance , resp ,
-		est.slopegroups=NULL ){
+		est.slopegroups=NULL , variance.Npars=NULL ){
 	# 2PL estimation
 	# c("2PL","GPCM","GPCM.design","2PL.groups") )	
   #***Model parameters
@@ -44,6 +44,11 @@
 	if ( ! is.null( variance.fixed) ){ 
 			ic$Nparscov <- max(0 , ic$Nparscov - nrow(variance.fixed ) )
 									 }
+									 
+	if ( ! is.null(variance.Npars) ){
+	       ic$Nparscov <- variance.Npars 
+						}
+									
 	# total number of parameters
 	ic$Npars <- ic$np <- ic$Nparsxsi + ic$NparsB + ic$Nparsbeta + ic$Nparscov
     	# AIC

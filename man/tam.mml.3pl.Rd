@@ -20,7 +20,8 @@ tam.mml.3pl(resp, Y = NULL, group = NULL, formulaY = NULL, dataY = NULL, ndim = 
   est.variance = TRUE, A = NULL, notA=FALSE , Q = NULL, E = NULL,gammaslope.des = "2PL", 
   gammaslope = NULL, gammaslope.fixed = NULL, 
   est.some.slopes = TRUE, gammaslope.constr.V = NULL, gammaslope.constr.c = NULL, 
-  gammaslope.prior = NULL, est.guess = NULL, guess = rep(0, ncol(resp)), 
+  gammaslope.prior = NULL, userfct.gammaslope = NULL , gammaslope.constr.Npars = 0 ,
+  est.guess = NULL, guess = rep(0, ncol(resp)), 
   guess.prior = NULL, skillspace = "normal", theta.k = NULL, delta.designmatrix = NULL, 
   delta.fixed = NULL, pweights = NULL, control = list() )
 }
@@ -137,6 +138,13 @@ An optional constraint vector \eqn{c} for item slope parameters \eqn{\gamma}
      assumed that \eqn{\gamma_k \sim N( \mu_k , \sigma_k^2 )}. The first column
      in \code{gammaslope.prior} is \eqn{\mu_k}, the second is \eqn{\sigma_k}. 
 }
+\item{userfct.gammaslope}{A user specified function for
+	constraints or transformations of the \eqn{\gamma} parameters
+within the algorithm. See Example 17 in \code{\link{tam.mml}}.}
+\item{gammaslope.constr.Npars}{Number of constrained
+	\eqn{\gamma} parameters in \code{userfct.gammaslope}	
+}
+
   \item{est.guess}{
 An optional vector of integers indicating for which items a guessing
 parameter should be estimated. Same integers correspond to same estimated 

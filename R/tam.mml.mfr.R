@@ -117,7 +117,7 @@ tam.mml.mfr <-
                                  constraint=constraint, ndim=ndim,
                                  Q=Q, A=A, B=B , progress=progress)
 							}	 
-	
+													
     A <- design$A$A.3d.0	
     cA <- design$A$A.flat.0	
     B <- design$B$B.3d.0

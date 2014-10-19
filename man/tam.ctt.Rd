@@ -2,10 +2,11 @@
 \alias{tam.ctt}
 \alias{tam.ctt2}
 \alias{tam.ctt3}
+\alias{plotctt}
 
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Classical Test Theory Based Statistics
+Classical Test Theory Based Statistics and Plots
 }
 \description{
 This function computes some item statistics based on classical test
@@ -13,10 +14,10 @@ theory.
 }
 \usage{
 tam.ctt(resp, wlescore=NULL, pvscores=NULL, group=NULL , progress=TRUE)
-
 tam.ctt2(resp, wlescore=NULL, group=NULL , allocate=30 , progress=TRUE)
-
 tam.ctt3(resp, wlescore=NULL, group=NULL , allocate=30 , progress=TRUE)
+
+plotctt( resp , theta , Ncuts = NULL , ask = FALSE , ... )
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -41,6 +42,15 @@ should be displayed.
 \item{allocate}{Average number of categories per item. This argument is just
 	used for matrix size allocations. If an error is produced, use
 	a sufficiently higher number.
+}
+\item{theta}{A score to be conditioned}
+\item{Ncuts}{Number of break points for \code{theta}}
+\item{ask}{
+  A logical which asks for changing the graphic from item to item.
+  The default is \code{FALSE}.
+}
+\item{\dots}{
+  Further arguments to be passed.
 }
 }
 \details{
@@ -106,6 +116,9 @@ stat1a <- tam.ctt2( resp=data.mc$raw , wlescore=w1$theta )  # faster
 stat1b <- tam.ctt2( resp=data.mc$raw )  # only frequencies
 stat1c <- tam.ctt3( resp=data.mc$raw , wlescore=w1$theta )  # faster
 
+# plot empirical item response curves
+plotctt( resp=data.mc$raw , theta = w1$theta , Ncuts =5 , ask=TRUE)
+
 # CTT results for scored data
 stat2 <- tam.ctt( resp=data.mc$scored , wlescore=w1$theta , pvscores=p1[,-1] )
 
@@ -119,4 +132,5 @@ stat3a <- tam.ctt2( resp=data.mc$raw , wlescore=w1$theta ,  group=group)
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{Classical test theory statistics}
+\keyword{plot}
 %% \keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

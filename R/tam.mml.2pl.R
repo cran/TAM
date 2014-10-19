@@ -8,7 +8,9 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 				 est.variance = FALSE , 
                  A=NULL , B=NULL , B.fixed = NULL , 
 				 Q=NULL , est.slopegroups=NULL , E = NULL , 
-                 pweights = NULL , control = list() 
+                 pweights = NULL , 
+			     userfct.variance = NULL , variance.Npars = NULL , 				 
+				 control = list() 
                  # control can be specified by the user 
                  ){
   
@@ -517,6 +519,13 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
     #---end 2PL---
 # cat("sufficient statistics 2PL") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
     
+	
+	  # function for reducing the variance	  
+	  if ( ! is.null( userfct.variance ) ){  
+			variance <- do.call( userfct.variance , list(variance ) )			
+				}
+	
+	
 	if (max(abs(variance-oldvariance)) < conv) varConv <- TRUE
     
     ######################################
@@ -717,7 +726,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 	ic <- .TAM.ic( nstud , deviance , xsi , xsi.fixed ,
 		beta , beta.fixed , ndim , variance.fixed , G ,
 		irtmodel ,B_orig=B_orig ,  B.fixed , E , est.variance , resp ,
-		est.slopegroups)
+		est.slopegroups , variance.Npars=variance.Npars )
 
 	#***
 	# calculate counts

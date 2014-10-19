@@ -34,14 +34,16 @@ tam.mml(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
     beta.fixed = NULL, beta.inits = NULL, variance.fixed = NULL, 
     variance.inits = NULL, est.variance = FALSE, A = NULL, B = NULL, 
     B.fixed = NULL,  Q = NULL,  est.slopegroups = NULL, E = NULL, 
-    pweights = NULL, control = list())
+    pweights = NULL, userfct.variance = NULL , variance.Npars = NULL , 
+    control = list())
 
 tam.mml.2pl(resp, Y = NULL, group = NULL, irtmodel = "2PL", formulaY = NULL, 
     dataY = NULL, ndim = 1, pid = NULL, xsi.fixed = NULL, xsi.inits = NULL,
     beta.fixed = NULL, beta.inits = NULL, variance.fixed = NULL, 
     variance.inits = NULL, est.variance = FALSE, A = NULL, B = NULL, 
     B.fixed = NULL, Q = NULL, est.slopegroups = NULL, E = NULL, 
-    pweights = NULL, control = list())
+    pweights = NULL, userfct.variance = NULL , variance.Npars = NULL , 
+    control = list())
             
 tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
     dataY = NULL, ndim = 1, pid = NULL, xsi.fixed = NULL, xsi.inits = NULL, 
@@ -193,7 +195,11 @@ tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
 \item{facets}{A data frame with facet entries (only applies to 
 	\code{tam.mml.mfr})
 		}
-  \item{control}{
+\item{userfct.variance}{Optional user customized function for variance speicification
+(See Simulated Example 17).}
+\item{variance.Npars}{Number of estimated parameters of variance matrix
+if a \code{userfct.variance} is provided.} 		
+\item{control}{
   A list of control arguments for the algorithm: \cr\cr
   \code{ list( nodes = seq(-6,6,len=21) , snodes = 0 , QMC=TRUE,}\cr
     \code{        convD = .001 ,conv = .0001 , convM = .0001 , Msteps = 4 ,   }\cr
@@ -488,10 +494,12 @@ Use \code{\link{tam.se}} for improved standard errors.
 
 For model comparisons see \code{\link{anova.tam}}.
 
-See \code{\link[sirt:tam2mirt]{tam2mirt}} (\pkg{sirt}) for converting
-\code{tam} objects into objects of class 
-\code{\link[mirt:mirt]{mirt}} in the \pkg{mirt} package.
 }
+
+%See \code{\link[sirt:tam2mirt]{tam2mirt}} (\pkg{sirt}) for converting
+%\code{tam} objects into objects of class 
+%\code{\link[mirt:mirt]{mirt}} in the \pkg{mirt} package.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% EXAMPLES
@@ -536,7 +544,7 @@ xsi.inits <- cbind( c(2,4,40) , c(-1.8,-1.6,2))
 mod1b <- tam.mml( resp=sim.rasch , xsi.inits=xsi.inits )
 
 #***
-# 1PL estimtaion with sum constraint on item difficulties
+# 1PL estimation with sum constraint on item difficulties
 dat <- sim.rasch
 # modify A design matrix to include the sum constraint
 des <- designMatrices(resp=dat)
@@ -681,8 +689,8 @@ library(mvtnorm)
 N <- 1000      
 Y <- cbind( rnorm( N ) , rnorm(N) )
 theta <- rmvnorm( N,mean=c(0,0), sigma=matrix( c(1,.5,.5,1) , 2 , 2 ))
-theta[,1] <- rnorm( N ) + .4 * Y[,1] + .2 * Y[,2]  # latent regression model
-theta[,2] <- rnorm( N ) + .8 * Y[,1] + .5 * Y[,2]  # latent regression model
+theta[,1] <- theta[,1] + .4 * Y[,1] + .2 * Y[,2]  # latent regression model
+theta[,2] <- theta[,2] + .8 * Y[,1] + .5 * Y[,2]  # latent regression model
 I <- 20
 p1 <- plogis( outer( theta[,1] , seq( -2 , 2 , len=I ) , "-" ) )
 resp1 <- 1 * ( p1 > matrix( runif( N*I ) , nrow=N , ncol=I ) )
@@ -885,11 +893,11 @@ mod7$B
 
 # recalculate estimated basis parameters
 lm( mod7$B[,2,1] ~ 0+ as.matrix(E ) )
-##   Call:
-##   lm(formula = mod7$B[, 2, 1] ~ 0 + as.matrix(E))
-##   Coefficients:
-##   as.matrix(E)1  as.matrix(E)2  as.matrix(E)3  as.matrix(E)4  as.matrix(E)5  
-##          0.9904         1.1896         0.7817         0.9601         1.2132  
+  ##   Call:
+  ##   lm(formula = mod7$B[, 2, 1] ~ 0 + as.matrix(E))
+  ##   Coefficients:
+  ##   as.matrix(E)1  as.matrix(E)2  as.matrix(E)3  as.matrix(E)4  as.matrix(E)5  
+  ##          0.9904         1.1896         0.7817         0.9601         1.2132  
 
 #############################################################################
 # EXAMPLE 8: Differential item functioning                                  #
@@ -973,12 +981,12 @@ summary(mod9b)
 data(data.ex10)
 dat <- data.ex10
 head(dat)
-##     pid rater I0001 I0002 I0003 I0004 I0005
-## 1     1     1     0     1     1     0     0
-## 451   1     2     1     1     1     1     0
-## 901   1     3     1     1     1     0     1
-## 452   2     2     1     1     1     0     1
-## 902   2     3     1     1     0     1     1
+  ##     pid rater I0001 I0002 I0003 I0004 I0005
+  ## 1     1     1     0     1     1     0     0
+  ## 451   1     2     1     1     1     1     0
+  ## 901   1     3     1     1     1     0     1
+  ## 452   2     2     1     1     1     0     1
+  ## 902   2     3     1     1     0     1     1
 
 facets <- dat[ , "rater" , drop=FALSE ] # define facet (rater)
 pid <- dat$pid      # define person identifier (a person occurs multiple times)
@@ -1062,9 +1070,9 @@ summary(mod2)
 library(sirt)
 data(data.long, package="sirt")
 dat <- data.long
-##   > colnames(dat)
-##    [1] "idstud" "I1T1"   "I2T1"   "I3T1"   "I4T1"   "I5T1"   "I6T1"  
-##    [8] "I3T2"   "I4T2"   "I5T2"   "I6T2"   "I7T2"   "I8T2"  
+  ##   > colnames(dat)
+  ##    [1] "idstud" "I1T1"   "I2T1"   "I3T1"   "I4T1"   "I5T1"   "I6T1"  
+  ##    [8] "I3T2"   "I4T2"   "I5T2"   "I6T2"   "I7T2"   "I8T2"  
 
 ## item 1 to 6 administered at T1 and items 3 to 8 at T2
 ## items 3 to 6 are anchor items
@@ -1082,31 +1090,31 @@ Q[7:12,2] <- 1      # items at T2
 # create draft design matrix and modify it
 A <- designMatrices(resp=data.long[,-1])$A
 dimnames(A)[[1]] <- colnames(data.long)[-1]
-##   > str(A)
-##    num [1:12, 1:2, 1:12] 0 0 0 0 0 0 0 0 0 0 ...
-##    - attr(*, "dimnames")=List of 3
-##     ..$ : chr [1:12] "Item01" "Item02" "Item03" "Item04" ...
-##     ..$ : chr [1:2] "Category0" "Category1"
-##     ..$ : chr [1:12] "I1T1" "I2T1" "I3T1" "I4T1" ...
+  ##   > str(A)
+  ##    num [1:12, 1:2, 1:12] 0 0 0 0 0 0 0 0 0 0 ...
+  ##    - attr(*, "dimnames")=List of 3
+  ##     ..$ : chr [1:12] "Item01" "Item02" "Item03" "Item04" ...
+  ##     ..$ : chr [1:2] "Category0" "Category1"
+  ##     ..$ : chr [1:12] "I1T1" "I2T1" "I3T1" "I4T1" ...
 A1 <- A[  ,  , c(1:6 , 11:12 ) ]
 dimnames(A1)[[3]] <- substring( dimnames(A1)[[3]],1,2)
 A1[7,2,3] <- -1     # difficulty(I3T1) = difficulty(I3T2)
 A1[8,2,4] <- -1     # I4T1 = I4T2
 A1[9,2,5] <- A1[10,2,6] <- -1
-##   > A1[,2,]
-##        I1 I2 I3 I4 I5 I6 I7 I8
-##   I1T1 -1  0  0  0  0  0  0  0
-##   I2T1  0 -1  0  0  0  0  0  0
-##   I3T1  0  0 -1  0  0  0  0  0
-##   I4T1  0  0  0 -1  0  0  0  0
-##   I5T1  0  0  0  0 -1  0  0  0
-##   I6T1  0  0  0  0  0 -1  0  0
-##   I3T2  0  0 -1  0  0  0  0  0
-##   I4T2  0  0  0 -1  0  0  0  0
-##   I5T2  0  0  0  0 -1  0  0  0
-##   I6T2  0  0  0  0  0 -1  0  0
-##   I7T2  0  0  0  0  0  0 -1  0
-##   I8T2  0  0  0  0  0  0  0 -1
+  ##   > A1[,2,]
+  ##        I1 I2 I3 I4 I5 I6 I7 I8
+  ##   I1T1 -1  0  0  0  0  0  0  0
+  ##   I2T1  0 -1  0  0  0  0  0  0
+  ##   I3T1  0  0 -1  0  0  0  0  0
+  ##   I4T1  0  0  0 -1  0  0  0  0
+  ##   I5T1  0  0  0  0 -1  0  0  0
+  ##   I6T1  0  0  0  0  0 -1  0  0
+  ##   I3T2  0  0 -1  0  0  0  0  0
+  ##   I4T2  0  0  0 -1  0  0  0  0
+  ##   I5T2  0  0  0  0 -1  0  0  0
+  ##   I6T2  0  0  0  0  0 -1  0  0
+  ##   I7T2  0  0  0  0  0  0 -1  0
+  ##   I8T2  0  0  0  0  0  0  0 -1
 
 # estimate model
 # set intercept of second dimension (T2) to zero
@@ -1128,19 +1136,19 @@ A1[9,2,5] <- -1
 A1[6,2,3] <- A1[6,2,4] <- A1[6,2,5] <- 1  # I6T1=-(I3T1+I4T1+I5T1)
 A1[10,2,3] <- A1[10,2,4] <- A1[10,2,5] <- 1  # I6T2=-(I3T2+I4T2+I5T2)
 A1[,2,]
-##      I1 I2 I3 I4 I5 I7 I8
-## I1T1 -1  0  0  0  0  0  0
-## I2T1  0 -1  0  0  0  0  0
-## I3T1  0  0 -1  0  0  0  0
-## I4T1  0  0  0 -1  0  0  0
-## I5T1  0  0  0  0 -1  0  0
-## I6T1  0  0  1  1  1  0  0
-## I3T2  0  0 -1  0  0  0  0
-## I4T2  0  0  0 -1  0  0  0
-## I5T2  0  0  0  0 -1  0  0
-## I6T2  0  0  1  1  1  0  0
-## I7T2  0  0  0  0  0 -1  0
-## I8T2  0  0  0  0  0  0 -1
+  ##      I1 I2 I3 I4 I5 I7 I8
+  ## I1T1 -1  0  0  0  0  0  0
+  ## I2T1  0 -1  0  0  0  0  0
+  ## I3T1  0  0 -1  0  0  0  0
+  ## I4T1  0  0  0 -1  0  0  0
+  ## I5T1  0  0  0  0 -1  0  0
+  ## I6T1  0  0  1  1  1  0  0
+  ## I3T2  0  0 -1  0  0  0  0
+  ## I4T2  0  0  0 -1  0  0  0
+  ## I5T2  0  0  0  0 -1  0  0
+  ## I6T2  0  0  1  1  1  0  0
+  ## I7T2  0  0  0  0  0 -1  0
+  ## I8T2  0  0  0  0  0  0 -1
 
 mod13b <- tam.mml( resp=data.long[,-1] , Q=Q , A=A1 , beta.fixed=FALSE)
 summary(mod13b)
@@ -1155,10 +1163,9 @@ dat <- data.long
 dat[(1:50),2] <- sample(c(0,1,2), 50, replace = TRUE)
 dat[(1:50),5] <- sample(c(0,1,2), 50, replace = TRUE)
 dat[(1:50),9] <- sample(c(0,1,2), 50, replace = TRUE)
-
-##   > colnames(dat)
-##    [1] "idstud" "I1T1"   "I2T1"   "I3T1"   "I4T1"   "I5T1"   "I6T1"  
-##    [8] "I3T2"   "I4T2"   "I5T2"   "I6T2"   "I7T2"   "I8T2"  
+  ##   > colnames(dat)
+  ##    [1] "idstud" "I1T1"   "I2T1"   "I3T1"   "I4T1"   "I5T1"   "I6T1"  
+  ##    [8] "I3T2"   "I4T2"   "I5T2"   "I6T2"   "I7T2"   "I8T2"  
 
 ## item 1 to 6 administered at T1, items 3 to 8 at T2
 ## items 3 to 6 are anchor items
@@ -1173,12 +1180,12 @@ Q[7:12,2] <- 1      # items at T2
 #     create draft design matrix and modify it
 A <- designMatrices(resp=dat[,-1])$A
 dimnames(A)[[1]] <- colnames(dat)[-1]
-## > str(A)
-## num [1:12, 1:3, 1:15] 0 0 0 0 0 0 0 0 0 0 ...
-## - attr(*, "dimnames")=List of 3
-## ..$ : chr [1:12] "I1T1" "I2T1" "I3T1" "I4T1" ...
-## ..$ : chr [1:3] "Category0" "Category1" "Category2"
-## ..$ : chr [1:15] "I1T1_Cat1" "I1T1_Cat2" "I2T1_Cat1" "I3T1_Cat1" ...
+  ## > str(A)
+  ## num [1:12, 1:3, 1:15] 0 0 0 0 0 0 0 0 0 0 ...
+  ## - attr(*, "dimnames")=List of 3
+  ## ..$ : chr [1:12] "I1T1" "I2T1" "I3T1" "I4T1" ...
+  ## ..$ : chr [1:3] "Category0" "Category1" "Category2"
+  ## ..$ : chr [1:15] "I1T1_Cat1" "I1T1_Cat2" "I2T1_Cat1" "I3T1_Cat1" ...
 
 # define matrix A
 # Items 1 to 3 administered at T1, Items 3 to 6 are anchor items
@@ -1193,12 +1200,11 @@ A1[7,,] <- A1[3,,]  # item 7, i.e. I3T2, loads on same parameters as
 A1[8,,] <- A1[4,,]  # same for item 8 and item 4 
 A1[9,,] <- A1[5,,]  # same for item 9 and item 5
 A1[10,,] <- A1[6,,] # same for item 10 and item 6
-
-## > A1[8,,]
-##           I1_Cat1 I1_Cat2 I2_Cat1 I3_Cat1 I4_Cat1 I4_Cat2 I5_Cat1 ...
-## Category0       0       0       0       0       0       0       0 
-## Category1       0       0       0       0      -1       0       0
-## Category2       0       0       0       0      -1      -1       0 
+  ## > A1[8,,]
+  ##           I1_Cat1 I1_Cat2 I2_Cat1 I3_Cat1 I4_Cat1 I4_Cat2 I5_Cat1 ...
+  ## Category0       0       0       0       0       0       0       0 
+  ## Category1       0       0       0       0      -1       0       0
+  ## Category2       0       0       0       0      -1      -1       0 
 
 # (3) estimate model
 #     set intercept of second dimension (T2) to zero
@@ -1265,17 +1271,17 @@ data <- data.ex15
 # Model 15a: 
 mod15a <- tam.mml.mfr(resp = data[,-c(1:2)],facets=data[,"group",drop=FALSE], 
     formulaA = ~ item + group*item , pid = data$pid , control=list(maxiter=50))
-## See output:
-## 
-##   Iteration 47     2013-09-10 16:51:39
-##   E Step
-##   M Step Intercepts   |----
-##     Deviance = 75510.2868 | Deviance change: -595.0609
-##   !!! Deviance increases!                                        !!!!
-##   !!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!
-##     Maximum intercept parameter change: 0.925045
-##     Maximum regression parameter change: 0
-##     Variance:  0.9796  | Maximum change: 0.009226
+# See output:
+  ## 
+  ##   Iteration 47     2013-09-10 16:51:39
+  ##   E Step
+  ##   M Step Intercepts   |----
+  ##     Deviance = 75510.2868 | Deviance change: -595.0609
+  ##   !!! Deviance increases!                                        !!!!
+  ##   !!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!
+  ##     Maximum intercept parameter change: 0.925045
+  ##     Maximum regression parameter change: 0
+  ##     Variance:  0.9796  | Maximum change: 0.009226
 
 #***
 # Model 15b: Follow the suggestions of changing the default of fac.oldxsi and 
@@ -1316,6 +1322,200 @@ summary(mod1)
 xsi1 <- mod1$xsi
 difxsi <- xsi1[ intersect( grep("cnt",rownames(xsi1)),grep("M03" ,rownames(xsi1))) , ]
 - colSums(difxsi)		# this is the DIF effect of the remaining item
+
+#############################################################################
+# SIMULATED EXAMPLE 17: Several multidimensional and subdimension models
+#############################################################################
+
+library(mirt)
+#*** (1) simulate data in mirt package
+set.seed(9897)
+# simulate data according to the four-dimensional Rasch model
+# variances
+variances <- c( 1.45 , 1.74 , .86 , 1.48  )
+# correlations
+corrs <- matrix( 1 , 4 , 4 )
+dd1 <- 1 ; dd2 <- 2 ; corrs[dd1,dd2] <- corrs[dd2,dd1] <- .88
+dd1 <- 1 ; dd2 <- 3 ; corrs[dd1,dd2] <- corrs[dd2,dd1] <- .85
+dd1 <- 1 ; dd2 <- 4 ; corrs[dd1,dd2] <- corrs[dd2,dd1] <- .87
+dd1 <- 2 ; dd2 <- 3 ; corrs[dd1,dd2] <- corrs[dd2,dd1] <- .84
+dd1 <- 2 ; dd2 <- 4 ; corrs[dd1,dd2] <- corrs[dd2,dd1] <- .90
+dd1 <- 3 ; dd2 <- 4 ; corrs[dd1,dd2] <- corrs[dd2,dd1] <- .90
+# covariance matrix
+covar <- outer( sqrt( variances) , sqrt(variances) )*corrs
+# item thresholds and item discriminations
+d <- matrix( runif(40, -2 , 2 ) , ncol=1 )
+a <- matrix(NA , nrow=40,ncol=4)
+a[1:10,1] <- a[11:20,2] <- a[21:30,3] <- a[31:40,4] <- 1
+# simulate data
+dat <- mirt::simdata(a=a, d=d, N=1000, itemtype="dich", sigma = covar )
+# define Q-matrix for testlet and subdimension models estimated below
+Q <- matrix( 0 , nrow=40 , ncol=5 )
+colnames(Q) <- c("g" , paste0( "subd"  , 1:4) )
+Q[,1] <- 1
+Q[1:10,2] <- Q[11:20,3] <- Q[21:30,4] <- Q[31:40,5] <- 1
+
+# define maximum number of iterations and number of quasi monte carlo nodes
+maxit <- 5  ; snodes <- 300	# this specification is only for speed reasons
+# maxit <- 50 ; snodes <- 1500
+
+#*****************
+# Model 1: Rasch testlet model
+#*****************
+
+# define a user function for restricting the variance according to the 
+# Rasch testlet model
+variance.fct1 <- function( variance ){   
+            ndim <- ncol(variance)
+            variance.new <- matrix( 0 , ndim , ndim )
+            diag(variance.new) <- diag(variance)
+            variance <- variance.new
+            return(variance)
+                    }
+variance.Npars <- 5	# number of estimated parameters in variance matrix
+# estimation using tam.mml
+mod1 <- tam.mml( dat , Q=Q , userfct.variance=variance.fct1 , variance.Npars=variance.Npars , 
+                control=list(maxiter=maxit , QMC=TRUE , snodes=snodes) )
+summary(mod1)
+
+#*****************
+# Model 2: Testlet model with correlated testlet effects
+#*****************
+
+# specify a testlet model with general factor g and testlet effects
+# u_1,u_2,u_3 and u_4. Assume that Cov(g,u_t)=0 for all t=1,2,3,4.
+# Additionally, assume that \sum_t,t' Cov( u_t , u_t') = 0, i.e.
+# the sum of all testlet covariances is equal to zero
+# => testlet effects are uncorrelated on average.
+
+# set Cov(g,u_t)=0 and sum of all testlet covariances equals to zero
+variance.fct2 <- function( variance ){   
+            ndim <- ncol(variance)
+            variance.new <- matrix( 0 , ndim , ndim )
+            diag(variance.new) <- diag(variance)
+            variance.new[1,2:ndim] <- variance.new[2:ndim,1] <- 0
+            # calculate average covariance between testlets
+            v1 <- variance[ -1 , -1] - variance.new[-1,-1]
+            M1 <- sum(v1) / ( ( ndim-1)^2 - ( ndim - 1))
+            v1 <- v1 - M1
+            variance.new[ -1 , -1 ] <- v1
+            diag(variance.new) <- diag(variance)
+            variance <- variance.new
+            return(variance)
+                    }
+variance.Npars <- 1 + 4 + (4*3)/2 - 1
+# estimate model in TAM
+mod2 <- tam.mml( dat , Q=Q , userfct.variance=variance.fct2 , variance.Npars=variance.Npars , 
+                control=list(maxiter=maxit , QMC=TRUE , snodes=snodes) )
+summary(mod2)
+
+#*****************
+# Model 3: Testlet model with correlated testlet effects (different identification)
+#*****************
+
+# Testlet model like in Model 2. But now the constraint is
+# \sum _t,t' Cov(u_t , u_t') + \sum_t Var(u_t) = 0 , i.e.
+# the sum of all testlet covariances and variances is equal to zero.
+variance.fct3 <- function( variance ){   
+            ndim <- ncol(variance)
+            variance.new <- matrix( 0 , ndim , ndim )
+            diag(variance.new) <- diag(variance)
+            variance.new[1,2:ndim] <- variance.new[2:ndim,1] <- 0
+            # calculate average covariance and variance between testlets
+            v1 <- variance[ -1 , -1]
+            M1 <- mean(v1)
+            v1 <- v1 - M1
+            variance.new[ -1 , -1 ] <- v1            
+            # ensure positive definiteness of covariance matrix
+            eps <- 10^(-2)
+            diag(variance.new) <- diag( variance.new) + eps
+            variance.new <- psych::cor.smooth( variance.new )  # smoothing in psych
+            variance <- variance.new
+            return(variance)
+                    }
+variance.Npars <- 1 + 4 + (4*3)/2 - 1
+# estimate model in TAM
+mod3 <- tam.mml( dat , Q=Q , userfct.variance=variance.fct3 , variance.Npars=variance.Npars , 
+                control=list(maxiter=maxit , QMC=TRUE , snodes=snodes) )
+summary(mod3)
+
+#*****************
+# Model 4: Rasch subdimension model
+#*****************
+
+# The Rasch subdimension model is specified according to Brandt (2008).
+# The fourth testlet effect is defined as u4 = - (u1+u2+u3)
+# specify an alternative Q-matrix with 4 dimensions
+Q2 <- Q[,-5]
+Q2[31:40,2:4] <- -1
+
+# set Cov(g,u1)=Cov(g,u2)=Cov(g,u3)=0
+variance.fixed <- rbind( c(1,2,0) , c(1,3,0) , c(1,4,0) )
+# estimate model in TAM
+mod4 <- tam.mml( dat , Q=Q2 ,variance.fixed=variance.fixed , 
+                control=list(maxiter=maxit , QMC=TRUE , snodes=snodes) )
+summary(mod4)
+
+#*****************
+# Model 5: Higher-order model
+#*****************
+
+# A four-dimensional model with a higher-order factor is specified.
+# F_t = a_t g + eps_g 
+Q3 <- Q[,-1]
+# define fitting function using the lavaan package and ULS estimation
+N0 <- nrow(dat)         # sample size of dataset
+library(lavaan)		# requires lavaan package for fitting covariance
+variance.fct5 <- function( variance ){   
+    ndim <- ncol(variance)
+    rownames(variance) <- colnames(variance) <- paste0("F",1:ndim)
+    lavmodel <- paste0(
+        "FHO =~" , paste0( paste0( "F" , 1:ndim ) , collapse="+" ) )
+    lavres <- lavaan::cfa( model=lavmodel , sample.cov=variance , estimator = "ULS" , 
+                       std.lv=TRUE , sample.nobs=N0)            
+    variance.new <- fitted(lavres)$cov
+    variance <- variance.new
+    # print coefficients
+    cat( paste0( "\n **** Higher order loadings: " ,
+            paste0( paste0( round( coef(lavres)[ 1:ndim ] , 3 )) , collapse=" ") 
+                        ) , "\n")
+    return(variance)
+                    }
+variance.Npars <- 4+4
+# estimate model in TAM
+mod5 <- tam.mml( dat , Q=Q3 , userfct.variance=variance.fct5 , variance.Npars=variance.Npars , 
+                control=list(maxiter=maxit , QMC=TRUE , snodes=snodes) )
+summary(mod5)
+
+#*****************
+# Model 6: Generalized Rasch subdimension model (Brandt, 2012)
+#*****************
+
+Q2 <- Q[,-5]
+Q2[31:40,2:4] <- -1
+# fixed covariances
+variance.fixed2 <- rbind( c(1,2,0) , c(1,3,0) , c(1,4,0)  )
+# design matrix for item loading parameters
+#      items x category x dimension x xsi parameter
+E <- array( 0 , dim = c( 40 , 2 , 4 , 4 ) )
+E[ 1:10 , 2 , c(1,2) , 1 ] <- 1
+E[ 11:20 , 2 , c(1,3) , 2 ] <- 1
+E[ 21:30 , 2 , c(1,4) , 3 ] <- 1
+E[ 31:40 , 2 , 1 , 4 ] <- 1
+E[ 31:40 , 2 , 2:4 , 4 ] <- -1
+
+# constraint on slope parameters, see Brandt (2012)
+gammaconstr <- function( gammaslope ){
+        K <- length( gammaslope)
+        g1 <- sum( gammaslope^2  )
+        gammaslope.new <- sqrt(K) / sqrt(g1) * gammaslope 
+        return(gammaslope.new)
+                    }
+# estimate model
+mod6 <- tam.mml.3pl( dat, E=E, Q=Q2, variance.fixed=variance.fixed2,  skillspace="normal", 
+                userfct.gammaslope = gammaconstr , gammaslope.constr.Npars = 1 , 
+                control=list(maxiter=maxit , QMC=TRUE , snodes=snodes ) )
+summary(mod6)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

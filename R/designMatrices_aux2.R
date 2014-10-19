@@ -61,14 +61,39 @@
     
     names( expand.list ) <- fvars
     
+	
     #cat(" +++  v100" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     							  	  
     #     expand.list <- expand.list[ !unlist( lapply(expand.list, is.null) ) ]
     
     for (vv in seq(1 , length(expand.list) ) ){
       expand.list[[vv]] <- paste( expand.list[[vv]] ) 
     }
+	
+	
     # cat(" +++  v110" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     								  	
-    X <- rownames.design2( expand.grid(expand.list) ) 
+	g2 <- g1 <- expand.grid(expand.list)
+	diffK <- ( sd( maxKi) > 0 )
+	diffK <- FALSE
+	# reduced combinations of items
+	if (diffK){	
+		I <- length(maxKi)
+		# g1 <- as.data.frame(g1)
+		for (ii in 1:I){
+			ind <- which( ( ( as.numeric(paste0(g1$item)) == ii ) & 
+					( as.numeric(paste0(g1$step)) > maxKi[ii]  ) )	 )
+			if ( length(ind) > 0 ){
+				g1 <- g1[ - ind  , ]		
+								}
+					}
+			}
+			
+			
+			
+    X <- rownames.design2( g1 )
+	if (diffK){ 
+		X2 <- rownames.design2( g2 )
+				}
+	
 	#**** include maxKi (2014-05-30)
 #	X$maxKi <- maxKi[ X$item ]
 #	X$par.exist <- 1 * ( as.numeric(paste(X$step)) <= X$maxKi )	
@@ -83,11 +108,17 @@
     }
     # cat(" +++  v120" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     								  	 
     mm <- - model.matrix(formulaA, X, contrasts = contr.list)
-    #    mm <- - model.matrix(formulaA, X )
-    if( constraint == "items" ) mm <- mm[,-1]
+	
+	if (diffK){
+		mm2 <- - model.matrix(formulaA, X2, contrasts = contr.list)
+				}
 
-# Revalpr("mm")
-# stop()
+
+				
+    #    mm <- - model.matrix(formulaA, X )
+    if( constraint == "items" ){ mm <- mm[,-1] }
+
+
     
     ############################################################
     ###*** ARb 2013-03-28
@@ -129,6 +160,8 @@
 	  # collect xsi parameters to be excluded
 	  xsi.elim.index <- xsi.elim <- NULL 
       ii <- 0 ; vv <- 1
+	  
+	  
       for( sg in stepgroups ){
 #         sg <- stepgroups[2]
 #Revalpr("sg")		
@@ -155,11 +188,20 @@
 				xsi.elim.index <- c( xsi.elim.index , 
 							which( colnames(mm.sg.temp ) %in% i3 ) )
 #				mm.sg.temp[  , i3 ] <- NA
-				mm.sg.temp[ ! ( is.na( mm.sg.temp[  , i3 ] ) ) , i3 ] <- 0
-							}
+#				mm.sg.temp[ ! ( is.na( mm.sg.temp[  , i3 ] ) ) , i3 ] <- 0
+
+				#@@@ suggestion Michal Modzelewski 				
+				 mm.sg.temp[ , i3 ][ ! ( is.na( mm.sg.temp[ , i3 ] ) )] <- 0				
+		 
+							}  #**** end i3 
+			#*******************				
+							
+							
 						}
-					}	
-			
+					}
+# Revalpr("maxKi[ii]")
+# Revalpr("mm.sg.temp")
+					
 			A <- rbind(A, mm.sg.temp)
 # Revalpr("A")			
 		if ( maxKi[ii] < maxK ){

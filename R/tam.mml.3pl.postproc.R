@@ -4,7 +4,8 @@
 	beta , beta.fixed , ndim , variance.fixed , G , irtmodel ,
 	B_orig=NULL , B.fixed , E , est.variance , resp ,
 	est.slopegroups=NULL , skillspace , delta , est.guess , fulldesign ,
-	est.some.slopes , gammaslope , gammaslope.fixed, gammaslope.constr.V){
+	est.some.slopes , gammaslope , gammaslope.fixed, gammaslope.constr.V ,
+	gammaslope.constr.Npars ){
   #***Model parameters
   ic <- data.frame("n" = nstud , "deviance" = deviance )
   dev <- deviance
@@ -23,6 +24,8 @@
 	if ( ! is.null( gammaslope.fixed ) ){
 		ic$NparsB <- ic$NparsB - nrow(gammaslope.fixed )
 					}
+	ic$NparsB <- ic$NparsB - gammaslope.constr.Npars
+	
 	
 	# beta regression parameters
 	ic$Nparsbeta <- 0

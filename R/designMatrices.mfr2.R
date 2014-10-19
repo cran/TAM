@@ -149,11 +149,11 @@ designMatrices.mfr2 <-
 				PACKAGE="TAM")
     # cat(" ---  after gresp   " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    
     # This step is time-consuming!!
-#cat(" ---  after gresp (2) " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     					    
+# cat(" ---  after gresp (2) " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     					    
   
     ind.resp.cols <- as.numeric(X.noStep.ind)
     gresp.noStep <- resp[,ind.resp.cols]
-#cat(" ---  gresp no step    " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1
+# cat(" ---  gresp no step    " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1
     if( length(otherFacets) > 0 ){
       rnFacets <- rownames( rownames.design2( as.matrix(facets[,otherFacets]) ))
       rnX <-      rownames( rownames.design2( as.matrix(X[,otherFacets]) ))
@@ -211,7 +211,7 @@ designMatrices.mfr2 <-
       x2 <- aperm( x2 , c(2,1,3) )
       return(x2)
     }    
-#cat(" ---  before item rename" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    
+# cat(" ---  before item rename" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    
     #***
     # debugging ind manually
     ind <- FALSE * ind
@@ -223,7 +223,7 @@ designMatrices.mfr2 <-
     } else {
       itemren <- data.frame( "item" =  colnames(resp) , "itemren" = paste0( "item" , 1:nI ) )
     }
-#cat(".....\nbefore rename A" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1	
+# cat(".....\nbefore rename A" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1	
     # print("g100")	
     A <- .rename.items( matr=A , itemren )
 
@@ -245,11 +245,11 @@ designMatrices.mfr2 <-
     #	gresp <- t( .rename.items3( matr=t(gresp) , facet.list , cols=FALSE)	)	
     dimnames(gresp)[[2]] <- dimnames(A)[[1]]	
     gresp.noStep <- t( .rename.items( matr=t(gresp.noStep) , itemren , cols=FALSE)	)	
-    # cat("h2" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1					
+#cat("h2" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1					
     #	gresp.noStep <- t( .rename.items3( matr=t(gresp.noStep) , facet.list , I , cols=FALSE)	)	
     gresp.noStep <- t( .rename.items3a( matr=t(gresp.noStep) , facet.list , I , cols=FALSE ,
                                         xsi.table )	)		
-    #cat(".rename.items (gresp.noStep)" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1					
+#cat(".rename.items (gresp.noStep)" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1					
     Q <- .rename.items( matr=Q , itemren , cols=FALSE)
 
     dimnames(Q)[[1]] <- dimnames(A)[[1]]
@@ -269,7 +269,7 @@ designMatrices.mfr2 <-
     #cat(".rename.items2a (G1$parameter)  " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1					
     G1$parameter <- .rename.items2b( paste( G1$parameter) , facet.list , I , xsi.table ) 	
     xsi.constr$xsi.table <- G1	
-    # cat(".rename.items2b (G1$parameter)  " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1	
+ # cat(".rename.items2b (G1$parameter)  " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1	
     #***
     G1 <- xsi.constr$xsi.constraints
     rownames(G1) <- .rename.items2( rownames(G1) , itemren) 	
@@ -285,11 +285,14 @@ designMatrices.mfr2 <-
       cat( "        o Relabeled Variable Names (" , paste(Sys.time()) , ")\n") ; flush.console();
     }
     
-#cat(" ---  after all item renames" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    			
+# cat(" ---  after all item renames" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    			
     
     # A
     A.flat.0 <- A.flat <- A; A.flat.0[ind,] <- 0
-    A.3d <- .generateB.3d( A.flat )
+# cat("d300\n")
+# Revalpr("A.flat")	
+    A.3d <- .generateB.3d( A.flat )		# here occurs the problem if one works with a reduced expand.grid
+# cat("d400\n")	
     A.flat <- A.flat[!ind,]
     A.3d.0 <- .generateB.3d( A.flat.0 )
     # B                  
@@ -304,7 +307,7 @@ designMatrices.mfr2 <-
     Q.3d <- .generateB.3d( Q.flat )
     Q.flat <- Q.flat[!ind,]
     Q.3d.0 <- .generateB.3d( Q.flat.0 )     
-#cat(" ---  output mfr" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    			
+# cat(" ---  output mfr" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    			
     # out
     out <- list( "gresp" = list("gresp"=gresp, "gresp.noStep"=gresp.noStep), 
                  "A" = list("A.flat"=A.flat, "A.flat.0"=A.flat.0, 

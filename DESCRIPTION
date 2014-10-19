@@ -1,8 +1,8 @@
 Package: TAM
 Type: Package
 Title: Test Analysis Modules
-Version: 1.0-3.18-1
-Date: 2014-09-08
+Version: 1.1
+Date: 2014-10-19
 Author: Thomas Kiefer [aut], Alexander Robitzsch [aut, cre], Margaret Wu [aut]
 Maintainer: Alexander Robitzsch <a.robitzsch@bifie.at>
 Authors@R: c(person("Thomas", "Kiefer", role = c("aut"), email =
@@ -19,12 +19,12 @@ Description:
   estimation of ability. 
 Depends: R (>= 2.15.1), MASS
 Imports: mvtnorm, CDM (>= 3.4), tensor, sfsmisc, GPArotation, psych,
-        Rcpp
+        Rcpp, mirt (>= 1.5), lattice
 Suggests: sirt (>= 0.47)
 LinkingTo: Rcpp, RcppArmadillo
 License: GPL (>= 2)
 URL: http://www.edmeasurementsurveys.com/TAM/Tutorials/
-Packaged: 2014-09-08 17:07:45 UTC; robitzsch
+Packaged: 2014-10-19 17:43:19 UTC; robitzsch
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2014-09-08 19:20:54
+Date/Publication: 2014-10-19 22:23:15

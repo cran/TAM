@@ -17,7 +17,7 @@ objects of classes \code{tam}, \code{tam.mml} and
 \usage{
 tam.fit(tamobj, ...)
 
-tam.mml.fit(tamobj, FitMatrix=NULL, Nsimul=NULL,progress=FALSE)
+tam.mml.fit(tamobj, FitMatrix=NULL, Nsimul=NULL,progress=TRUE)
 
 tam.jml.fit(tamobj)
 }
@@ -176,7 +176,18 @@ mod1 <- tam.mml(resp=dat)
 fit1 <- tam.fit( mod1 )
 round( cbind( "b"=mod1$item$AXsi_.Cat1 , fit1 )[1:7,], 3 ) 
 
-# S-X2 item fit statistic  
+#*** compute item fit statistic in mirt package
+library(mirt)
+library(sirt)
+mod1c <- mirt::mirt( dat , model=1 , itemtype="Rasch" , verbose=TRUE)
+print(mod1c)                      # model summary
+sirt::mirt.wrapper.coef(mod1c)    # estimated parameters
+fit1c <- mirt::itemfit(mod1c , method="EAP")    # model fit in mirt package
+# compare results of TAM and mirt
+dfr <- cbind( "TAM"=fit1 , "mirt"=fit1c[,-c(1:2)] )
+
+# S-X2 item fit statistic (see also the output from mirt) 
+library(CDM)
 sx2mod1 <- CDM::itemfit.sx2( mod1 )
 summary(sx2mod1)
 }

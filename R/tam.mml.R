@@ -8,7 +8,9 @@ tam.mml <-
             est.variance = FALSE , 
             A=NULL , B=NULL , B.fixed = NULL , 
             Q=NULL , est.slopegroups=NULL , E = NULL , 
-            pweights = NULL , control = list() 
+            pweights = NULL , 
+			userfct.variance = NULL , variance.Npars = NULL , 
+			control = list() 
             # control can be specified by the user 
   ){
     
@@ -456,7 +458,8 @@ tam.mml <-
       # calculate student's prior distribution
       gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
                            nnodes=nnodes , ndim=ndim,YSD=YSD)
-      
+
+						   
       # cat("stud_prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						 
       # calculate student's likelihood
       res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=gwt , resp=resp , nitems=nitems , 
@@ -492,9 +495,15 @@ tam.mml <-
       if ( max(abs(beta-oldbeta)) < conv){    
         betaConv <- TRUE       # not include the constant as it is constrained
       }
+
       
       if (G == 1){
         diag(variance) <- diag(variance) + 10^(-10)
+		# diag(variance) <- diag(variance) + 10^(-3)
+		
+#		 diag(variance) <- diag(variance) + .0035
+# Revalpr("round(cov2cor(variance),4)")
+
         #		if( det(variance) < 10^(-20) ){
         #		  stop("\n variance is close to singular or zero. Estimation cannot proceed")
         #@@ARb: I would not prefer to stop the program but adding a small
@@ -502,6 +511,14 @@ tam.mml <-
         #				} 
       }
       
+	    
+	  # function for reducing the variance	  
+	  if ( ! is.null( userfct.variance ) ){  
+			variance <- do.call( userfct.variance , list(variance ) )			
+				}
+	  
+
+	  
       #     #---2PL---
       #     #compute sufficient statistics for 2PL slope parameters
       #     if (irtmodel %in% c("2PL","GPCM","GPCM.design","2PL.groups")) {
@@ -584,20 +601,7 @@ tam.mml <-
       
       # cat("mstep item parameters") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						 	
       
-      #     #---2PL---
-      #     if (irtmodel %in% c("2PL","GPCM","GPCM.design","2PL.groups") ) {
-      # #    if (progress){ cat("M Step Intercepts   |"); flush.console() }	
-      #      if (progress){ cat("\nM Step Slopes       |"); flush.console() }
-      #       oldB <- B
-      #       res <- Mstep_slope.v2(B_orig, B, B_obs, B.fixed , max.increment, nitems, A, 
-      #                      AXsi, xsi, theta, nnodes, maxK, itemwt, Msteps, ndim, convM,
-      # 					 irtmodel ,  progress , est.slopegroups,E,basispar)
-      # 	  B <- res$B
-      # 	  basispar <- res$basispar
-      #       a4 <- max( abs( B - oldB ))  
-      #     }
-      #     #---end 2PL---
-      
+     
       #***
       # decrease increments in every iteration
       if( increment.factor > 1){max.increment <-  1 / increment.factor^iter }    
@@ -608,6 +612,8 @@ tam.mml <-
       } else {
         #       deviance <- - 2 * sum( pweights * log( res.hwt$rfx ) )
         deviance <- - 2 * sum( pweights * log( rowMeans( res.hwt$swt ) ) )
+
+		
       }
       deviance.history[iter,2] <- deviance
       a01 <- abs( ( deviance - olddeviance ) / deviance  )
@@ -722,7 +728,7 @@ tam.mml <-
     ic <- .TAM.ic( nstud , deviance , xsi , xsi.fixed ,
                    beta , beta.fixed , ndim , variance.fixed , G ,
                    irtmodel , B_orig=NULL , B.fixed , E , est.variance =TRUE ,
-                   resp )
+                   resp , variance.Npars=variance.Npars )
     # cat("TAM.ic") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1			
     #***
     # calculate counts

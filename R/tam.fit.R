@@ -10,7 +10,7 @@ tam.fit <- function( tamobj, ... ){
 }
 
 tam.mml.fit <-
-  function( tamobj, FitMatrix=NULL , Nsimul=NULL , progress = FALSE ){
+  function( tamobj, FitMatrix=NULL , Nsimul=NULL , progress = TRUE ){
     #####################################################
     # INPUT:
     # tamobj ... result from tam analysis
@@ -21,10 +21,10 @@ tam.mml.fit <-
     
 	if ( is.null(Nsimul) ){
 			nstud <- tamobj$nstud
-			if ( nstud < 400 ){ Nsimul <- 100 }
-			if ( nstud < 1000 ){ Nsimul <- 40 }
+			Nsimul <- 5
 			if ( nstud < 3000 ){ Nsimul <- 15 }			
-			if ( nstud > 3000 ){ Nsimul <- 5 }			
+			if ( nstud < 1000 ){ Nsimul <- 40 }
+			if ( nstud < 400 ){ Nsimul <- 100 }						
 						}
 	 if (progress){
 	    cat( paste0("Item fit calculation based on " , Nsimul , " simulations\n") )
@@ -86,10 +86,14 @@ tam.mml.fit <-
       Vz2i <- C4i - vari^2
       Uz2i <- C4i/(vari^2) - 1
       
-      xbar <- resp.ind[,ip]%*%t( xbari )
-      var1 <- resp.ind[,ip]%*%t( vari )
-      Vz2 <- resp.ind[,ip]%*%t( Vz2i )
-      Uz2 <- resp.ind[,ip]%*%t( Uz2i )
+      # xbar <- resp.ind[,ip]%*%t( xbari )      
+	  xbar <- tcrossprod( resp.ind[,ip] ,  xbari )
+	  # var1 <- resp.ind[,ip]%*%t( vari )
+	  var1 <- tcrossprod( resp.ind[,ip] ,  vari )	  	  
+      # Vz2 <- resp.ind[,ip]%*%t( Vz2i )
+	  Vz2 <- tcrossprod( resp.ind[,ip] ,  Vz2i )	  	  
+      # Uz2 <- resp.ind[,ip]%*%t( Uz2i )
+	  Uz2 <- tcrossprod( resp.ind[,ip] ,  Uz2i )	
       
       Ax <- matrix(rep(ParamScore[,p],nnodes),nrow=nstud, ncol=nnodes)
       
@@ -99,7 +103,7 @@ tam.mml.fit <-
       
 	  Outfit_SIM <- Infit_SIM <- rep(NA, Nsimul )
 	  Infit_t_SIM <- Outfit_t_SIM <- rep(NA,Nsimul )
-	  
+	    	  
 	  #*******
 	  # start simulation
 	  for ( hh in 1:Nsimul ){
@@ -108,7 +112,7 @@ tam.mml.fit <-
       nthetal <- rep(1,ncol(c_hwt))      
 		  #    j <- apply(c_hwt,1, function (x) {findInterval(runif(1),x)})
 		  #    j <- sapply(1:N, function (ii) {findInterval(rn1[ii],c_hwt[ii,])})  	  
-      j <- rowSums( c_hwt < outer( rn1 , nthetal ) )
+      # j <- rowSums( c_hwt < outer( rn1 , nthetal ) )
       j <- rowSums( c_hwt < rn1)
       j[ j == 0 ] <- 1
       NW <- ncol(c_hwt)

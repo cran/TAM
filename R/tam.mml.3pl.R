@@ -11,7 +11,8 @@ tam.mml.3pl <-
 			gammaslope=NULL , gammaslope.fixed=NULL ,
             est.some.slopes=TRUE ,    			
 			gammaslope.constr.V=NULL , gammaslope.constr.c = NULL , 
-			gammaslope.prior=NULL , 
+			gammaslope.prior=NULL ,  userfct.gammaslope = NULL ,
+			gammaslope.constr.Npars = 0 ,
 			est.guess = NULL ,  guess = rep(0,ncol(resp)) , 
 			guess.prior=NULL ,
             skillspace = "normal" , theta.k = NULL , 
@@ -48,7 +49,9 @@ tam.mml.3pl <-
     increment.factor <- progress <- nodes <- snodes <- ridge <- xsi.start0 <- QMC <- NULL
     maxiter <- conv <- convD <- min.variance <- max.increment <- Msteps <- convM <- NULL 
     delta <- R <- NULL
-    B <- NULL ; B.fixed <- NULL ;
+    B <- NULL ; B.fixed <- NULL ; theta <- NULL	
+	 
+	 
 	irtmodel <- "2PL" 
 	est.slopegroups <- NULL	
 	#********************
@@ -352,7 +355,6 @@ tam.mml.3pl <-
     xsi.min.deviance <- xsi
     beta.min.deviance <- beta
     variance.min.deviance <- variance
-	
     # nodes
     if ( snodes == 0 ){
      if ( skillspace=="normal"){	
@@ -373,7 +375,7 @@ tam.mml.3pl <-
     } else {
       # sampled theta values
       if (QMC){			
-        r1 <- QUnif (n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)						
+        r1 <- QUnif(n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)						
         theta0.samp <- qnorm( r1 )
       } else {
         theta0.samp <- matrix( mvrnorm( snodes , mu = rep(0,ndim) , 
@@ -381,8 +383,9 @@ tam.mml.3pl <-
                                nrow= snodes , ncol=ndim )			
       }
       thetawidth <- NULL
+	  theta <- theta0.samp
     }
-				            
+	
     deviance <- 0  
     deviance.history <- matrix( 0 , nrow=maxiter , ncol = 2)
     colnames(deviance.history) <- c("iter" , "deviance")
@@ -397,7 +400,9 @@ tam.mml.3pl <-
     
 	#*************************
 	# skill space
-	ntheta <- nrow(theta)
+	if ( ! is.null(theta ) ){ 
+			ntheta <- nrow(theta)
+					} 															
 	fulldesign <- FALSE
 	if ( skillspace != "normal" ){	    
 		gwt <- hwt <- matrix( 1/ntheta , nrow=nstud , ncol=ntheta)				 						
@@ -541,7 +546,9 @@ tam.mml.3pl <-
 	  if (skillspace == "normal" ){	  	 	# normal distribution
 		  gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
 							   nnodes=nnodes , ndim=ndim,YSD=YSD)
-		  gwt <- gwt / rowSums( gwt ) 
+		 if ( snodes == 0 ){
+			gwt <- gwt / rowSums( gwt ) 
+							}
 									}
       if ( skillspace != "normal" ){		# non-normal distribution			
 		  for (gg in 1:G){
@@ -561,13 +568,17 @@ tam.mml.3pl <-
 	  # likelihood	and posterior  
 				
       # calculate student's likelihood	
+	   gwt1 <- gwt
        res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=gwt1 , resp=resp , nitems=nitems , 
-                                   resp.ind.list=resp.ind.list , normalization=FALSE , 
+	                               resp.ind.list=resp.ind.list , normalization=FALSE , 
                                    thetasamp.density=thetasamp.density , snodes=snodes ,
                                    resp.ind=resp.ind	)
-	   hwt0 <- hwt <- res.hwt$hwt * gwt
-       hwt <- hwt / rowSums( hwt )	   
-      
+#	   hwt0 <- hwt <- res.hwt$hwt * gwt
+#       hwt <- hwt / rowSums( hwt )	   
+
+	   hwt0 <- hwt <- res.hwt[["hwt"]]  
+       hwt <- hwt / rowSums( hwt )	   	   
+	   
       # cat("posterior v2") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
       
       if (progress){ cat("M Step Intercepts   |"); flush.console() }
@@ -651,7 +662,8 @@ tam.mml.3pl <-
 
       ###############################################
 	  # M-step item slopes	  
-      if ( est.some.slopes){	  
+      if ( est.some.slopes){
+          oldgamma <- gammaslope	  
 		  res <- .mml.3pl.est.slopes( max.increment , np , 
 				Msteps , nitems , A , AXsi , B , xsi , guess , theta , nnodes , maxK ,
 				progress ,ItemScore , fac.oldxsi , rprobs , xsi.fixed , convM , rprobs0 ,
@@ -664,7 +676,14 @@ tam.mml.3pl <-
             e1 <- matrix( gammaslope , ncol=1 )
 			gammaslope <- ( e1 + V %*% V1 %*% ( e2 - t(V) %*% e1 ) )[,1]		
 									}		  		  
+		  # userfunction gammaslope
+		  if ( ! is.null( userfct.gammaslope ) ){
+				gammaslope <- do.call( userfct.gammaslope , list(gammaslope) )
+#				B <- .mml.3pl.computeB( E , gammaslope )		
+					}	  		  
+		  gammaslope <- fac.oldxsi	* oldgamma + ( 1 - fac.oldxsi)*gammaslope		
 		  B <- .mml.3pl.computeB( E , gammaslope )
+		  
 				}
 	  #*********************
 	  # 3PL estimation
@@ -679,6 +698,8 @@ tam.mml.3pl <-
 					}
       # cat("M steps slopes") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
       
+	  
+
       #***
       # decrease increments in every iteration
       if( increment.factor > 1){max.increment <-  1 / increment.factor^iter }
@@ -692,7 +713,9 @@ tam.mml.3pl <-
 		 deviance <- - 2 * sum( pweights * log( rfx ) )
       } else {
         #      deviance <- - 2 * sum( pweights * log( res.hwt$rfx ) )
-        deviance <- - 2 * sum( pweights * log( rowMeans( res.hwt$swt ) ) )
+#        deviance <- - 2 * sum( pweights * log( rowMeans( res.hwt$swt ) ) )
+# Revalpr("sum(res.hwt$rfx)")		
+        deviance <- - 2 * sum( pweights * log( rowMeans( res.hwt$hwt ) ) )
       }
       deviance.history[iter,2] <- deviance
       a01 <- abs( ( deviance - olddeviance ) / deviance  )
@@ -749,6 +772,8 @@ tam.mml.3pl <-
 					}
 		cat( "\n" )					
         flush.console()
+		
+				
       }
     } # end of EM loop
     ############################################################################
@@ -796,7 +821,7 @@ tam.mml.3pl <-
                    irtmodel ,B_orig=B_orig ,  B.fixed , E , est.variance , resp ,
                    est.slopegroups , skillspace , delta , est.guess ,
 				   fulldesign , est.some.slopes , gammaslope ,
-				   gammaslope.fixed , gammaslope.constr.V )
+				   gammaslope.fixed , gammaslope.constr.V , gammaslope.constr.Npars )
     #***
     # calculate counts
     res <- .tam.calc.counts( resp, theta , resp.ind , 

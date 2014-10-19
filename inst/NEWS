@@ -28,18 +28,52 @@ a.robitzsch@bifie.at
 
 URL:
 ----
+For tutorials see
 http://www.edmeasurementsurveys.com/TAM/Tutorials/
+
+For development versions see
+https://sites.google.com/site/alexanderrobitzsch/software
+
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
+-------------------------------------------------------
+Changes in Version 1.1   (2014-10-19)
+-------------------------------------------------------
+
+Features:
+* added user defined variance function in tam.mml and
+  tam.mml.2pl
+* added user defined constraints on slope parameters
+  in 'tam.mml.3pl'
+
+Bug fixes:
+* fixed a bug in deviance computation in 'tam.mml.3pl' when
+  stochastic nodes are used
+* (hopefully) fixed computational problems in multidimensional models
+  with nearly singular covariance matrix 
+  (thanks to a discussion with Johannes Hartig)  
+
+Notes:
+* added a plot function 'plot.ctt' accompanying the classical test 
+  theory based statistic
+* fixed a bug in creation of design matrices in faceted models with
+  differing categories per item (thanks to Michal Modzelewski). 
+  Note that the treatment of faceted models is still not compatible
+  with other software (like ConQuest). A substantial bug fix
+  is planned in future TAM relaeses. 
+
+Datasets included or modified:
+* data.ctest1 (thanks to HGP)
+
+Examples included or modified:
+* tam.fit (4), tam.mml (17), tam.ctt (1)
 
 
 -------------------------------------------------------
 Changes in Version 1.0-3.18 (2014-09-08)
 -------------------------------------------------------
-
-Features:
-x ...
 
 Bug fixes:
 x modified incorrectly calculated thresholds with 'tam.threshold'
