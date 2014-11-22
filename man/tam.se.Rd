@@ -118,20 +118,19 @@ plot( mod$xsi$se , semod$xsi$se , pch=16 , xlim=c(0,.15) , ylim=c(0,.15) ,
 lines( c(-6,6) , c(-6,6) , col="gray")
 
 round( cbind( mod$xsi , semod$xsi[,-1] ) , 3 )
-##   > round( cbind( mod$xsi , semod$xsi[,-1] ) , 3 )
-##                    xsi se.xsi   N    est    se
-##   I0001         -1.956  0.092 500 -1.956 0.095
-##   I0002         -1.669  0.085 500 -1.669 0.088
-##   [...]
-##   I0010          2.515  0.108 500  2.515 0.110
-##   female1       -0.091  0.025 500 -0.091 0.041
-##   I0001:female1 -0.051  0.070 500 -0.051 0.071
-##   I0002:female1  0.085  0.067 500  0.085 0.068
-##   [...]
-##   I0009:female1 -0.019  0.068 500 -0.019 0.068
-##
-## => the largest discrepancy in standard errors is observed for the
-##    main female effect (.041 in 'tam.se' instead of .025 in 'tam.mml')
+  ##                    xsi se.xsi   N    est    se
+  ##   I0001         -1.956  0.092 500 -1.956 0.095
+  ##   I0002         -1.669  0.085 500 -1.669 0.088
+  ##   [...]
+  ##   I0010          2.515  0.108 500  2.515 0.110
+  ##   female1       -0.091  0.025 500 -0.091 0.041
+  ##   I0001:female1 -0.051  0.070 500 -0.051 0.071
+  ##   I0002:female1  0.085  0.067 500  0.085 0.068
+  ##   [...]
+  ##   I0009:female1 -0.019  0.068 500 -0.019 0.068
+  ##
+# => The largest discrepancy in standard errors is observed for the
+#    main female effect (.041 in 'tam.se' instead of .025 in 'tam.mml')
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

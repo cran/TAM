@@ -145,6 +145,7 @@ tam.jml2 <-
     
     #Initialise xsi
     xsi[est.xsi.index] <- - log(abs(ItemScore[est.xsi.index]/(ItemMax[est.xsi.index]-ItemScore[est.xsi.index])))  #log of odds ratio of raw scores
+
     
     #Compute person sufficient statistics (total score on each dimension)
     PersonScores <- cResp %*% cB
@@ -219,6 +220,7 @@ tam.jml2 <-
       meanChangeWLE <- jmlAbility$meanChangeWLE
       maxthetachange <- max( abs( theta - theta_old ) )
       errorMLE <- jmlAbility$errorWLE
+
       
       #update xsi, item parameters
       #    jmlxsi0 <- tam.jml.xsi ( resp , resp.ind, A, B, nstud, nitems, maxK, convM, 
@@ -272,6 +274,7 @@ tam.jml2 <-
     
     meanChangeWLE <- jmlWLE$meanChangeWLE
     errorWLE <- jmlWLE$errorWLE
+
     
     #WLE person separation reliability
     varWLE <- var(thetaWLE)
@@ -339,7 +342,7 @@ tam.jml2 <-
                  "xsi.fixed" = xsi.fixed , "deviance" = deviance ,
                  "deviance.history" = deviance.history ,
                  "control" = con1a , "iter"=iter)
-    res$time <-  c(s1,s2,s2-s1)
+    res$time <-  c(s11,s2,s2-s11)
     class(res) <- "tam.jml"
     return(res)
   }

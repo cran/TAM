@@ -70,4 +70,20 @@
 				 "gammachange"= max( abs( Xlambda00 - Xlambda) ) )
 			}
 ################################################################################			
+
+
+.mml.3pl.gammaslope.center <- function( gammaslope , gammaslope.center.index  ,
+				gammaslope.center.value  ){							
+									
+		if ( ! is.null( gammaslope.center.index ) ){
+			M <- max( gammaslope.center.index )
+		for (mm in 1:M){
+			ind.mm <- which( gammaslope.center.index == mm )
+			IM <- length(ind.mm)
+			rmm <- gammaslope[ ind.mm ] - mean( gammaslope[ind.mm] )
+			gammaslope[ ind.mm ] <- gammaslope.center.value[mm] / IM + rmm
+						}
+						}
+		return(gammaslope )
+				}
 				 

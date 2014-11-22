@@ -164,14 +164,14 @@ for (rr in raters){
     dat1.rr <- data.cqc03[ data.cqc03$rater == rr , ]
     dat1[ match(dat1.rr$pid , persons) ,rr] <- dat1.rr$crit1
         }
-##   > head(dat1)
-##       pid R11 R12 R13 R14 R15 R16 R17 R18 R19 R20 R21 R22 R23 R24 R25 R26
-##   1 10001   2   2  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
-##   2 10002  NA  NA   2   1  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
-##   3 10003  NA  NA   3   2  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
-##   4 10004  NA  NA   2   1  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
-##   5 10005  NA  NA   1   1  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
-##   6 10006  NA  NA   1   1  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
+  ##   > head(dat1)
+  ##       pid R11 R12 R13 R14 R15 R16 R17 R18 R19 R20 R21 R22 R23 R24 R25 R26
+  ##   1 10001   2   2  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
+  ##   2 10002  NA  NA   2   1  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
+  ##   3 10003  NA  NA   3   2  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
+  ##   4 10004  NA  NA   2   1  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
+  ##   5 10005  NA  NA   1   1  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
+  ##   6 10006  NA  NA   1   1  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
 
 # estimate model 03c
 mod03c <- tam.mml( dat1[,-1] , pid = dat1$pid )
@@ -207,14 +207,14 @@ xsi.fixed <- cbind( seq(1,nrow(xsi.est)) , xsi.est$xsi )
 rownames(xsi.fixed) <- rownames(xsi.est)
 xsi.fixed <- xsi.fixed[ c(8:13) ,]
 xsi.fixed[,2] <- 0
-##   > xsi.fixed
-##             [,1] [,2]
-##   raterAM      8    0
-##   raterBE      9    0
-##   raterCO     10    0
-##   topicFami   11    0
-##   topicScho   12    0
-##   topicSpor   13    0
+  ##   > xsi.fixed
+  ##             [,1] [,2]
+  ##   raterAM      8    0
+  ##   raterBE      9    0
+  ##   raterCO     10    0
+  ##   topicFami   11    0
+  ##   topicScho   12    0
+  ##   topicSpor   13    0
 mod04c1 <- tam.mml.mfr( resp , facets= facets ,
             formulaA = formulaA , pid = data.cqc04$pid , xsi.fixed=xsi.fixed )
 summary( mod04c1 )

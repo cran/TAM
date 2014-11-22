@@ -579,7 +579,7 @@ tam.mml.mfr <-
 
       rprobs <- res[["rprobs"]]
       AXsi <- res[["AXsi"]]
-	  	 
+	  
       # calculate student's prior distribution
       gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
                            nnodes=nnodes , ndim=ndim,YSD=YSD)
@@ -589,9 +589,8 @@ tam.mml.mfr <-
       res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=gwt , resp=gresp.noStep , nitems=nitems , 
                                    resp.ind.list= resp.ind.list , normalization=TRUE , 
                                    thetasamp.density=thetasamp.density , snodes=snodes ,
-                                   resp.ind=resp.ind	)	
+                                   resp.ind=resp.ind	, avoid.zerosum=TRUE)	
       hwt <- res.hwt[["hwt"]] 
-
 	  
       # cat("calc posterior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		  
       if (progress){ cat("M Step Intercepts   |"); flush.console() }
@@ -606,7 +605,8 @@ tam.mml.mfr <-
                                 ndim=ndim , nstud=nstud , beta.fixed=beta.fixed , variance=variance , 
                                 Variance.fixed=variance.fixed , group=group ,  G=G , snodes = snodes ,
                                 nomiss=nomiss)
-      
+
+								
       beta <- resr$beta
       #cat("m step regression") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		        
       variance <- resr$variance	
@@ -614,7 +614,6 @@ tam.mml.mfr <-
         variance[ variance < min.variance ] <- min.variance 
       }
       itemwt <- resr$itemwt
-      
       # constraint cases (the design matrix A has no constraint on items)
       if ( max(abs(beta-oldbeta)) < conv){    
         betaConv <- TRUE       # not include the constant as it is constrained
@@ -627,8 +626,7 @@ tam.mml.mfr <-
         #       constant in the diagonal.
         #				} 
       }
-      
-      if (max(abs(variance-oldvariance)) < conv) varConv <- TRUE     
+      if (max(abs(variance-oldvariance)) < conv){ varConv <- TRUE      }
       ######################################
       #M-step item parameters
       converge <- FALSE
@@ -640,7 +638,7 @@ tam.mml.mfr <-
 
      
       est.xsi.index <- est.xsi.index0	  
-      while (!converge & ( Miter <= Msteps ) ) {	
+      while (!converge & ( Miter <= Msteps ) ) {	  
         # Only compute probabilities for items contributing to param p
         if (Miter > 1){ 
           res.p <- calc_prob.v5( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , 
@@ -665,19 +663,24 @@ tam.mml.mfr <-
         deriv <- xbar2 - xxf 			
         increment <- diff*abs(1/( deriv + 10^(-20) ) )
         if ( !is.null( xsi.fixed) ){ increment[ xsi.fixed[,1] ] <- 0 } 
-        #!!!	  necesessary to include statement to control increment?
+        #!!!	  necessary to include statement to control increment?
         ci <- ceiling( abs(increment) / ( abs( old_increment) + 10^(-10) ) )
-        increment <- ifelse( abs( increment) > abs(old_increment)  , 
-                             increment/(2*ci) , increment )
+        a1 <- abs(old_increment)
+
+        increment <- ifelse( abs( increment) > a1  , 
+                             increment/(2*ci) , increment )					 
         #****
         # inclusion
-        #        increment <- ifelse( abs( increment) > max.increment  , 
-        #                             sign(increment)*max.increment , increment )
-        #		max.increment <- max( abs(increment) )
+		
+#                increment <- ifelse( abs( increment) > old_increment  , 
+#                                     sign(increment)*old_increment / 1.5 , increment )
+#        		max.increment <- max( abs(increment) )
         #****
         
-        old_increment <- increment        
-        
+        old_increment <- abs(increment)
+#        w <- 1		
+#		old_increment <- w * abs(increment) + (1-w)*abs(old_increment)
+		
         xsi <- xsi+increment   # update parameter p
         
         # stabilizing the algorithm | ARb 2013-09-10
@@ -820,7 +823,8 @@ tam.mml.mfr <-
     ic <- .TAM.ic( nstud , deviance , xsi , xsi.fixed ,
                    beta , beta.fixed , ndim , variance.fixed , G ,
                    irtmodel , B_orig=NULL , B.fixed , E , est.variance =TRUE ,
-                   resp )
+                   resp , est.slopegroups=NULL , 
+				   variance.Npars= NULL , group )
     
     #***
     # calculate counts
@@ -951,7 +955,6 @@ tam.mml.mfr <-
     xsi1 <- xsi1[ match( xsiFacet$parameter , xsi1$parameter) , ]
     xsi.facets <- xsi1
     rownames(xsi.facets) <- NULL
-    
     i1 <- grep( "Intercept" , xsi.facets$parameter)
     if ( length(i1) > 0 ){
       xsi.facets <-  xsi.facets[ - i1 , ] 
@@ -963,6 +966,13 @@ tam.mml.mfr <-
     if(delete.red.items) resp <- resp[,-miss.items]
     colnames(resp) <- dimnames(A)[[1]]
     
+	 res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=1+0*gwt , resp=resp , nitems=nitems , 
+                                   resp.ind.list=resp.ind.list , normalization=FALSE , 
+                                   thetasamp.density=thetasamp.density , snodes=snodes ,
+                                   resp.ind=resp.ind	)	
+      res.like <- res.hwt[["hwt"]] 		
+	
+	
     # Output list
     deviance.history <- deviance.history[ 1:iter , ]
     res <- list( "xsi" = xsi , "xsi.facets" = xsi.facets , 
@@ -984,9 +994,10 @@ tam.mml.mfr <-
                  "AXsi_" = - AXsi ,			   
                  "se.AXsi" = se.AXsi , 
                  "nstud" = nstud , "resp.ind.list" = resp.ind.list ,
-                 "hwt" = hwt , "ndim" = ndim ,
+                 "hwt" = hwt , "like" = res.like , "ndim" = ndim ,
                  "xsi.fixed" = xsi.fixed , "beta.fixed" = beta.fixed , "Q"=Q,
                  "formulaA"=formulaA , "facets"=facets ,
+				 "xsi.constr" = xsi.constr , 
                  "variance.fixed" = variance.fixed ,
                  "nnodes" = nnodes , "deviance" = deviance ,
                  "ic" = ic , 

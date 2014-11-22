@@ -1,31 +1,52 @@
-\name{anova.tam}
+\name{anova-logLik}
 \alias{anova.tam}
 \alias{anova.tam.mml}
+\alias{anova.tam.mml.3pl}
 
+\alias{logLik.tam}
+\alias{logLik.tam.mml}
+\alias{logLik.tam.mml.3pl}
 
 
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Likelihood Ratio Test for Model Comparisons
+Likelihood Ratio Test for Model Comparisons and Log-Likelihood Value
 }
-\description{
-This function compares two models estimated \code{tam}
-or \code{tam.mml} using a likelihood ratio test.
-}
-\usage{
-\method{anova}{tam}(object,object1,\dots)
 
-\method{anova}{tam.mml}(object,object1,\dots)
+
+\description{
+The \code{anova} function compares two models estimated of class \code{\link{tam}}
+\code{\link{tam.mml}} or \code{\link{tam.mml.3pl}} using a likelihood ratio test.
+The \code{logLik} function extracts the value of the log-Likelihood.
+
+The function can be applied for values of \code{\link{tam.mml}},
+\code{\link{tam.mml.2pl}}, \code{\link{tam.mml.mfr}}, \code{\link{tam.fa}}
+and \code{\link{tam.mml.3pl}}.
+}
+
+
+\usage{
+\method{anova}{tam}(object, \dots)
+
+\method{anova}{tam.mml}(object, \dots)
+
+\method{anova}{tam.mml.3pl}(object, \dots)
+
+\method{logLik}{tam}(object, \dots)
+
+\method{logLik}{tam.mml}(object, \dots)
+
+\method{logLik}{tam.mml.3pl}(object, \dots)
+
 }
 
 
 
 \arguments{
   \item{object}{
-Object of class \code{tam} or \code{tam.mml} 
-}
-  \item{object1}{
-Object of class \code{tam} or \code{tam.mml} 
+Object of class \code{\link{tam}}, \code{\link{tam.mml}}
+or \code{\link{tam.mml.3pl}}. Note that for \code{anova} two objects 
+(fitted models) must be provided.
 }
 \item{\dots}{Further arguments to be passed}
 }
@@ -65,15 +86,17 @@ information criteria.
 	
 data(sim.rasch)
 # 1PL estimation
-mod1 <- tam.mml(resp=sim.rasch) 
+mod1 <- tam.mml(resp=sim.rasch)
+logLik(mod1)
 # 2PL estimation
-mod2 <- tam.mml.2pl(resp=sim.rasch , irtmodel="2PL") 
+mod2 <- tam.mml.2pl(resp=sim.rasch , irtmodel="2PL")
+logLik(mod2)
 # Model comparison
 anova( mod1 , mod2 )
-## > anova( mod1 , mod2 )
-##     Model   loglike Deviance Npars      AIC      BIC    Chisq df       p
-## 1 Model 1 -42077.88 84155.77    41 84237.77 84467.40 54.05078 39 0.05508
-## 2 Model 2 -42050.86 84101.72    80 84261.72 84709.79       NA NA      NA
+  ## > anova( mod1 , mod2 )
+  ##     Model   loglike Deviance Npars      AIC      BIC    Chisq df       p
+  ## 1 Model 1 -42077.88 84155.77    41 84237.77 84467.40 54.05078 39 0.05508
+  ## 2 Model 2 -42050.86 84101.72    80 84261.72 84709.79       NA NA      NA
 
 \dontrun{
 #############################################################################
@@ -87,12 +110,11 @@ mod1 <- tam.mml.2pl(resp= data.read )
 # 2-dimensional model
 mod2 <- tam.fa(resp= data.read , irtmodel="efa" , nfactors=2 ,
         control=list(maxiter=150) ) 
-
 # Model comparison
 anova( mod1 , mod2 )
-##       Model   loglike Deviance Npars      AIC      BIC    Chisq df  p
-##   1 Model 1 -1954.888 3909.777    24 3957.777 4048.809 76.66491 11  0
-##   2 Model 2 -1916.556 3833.112    35 3903.112 4035.867       NA NA NA
+  ##       Model   loglike Deviance Npars      AIC      BIC    Chisq df  p
+  ##   1 Model 1 -1954.888 3909.777    24 3957.777 4048.809 76.66491 11  0
+  ##   2 Model 2 -1916.556 3833.112    35 3903.112 4035.867       NA NA NA
 }
 }
 
@@ -101,4 +123,5 @@ anova( mod1 , mod2 )
 % R documentation directory.
 \keyword{Likelihood ratio test}
 \keyword{anova}
+\keyword{logLik}
 %%\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

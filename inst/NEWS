@@ -26,16 +26,80 @@ mailto:
 Alexander Robitzsch
 a.robitzsch@bifie.at
 
+For reporting a bug, please provide always a reproducible R script 
+and (if necessary) a corresponding dataset.
+
 URL:
 ----
-For tutorials see
-http://www.edmeasurementsurveys.com/TAM/Tutorials/
-
 For development versions see
 https://sites.google.com/site/alexanderrobitzsch/software
 
+For tutorials see
+http://www.edmeasurementsurveys.com/TAM/Tutorials/
+
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+-------------------------------------------------------
+Changes in Version 1.2   (2014-11-22)
+-------------------------------------------------------
+
+Features:
+* included fit of constrained facet parameters for output
+  of 'tam.mml.mfr'
+* included extended lavaan syntax 'lavaanify.IRT'. This
+  function was previously included in sirt package as
+  'lavaanify.sirt'. 
+* added argument 'gammaslope.center' in 'tam.mml.3pl' for 
+  centering item parameters within iterations in estimation 
+* included an argument of fixing person parameters in 'tam.jml'
+  (see tam.jml, Example 1)  
+* added S3 methods for fitted models in TAM: 
+  'logLik', 'IRT.likelihood', 'IRT.posterior', 'IRT.irfprob', 
+  'IRT.factor.scores'. These S3 methods were defined in the
+  recent version of the CDM (>= 4.0) package.
+
+Bug fixes:
+* improved model identification in 'tam.mml.mfr' in case
+  of differing number of categories per item and fixed
+  a bug in creating the A matrix (thanks to Michal Modzelewski). 
+* fixed a miscount of number of estimated parameters in
+  multiple group models (thanks to Michal Modzelewski). 
+* fixed incorrect handling of irtmodel="PCM2" in 'tam.mml'
+  for multidimensional models (thanks to Chen-Wei Liu)
+* fixed a bug in 'tam.jml2' when some item parameters were
+  fixed with the xsi.fixed argument
+* fixed a bug in fit calculation for tam.jml objects
+  (thanks to Hillary Ferral)
+
+Notes:
+* included Rcpp based version of item fit calculation to
+  reduce computational time
+* changed calculation of tam.fit in case of missing item responses
+  which substantially changes fit statistics especially for
+  faceted models.  
+* changed handling of simulating abilities in 'tam.fit'
+* included p values in output for fit statistics in 'tam.fit'
+* included estimation of Thurstonian thresholds for multidimensional
+  models 
+* added an example of a 2PL mixture distribution IRT model with
+  two latent classes (tam.mml.3pl, Simulated Example 8)
+* changed summary layout in 'tam.mml.3pl'
+* made item parameter estimation in 'tam.jml' more computationally
+  efficient
+* added anova method for 'tam.mml.3pl'
+* added value of the individual likelihood in 'tam.mml',
+  'tam.mml.2pl' and 'tam.mml.3pl'
+
+
+Datasets included or modified:
+* rating dataset data.exJ03 (provided by Matt Barney)
+
+Examples included or modified:
+* tam.fit (4), tam.threshold (2), tam.mml.3pl (7,8), lavaanify.IRT (1,2),
+  tam.jml (1,4), IRT.likelihood.tam (1), IRT.factor.scores (1),
+  IRT.irfprob (1)
 
 
 -------------------------------------------------------
@@ -70,7 +134,6 @@ Datasets included or modified:
 Examples included or modified:
 * tam.fit (4), tam.mml (17), tam.ctt (1)
 
-
 -------------------------------------------------------
 Changes in Version 1.0-3.18 (2014-09-08)
 -------------------------------------------------------
@@ -78,7 +141,7 @@ Changes in Version 1.0-3.18 (2014-09-08)
 Bug fixes:
 x modified incorrectly calculated thresholds with 'tam.threshold'
   for multidimensional models (reported by Janine Buchholz and
-  Jörg-Henrik Heine)
+  Joerg-Henrik Heine)
 
 Notes:
 x included SRMSR fit statistic in tam.modelfit
@@ -186,7 +249,7 @@ x added 'AXsi_' as value in tam.mml, tam.mml.2pl and tam.mml.mfr
 x cleaned labels in 'tam.mml.mfr' for faceted models
 x included the argument 'score.resp' in tam.wle for scoring
   a new dataset different than the one which is used for item
-  calibration in tam (requested by Jan Böhnke)
+  calibration in tam (requested by Jan Boehnke)
 x added examples for applying a sum constraint of item
   parameters in 'tam.mml' (request by Kelvin Gregory)
 x included argument 'adj' in tam.jml/tam.jml2 for modifying 

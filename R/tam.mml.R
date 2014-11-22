@@ -75,7 +75,10 @@ tam.mml <-
       con1a$snodes <- snodes <- 0
     }
     # define design matrix in case of PCM2
-    if (( irtmodel=="PCM2" ) & (is.null(Q)) & ( is.null(A)) ){ 
+#    if (( irtmodel=="PCM2" ) & (is.null(Q)) & ( is.null(A)) ){ 
+#      A <- .A.PCM2( resp ) 
+#    }  
+    if (( irtmodel=="PCM2" ) & ( is.null(A)) ){ 
       A <- .A.PCM2( resp ) 
     }  
     
@@ -728,7 +731,8 @@ tam.mml <-
     ic <- .TAM.ic( nstud , deviance , xsi , xsi.fixed ,
                    beta , beta.fixed , ndim , variance.fixed , G ,
                    irtmodel , B_orig=NULL , B.fixed , E , est.variance =TRUE ,
-                   resp , variance.Npars=variance.Npars )
+                   resp ,  est.slopegroups=NULL , 
+				   variance.Npars=variance.Npars , group )
     # cat("TAM.ic") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1			
     #***
     # calculate counts
@@ -836,6 +840,14 @@ tam.mml <-
     rownames(obji) <- dimnames(A)[[3]]	
     xsi <- obji
     
+	#**** calculate individual likelihood
+      res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=1+0*gwt , resp=resp , nitems=nitems , 
+                                   resp.ind.list=resp.ind.list , normalization=FALSE , 
+                                   thetasamp.density=thetasamp.density , snodes=snodes ,
+                                   resp.ind=resp.ind	)	
+      res.like <- res.hwt[["hwt"]] 	
+	
+	
     # Output list
     deviance.history <- deviance.history[ 1:iter , ]
     res <- list( "xsi" = xsi ,
@@ -857,7 +869,8 @@ tam.mml <-
                  "AXsi_" = - AXsi ,
                  "se.AXsi" = se.AXsi , 
                  "nstud" = nstud , "resp.ind.list" = resp.ind.list ,
-                 "hwt" = hwt , "ndim" = ndim ,
+                 "hwt" = hwt ,  "like" = res.like , 
+				 "ndim" = ndim ,
                  "xsi.fixed" = xsi.fixed , "beta.fixed" = beta.fixed , "Q" = Q  ,
                  "variance.fixed" = variance.fixed ,
                  "nnodes" = nnodes , "deviance" = deviance ,

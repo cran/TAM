@@ -71,11 +71,14 @@ designMatrices.mfr2 <-
     }
     
 # cat(" ---  before .A.matrix" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						
+
+
     
     # A Matrix
     if( is.null(A) ){
       AX <- .A.matrix2( resp, formulaA = formulaA, facets = facets, constraint = constraint ,
-                       progress=progress , Q = Q)					   
+                       progress=progress , Q = Q)			
+					   
       A <- AX$A; X <- AX$X; otherFacets <- AX$otherFacets
 	  xsi.elim <- AX$xsi.elim  
       xsi.constr <- AX$xsi.constr
@@ -90,6 +93,8 @@ designMatrices.mfr2 <-
 		Xnames.noStep <- gsub("-step([[:digit:]])*", "", rownames(X.noStep))
 
     }
+
+	
 #Revalprstr("X.noStep") 	
 # cat(" ---  created A matrix (I) " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     					
     # TK: 2014-03-12
@@ -134,6 +139,7 @@ designMatrices.mfr2 <-
     }	
 
 # cat(" ---  created B matrix " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						
+
 	
     # gresp
     ind.resp.cols <- as.numeric(X.ind)
@@ -194,13 +200,19 @@ designMatrices.mfr2 <-
       ) )
     }
     # generate B
-    .generateB.3d <- function(x){  
-      x2 <- array( 0 , c(nStep , nGenit/nStep , ncol(x) ) )
+    .generateB.3d <- function(x , diffK=FALSE){  
+	  #@@ ARb 2014-10-21
+		dim2 <- nGenit/nStep
+		dimnames2 <- unique(gsub("(^|-)+step([[:digit:]])*", "", rownames(x)))
+		dim2 <- length(dimnames2)
+  
+      x2 <- array( 0 , c(nStep , dim2 , ncol(x) ) )
       dimnames(x2) <- list( paste("_step",0:maxK, sep= ""), 
-                            unique(gsub("(^|-)+step([[:digit:]])*", "", rownames(x))),
+                            dimnames2 ,
                             colnames(x) )
+		#@@@@@						
       for (dd in seq(1 , ncol(x) ) ){
-        for (ss in 0:(nStep-1)){
+	  for (ss in 0:(nStep-1)){
           str.ss <- paste0("step",ss )
           iss <- grep(  paste0(str.ss,"+(-|$)") , rownames(x))# , fixed=TRUE )
           str.ss2 <- gsub( paste0("(^|-)+",str.ss) , "" , rownames(x)[iss] )
@@ -209,6 +221,38 @@ designMatrices.mfr2 <-
         }
       }
       x2 <- aperm( x2 , c(2,1,3) )
+	  #****
+      # handle differing number of categories
+	  maxK <- max( maxKi )
+      items.diffK <- which( maxKi < maxK )
+	  if ( length( items.diffK) == 0 ){
+	     diffK <- FALSE }
+	  if ( diffK ){
+		  for (ii in items.diffK ){
+		#	  ii <- 2	
+			  item.ii <- colnames(resp)[ii]
+			  Ki.ii <- maxKi[ii]
+			  ind1 <- grep( paste0( item.ii , "-") , dimnames(x2)[[1]] )
+			  ind2 <- grep( paste0( "step" ,  Ki.ii ) , dimnames(x2)[[2]] )
+			  ind3 <- grep( paste0( item.ii , ":") , dimnames(x2)[[3]] )
+			  ind3b <- grep( paste0( "step")  , dimnames(x2)[[3]] )
+			  ind3 <- intersect( ind3 , ind3b )
+			  if ( length(ind1)*length(ind2)*length(ind3) > 0 ){
+				   x2[ ind1 , ind2 , ind3 ] <- 0
+									}
+			 for (vv in seq( Ki.ii+1 , maxK)){ 
+				 # vv <- Ki.ii + 1 
+				 ind1 <- grep( paste0( item.ii , "-") , dimnames(x2)[[1]] )
+				 if ( length(grep("-",dimnames(x2)[[1]] )) == 0 ){
+					ind1 <- grep( paste0( item.ii ) , dimnames(x2)[[1]] )
+								}
+				 ind2 <- grep( paste0( "step" ,  vv ) , dimnames(x2)[[2]] )
+				 if ( length(ind1)*length(ind2) > 0 ){
+					   x2[ ind1 , ind2 , ] <- NA
+										}
+							}
+				}
+			}
       return(x2)
     }    
 # cat(" ---  before item rename" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    
@@ -291,10 +335,10 @@ designMatrices.mfr2 <-
     A.flat.0 <- A.flat <- A; A.flat.0[ind,] <- 0
 # cat("d300\n")
 # Revalpr("A.flat")	
-    A.3d <- .generateB.3d( A.flat )		# here occurs the problem if one works with a reduced expand.grid
+    A.3d <- .generateB.3d( A.flat , diffK=TRUE )		# here occurs the problem if one works with a reduced expand.grid	
 # cat("d400\n")	
     A.flat <- A.flat[!ind,]
-    A.3d.0 <- .generateB.3d( A.flat.0 )
+    A.3d.0 <- .generateB.3d( A.flat.0 , diffK=TRUE)
     # B                  
     B.flat.0 <- B.flat <- B; B.flat.0[ind,] <- 0
     B.3d <- .generateB.3d( B.flat )

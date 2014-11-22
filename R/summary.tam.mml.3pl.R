@@ -21,7 +21,7 @@ summary.tam.mml.3pl <- function( object , file = NULL , ...){
 	
 	ctr <- object$control
 	cat("Skill space:" , ifelse(object$skillspace=="normal" ,
-			"Normal Distributrion", "Discrete Distribution" ) , "\n")
+			"Normal Distribution", "Discrete Distribution" ) , "\n")
 	
 	if (object$skillspace=="normal"){	
 		if (ctr$snodes==0){
@@ -74,7 +74,8 @@ summary.tam.mml.3pl <- function( object , file = NULL , ...){
 		
 	#***********************
 	# summary distribution: normal distribution
-		
+	PK <- ncol( object$theta)
+	
 	if (object$skillspace == "normal"){	
 		cat("------------------------------------------------------------\n")
 			cat("EAP Reliability\n")
@@ -119,16 +120,34 @@ summary.tam.mml.3pl <- function( object , file = NULL , ...){
 			colnames(obji) <- paste0("Group" , 1:object$G)
 			print( obji )		
 			TP <- nrow(obji)
-			
+	
+	
+	
+if ( PK < 10 ){	
 		cat("------------------------------------------------------------\n")
-			cat("Trait distribution\n")
+			cat("Full Trait distribution\n")
 			obji <- round( object$pi.k , 4 )			
 			colnames(obji) <- paste0("Group" , 1:object$G)
 			if ( TP < 100 ){
 				print( obji )				
 							}
+    cat("------------------------------------------------------------\n")
+	cat("Moments of Trait Distribution\n")
+	obji <- object$pi.k
+	cat( "\nM Trait:\n" ) 
+	print( round( t(object$moments$mean.trait ), 3 ) ) 
+	cat( "\nSD Trait:\n" ) 
+	print( round( t(object$moments$sd.trait ), 3 ) ) 
+	cat( "\nSkewness Trait:\n" ) 
+	print( round( t(object$moments$skewness.trait ), 3 ) ) 	
+					cat( "\nCorrelations Trait: \n" )
+					for (gg in 1:object$G){
+						cat("Group" , gg , "\n")
+						print( round( object$moments$correlation.trait[[gg]] , 3 ) )
+								}
+						}
 					}
-			
+if (PK < 10 ){ 			
 	cat("------------------------------------------------------------\n")		
 		cat("Item Parameters -A*Xsi\n")
 #		cat("   Item difficulties -A*Xsi are displayed in 'AXsi_'! \n\n")
@@ -151,6 +170,26 @@ summary.tam.mml.3pl <- function( object , file = NULL , ...){
 		for (vv in seq(1,ncol(obji) ) ){ obji[,vv] <- round( obji[,vv] , 3) }
 		print(obji)
 			}
+		} else {  # PK >= 10
+	cat("------------------------------------------------------------\n")		
+	if (( object$maxK > 2 ) | ( object$printxsi) ){
+		cat("\nItem Parameters Xsi\n")
+#		cat("   Item difficulties -A*Xsi are displayed in 'AXsi_'! \n\n")
+		obji <- object$xsi
+#		obji[,1] <- obji[,-1]
+		for (vv in seq(1,ncol(obji) ) ){ obji[,vv] <- round( obji[,vv] , 3) }
+		print(obji)
+			}
+		cat("\nGammaslope Parameters\n")
+		obji <- object$gammaslope
+		print(round(obji,3)  )   			
+		cat("\nGuessing Parameters\n")
+		obji <- object$item$guess
+		names(obji) <- colnames(object$resp)
+		print(round(obji,3)  )   					
+		
+		
+		}
 					
 	#******
 	if ( ! is.null( file ) ){

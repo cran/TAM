@@ -16,7 +16,7 @@ Modules for psychometric test analysis demonstrated
   with the help of artificial example data. 
   The package includes MML and JML estimation of 
   uni- and multidimensional IRT (Rasch,  2PL, Generalized Partial 
-  Credit, Rating Scale, Multi Facets) 
+  Credit, Rating Scale, Multi Facets, Nominal Item Response) 
   models, fit statistic computation, standard error estimation, as 
   well as plausible value imputation and weighted likelihood
   estimation of ability. 
@@ -91,7 +91,8 @@ tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
      the ConQuest parametrization \code{'item+step'}). \cr
      For estimated item slopes (in \code{tam.mml.2pl})
      options are \code{2PL} (all slopes of item categories
-     are estimated), \code{GPCM} (generalized partial credit
+     are estimated; Nominal Item Response Model), 
+     \code{GPCM} (generalized partial credit
      model in which every item gets one and only slope
      parameter per dimension) and \code{2PL.groups}
      (subsets of items get same item slope estimates)
@@ -408,6 +409,7 @@ are displayed.
 \item{nstud}{Number of persons}
 \item{resp.ind.list}{List of response indicator vectors}
 \item{hwt}{Individual posterior distribution}
+\item{like}{Individual likelihood}
 \item{ndim}{Number of dimensions}
 \item{xsi.fixed}{Fixed \eqn{\xi} parameters}
 \item{B.fixed}{Fixed loading parameters (only applies to \code{tam.mml.2pl})}
@@ -429,10 +431,11 @@ credit model (only applies to \code{tam.mml.2pl} in case of
 \item{ic}{Vector with information criteria}
 \item{deviance.history}{Deviance history in iterations}
 \item{control}{List of control arguments}
-% \item{design}{Output produced by \code{designMatrices} or
-% \code{designMatrices.mfr}}
 \item{\dots}{Further values}
 }
+
+% \item{design}{Output produced by \code{designMatrices} or
+% \code{designMatrices.mfr}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% REFERENCES
@@ -494,11 +497,14 @@ Use \code{\link{tam.se}} for improved standard errors.
 
 For model comparisons see \code{\link{anova.tam}}.
 
+See \code{\link[sirt:tam2mirt]{tam2mirt}} (\pkg{sirt}) for converting
+\code{tam} objects into objects of class 
+\code{\link[mirt:mirt]{mirt}} in the \pkg{mirt} package.
+
+\code{\link{logLik.tam}}, \code{\link{anova.tam}}
 }
 
-%See \code{\link[sirt:tam2mirt]{tam2mirt}} (\pkg{sirt}) for converting
-%\code{tam} objects into objects of class 
-%\code{\link[mirt:mirt]{mirt}} in the \pkg{mirt} package.
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -766,7 +772,7 @@ mod5$B
 #############################################################################
 data( data.gpcm )
 
-# Ex6.1: 2PL model
+# Ex6.1: Nominal response model (irtmodel="2PL")
 mod6_1 <- tam.mml.2pl( resp=data.gpcm , irtmodel="2PL" , control=list( maxiter=200) )
 mod6_1$item # item intercepts
 mod6_1$B    # for every category a separate slope parameter is estimated

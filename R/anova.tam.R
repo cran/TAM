@@ -1,9 +1,14 @@
 ##############################################################
 # Likelihood ratio test for tam objects
 # Function is copied from the CDM package
-anova.tam <- function( object , object1 , ... ){ 
-	model1 <- object
-	model2 <- object1
+anova.tam <- function( object , ... ){
+    if (length(list(object, ...)) != 2){ 
+        stop("anova method can only be applied for comparison of two models.\n")		
+		}
+	objects <- list(object, ...)
+	model1 <- objects[[1]]
+	model2 <- objects[[2]]
+
 	# define some necessary parameters
 	model1$AIC <- model1$ic$AIC
 	model1$BIC <- model1$ic$BIC
@@ -41,3 +46,4 @@ anova.tam <- function( object , object1 , ... ){
 ##############################################################
 
 anova.tam.mml <- anova.tam
+anova.tam.mml.3pl <- anova.tam.mml

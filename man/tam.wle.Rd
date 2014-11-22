@@ -24,7 +24,7 @@ tam.mml.wle(tamobj, score.resp=NULL, WLE=TRUE, adj=0.3, Msteps=20, convM=1e-04)
 tam.mml.wle2(tamobj, score.resp=NULL, WLE=TRUE, adj=0.3, Msteps=20, convM=1e-04)
 
 tam.jml.WLE(tamobj, resp, resp.ind, A, B, nstud, nitems, maxK, convM, 
-    PersonScores, theta, xsi, Msteps, WLE=FALSE)
+    PersonScores, theta, xsi, Msteps, WLE=FALSE, theta.fixed = NULL)
 }
 
 \arguments{
@@ -73,6 +73,9 @@ tam.jml.WLE(tamobj, resp, resp.ind, A, B, nstud, nitems, maxK, convM,
 }
 \item{xsi}{Parameter vector \eqn{\xi} (applies only to \code{tam.jml.WLE})
 }
+\item{theta.fixed}{Matrix for fixed person parameters \eqn{theta}. The first
+	column includes the index whereas the second column includes
+the fixed value.}
 \item{\dots}{Further arguments to be passed}
 }
 
@@ -125,8 +128,8 @@ data(sim.rasch)
 mod1 <- tam.mml(resp=sim.rasch) 
 # WLE estimation
 wle1 <- tam.wle( mod1 )
-## ----
-## WLE Reliability = 0.894 
+  ## ----
+  ## WLE Reliability = 0.894 
 
 # scoring for a different dataset containing same items (first 10 persons in 
 #  sim.rasch)
@@ -149,14 +152,14 @@ Q[ cbind( 1:12 , rep(1:3,each=4) ) ] <- 1
 resp <- data.read
 resp[1:2 , 5:12] <- NA
 resp[3,1:4] <- NA
-##   > head(resp)
-##      A1 A2 A3 A4 B1 B2 B3 B4 C1 C2 C3 C4
-##   2   1  1  1  1 NA NA NA NA NA NA NA NA
-##   22  1  1  0  0 NA NA NA NA NA NA NA NA
-##   23 NA NA NA NA  1  0  1  1  1  1  1  1
-##   41  1  1  1  1  1  1  1  1  1  1  1  1
-##   43  1  0  0  1  0  0  1  1  1  0  1  0
-##   63  1  1  0  0  1  0  1  1  1  1  1  1
+  ##   > head(resp)
+  ##      A1 A2 A3 A4 B1 B2 B3 B4 C1 C2 C3 C4
+  ##   2   1  1  1  1 NA NA NA NA NA NA NA NA
+  ##   22  1  1  0  0 NA NA NA NA NA NA NA NA
+  ##   23 NA NA NA NA  1  0  1  1  1  1  1  1
+  ##   41  1  1  1  1  1  1  1  1  1  1  1  1
+  ##   43  1  0  0  1  0  0  1  1  1  0  1  0
+  ##   63  1  1  0  0  1  0  1  1  1  1  1  1
 
 # estimate 3-dimensional Rasch model
 mod <- tam.mml( resp=resp , Q=Q , control=list(snodes=1000,maxiter=50) )
@@ -165,31 +168,31 @@ summary(mod)
 # WLE estimates
 wmod <- tam.wle(mod , Msteps=3)
 summary(wmod)
-##   head(round(wmod,2))
-##      pid N.items PersonScores.Dim01 PersonScores.Dim02 PersonScores.Dim03
-##   2    1       4                3.7                0.3                0.3
-##   22   2       4                2.0                0.3                0.3
-##   23   3       8                0.3                3.0                3.7
-##   41   4      12                3.7                3.7                3.7
-##   43   5      12                2.0                2.0                2.0
-##   63   6      12                2.0                3.0                3.7
-##      PersonMax.Dim01 PersonMax.Dim02 PersonMax.Dim03 theta.Dim01 theta.Dim02
-##   2              4.0             0.6             0.6        1.06          NA
-##   22             4.0             0.6             0.6       -0.96          NA
-##   23             0.6             4.0             4.0          NA       -0.07
-##   41             4.0             4.0             4.0        1.06        0.82
-##   43             4.0             4.0             4.0       -0.96       -1.11
-##   63             4.0             4.0             4.0       -0.96       -0.07
-##      theta.Dim03 error.Dim01 error.Dim02 error.Dim03 WLE.rel.Dim01
-##   2           NA        1.50          NA          NA          -0.1
-##   22          NA        1.11          NA          NA          -0.1
-##   23        0.25          NA        1.17        1.92          -0.1
-##   41        0.25        1.50        1.48        1.92          -0.1
-##   43       -1.93        1.11        1.10        1.14          -0.1
+  ##   head(round(wmod,2))
+  ##      pid N.items PersonScores.Dim01 PersonScores.Dim02 PersonScores.Dim03
+  ##   2    1       4                3.7                0.3                0.3
+  ##   22   2       4                2.0                0.3                0.3
+  ##   23   3       8                0.3                3.0                3.7
+  ##   41   4      12                3.7                3.7                3.7
+  ##   43   5      12                2.0                2.0                2.0
+  ##   63   6      12                2.0                3.0                3.7
+  ##      PersonMax.Dim01 PersonMax.Dim02 PersonMax.Dim03 theta.Dim01 theta.Dim02
+  ##   2              4.0             0.6             0.6        1.06          NA
+  ##   22             4.0             0.6             0.6       -0.96          NA
+  ##   23             0.6             4.0             4.0          NA       -0.07
+  ##   41             4.0             4.0             4.0        1.06        0.82
+  ##   43             4.0             4.0             4.0       -0.96       -1.11
+  ##   63             4.0             4.0             4.0       -0.96       -0.07
+  ##      theta.Dim03 error.Dim01 error.Dim02 error.Dim03 WLE.rel.Dim01
+  ##   2           NA        1.50          NA          NA          -0.1
+  ##   22          NA        1.11          NA          NA          -0.1
+  ##   23        0.25          NA        1.17        1.92          -0.1
+  ##   41        0.25        1.50        1.48        1.92          -0.1
+  ##   43       -1.93        1.11        1.10        1.14          -0.1
 
-## (1) Note that estimated WLE reliabilities are not trustworthy in this example.
-## (2) If cases do not possess any observations on dimensions, then WLEs
-##     and their corresponding standard errors are set to NA.
+# (1) Note that estimated WLE reliabilities are not trustworthy in this example.
+# (2) If cases do not possess any observations on dimensions, then WLEs
+#     and their corresponding standard errors are set to NA.
 }
 }
 

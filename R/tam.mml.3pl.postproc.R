@@ -3,9 +3,9 @@
 .mml.3pl.TAM.ic <- function( nstud , deviance , xsi , xsi.fixed ,
 	beta , beta.fixed , ndim , variance.fixed , G , irtmodel ,
 	B_orig=NULL , B.fixed , E , est.variance , resp ,
-	est.slopegroups=NULL , skillspace , delta , est.guess , fulldesign ,
+	est.slopegroups=NULL , skillspace , delta , delta.fixed , est.guess , fulldesign ,
 	est.some.slopes , gammaslope , gammaslope.fixed, gammaslope.constr.V ,
-	gammaslope.constr.Npars ){
+	gammaslope.constr.Npars , gammaslope.center.index  ){
   #***Model parameters
   ic <- data.frame("n" = nstud , "deviance" = deviance )
   dev <- deviance
@@ -25,8 +25,10 @@
 		ic$NparsB <- ic$NparsB - nrow(gammaslope.fixed )
 					}
 	ic$NparsB <- ic$NparsB - gammaslope.constr.Npars
+	if ( ! is.null(gammaslope.center.index ) ){
+		ic$NparsB <- ic$NparsB - max( gammaslope.center.index )
 	
-	
+						}	
 	# beta regression parameters
 	ic$Nparsbeta <- 0
 	ic$Nparscov <- 0
@@ -47,7 +49,12 @@
         if ( fulldesign ){ 
              ic$Ndelta <- ic$Ndelta - ncol(delta)
 							}
-							} else { ic$Ndelta <- 0 }
+             if ( ! is.null( delta.fixed ) ){							
+				ic$Ndelta <- ic$Ndelta - nrow(delta.fixed )
+									}			 							
+							} else { 
+			ic$Ndelta <- 0 
+						}
 	# total number of parameters
 	ic$Npars <- ic$np <- ic$Nparsxsi + ic$NparsB + ic$Nparsbeta + ic$Nparscov + 
 		          ic$Nguess + ic$Ndelta	

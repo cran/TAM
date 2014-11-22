@@ -1,7 +1,8 @@
 tam.jml <-
 function( resp , group = NULL , adj=.3 , disattenuate = FALSE ,
                      bias = TRUE, xsi.fixed=NULL ,  xsi.inits = NULL ,  
-                     A=NULL , B=NULL , Q=NULL , ndim=1 ,
+					 theta.fixed=NULL , 
+                     A=NULL , B=NULL , Q=NULL , ndim=1 ,					
                      pweights = NULL , control = list() 
                      # control can be specified by the user 
 ){
@@ -151,6 +152,10 @@ function( resp , group = NULL , adj=.3 , disattenuate = FALSE ,
   
   #Initialise theta (WLE) values for all students
   theta <- log(PersonScores/(PersonMaxB-PersonScores)) #log of odds ratio of raw score
+  if ( ! is.null( theta.fixed ) ){
+	theta[ theta.fixed[,1] ] <- theta.fixed[,2]
+							}
+  
   
   deviance <- 0  
   deviance.history <- matrix( 0 , nrow=maxiter , ncol = 2)
@@ -175,13 +180,15 @@ function( resp , group = NULL , adj=.3 , disattenuate = FALSE ,
     }
     olddeviance <- deviance
     
+	#**********************
     #update theta, ability estimates
     
 #    jmlAbility <- tam.jml.WLE ( resp , resp.ind, A, B, nstud, nitems, maxK, convM, 
 #                                PersonScores, theta, xsi, Msteps, WLE=FALSE)
 
 	jmlAbility <- tam.jml.WLE( tamobj, resp , resp.ind, A, B, nstud, nitems, maxK, convM, 
-				 PersonScores, theta, xsi, Msteps, WLE=FALSE )								
+				 PersonScores, theta, xsi, Msteps, WLE=FALSE ,
+				 theta.fixed=theta.fixed)								
 															
     theta <- jmlAbility$theta
     if (is.null( xsi.fixed))  theta <- theta - mean(theta)
@@ -227,10 +234,13 @@ function( resp , group = NULL , adj=.3 , disattenuate = FALSE ,
   }# end of all convergence 
   
   #After convergence, compute final WLE (WLE set to TRUE)
+  
   jmlWLE <- tam.jml.WLE ( tamobj , resp , resp.ind, A, B, nstud, nitems, maxK, convM, 
-                          PersonScores, theta, xsi, Msteps, WLE=TRUE)
+                          PersonScores, theta, xsi, Msteps, WLE=TRUE ,
+						  theta.fixed=theta.fixed )
 						  
   thetaWLE <- jmlWLE$theta[,1]
+
   meanChangeWLE <- jmlWLE$meanChangeWLE
   errorWLE <- jmlWLE$errorWLE
   

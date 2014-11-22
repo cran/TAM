@@ -139,10 +139,10 @@ boxplot(pv1b$pv[ , 2:6 ] )
 
 data(data.pisaRead, package="sirt")
 dat <- data.pisaRead$data
-##   > colnames(dat)
-##    [1] "idstud"   "idschool" "female"   "hisei"    "migra"    "R432Q01" 
-##    [7] "R432Q05"  "R432Q06"  "R456Q01"  "R456Q02"  "R456Q06"  "R460Q01" 
-##   [13] "R460Q05"  "R460Q06"  "R466Q02"  "R466Q03"  "R466Q06" 
+  ##   > colnames(dat)
+  ##    [1] "idstud"   "idschool" "female"   "hisei"    "migra"    "R432Q01" 
+  ##    [7] "R432Q05"  "R432Q06"  "R456Q01"  "R456Q02"  "R456Q06"  "R460Q01" 
+  ##   [13] "R460Q05"  "R460Q06"  "R466Q02"  "R466Q03"  "R466Q06" 
 
 ## Note that reading items have variable names starting with R4
 

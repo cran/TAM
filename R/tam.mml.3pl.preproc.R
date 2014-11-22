@@ -76,17 +76,21 @@
 	   TP <- nrow(theta)	   	   
 	   Fdes <- array( 0 , dim=c(I , maxK , TP , Ngam ) )
 	   ttheta <- t(theta)
+
        for (pp in 1:Ngam){
 	   for (cc in 1:maxK){
          if (D==1){		
 			Fdes[,cc,,pp] <- E[ , cc , , pp , drop=FALSE] %*% ttheta
 							}
          if (D >1){
-			E.cc.pp <- E[ , cc , , pp ]				
+			E.cc.pp <- E[ , cc , , pp  ]
+		  #***** Fdes <- array( 0 , dim=c(I , maxK , TP , Ngam ) )
 			Fdes[,cc,,pp] <- E.cc.pp %*% ttheta
+			# Fdes[,cc,,pp] <- E.cc.pp %*% ttheta
 							}							
 						}
 					}
+					
       return(Fdes)
 		}
 

@@ -9,7 +9,7 @@ Q3 and Adjusted Q3 Statistic and Further Model Fit Statistics
 This function computes the Q3 statistic (Yen, 1984) and an
 adjusted variant of it (see Details). In addition,
 some effect sizes of model fit (\code{MADaQ3}, \eqn{MADRESIDCOV},
-\eqn{SRMR}) are implemneted.
+\eqn{SRMR}) are implemented.
 }
 
 

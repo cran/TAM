@@ -3,9 +3,10 @@
 .TAM.ic <- function( nstud , deviance , xsi , xsi.fixed ,
 	beta , beta.fixed , ndim , variance.fixed , G , irtmodel ,
 	B_orig=NULL , B.fixed , E , est.variance , resp ,
-		est.slopegroups=NULL , variance.Npars=NULL ){
+		est.slopegroups=NULL , variance.Npars=NULL , group ){
 	# 2PL estimation
 	# c("2PL","GPCM","GPCM.design","2PL.groups") )	
+# Revalpr( "unique(group)")
   #***Model parameters
   ic <- data.frame("n" = nstud , "deviance" = deviance )
   dev <- deviance
@@ -48,7 +49,9 @@
 	if ( ! is.null(variance.Npars) ){
 	       ic$Nparscov <- variance.Npars 
 						}
-									
+	if ( ! is.null(group) ){
+	     ic$Nparscov <- ic$Nparscov + length( unique(group) ) - 1
+							}
 	# total number of parameters
 	ic$Npars <- ic$np <- ic$Nparsxsi + ic$NparsB + ic$Nparsbeta + ic$Nparscov
     	# AIC

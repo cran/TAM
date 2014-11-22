@@ -7,6 +7,7 @@
 \alias{data.ex12}
 \alias{data.ex14}
 \alias{data.ex15}
+\alias{data.exJ03}
 
 
 \docType{data}
@@ -24,6 +25,7 @@ data(data.ex11)
 data(data.ex12)
 data(data.ex14)
 data(data.ex15)
+data(data.exJ03)
 }
 
 \format{
@@ -117,6 +119,23 @@ has the following format:
 This dataset shows an atypical convergence behavior. Look at Example 15
 to fix convergence problems using arguments \code{increment.factor} and
 \code{fac.oldxsi}. \cr
+
+%% Example data.exJ03
+\item Data \code{data.exJ03} for Example 4 in \code{\link{tam.jml}} 
+has the following format:
+\code{List of 2} \cr
+\code{ $ resp:'data.frame':   40 obs. of  20 variables:} \cr
+\code{  ..$ I104: int [1:40] 4 5 6 5 3 4 3 5 4 6 ...} \cr
+\code{  ..$ I118: int [1:40] 6 4 6 5 3 2 5 3 5 4 ...} \cr
+\code{[...]}
+\code{  ..$ I326: int [1:40] 6 1 5 1 4 2 4 1 6 1 ...} \cr
+\code{  ..$ I338: int [1:40] 6 2 6 1 6 2 4 1 6 1 ...} \cr
+\code{ $ X   :'data.frame':   40 obs. of  4 variables:} \cr
+\code{  ..$ rater : int [1:40] 40 40 96 96 123 123 157 157 164 164 ...} \cr
+\code{  ..$ gender: int [1:40] 2 2 1 1 1 1 2 2 2 2 ...} \cr
+\code{  ..$ region: num [1:40] 1 1 1 1 2 2 1 1 1 1 ...} \cr
+\code{  ..$ leader: int [1:40] 1 2 1 2 1 2 1 2 1 2 ...} \cr
+It is a rating dataset (a subset of a dataset provided by Matt Barney). \cr
 
 } %% end itemize
 }

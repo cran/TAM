@@ -102,7 +102,7 @@ tam.jml.fit <-
     infitItem_t <- (infitItem^(1/3) - 1) * (3/sqrt(var_infit)) + sqrt(var_infit)/3
     
     # collect item statistics
-    fit.item <- data.frame("xsi.label" = dimnames(A)[[3]] , "outfitItem" = outfitItem , 
+    fit.item <- data.frame("item" = colnames(tamobj$resp) , "outfitItem" = outfitItem , 
                            "outfitItem_t" = outfitItem_t, "infitItem" = infitItem , 
                            "infitItem_t" = infitItem_t)
     

@@ -73,7 +73,8 @@
     # cat(" +++  v110" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     								  	
 	g2 <- g1 <- expand.grid(expand.list)
 	diffK <- ( sd( maxKi) > 0 )
-	diffK <- FALSE
+	# diffK <- FALSE
+	diffK <- TRUE
 	# reduced combinations of items
 	if (diffK){	
 		I <- length(maxKi)
@@ -164,12 +165,17 @@
 	  
       for( sg in stepgroups ){
 #         sg <- stepgroups[2]
-#Revalpr("sg")		
-		mm1 <- mm[ grep(sg, rownames(mm)) ,]		
-       mm.sg.temp <- rbind( 0, apply( mm[ grep(sg, rownames(mm)) ,], 2, cumsum ) )
-        
+		mm1 <- mm[ grep(sg, rownames(mm)) ,]
+	   ind2 <- grep(sg, rownames(mm))
+#	   if (length(ind2)>0){
+          mm.sg.temp <- rbind( 0, apply( mm[ ind2 ,,drop=FALSE], 2, cumsum ) )
+#						}	
+	if ( is.null(rownames(mm.sg.temp)) ){
+		rownames(mm.sg.temp) <- paste0("rn" , seq(0,nrow(mm.sg.temp)-1) )
+								}
         # substitute the following line later if ...
         rownames(mm.sg.temp)[1] <- gsub("step([[:digit:]])*", "step0", sg, fixed=T)
+		rownames(mm.sg.temp)[-1] <- rownames(mm[ind2,,drop=FALSE])
 		#****
 		# set entries to zero if there are no categories in data
 		sg1 <- strsplit( sg , split= "-")[[1]]
@@ -198,12 +204,8 @@
 							
 							
 						}
-					}
-# Revalpr("maxKi[ii]")
-# Revalpr("mm.sg.temp")
-					
+					}				
 			A <- rbind(A, mm.sg.temp)
-# Revalpr("A")			
 		if ( maxKi[ii] < maxK ){
 		for (kk in (maxKi[ii]+1):maxK){
 			vv <- paste0( sg1[1] , "-step" , kk ) 
@@ -243,6 +245,7 @@
       
     }# end step in fvars
 
+	
 	#***
 	# set entries in A to zero for constraints
 	A[ rowMeans(is.na(A)) < 1 , xsi.elim ] <- 0
@@ -254,6 +257,9 @@
     A <- A[ ! duplicated( rownames(A) ) , ]
     A <- A[order(rownames(A)), ,drop = FALSE]      
     X.out <- X.out[order(rownames(X.out)), ,drop = FALSE]
+
+	
+	
 	
 	#*** elimination
 	if ( ! is.null(xsi.elim) ){

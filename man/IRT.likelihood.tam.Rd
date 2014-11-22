@@ -1,0 +1,92 @@
+\name{IRT.likelihood}
+
+\alias{IRT.likelihood.tam}
+\alias{IRT.likelihood.tam.mml}
+\alias{IRT.likelihood.tam.mml.3pl}
+
+\alias{IRT.posterior.tam}
+\alias{IRT.posterior.tam.mml}
+\alias{IRT.posterior.tam.mml.3pl}
+
+
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{
+Extracting Individual Likelihood and Individual Posterior
+}
+
+
+\description{
+Extracts individual likelihood and posterior for models
+fitted in \pkg{TAM}. See \code{\link[CDM:IRT.likelihood]{IRT.likelihood}} 
+(\pkg{CDM}) for more details.
+}
+
+
+\usage{
+\method{IRT.likelihood}{tam}(object, \dots)
+\method{IRT.likelihood}{tam.mml}(object, \dots)
+\method{IRT.likelihood}{tam.mml.3pl}(object, \dots)
+
+\method{IRT.posterior}{tam}(object, \dots)
+\method{IRT.posterior}{tam.mml}(object, \dots)
+\method{IRT.posterior}{tam.mml.3pl}(object, \dots)
+}
+
+
+
+\arguments{
+  \item{object}{
+Object of class \code{\link{tam}}, \code{\link{tam.mml}}
+or \code{\link{tam.mml.3pl}}.
+}
+\item{\dots}{Further arguments to be passed}
+}
+
+
+%\details{
+%%  ~~ If necessary, more details than the description above ~~
+%}
+
+
+\value{
+See \code{\link[CDM:IRT.likelihood]{IRT.likelihood}} (\pkg{CDM}).
+}
+
+
+%\references{
+%% ~put references to the literature/web site here ~
+%}
+%\author{
+%% Alexander Robitzsch
+%}
+%\note{
+%%  ~~further notes~~
+%}
+
+%% ~Make other sections like Warning with \section{Warning }{....} ~
+
+%\seealso{
+%% ~~objects to See Also as \code{\link{help}}, ~~~
+%}
+
+
+\examples{
+#############################################################################
+# EXAMPLE 1: Dichotomous data sim.rasch - extracting likelihood/posterior
+#############################################################################
+	
+data(sim.rasch)
+# 1PL estimation
+mod1 <- tam.mml(resp=sim.rasch)
+lmod1 <- IRT.likelihood(mod1)
+str(lmod1)
+pmod1 <- IRT.posterior(mod1)
+str(pmod1)
+}
+
+
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{Individual likelihood}
+\keyword{Individual posterior}
+%%\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

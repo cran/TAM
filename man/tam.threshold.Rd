@@ -23,7 +23,8 @@ The default is \code{prob.lvl=0.5}.
 }
 
 \details{
-This function only supports unidimensional models.
+This function only works appropriately for unidimensional models
+or between item multidimensional models.
 }
 
 \value{
@@ -57,18 +58,42 @@ data( data.gpcm )
 # Model 1: partial credit model
 mod1 <- tam.mml( resp=data.gpcm ,control=list( maxiter=200) )
 summary(mod1)
-##   Item Parameters -A*Xsi
-##        item   N     M AXsi_.Cat1 AXsi_.Cat2 AXsi_.Cat3 B.Cat1.Dim1 B.Cat2.Dim1 B.Cat3.Dim1
-##   1 Comfort 392 0.880     -1.302      1.154      3.881           1           2           3
-##   2    Work 392 1.278     -1.706     -0.847      0.833           1           2           3
-##   3 Benefit 392 1.163     -1.233     -0.404      1.806           1           2           3
+  ##   Item Parameters -A*Xsi
+  ##        item   N     M AXsi_.Cat1 AXsi_.Cat2 AXsi_.Cat3 B.Cat1.Dim1 B.Cat2.Dim1 B.Cat3.Dim1
+  ##   1 Comfort 392 0.880     -1.302      1.154      3.881           1           2           3
+  ##   2    Work 392 1.278     -1.706     -0.847      0.833           1           2           3
+  ##   3 Benefit 392 1.163     -1.233     -0.404      1.806           1           2           3
 
 # Calculation of Thurstonian thresholds
 tam.threshold(mod1)
-##                Cat1      Cat2     Cat3
-##   Comfort -1.325226 2.0717468 3.139801
-##   Work    -1.777679 0.6459045 1.971222
-##   Benefit -1.343536 0.7491760 2.403168
+  ##                Cat1      Cat2     Cat3
+  ##   Comfort -1.325226 2.0717468 3.139801
+  ##   Work    -1.777679 0.6459045 1.971222
+  ##   Benefit -1.343536 0.7491760 2.403168
+
+\dontrun{
+#############################################################################
+# EXAMPLE 2: Multidimensional model data.math
+#############################################################################
+	
+library(sirt)
+data(data.math, package="sirt")
+dat <- data.math$data
+# select items
+items1 <- grep("M[A-D]" , colnames(dat) , value=TRUE)
+items2 <- grep("M[H-I]" , colnames(dat) , value=TRUE)
+# select dataset
+dat <- dat[ c(items1,items2)]
+# create Q-matrix
+Q <- matrix( 0 , nrow=ncol(dat) , ncol=2 )
+Q[ seq(1,length(items1) ) , 1 ] <- 1
+Q[ length(items1) + seq(1,length(items2) ) , 2 ] <- 1
+
+# fit two-dimensional model
+mod1 <- tam.mml( dat , Q=Q )
+# compute thresholds (specify a probability level of .625)
+tmod1 <- tam.threshold( mod1  , prob.lvl = .625 )
+}	
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

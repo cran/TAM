@@ -16,7 +16,7 @@ item response models with joint maximum likelihood (JML,
 
 \usage{
 tam.jml(resp, group = NULL, adj = .3, disattenuate = FALSE, bias = TRUE, 
-    xsi.fixed = NULL, xsi.inits = NULL, A = NULL, B = NULL, Q = NULL, 
+    xsi.fixed = NULL, xsi.inits = NULL, theta.fixed=NULL, A = NULL, B = NULL, Q = NULL, 
     ndim = 1, pweights = NULL, control = list())
 
 tam.jml2(resp, group = NULL, adj = .3 , disattenuate = FALSE, bias = TRUE, 
@@ -63,6 +63,9 @@ scores (score of zero or maximum score. The default is a value of 0.3}
      all parameters must be specified and the vector is not of the
      same format as \code{xsi.fixed}.
 }
+\item{theta.fixed}{Matrix for fixed person parameters \eqn{theta}. The first
+	column includes the index whereas the second column includes
+the fixed value. This argument only applies to \code{tam.jml}.}
   \item{A}{
      A design array \eqn{A} for item category intercepts.
      For item \eqn{i} and category \eqn{k}, the threshold is
@@ -123,14 +126,6 @@ A list with following entries
 \item{ItemScore}{Sufficient statistic for each item parameter}
 \item{PersonMax}{Maximum person score}
 \item{ItemMax}{Maximum item score}
-%\item{outfitPerson}{Person outfit statistic}
-%\item{outfitItem}{Item outfit statistic}
-%\item{infitPerson}{Person infit statistic}
-%\item{infitItem}{Item infit statistic}
-%\item{outfitPerson_t}{The \eqn{t} value of person outfit}
-%\item{outfitItem_t}{The \eqn{t} value of item outfit}
-%\item{infitPerson_t}{The \eqn{t} value of person infit}
-%\item{infitItem_t}{The \eqn{t} value of item infit}
 \item{deviance}{Deviance}
 \item{deviance.history}{Deviance history in iterations}
 \item{resp}{Original data frame}
@@ -148,6 +143,15 @@ A list with following entries
 \item{\dots}{}
 }
 
+%\item{outfitPerson}{Person outfit statistic}
+%\item{outfitItem}{Item outfit statistic}
+%\item{infitPerson}{Person infit statistic}
+%\item{infitItem}{Item infit statistic}
+%\item{outfitPerson_t}{The \eqn{t} value of person outfit}
+%\item{outfitItem_t}{The \eqn{t} value of item outfit}
+%\item{infitPerson_t}{The \eqn{t} value of person infit}
+%\item{infitItem_t}{The \eqn{t} value of item infit}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% REFERENCES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -162,9 +166,11 @@ Chicago: MESA Press.
 %%  ~~who you are~~
 %}
 
-%\note{
-%%  ~~further notes~~
-%}
+\note{
+This joint maximum likelihood estimation procedure should be 
+compatible with Winsteps and Facets software, see also
+\url{http://www.rasch.org/software.htm}.
+}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
@@ -206,20 +212,36 @@ lines( c(-5,5) , c(-5,5) , col="gray" )
 mod1d <- tam.jml2(resp=resp , adj=.05)
 # compare item parameters
 round( rbind( mod1b$xsi , mod1d$xsi ) , 3 )
-##          [,1]   [,2]   [,3]   [,4]   [,5]  [,6]  [,7]  [,8]  [,9] [,10]
-##   [1,] -2.076 -1.743 -1.217 -0.733 -0.338 0.147 0.593 1.158 1.570 2.091
-##   [2,] -2.105 -1.766 -1.233 -0.746 -0.349 0.139 0.587 1.156 1.574 2.108
+  ##          [,1]   [,2]   [,3]   [,4]   [,5]  [,6]  [,7]  [,8]  [,9] [,10]
+  ##   [1,] -2.076 -1.743 -1.217 -0.733 -0.338 0.147 0.593 1.158 1.570 2.091
+  ##   [2,] -2.105 -1.766 -1.233 -0.746 -0.349 0.139 0.587 1.156 1.574 2.108
 
 # person parameters for persons with a score 0, 5 and 10
 pers1 <- data.frame( "score_adj0.3"= mod1b$PersonScore , "theta_adj0.3"= mod1b$theta , 
            "score_adj0.05"= mod1d$PersonScore , "theta_adj0.05"= mod1d$theta  )
 round( pers1[ c(698, 683, 608) , ] ,3  )
-##       score_adj0.3 theta_adj0.3 score_adj0.05 theta_adj0.05
-##   698          0.3       -4.404          0.05        -6.283
-##   683          5.0       -0.070          5.00        -0.081
-##   608          9.7        4.315          9.95         6.179
+  ##       score_adj0.3 theta_adj0.3 score_adj0.05 theta_adj0.05
+  ##   698          0.3       -4.404          0.05        -6.283
+  ##   683          5.0       -0.070          5.00        -0.081
+  ##   608          9.7        4.315          9.95         6.179
 
 \dontrun{
+#*** Models in which some item parameters are fixed
+xsi.fixed <- cbind( c(1,3,9,10) , c(-2 , -1.2 , 1.6 , 2 ) )
+mod1e <- tam.jml2( resp=resp , xsi.fixed = xsi.fixed )
+summary(mod1e)
+# the same fixing in tam.jml
+mod1f <- tam.jml( resp=resp , xsi.fixed = xsi.fixed )
+summary(mod1f)
+
+#*** Model in which also some person parameters theta are fixed
+# fix theta parameters of persons 2, 3, 4 and 33 to values -2.9, ...
+theta.fixed <- cbind( c(2,3,4,33) , c( -2.9 , 4 , -2.9 , -2.9 ) )
+mod1g <- tam.jml( resp=resp , xsi.fixed = xsi.fixed , theta.fixed=theta.fixed )
+# look at estimated results
+ind.person <- c( 1:5 , 30:33 )
+cbind( mod1g$WLE , mod1g$errorWLE )[ind.person,]
+
 #############################################################################
 # EXAMPLE 2: Partial credit model
 #############################################################################
@@ -229,6 +251,7 @@ data(data.gpcm)
 mod2 <- tam.jml2(resp=data.gpcm)
 mod2$xsi     # extract item parameters
 summary(mod2)
+tam.fit(mod2)	# item and person infit/outfit statistic
 
 #############################################################################
 # EXAMPLE 3: Facet model estimation using joint maximum likelihood
@@ -237,13 +260,13 @@ summary(mod2)
 
 data(data.ex10)
 dat <- data.ex10
-## > head(dat)
-##  pid rater I0001 I0002 I0003 I0004 I0005
-##    1     1     0     1     1     0     0
-##    1     2     1     1     1     1     0
-##    1     3     1     1     1     0     1
-##    2     2     1     1     1     0     1
-##    2     3     1     1     0     1     1
+  ## > head(dat)
+  ##  pid rater I0001 I0002 I0003 I0004 I0005
+  ##    1     1     0     1     1     0     0
+  ##    1     2     1     1     1     1     0
+  ##    1     3     1     1     1     0     1
+  ##    2     2     1     1     1     0     1
+  ##    2     3     1     1     0     1     1
 
 facets <- dat[ , "rater" , drop=FALSE ] # define facet (rater)
 pid <- dat$pid      # define person identifier (a person occurs multiple times)
@@ -261,6 +284,46 @@ resp1 <- mod3a$resp
 mod3b <- tam.jml( resp=resp1 , A=mod3a$A , control=list(maxiter=200) )
 # 'tam.jml2'
 mod3c <- tam.jml2( resp=resp1 , A=mod3a$A , control=list(maxiter=200) )	
+
+#############################################################################
+# EXAMPLE 4: Multi faceted model with some anchored item and person parameters
+#############################################################################
+
+data(data.exJ03)
+resp <- data.exJ03$resp
+X <- data.exJ03$X
+
+#*** (0) preprocess data with tam.mml.facets
+mod0 <- tam.mml.mfr( resp=resp , facets = X , pid = X$rater , 
+                formulaA = ~ leader + item + step ,
+                control=list(maxiter=2) )
+summary(mod0)
+
+#*** (1) estimation with tam.jml (no parameter fixings)
+
+# extract processed data and design matrix from tam.mml.mfr
+resp1 <- mod0$resp
+A1 <- mod0$A
+# estimate model with tam.jml
+mod1 <- tam.jml( resp=resp1 , A=A1 , control=list( Msteps=4 , maxiter=100 ) )
+summary(mod1)
+
+#*** (2) fix some parameters (persons and items)
+
+# look at indices in mod1$xsi
+mod1$xsi
+# fix step parameters
+xsi.index1 <- cbind( 21:25 , c( -2.44 , 0.01 , -0.15 , 0.01 ,  1.55 ) )
+# fix some item parameters of items 1,2,3,6 and 13
+xsi.index2 <- cbind( c(1,2,3,6,13) , c(-2,-1,-1,-1.32 , -1 ) )
+xsi.index <- rbind( xsi.index1 , xsi.index2 )
+# fix some theta parameters of persons 1, 15 and 20
+theta.fixed <- cbind(  c(1,15,20) , c(0.4 , 1 , 0 ) )
+# estimate model
+mod2 <- tam.jml( resp=resp1 , A=A1 , xsi.fixed=xsi.fixed , theta.fixed=theta.fixed , 
+            control=list( Msteps=4 , maxiter=100 ) )                                
+summary(mod2)
+cbind( mod2$WLE , mod2$errorWLE )
 }
 }
 

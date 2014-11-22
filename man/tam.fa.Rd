@@ -157,6 +157,8 @@ Wang, W.-C., & Wilson, M. (2005). The Rasch testlet model.
 \seealso{
 For more details see \code{\link{tam.mml}} because \code{tam.fa} is just
 a wrapper for \code{\link{tam.mml.2pl}} and \code{\link{tam.mml}}.
+
+\code{\link{logLik.tam}}, \code{\link{anova.tam}}
 }
 
 
@@ -186,9 +188,9 @@ promax(mod1a$B.stand)
 # more rotations are included in the GPArotation package
 library(GPArotation)
 # geomin rotation oblique
-geominQ( mod1a$B.stand )
+GPArotation::geominQ( mod1a$B.stand )
 # quartimin rotation
-quartimin( mod1a$B.stand )
+GPArotation::quartimin( mod1a$B.stand )
 
 #***
 # Model 1b: Rasch testlet model with 3 testlets

@@ -8,16 +8,16 @@ Test Analysis Modules
 \description{
   The package includes marginal and joint maximum likelihood
   estimation of uni- and multidimensional item response models 
-  (Rasch,  2PL, Generalized Partial Credit, Rating Scale, Multi Facets),
-  fit statistics, standard error estimation, as 
-  well as plausible value imputation and weighted likelihood
-  estimation of ability.
+  (Rasch,  2PL, 3PL, Generalized Partial Credit, Multi Facets,
+  Nominal Item Response, Structured Latent Class Analysis,
+  Mixture Distribution IRT Models, Located Latent Class Models,
+  Cognitive Diagnostic Models),fit statistics and person parameter estimation. 
 }
 \details{
 \tabular{ll}{
 Package: \tab \pkg{TAM}\cr
 Type: \tab Package\cr
-Version: \tab 1.1\cr
+Version: \tab 1.2\cr
 Publication Year: \tab 2014\cr
 License: \tab GPL (>=2.0)\cr
 URL: \tab \url{http://www.edmeasurementsurveys.com/TAM/Tutorials/} \cr

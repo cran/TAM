@@ -67,7 +67,6 @@ function( resp , hwt ,  resp.ind ,
 		variance <- (sumsig2-sumbeta%t*%beta)/nstud  #new variance
 			}
 			
-			
 	# fixed beta coefficients
 	if ( ! is.null( beta.fixed )){ 
 		beta[ beta.fixed[,1:2,drop=FALSE] ] <- beta.fixed[,3] 

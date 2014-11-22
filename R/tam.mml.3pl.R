@@ -11,6 +11,7 @@ tam.mml.3pl <-
 			gammaslope=NULL , gammaslope.fixed=NULL ,
             est.some.slopes=TRUE ,    			
 			gammaslope.constr.V=NULL , gammaslope.constr.c = NULL , 
+			gammaslope.center.index=NULL ,  gammaslope.center.value=NULL , 
 			gammaslope.prior=NULL ,  userfct.gammaslope = NULL ,
 			gammaslope.constr.Npars = 0 ,
 			est.guess = NULL ,  guess = rep(0,ncol(resp)) , 
@@ -75,7 +76,9 @@ tam.mml.3pl <-
 			gammaslope <- rep(1,Ngam ) 
 					}
 				}	
-	  B <-.mml.3pl.computeB( E , gammaslope )	 
+							
+	  B <-.mml.3pl.computeB( E , gammaslope )
+	  
 	 #*********************** 	
     if ( is.null(A)){ printxsi <- FALSE  } else { printxsi <- TRUE }  
     # attach control elements
@@ -114,6 +117,7 @@ tam.mml.3pl <-
     if (( irtmodel=="PCM2" ) & (is.null(Q)) & ( is.null(A)) ){ 
       A <- .A.PCM2( resp ) 
     }  
+
 
 	# manage guessing parameters
 	if ( ! is.null(est.guess) ){
@@ -328,16 +332,18 @@ tam.mml.3pl <-
       cat("    * Calculated Sufficient Statistics   (", 
           paste(Sys.time()) , ")\n") ; flush.console()	  
     }  
-   
+
+
     # starting values for xsi
     maxAi <-  - (apply(-(A) , 3 , rowMaxs , na.rm=TRUE))  
     personMaxA <- resp.ind %*% maxAi
     ItemMax <- personMaxA %t*% pweights  
     # maximum score in resp, equal categories?  
-    maxscore.resp <- apply( resp , 2 , max )
+    maxscore.resp <- apply( resp , 2 , max , na.rm=TRUE)
     if ( ncol(resp)>1){ 
       sd.maxscore.resp <- sd(maxscore.resp)
     } else { sd.maxscore.resp <- 0 }
+
     
     equal.categ <- if( sd.maxscore.resp > .00001 ){ FALSE } else { TRUE  }
     #  xsi[est.xsi.index] <- - log(abs(ItemScore[est.xsi.index]/(ItemMax[est.xsi.index]-
@@ -351,7 +357,8 @@ tam.mml.3pl <-
       xsi[ xsi.inits[,1] ] <- xsi.inits[,2]
     }
     if ( ! is.null( xsi.fixed ) ){   xsi[ xsi.fixed[,1] ] <- xsi.fixed[,2] }
-    
+
+ 
     xsi.min.deviance <- xsi
     beta.min.deviance <- beta
     variance.min.deviance <- variance
@@ -364,7 +371,6 @@ tam.mml.3pl <-
 				theta <- as.matrix( theta.k )
 				nnodes <- nrow(theta)
 								}		
-	  
       #we need this to compute sumsig2 for the variance
       #    theta2 <- matrix(theta.sq(theta), nrow=nrow(theta),ncol=ncol(theta)^2)            
       theta2 <- matrix(theta.sq2(theta), nrow=nrow(theta),ncol=ncol(theta)^2)            
@@ -385,7 +391,6 @@ tam.mml.3pl <-
       thetawidth <- NULL
 	  theta <- theta0.samp
     }
-	
     deviance <- 0  
     deviance.history <- matrix( 0 , nrow=maxiter , ncol = 2)
     colnames(deviance.history) <- c("iter" , "deviance")
@@ -444,6 +449,10 @@ tam.mml.3pl <-
 			V1 <- solve( crossprod(V) )
 										}	
 	
+  	 gammaslope <- .mml.3pl.gammaslope.center( gammaslope , gammaslope.center.index  ,
+	         			gammaslope.center.value  )
+
+	
 	#******
 	# prior distribution guessing parameter
 	if ( ! is.null(guess.prior) ){
@@ -468,12 +477,13 @@ tam.mml.3pl <-
 										
 	  #******
 	  # compute F design matrix for loadings
+
 	  Fdes <- .mml.3pl.computeFdes( E , gammaslope , theta )	  
       # use simplified design for F
 	  dimFdes <- dim(Fdes)
-
+ 
 	  res <- .Call("mml3_calc_Fdes" , as.vector(Fdes) , dimFdes=dimFdes ,
-				PACKAGE="TAM" )	  
+				       PACKAGE="TAM" )	  
 	  FdesM <- res$FdesM[ 1:res$NFdesM , ]
 					
     ##**SE
@@ -675,15 +685,18 @@ tam.mml.3pl <-
 		 if ( ! is.null(gammaslope.constr.V) ){
             e1 <- matrix( gammaslope , ncol=1 )
 			gammaslope <- ( e1 + V %*% V1 %*% ( e2 - t(V) %*% e1 ) )[,1]		
-									}		  		  
+									}
+
+		gammaslope <- .mml.3pl.gammaslope.center( gammaslope , gammaslope.center.index  ,
+				gammaslope.center.value  )
+									
 		  # userfunction gammaslope
 		  if ( ! is.null( userfct.gammaslope ) ){
 				gammaslope <- do.call( userfct.gammaslope , list(gammaslope) )
 #				B <- .mml.3pl.computeB( E , gammaslope )		
 					}	  		  
 		  gammaslope <- fac.oldxsi	* oldgamma + ( 1 - fac.oldxsi)*gammaslope		
-		  B <- .mml.3pl.computeB( E , gammaslope )
-		  
+		  B <- .mml.3pl.computeB( E , gammaslope )	  
 				}
 	  #*********************
 	  # 3PL estimation
@@ -704,7 +717,7 @@ tam.mml.3pl <-
       # decrease increments in every iteration
       if( increment.factor > 1){max.increment <-  1 / increment.factor^iter }
 
-	  
+	    
       # calculate deviance
       if ( snodes == 0 ){ 
 #        deviance <- - 2 * sum( pweights * log( res.hwt$rfx * thetawidth ) )
@@ -720,7 +733,7 @@ tam.mml.3pl <-
       deviance.history[iter,2] <- deviance
       a01 <- abs( ( deviance - olddeviance ) / deviance  )
       a02 <- abs( ( deviance - olddeviance )  )	
-     
+	  
       if( deviance - olddeviance < 0 ){ 
         xsi.min.deviance <- xsi 
         beta.min.deviance <- beta
@@ -733,7 +746,7 @@ tam.mml.3pl <-
         se.xsi.min <- se.xsi
         se.B.min <- se.B
       }
-          
+       
       a1 <- max( abs( xsi - oldxsi ))	
       a2 <- max( abs( beta - oldbeta ))	
       a3 <- max( abs( variance - oldvariance ))
@@ -819,9 +832,10 @@ tam.mml.3pl <-
     ic <- .mml.3pl.TAM.ic( nstud , deviance , xsi , xsi.fixed ,
                    beta , beta.fixed , ndim , variance.fixed , G ,
                    irtmodel ,B_orig=B_orig ,  B.fixed , E , est.variance , resp ,
-                   est.slopegroups , skillspace , delta , est.guess ,
+                   est.slopegroups , skillspace , delta , delta.fixed , est.guess ,
 				   fulldesign , est.some.slopes , gammaslope ,
-				   gammaslope.fixed , gammaslope.constr.V , gammaslope.constr.Npars )
+				   gammaslope.fixed , gammaslope.constr.V , gammaslope.constr.Npars ,
+				   gammaslope.center.index    )
     #***
     # calculate counts
     res <- .tam.calc.counts( resp, theta , resp.ind , 
@@ -835,6 +849,11 @@ tam.mml.3pl <-
     item1 <- .mml.3pl.TAM.itempartable( resp , maxK , AXsi , B , ndim ,
                                 resp.ind , rprobs,n.ik,pi.k , guess , est.guess )
     
+	# distribution moments
+	if ( skillspace != "normal" ){
+		D <- ncol(theta.k)
+		moments <- .mml.3pl.distributionmoments( D =D , G =G , pi.k=pi.k , theta.k=theta.k )
+								} else { moments <- NULL }
     #####################################################
     # post ... posterior distribution	
     # create a data frame person	
@@ -933,10 +952,21 @@ tam.mml.3pl <-
     rownames(obji) <- dimnames(A)[[3]]	
     xsi <- obji
     
+	# labels gammaslope parameters
+	names(gammaslope) <- dimnames(E)[[4]]
+	
+	#**** calculate individual likelihood
+      res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=1+0*gwt , resp=resp , nitems=nitems , 
+                                   resp.ind.list=resp.ind.list , normalization=FALSE , 
+                                   thetasamp.density=thetasamp.density , snodes=snodes ,
+                                   resp.ind=resp.ind	)	
+      res.like <- res.hwt[["hwt"]] 	
+	
     # Output list
     deviance.history <- deviance.history[ 1:iter , ]
     res <- list( "xsi" = xsi ,
                  "beta" = beta , "variance" = variance ,
+				 "moments" = moments ,
                  "item" = item1 , 
                  "person" = person , pid = pid , "EAP.rel" = EAP.rel , 
                  "post" = hwt ,  "rprobs" = rprobs , "itemweight" = itemwt ,
@@ -954,7 +984,7 @@ tam.mml.3pl <-
                  "AXsi_" = - AXsi ,			   
                  "se.AXsi" = se.AXsi , 
                  "nstud" = nstud , "resp.ind.list" = resp.ind.list ,
-                 "hwt" = hwt , "ndim" = ndim ,
+                 "hwt" = hwt , "like"= res.like , "ndim" = ndim ,
                  "xsi.fixed" = xsi.fixed , "beta.fixed" = beta.fixed , "Q" = Q, 
                  "B.fixed" = B.fixed , "est.slopegroups" = est.slopegroups , "E" = E , "basispar" = basispar,
                  "variance.fixed" = variance.fixed ,

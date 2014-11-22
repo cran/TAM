@@ -17,7 +17,8 @@ objects of classes \code{tam}, \code{tam.mml} and
 \usage{
 tam.fit(tamobj, ...)
 
-tam.mml.fit(tamobj, FitMatrix=NULL, Nsimul=NULL,progress=TRUE)
+tam.mml.fit(tamobj, FitMatrix=NULL, Nsimul=NULL,progress=TRUE,
+   useRcpp=TRUE, seed=123, fit.facets=TRUE)
 
 tam.jml.fit(tamobj)
 }
@@ -41,6 +42,12 @@ The default is 100 (less than 400 students), 40 (less than 1000 students),
     An optional logical indicating whether computation progress should
     be displayed at console.
 }
+\item{useRcpp}{Optional logical indicating whether \pkg{Rcpp}
+	or pure \R code should be used for fit calculation.
+The latter is consistent with \pkg{TAM} (<=1.1).}
+\item{seed}{Fixed simulation seed.}
+\item{fit.facets}{An optional logical indicating whether
+fit for all facet parameters should be computed.}
 \item{\dots}{Further arguments to be passed}
 }
 
@@ -53,8 +60,14 @@ Item fit is automatically calculated in JML estimation using
 In case of \code{tam.mml.fit} a data frame with four columns:
 \item{Outfit}{Item outfit statistic}
 \item{Outfit_t}{The \eqn{t} value for the outfit statistic}
+\item{Outfit_p}{Significance \eqn{p} value for outfit statistic}
+\item{Outfit_phom}{Significance \eqn{p} value for outfit statistic, 
+adjusted for multiple testing according to the Holm procedure}
 \item{Infit}{Item infit statistic}
 \item{Infit_t}{The \eqn{t} value for the infit statistic}
+\item{Infit_p}{Significance \eqn{p} value for infit statistic}
+\item{Infit_phom}{Significance \eqn{p} value for infit statistic, 
+adjusted for multiple testing according to the Holm procedure}
 }
 
 \references{
@@ -88,12 +101,12 @@ data(sim.rasch)
 mod1 <- tam.mml(resp=sim.rasch) 
 # item fit
 fit1 <- tam.fit( mod1 )
-##   > print( round( fit1 ,3 ))
-##       Outfit Outfit_t Infit Infit_t
-##   I1   0.951   -1.549 0.994  -0.135
-##   I2   1.033    1.040 1.028   0.755
-##   I3   1.012    0.387 1.009   0.273
-##   I4   1.041    1.296 1.057   1.614
+  ##   > print( round( fit1 ,3 ))
+  ##       Outfit Outfit_t Infit Infit_t
+  ##   I1   0.951   -1.549 0.994  -0.135
+  ##   I2   1.033    1.040 1.028   0.755
+  ##   I3   1.012    0.387 1.009   0.273
+  ##   I4   1.041    1.296 1.057   1.614
 
 \dontrun{
 #############################################################################
@@ -106,15 +119,15 @@ mod2 <- tam.mml( resp=data.gpcm , irtmodel="PCM2" )
 summary(mod2)
 # estimate item fit
 fit2 <- tam.fit(mod2)
-## > round( fit2 ,3 )
-##                 Outfit Outfit_t Infit Infit_t
-##   Comfort        0.968   -0.426 0.967  -0.375
-##   Work           1.061    0.867 1.054   0.695
-##   Benefit        0.984   -0.196 0.987  -0.165
-##   Comfort_step1  0.932   -0.946 0.955  -0.728
-##   [...]
-##  => The first three rows of the data frame correspond to the fit statistics
-#      of first three items Comfort, Work and Benefit.
+  ## > round( fit2 ,3 )
+  ##                 Outfit Outfit_t Infit Infit_t
+  ##   Comfort        0.968   -0.426 0.967  -0.375
+  ##   Work           1.061    0.867 1.054   0.695
+  ##   Benefit        0.984   -0.196 0.987  -0.165
+  ##   Comfort_step1  0.932   -0.946 0.955  -0.728
+  ##   [...]
+#  => The first three rows of the data frame correspond to the fit statistics
+#     of first three items Comfort, Work and Benefit.
 
 #############################################################################
 # SIMULATED EXAMPLE 3: Fit statistic testing for local independence
@@ -190,6 +203,11 @@ dfr <- cbind( "TAM"=fit1 , "mirt"=fit1c[,-c(1:2)] )
 library(CDM)
 sx2mod1 <- CDM::itemfit.sx2( mod1 )
 summary(sx2mod1)
+
+# compare results of CDM and mirt
+sx2comp <-  cbind( sx2mod1$itemfit.stat[ , c("S-X2" , "p") ]  , 
+                    dfr[  , c("mirt.S_X2" , "mirt.p.S_X2") ] )
+round( sx2comp , 3 )
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
