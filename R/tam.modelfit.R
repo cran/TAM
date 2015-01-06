@@ -124,13 +124,23 @@ tam.modelfit <- function( tamobj , progress=TRUE ){
 					
 	# maximum chi square
 	modelfit.test <- data.frame("p.holm" = min( chi2.stat$p.holm ) )
+	
+	#******
+	# modelfit.stat
+	modelfit.stat <- fitstat
+	modelfit.stat["MADaQ3"] <- stat.MADaQ3["MADaQ3"]
+	modelfit.stat["pmaxX2"] <- modelfit.test["p.holm"]
+	modelfit.stat <- as.data.frame(modelfit.stat)
+	
+	
 	#******* OUTPUT *******
 	res <- list( "stat.MADaQ3"=stat.MADaQ3 , "chi2.stat"=chi2.stat ,
 		   "fitstat" = fitstat , "modelfit.test"= modelfit.test , 
 		   "stat.itempair"=dfr , 
 		   "chisquare.itemfit"=chisquare.itemfit , 
 		   "residuals" = residM ,
-		   "Q3.matr"=Q3.matr  ,  "aQ3.matr"=aQ3.matr)
+		   "Q3.matr"=Q3.matr  ,  "aQ3.matr"=aQ3.matr ,
+		   "statlist" = modelfit.stat )
 	class(res) <- "tam.modelfit"
 	return(res)
 	}

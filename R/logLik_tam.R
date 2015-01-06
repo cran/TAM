@@ -15,4 +15,5 @@ logLik.tam <- function (object, ...) {
 logLik.tam.mml <- logLik.tam
 ################################################################
 
-logLik.tam.mml.3pl <- logLik.tam
+logLik.tamaan <- logLik.tam.mml.3pl <- logLik.tam
+logLik.tam.latreg <- logLik.tam

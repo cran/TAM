@@ -5,7 +5,7 @@
 			Msteps , nitems , A , AXsi , B , xsi , guess , theta , nnodes , maxK ,
 			progress ,ItemScore , fac.oldxsi , rprobs , xsi.fixed , convM , rprobs0 ,
 			n.ik , N.ik , gammaslope , E , FdesM , dimFdes ,
-			gammaslope.fixed , gammaslope.prior ){
+			gammaslope.fixed , gammaslope.prior , maxgamma = 9.99 ){
 	  	  
 	  if (progress){ cat("\nM Step Slopes       |"); flush.console() }
 		eps <- 1e-10
@@ -16,6 +16,8 @@
 	  parchange <- 1
 	  oldfac <- fac.oldxsi
 	  iter <- 1
+	  	  
+	  
 	while( ( iter <= msteps ) & ( parchange > convM)  ){		
 	    Xlambda0 <- gammaslope <- Xlambda		
 		B <- .mml.3pl.computeB( E , gammaslope )
@@ -34,12 +36,26 @@
 		# prior distribution for gammaslope
 		  if ( ! is.null(gammaslope.prior) ){
 			  h <- .0001	
-			  d0  <- log(dnorm( Xlambda , mean=gammaslope.prior[,1] , 
-						       sd=gammaslope.prior[,2] ) + eps)
-			  d0p  <- log(dnorm( Xlambda + h , mean=gammaslope.prior[,1] , 
-						       sd=gammaslope.prior[,2] ) + eps)
-			  d0m  <- log(dnorm( Xlambda - h , mean=gammaslope.prior[,1] , 
-						       sd=gammaslope.prior[,2] ) + eps)
+			  if ( ncol(gammaslope.prior) == 2 ){
+				  d0  <- log( dnorm( Xlambda , mean=gammaslope.prior[,1] , 
+								   sd=gammaslope.prior[,2] ) + eps)
+				  d0p  <- log( dnorm( Xlambda + h , mean=gammaslope.prior[,1] , 
+								   sd=gammaslope.prior[,2] ) + eps)
+				  d0m  <- log( dnorm( Xlambda - h , mean=gammaslope.prior[,1] , 
+								   sd=gammaslope.prior[,2] ) + eps)
+											}
+			  if ( ncol(gammaslope.prior) == 4 ){
+				  d0  <- log( msm::dtnorm( Xlambda , mean=gammaslope.prior[,1] , 
+								   sd=gammaslope.prior[,2] , lower=gammaslope.prior[,3] ,
+								   upper=gammaslope.prior[,4] ) + eps)
+				  d0p  <- log( msm::dtnorm( Xlambda + h , mean=gammaslope.prior[,1] , 
+								   sd=gammaslope.prior[,2] , lower=gammaslope.prior[,3] ,
+								   upper=gammaslope.prior[,4] ) + eps)
+				  d0m  <- log( msm::dtnorm( Xlambda - h , mean=gammaslope.prior[,1] , 
+								   sd=gammaslope.prior[,2] , lower=gammaslope.prior[,3] ,
+								   upper=gammaslope.prior[,4] ) + eps)
+											}			  
+			  
 			  d1 <- ( d0p - d0 ) / h
 			  d2 <- ( ( d0p - d0 ) - ( d0 - d0m ) ) / h^2		
               d1.b <- d1.b + d1
@@ -51,15 +67,30 @@
 					sign(increment)*max.increment , increment )											
 		max.increment <- max(abs(increment)) / .98
 		Xlambda <- Xlambda + increment
-		se.Xlambda <- sqrt( 1 / abs( d2.b+10^(-10)) )	
+		se.Xlambda <- sqrt( 1 / abs( d2.b+10^(-10)) )
+
+		Xlambda <- ifelse( Xlambda > maxgamma , maxgamma , Xlambda )
+		Xlambda <- ifelse( Xlambda < - maxgamma , - maxgamma , Xlambda )
+		if ( ! is.null(gammaslope.prior) ){
+			if ( ncol(gammaslope.prior) == 4 ){
+					  Xlambda <- ifelse( Xlambda < gammaslope.prior[,3] ,
+										gammaslope.prior[,3] + 1.3* h , Xlambda )
+					  Xlambda <- ifelse( Xlambda > gammaslope.prior[,4] ,
+										gammaslope.prior[,4] - 1.3* h , Xlambda )
+								}
+					}
+				
 		if ( ! is.null( Xlambda.fixed) ){
 			Xlambda[ Xlambda.fixed[,1] ] <- Xlambda.fixed[,2]
 			se.Xlambda[ Xlambda.fixed[,1] ] <- 0		
 				}
+				
 		if (progress){ cat("-") ; flush.console() }		
 		iter <- iter + 1
 		parchange <- max( abs(Xlambda0-Xlambda))
+		
 			}
+		#********* end algorithm
 		if (oldfac > 0 ){
 			Xlambda <- oldfac*Xlambda00 + ( 1 - oldfac ) *Xlambda
 						}
@@ -70,11 +101,9 @@
 				 "gammachange"= max( abs( Xlambda00 - Xlambda) ) )
 			}
 ################################################################################			
-
-
+# centering gammaslope vector
 .mml.3pl.gammaslope.center <- function( gammaslope , gammaslope.center.index  ,
-				gammaslope.center.value  ){							
-									
+				gammaslope.center.value  ){														
 		if ( ! is.null( gammaslope.center.index ) ){
 			M <- max( gammaslope.center.index )
 		for (mm in 1:M){
@@ -84,6 +113,6 @@
 			gammaslope[ ind.mm ] <- gammaslope.center.value[mm] / IM + rmm
 						}
 						}
-		return(gammaslope )
+		return(gammaslope)
 				}
-				 
+###########################################################

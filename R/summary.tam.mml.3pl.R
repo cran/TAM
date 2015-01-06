@@ -50,6 +50,8 @@ summary.tam.mml.3pl <- function( object , file = NULL , ...){
     cat( "Number of estimated parameters = " , object$ic$Npars , "\n" )    
     cat( "    Item threshold parameters  = " , object$ic$Nparsxsi , "\n" )    
     cat( "    Item slope parameters      = " , object$ic$NparsB , "\n" )    
+    cat( "      Non-active item slopes   = " , 
+							object$ic$Ngamma.nonactive , "\n" )    
 	cat( "    Item guessing parameters   = " , object$ic$Nguess , "\n" )
     cat( "    Regression parameters      = " , object$ic$Nparsbeta , "\n" )    	
     cat( "    (Co)Variance parameters    = " , object$ic$Nparscov , "\n" )    		
@@ -57,7 +59,10 @@ summary.tam.mml.3pl <- function( object , file = NULL , ...){
 	
     cat( "AIC  = " , round( object$ic$AIC , 2 ) , " | penalty =" , 
 			round( object$ic$AIC - object$ic$deviance ,2 ) , 
-			"   | AIC = -2*LL + 2*p  \n" )    
+			"   | AIC = -2*LL + 2*p  \n" )   
+	cat( "AIC3 = " , round( object$ic$AIC3 , 2 ) , " | penalty =" , 
+				round( object$ic$AIC3 - object$ic$deviance ,2 ) , 
+				"   | AIC3 = -2*LL + 3*p  \n" )  							
     cat( "AICc = " , round( object$ic$AICc , 2 ) ," | penalty =" , 
 			round( object$ic$AICc - object$ic$deviance ,2 ) )
 		cat("    | AICc = -2*LL + 2*p + 2*p*(p+1)/(n-p-1)  (bias corrected AIC)\n" )   	

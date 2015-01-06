@@ -33,8 +33,12 @@ function( resp , group = NULL , adj=.3 , disattenuate = FALSE ,
   for (cc in 1:Lcon ){
     assign( names(con)[cc] , con1[[cc]] , envir = e1 ) 
   }
+  
+  resp <- add.colnames.resp(resp)
+  
   # maximum no. of categories per item.
   maxK <- max( resp , na.rm=TRUE ) + 1
+    
   
   resp <- as.matrix(resp)
   nitems <- ncol(resp)       # number of items

@@ -244,7 +244,11 @@ designMatrices.mfr2 <-
 				 # vv <- Ki.ii + 1 
 				 ind1 <- grep( paste0( item.ii , "-") , dimnames(x2)[[1]] )
 				 if ( length(grep("-",dimnames(x2)[[1]] )) == 0 ){
-					ind1 <- grep( paste0( item.ii ) , dimnames(x2)[[1]] )
+#					ind1 <- grep( paste0( item.ii ) , dimnames(x2)[[1]] )					
+					#***********************
+					#### fix Michal Modzelewski 2014-12-09
+					#### quick fix for the problem with general/specific names ####
+					ind1 <- grep( paste0( item.ii, "$" ) , dimnames(x2)[[1]] )										
 								}
 				 ind2 <- grep( paste0( "step" ,  vv ) , dimnames(x2)[[2]] )
 				 if ( length(ind1)*length(ind2) > 0 ){

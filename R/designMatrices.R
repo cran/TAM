@@ -1,11 +1,16 @@
 designMatrices <-
   function( modeltype = c( "PCM" , "RSM" ) , 
             maxKi = NULL , resp = resp , ndim = 1 ,
-            A = NULL , B = NULL , Q = NULL , R = NULL , ... ){
+            A = NULL , B = NULL , Q = NULL , R = NULL , 
+			constraint="cases" , ... ){
     
     modeltype <- match.arg(modeltype)
 #a0 <- Sys.time();
     I <- ncol(resp)
+	if ( ! is.null(A) ){
+		constraint <- "cases" 
+					}
+	
     A.draft <- A	# if ! is.null(A), it is necessary
     if( is.null(maxKi) ){
       if( !is.null(resp) ){
@@ -39,7 +44,7 @@ designMatrices <-
       
       # Q Matrix
       if( is.null(Q) ){
-        if( ndim > 1 ) warning("random q matrix")
+#        if( ndim > 1 ) warning("random q matrix")
         Q.draft <- matrix( 0 , nrow = nI , ncol = ndim )
         Q.draft[ cbind( 1:nI , sample(1:ndim, nI, replace=TRUE) ) ] <- 1 
       }else{
@@ -113,6 +118,35 @@ designMatrices <-
       
     }
 
+	#*****************************
+	# constraint = "items"
+
+    if ( constraint == "items"){ 
+		unidim <- is.null(Q)
+	    if ( ! is.null(Q) ){
+		      unidim <- ncol(Q) == 1
+							}	
+		#***** dichotomous items unidimensionality
+		if ( ( maxK==1 ) & (unidim ) ){	
+			I <- dim(A.draft)[3]
+			A.draft[ I , 2 , ] <- +1
+			A.draft <- A.draft[ ,, seq(1,I-1) ]
+					}
+		#***** dichotomous items multidimensionality
+		if ( ( maxK==1 ) & (! unidim ) ){	
+			rem.pars <- NULL
+			D <- ncol(Q)
+			for ( dd in 1:D){
+#				dd <- 1
+				ind.dd <- which(Q[,dd] != 0 )
+				ndd <- length(ind.dd)
+				rem.pars <- c(rem.pars , ind.dd[ndd] )
+				A.draft[ ind.dd[ndd] , 2 , ind.dd ] <- 1
+							}
+			A.draft <- A.draft[ , , - rem.pars ]
+							}
+				}
+	
 #cat("g300"); a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1       
     if(modeltype == "RSM"){
       if( is.null(A) ) 

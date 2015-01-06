@@ -9,25 +9,40 @@ Slight Extension of the \code{lavaan} Syntax, with Focus on Item Response Models
 This functions slightly extends the \code{lavaan}
 syntax implemented in the \pkg{lavaan} package
 (see \code{\link[lavaan:lavaanify]{lavaanify}}).
+
 Guessing and slipping parameters can be specified 
 by using the operators \code{?=g1} and \code{?=s1},
-respectively. The operator \code{__} can be used for a convenient
+respectively. 
+
+The operator \code{__} can be used for a convenient
 specification for groups of items. For example, \code{I1__I5} refers
 to items \code{I1,...,I5}. The operator \code{__} can also be used for
-item labels (see Example 2).
+item labels (see Example 2). 
+
+Nonlinear terms can also be specified for loadings (\code{=~}) and
+regressions (\code{~}) (see Example 3).
+
+It is also possible to construct the syntax using a loop by making use
+of the \code{DO} statement, see \code{\link{doparse}} for specification.
 }
 
 \usage{
-lavaanify.IRT(lavmodel, items=NULL, data=NULL)
+lavaanify.IRT(lavmodel, items=NULL, data=NULL, include.residuals=TRUE,
+    doparse=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{lavmodel}{
 A model in \code{lavaan} syntax plus the additional
-operators \code{?=g1} and \code{?=s1}.
+operators \code{?=g1}, \code{?=s1}, \code{__} and nonlinear terms.
 }
 \item{items}{Optional vector of item names}
 \item{data}{Optional data frame with item responses}
+\item{include.residuals}{Optional logical indicating whether
+       residual variances should be processed such that they
+       are freely estimated.}
+\item{doparse}{Optional logical indicating whether \code{lavmodel}
+should be parsed for \code{DO} statements.} 
 }
 
 %\details{
@@ -38,14 +53,18 @@ operators \code{?=g1} and \code{?=s1}.
 A list with following entries	
 \item{lavpartable}{A \code{lavaan} parameter table}
 \item{lavaan.syntax}{Processed syntax for \code{lavaan} package}
+\item{nonlin_factors}{Data frame with renamed and original nonlinear
+factor specifications}
+\item{nonlin_syntable}{Data frame with original and modified 
+syntax if nonlinear factors are used.}
 }
 
 %\references{
 %% ~put references to the literature/web site here ~
 %}
-\author{
-Alexander Robitzsch
-}
+%\author{
+%Alexander Robitzsch
+%}
 
 %\note{
 %%  ~~further notes~~
@@ -63,6 +82,8 @@ objects.
 
 See \code{\link[sirt:lavaan2mirt]{lavaan2mirt}} (\pkg{sirt}) 
 for estimating models in the \pkg{mirt} package using \code{lavaan} syntax.
+
+See \code{\link{doparse}} for the \code{DO} and \code{DO2} statements.
 }
 
 \examples{
@@ -147,7 +168,88 @@ lavmodel <- "
 lav3 <- lavaanify.IRT( lavmodel , data=dat)
 lav3$lavpartable
 cat( lav3$lavaan.syntax )
+
+#############################################################################
+# EXAMPLE 3: Nonlinear terms
+#############################################################################
+
+#*** define items
+items <- paste0("I",1:12)
+
+#*** define lavaan model
+lavmodel <- "
+   F1 =~ I1__I5
+   F2 =~ I6__I9
+   F3 =~ I10__I12
+   # I3, I4 and I7 load on interaction of F1 and F2
+   I(F1*F2) =~ a*I3+a*I4
+   I(F1*F2) =~ I7
+   # I3 and I5 load on squared factor F1
+   I(F1^2) =~ I3 + I5
+   # I1 regression on B spline version of factor F1
+   I( bs(F1,4) ) =~ I1
+   F2 ~ F1 + b*I(F1^2) + I(F1>0)
+   F3 ~ F1 + F2 + 1.4*I(F1*F2) + b*I(F1^2) + I(F2^2 )
+   # F3 ~ F2 + I(F2^2)      # this line is ignored in the lavaan model
+   F1 ~~ 1*F1
+    "   
+    
+#*** process lavaan syntax    
+lav3 <- lavaanify.IRT( lavmodel , items=items)
+
+#*** inspect results
+lav3$lavpartable
+cat( lav3$lavaan.syntax )
+lav3$nonlin_syntable
+lav3$nonlin_factors
+
+#############################################################################
+# EXAMPLE 4: Using lavaanify.IRT for estimation with lavaan
+#############################################################################
+
+data(data.big5, package="sirt") 
+# extract first 10 openness items
+items <- which( substring( colnames(data.big5) , 1 , 1 ) == "O"  )[1:10]
+dat <- as.data.frame( data.big5[ , items ] )
+  ##   > colnames(dat)
+  ##    [1] "O3"  "O8"  "O13" "O18" "O23" "O28" "O33" "O38" "O43" "O48"
+apply(dat,2,var)  # variances
+
+#*** Model 1: Confirmatory factor analysis with one factor
+lavmodel <- "
+   O =~ O3__O48   # convenient syntax for defining the factor for all items
+   O ~~ 1*O
+   "
+# process lavaan syntax   
+res <- lavaanify.IRT( lavmodel , data = dat )
+# estimate lavaan model 
+mod1 <- lavaan( model= res$lavaan.syntax , data=dat)
+summary(mod1 , standardized=TRUE , fit.measures = TRUE , rsquare=TRUE )
 }
+
+#############################################################################
+# EXAMPLE 5: lavaanify.IRT with do statements
+#############################################################################
+
+lavmodel <- "
+  DO(1,6,1)
+    F =~ I\%
+  DOEND
+  DO(1,5,2)
+    A =~ I\%
+  DOEND  
+  DO(2,6,2)
+    B =~ I\%
+  DOEND
+  F ~~ 1*F
+  A ~~ 1*A
+  B ~~ 1*B
+  F ~~ 0*A
+  F ~~ 0*B
+  A ~~ 0*B
+   "
+res <- lavaanify.IRT( lavmodel , items = paste("I",1:6) )   
+cat(res$lavaan.syntax)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

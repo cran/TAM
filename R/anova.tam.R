@@ -2,6 +2,7 @@
 # Likelihood ratio test for tam objects
 # Function is copied from the CDM package
 anova.tam <- function( object , ... ){
+    cl2 <- paste(match.call())[-1]
     if (length(list(object, ...)) != 2){ 
         stop("anova method can only be applied for comparison of two models.\n")		
 		}
@@ -19,13 +20,13 @@ anova.tam <- function( object , ... ){
     model2$loglike <- model2$deviance / (-2)	
 	model2$Npars <- model2$ic$Npars
 	# test
-    dfr1 <- data.frame( "Model" = "Model 1" , 
+    dfr1 <- data.frame( "Model" = cl2[1] , 
 		"loglike" = model1$loglike , 
 		"Deviance" = -2*model1$loglike )
     dfr1$Npars <- sum(model1$Npars)
     dfr1$AIC <- model1$AIC
     dfr1$BIC <- model1$BIC
-    dfr2 <- data.frame( "Model" = "Model 2" , 
+    dfr2 <- data.frame( "Model" = cl2[2] , 
 		"loglike" = model2$loglike , 	
 		"Deviance" = -2*model2$loglike )
     dfr2$Npars <- sum(model2$Npars)
@@ -47,3 +48,5 @@ anova.tam <- function( object , ... ){
 
 anova.tam.mml <- anova.tam
 anova.tam.mml.3pl <- anova.tam.mml
+anova.tamaan <- anova.tam.mml
+anova.tam.latreg <- anova.tam

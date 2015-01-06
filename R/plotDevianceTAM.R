@@ -1,6 +1,6 @@
 ###############################################################################
 plotDevianceTAM   <- function ( tam.obj , omitUntil = 1, reverse = TRUE ) {
-        stopifnot(class(tam.obj) %in% c("tam.mml","tam.mml.2pl","tam.mml.mfr") )
+        stopifnot(class(tam.obj) %in% c("tam.mml","tam.mml.2pl","tam.mml.mfr","tam.mml.3pl","tamaan") )
         if(omitUntil>0)  {
 				devChange <- diff(tam.obj$deviance.history[-c(1:omitUntil),2])
 						} else { 

@@ -18,7 +18,7 @@ Generate design matrices, and display them at console.
 }
 \usage{
 designMatrices(modeltype = c("PCM", "RSM"), maxKi = NULL, resp = resp,
-    ndim = 1, A = NULL, B = NULL, Q = NULL, R = NULL, ...)
+    ndim = 1, A = NULL, B = NULL, Q = NULL, R = NULL, constraint = "cases" ,...)
     
 print.designMatrices(X, ...)
 
@@ -33,7 +33,7 @@ designMatrices.mfr2(resp, formulaA = ~ item + item:step, facets = NULL,
     constraint = c("cases", "items") , progress=FALSE , maxKi=NULL)
 rownames.design(X)
 
-.A.PCM2( resp, Kitem=NULL) 
+.A.PCM2( resp, Kitem=NULL , constraint = "cases" , Q = NULL) 
    # generates ConQuest parametrization of partial credit model
 
 .A.PCM3( resp, Kitem=NULL ) # parametrization for A matrix in the dispersion model

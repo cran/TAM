@@ -1,8 +1,8 @@
 Package: TAM
 Type: Package
 Title: Test Analysis Modules
-Version: 1.2
-Date: 2014-11-22
+Version: 1.3
+Date: 2015-01-06
 Author: Thomas Kiefer [aut], Alexander Robitzsch [aut, cre], Margaret Wu [aut]
 Maintainer: Alexander Robitzsch <a.robitzsch@bifie.at>
 Authors@R: c(person("Thomas", "Kiefer", role = c("aut"), email =
@@ -12,18 +12,21 @@ Authors@R: c(person("Thomas", "Kiefer", role = c("aut"), email =
 Description: 
   The package includes marginal and joint maximum likelihood
   estimation of uni- and multidimensional item response models 
-  (Rasch,  2PL, 3PL, Generalized Partial Credit, Multi Facets,
+  (Rasch, 2PL, 3PL, Generalized Partial Credit, Multi Facets,
   Nominal Item Response, Structured Latent Class Analysis,
   Mixture Distribution IRT Models, Located Latent Class Models,
-  Cognitive Diagnostic Models), fit statistics and person parameter estimation. 
-Depends: R (>= 2.15.1), CDM (>= 4.0), MASS
-Imports: Rcpp, mirt (>= 1.6), lavaan (>= 0.5-17), tensor, sfsmisc,
-        GPArotation, psych, lattice, mvtnorm
-Suggests: sirt (>= 1.0)
+  Cognitive Diagnostic Models). Latent regression models and
+  plausible value imputation are also supported.
+Depends: R (>= 2.15.1), CDM (>= 4.1), MASS
+Imports: Rcpp, mirt (>= 1.7), lavaan (>= 0.5-17), tensor, sfsmisc,
+        GPArotation, psych, lattice, mvtnorm, msm
+Suggests: sirt (>= 1.0), PP (>= 0.5-3), WrightMap (>= 1.1), semTools
+        (>= 0.4-6)
 LinkingTo: Rcpp, RcppArmadillo
 License: GPL (>= 2)
-URL: http://www.edmeasurementsurveys.com/TAM/Tutorials/
-Packaged: 2014-11-22 15:04:34 UTC; robitzsch
+URL: http://www.edmeasurementsurveys.com/TAM/Tutorials/,
+        https://sites.google.com/site/alexanderrobitzsch/software
+Packaged: 2015-01-06 16:30:41 UTC; robitzsch
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2014-11-22 19:10:30
+Date/Publication: 2015-01-06 18:33:54

@@ -46,9 +46,12 @@ columns to item steps.
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-%\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-%}
+\seealso{
+See the \pkg{WrightMap} package and Example 3 for creating Wright maps
+with fitted models in \pkg{TAM}, see 
+\code{\link[WrightMap:wrightMap]{wrightMap}}. 	
+}
+
 \examples{
 #############################################################################
 # EXAMPLE 1: ordered data - Partial credit model
@@ -70,7 +73,7 @@ tam.threshold(mod1)
   ##   Comfort -1.325226 2.0717468 3.139801
   ##   Work    -1.777679 0.6459045 1.971222
   ##   Benefit -1.343536 0.7491760 2.403168
-
+   
 \dontrun{
 #############################################################################
 # EXAMPLE 2: Multidimensional model data.math
@@ -93,6 +96,36 @@ Q[ length(items1) + seq(1,length(items2) ) , 2 ] <- 1
 mod1 <- tam.mml( dat , Q=Q )
 # compute thresholds (specify a probability level of .625)
 tmod1 <- tam.threshold( mod1  , prob.lvl = .625 )
+
+#############################################################################
+# EXAMPLE 3: Creating Wright maps with the WrightMap package
+#############################################################################
+
+library(WrightMap)
+# For conducting Wright maps in combination with TAM, see
+# http://wrightmap.org/post/100850738072/using-wrightmap-with-the-tam-package
+data(sim.rasch)
+dat <- sim.rasch
+
+# estimate Rasch model in TAM
+mod1 <- tam.mml(dat)
+summary(mod1)
+
+#--- A: creating a Wright map with WLEs
+
+# compute WLE
+wlemod1 <- tam.wle(mod1)$theta
+# extract thresholds
+tmod1 <- tam.threshold(mod1)
+# create Wright map
+WrightMap::wrightMap( thetas = wlemod1 , thresholds= tmod1 , label.items.srt=-90)
+
+#--- B: creating a Wright Map with population distribution
+
+# extract ability distribution and replicate observations
+uni.proficiency <- rep( mod1$theta[,1] , round( mod1$pi.k * mod1$ic$n) )
+# draw WrightMap
+WrightMap::wrightMap( thetas=uni.proficiency, thresholds= tmod1 , label.items.rows=3)
 }	
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

@@ -3,7 +3,7 @@
 \alias{IRT.irfprob.tam}
 \alias{IRT.irfprob.tam.mml}
 \alias{IRT.irfprob.tam.mml.3pl}
-
+\alias{IRT.irfprob.tamaan}
 
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
@@ -20,16 +20,20 @@ fitted in \pkg{TAM}. See \code{\link[CDM:IRT.irfprob]{IRT.irfprob}}
 
 \usage{
 \method{IRT.irfprob}{tam}(object, \dots)
+
 \method{IRT.irfprob}{tam.mml}(object, \dots)
+
 \method{IRT.irfprob}{tam.mml.3pl}(object, \dots)
+
+\method{IRT.irfprob}{tamaan}(object, \dots)
 }
 
 
 
 \arguments{
   \item{object}{
-Object of class \code{\link{tam}}, \code{\link{tam.mml}}
-or \code{\link{tam.mml.3pl}}.
+Object of class \code{\link{tam}}, \code{\link{tam.mml}},
+\code{\link{tam.mml.3pl}} or \code{\link{tamaan}}.
 }
 \item{\dots}{Further arguments to be passed}
 }

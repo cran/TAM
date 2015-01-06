@@ -3,7 +3,7 @@
 \alias{IRT.factor.scores.tam}
 \alias{IRT.factor.scores.tam.mml}
 \alias{IRT.factor.scores.tam.mml.3pl}
-
+\alias{IRT.factor.scores.tamaan}
 
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
@@ -20,16 +20,20 @@ fitted in \pkg{TAM}. See \code{\link[CDM:IRT.factor.scores]{IRT.factor.scores}}
 
 \usage{
 \method{IRT.factor.scores}{tam}(object, type="EAP", \dots)
+
 \method{IRT.factor.scores}{tam.mml}(object, type="EAP", \dots)
+
 \method{IRT.factor.scores}{tam.mml.3pl}(object, type="EAP", \dots)
+
+\method{IRT.factor.scores}{tamaan}(object, type="EAP", \dots)
 }
 
 
 
 \arguments{
   \item{object}{
-Object of class \code{\link{tam}}, \code{\link{tam.mml}}
-or \code{\link{tam.mml.3pl}}.
+Object of class \code{\link{tam}}, \code{\link{tam.mml}},
+\code{\link{tam.mml.3pl}} or \code{\link{tamaan}}.
 }
 \item{type}{Type of factor score to be used. \code{type="EAP"} can be used
 	for all classes in \pkg{TAM} while \code{type="WLE"} and

@@ -33,7 +33,7 @@ active in TAM. Not to be called by user.
 calc_exp_TK(rprobs, A, itemwt, p, ip, nitems, resp.ind)
 calc_posterior.v2(rprobs, gwt, resp, nitems, resp.ind.list, 
     normalization = TRUE, thetasamp.density = NULL, snodes = 0, resp.ind=NULL,
-    avoid.zerosum=FALSE)
+    avoid.zerosum=FALSE , logprobs = FALSE)
 calc_prob.v5(iIndex, A, AXsi, B, xsi, theta, nnodes, maxK, 
     recalc = TRUE)
 stud_prior.v2(theta, Y, beta, variance, nstud, nnodes, ndim, YSD)

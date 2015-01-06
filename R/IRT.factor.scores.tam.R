@@ -50,3 +50,19 @@ IRT.factor.scores.tam.mml.3pl <- function( object , type="EAP" , ... ){
 	attr(ll,"type") <- type
     return(ll)
         }
+#########################################################
+
+
+###########################################################
+# objects of class tamaan
+IRT.factor.scores.tamaan <- function( object , type="EAP" , ... ){
+	if (object$tamaanify$method %in% c( "tam.mml" , "tam.mml.2pl")  ){
+			res0 <- IRT.factor.scores.tam( object , type=type , ... )			
+			}
+	if (object$tamaanify$method == "tam.mml.3pl"){
+			res0 <- IRT.factor.scores.tam.mml.3pl( object , type=type,  ... )			
+							}
+	return(res0)	
+			}
+###################################################################			
+		

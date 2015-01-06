@@ -123,6 +123,7 @@ to fix convergence problems using arguments \code{increment.factor} and
 %% Example data.exJ03
 \item Data \code{data.exJ03} for Example 4 in \code{\link{tam.jml}} 
 has the following format:
+
 \code{List of 2} \cr
 \code{ $ resp:'data.frame':   40 obs. of  20 variables:} \cr
 \code{  ..$ I104: int [1:40] 4 5 6 5 3 4 3 5 4 6 ...} \cr

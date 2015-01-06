@@ -1,5 +1,8 @@
 useDynLib(TAM)
 
+########################################################
+################  EXPORTS ##############################
+
 export(designMatrices, .A.matrix, designMatrices.mfr,
        tam.fit, 
        tam.jml,
@@ -16,8 +19,14 @@ export(designMatrices, .A.matrix, designMatrices.mfr,
        designMatrices.mfr2 ,
        tam.modelfit ,
        plotctt ,
-       lavaanify.IRT 
+       lavaanify.IRT ,
+       tamaan , 
+       tamaanify ,
+       doparse,
+       tampv2datalist,
+       tam.latreg
        )
+
 
 # internal functions; not intended to be visible to users
 # export(calc_exp_TK, calc_posterior.v2, calc_prob.v5, 
@@ -25,49 +34,82 @@ export(designMatrices, .A.matrix, designMatrices.mfr,
 #        print.designMatrices, resp.pattern3, rowcumsums, rowMaxs,
 #        stud_prior.v2, tam.jml.xsi, tam.jml.xsi2, theta.sq)
 
-# S3method(print, designMatrices)
 
+###########################################
+############ S3 methods ###################
 
-S3method(summary, tam )
-S3method(summary, tam.mml )
-S3method(summary, tam.mml.3pl)
-S3method(summary, tam.modelfit )
-S3method(summary, tam.jml )
-
-
+#### anova
 S3method(anova, tam.mml )
 S3method(anova, tam )
 S3method(anova, tam.mml.3pl)
+S3method(anova, tamaan)
+S3method(anova, tam.latreg)
 
+
+#### logLik
 S3method(logLik, tam.mml )
 S3method(logLik, tam )
 S3method(logLik, tam.mml.3pl)
+S3method(logLik, tamaan )
+S3method(logLik, tam.latreg )
 
 
+#### plot
 S3method( plot , tam )
 S3method( plot , tam.mml )
 S3method( plot , tam.jml )
 
 
-S3method(IRT.likelihood, tam.mml )
-S3method(IRT.likelihood, tam )
-S3method(IRT.likelihood, tam.mml.3pl)
+#### summary
+S3method(summary, tam )
+S3method(summary, tam.mml )
+S3method(summary, tam.mml.3pl)
+S3method(summary, tam.modelfit )
+S3method(summary, tam.jml )
+S3method(summary, tamaan)
+S3method(summary, tam.latreg)
 
 
-S3method(IRT.posterior, tam.mml )
-S3method(IRT.posterior, tam )
-S3method(IRT.posterior, tam.mml.3pl)
 
-S3method(IRT.irfprob, tam.mml )
-S3method(IRT.irfprob, tam )
-S3method(IRT.irfprob, tam.mml.3pl)
+########################################
+###### S3 methods IRT.xx ###############
 
+
+
+#### IRT.factor.scores
 S3method(IRT.factor.scores, tam.mml )
 S3method(IRT.factor.scores, tam )
 S3method(IRT.factor.scores, tam.mml.3pl)
+S3method(IRT.factor.scores, tamaan )
 
 
-########### imports
+#### IRT.irfprob
+S3method(IRT.irfprob, tam.mml )
+S3method(IRT.irfprob, tam )
+S3method(IRT.irfprob, tam.mml.3pl)
+S3method(IRT.irfprob, tamaan )
+
+
+#### IRT.likelihood
+S3method(IRT.likelihood, tam.mml )
+S3method(IRT.likelihood, tam )
+S3method(IRT.likelihood, tam.mml.3pl)
+S3method(IRT.likelihood, tamaan )
+
+
+#### IRT.posterior
+S3method(IRT.posterior, tam.mml )
+S3method(IRT.posterior, tam )
+S3method(IRT.posterior, tam.mml.3pl)
+S3method(IRT.posterior, tamaan)
+
+
+
+
+
+######################################################
+############### IMPORTS ##############################
+
 import(mvtnorm)
 import(tensor)
 import(MASS)
@@ -80,3 +122,5 @@ importFrom(lattice,xyplot)
 import(mirt)
 import(lavaan)
 importFrom(utils,packageDescription)
+importFrom(msm,dtnorm)
+importFrom(msm,rtnorm)

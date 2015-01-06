@@ -3,11 +3,12 @@
 \alias{IRT.likelihood.tam}
 \alias{IRT.likelihood.tam.mml}
 \alias{IRT.likelihood.tam.mml.3pl}
+\alias{IRT.likelihood.tamaan}
 
 \alias{IRT.posterior.tam}
 \alias{IRT.posterior.tam.mml}
 \alias{IRT.posterior.tam.mml.3pl}
-
+\alias{IRT.posterior.tamaan}
 
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
@@ -24,20 +25,24 @@ fitted in \pkg{TAM}. See \code{\link[CDM:IRT.likelihood]{IRT.likelihood}}
 
 \usage{
 \method{IRT.likelihood}{tam}(object, \dots)
-\method{IRT.likelihood}{tam.mml}(object, \dots)
-\method{IRT.likelihood}{tam.mml.3pl}(object, \dots)
-
 \method{IRT.posterior}{tam}(object, \dots)
+
+\method{IRT.likelihood}{tam.mml}(object, \dots)
 \method{IRT.posterior}{tam.mml}(object, \dots)
+
+\method{IRT.likelihood}{tam.mml.3pl}(object, \dots)
 \method{IRT.posterior}{tam.mml.3pl}(object, \dots)
+
+\method{IRT.likelihood}{tamaan}(object, \dots)
+\method{IRT.posterior}{tamaan}(object, \dots)
 }
 
 
 
 \arguments{
   \item{object}{
-Object of class \code{\link{tam}}, \code{\link{tam.mml}}
-or \code{\link{tam.mml.3pl}}.
+Object of class \code{\link{tam}}, \code{\link{tam.mml}},
+\code{\link{tam.mml.3pl}} or \code{\link{tamaan}}.
 }
 \item{\dots}{Further arguments to be passed}
 }

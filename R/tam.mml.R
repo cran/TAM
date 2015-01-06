@@ -5,7 +5,7 @@ tam.mml <-
             xsi.fixed=NULL ,  xsi.inits = NULL , 
             beta.fixed = NULL , beta.inits = NULL , 
             variance.fixed = NULL , variance.inits = NULL , 
-            est.variance = FALSE , 
+            est.variance = FALSE , constraint="cases" , 
             A=NULL , B=NULL , B.fixed = NULL , 
             Q=NULL , est.slopegroups=NULL , E = NULL , 
             pweights = NULL , 
@@ -65,6 +65,8 @@ tam.mml <-
     }
     fac.oldxsi <- max( 0 , min( c( fac.oldxsi , .95 ) ) )  
     
+	resp <- add.colnames.resp(resp)
+	
     if (progress){ 
       cat(disp)	
       cat("Processing Data     ", paste(Sys.time()) , "\n") ; flush.console()
@@ -78,8 +80,14 @@ tam.mml <-
 #    if (( irtmodel=="PCM2" ) & (is.null(Q)) & ( is.null(A)) ){ 
 #      A <- .A.PCM2( resp ) 
 #    }  
+	#**** constraints
+	if ( constraint == "items" ){
+		irtmodel <- "PCM2"
+						}
+						
+						
     if (( irtmodel=="PCM2" ) & ( is.null(A)) ){ 
-      A <- .A.PCM2( resp ) 
+      A <- .A.PCM2( resp , constraint=constraint , Q=Q  ) 	    
     }  
     
     
@@ -147,7 +155,7 @@ tam.mml <-
     modeltype <- "PCM"
     if (irtmodel=="RSM"){  modeltype <- "RSM" }
     design <- designMatrices( modeltype= modeltype , maxKi=NULL , resp=resp , 
-                              A=A , B=B , Q=Q , R=R, ndim=ndim )
+                              A=A , B=B , Q=Q , R=R, ndim=ndim  , constraint=constraint )
     A <- design$A
     B <- design$B
     cA <- design$flatA
@@ -177,7 +185,9 @@ tam.mml <-
     if ( ! is.null( xsi.fixed ) ){
       xsi[ xsi.fixed[,1] ] <- xsi.fixed[,2]
       est.xsi.index <- setdiff( 1:np , xsi.fixed[,1] )
-    } else { est.xsi.index <- 1:np }
+				} else { 
+		est.xsi.index <- 1:np 
+						}
     est.xsi.index -> est.xsi.index0
     
     # variance inits  
@@ -244,7 +254,7 @@ tam.mml <-
     YYinv <- solve( W )
     
     #initialise regressors
-    if ( is.null(beta.fixed) & (  is.null(xsi.fixed) ) ){
+    if ( is.null(beta.fixed) & (  is.null(xsi.fixed) ) & ( constraint=="cases") ){
       beta.fixed <- matrix( c(1,1,0) , nrow= 1) 
       if (  ndim > 1){ 
         for ( dd in 2:ndim){
@@ -683,7 +693,6 @@ tam.mml <-
       
     } # end of EM loop
     #******************************************************
-    # stop("here")   
     xsi.min.deviance -> xsi 
     beta.min.deviance -> beta
     variance.min.deviance -> variance	
@@ -725,7 +734,7 @@ tam.mml <-
       se.AXsi[,kk] <- sqrt( diag( A1_kk %*% se.xsiD %*% t( A1_kk ) ) )	
       #****	
     }
-    # cat("se.axsi") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
+#    cat("se.axsi") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
     
     ##*** Information criteria
     ic <- .TAM.ic( nstud , deviance , xsi , xsi.fixed ,
@@ -733,14 +742,14 @@ tam.mml <-
                    irtmodel , B_orig=NULL , B.fixed , E , est.variance =TRUE ,
                    resp ,  est.slopegroups=NULL , 
 				   variance.Npars=variance.Npars , group )
-    # cat("TAM.ic") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1			
+#    cat("TAM.ic") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1			
     #***
     # calculate counts
     res <- .tam.calc.counts( resp, theta , resp.ind , 
                              group , maxK , pweights , hwt )
     n.ik <- res$n.ik
     pi.k <- res$pi.k 
-    # cat("calculate counts") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1				
+#    cat("calculate counts") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1				
     #****
     # collect item parameters
     item1 <- .TAM.itempartable( resp , maxK , AXsi , B , ndim ,

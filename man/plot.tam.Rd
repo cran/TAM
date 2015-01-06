@@ -6,7 +6,7 @@
 
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Plot Expected Response Curves for Unidimensional Item Response Models
+Plot Function for Unidimensional Item Response Models
 }
 \description{
 S3 plot method for objects of class \code{tam}, \code{tam.mml}
@@ -14,17 +14,17 @@ or \code{tam.mml}.
 }
 
 \usage{
-\method{plot}{tam}(x, items=1:x$nitems, low=-3, high=3, ngroups=6, 
+\method{plot}{tam}(x, items=1:x$nitems, type="expected", low=-3, high=3, ngroups=6, 
                    wle=NULL, export=TRUE, export.type="png", 
                    export.args=list(), observed=TRUE, overlay=FALSE , 
                    ask=FALSE, ...)
 	
-\method{plot}{tam.mml}(x, items=1:x$nitems, low=-3, high=3, ngroups=6, 
+\method{plot}{tam.mml}(x, items=1:x$nitems, type="expected", low=-3, high=3, ngroups=6, 
                        wle=NULL, export=TRUE, export.type="png", 
                        export.args=list(), observed=TRUE, overlay=FALSE , 
                        ask=FALSE, ...)
      
-\method{plot}{tam.jml}(x, items=1:x$nitems, low=-3, high=3, ngroups=6, 
+\method{plot}{tam.jml}(x, items=1:x$nitems, type="expected", low=-3, high=3, ngroups=6, 
                        wle=NULL, export=TRUE, export.type="png", 
                        export.args=list(), observed=TRUE, overlay=FALSE , 
                        ask=FALSE, ...)
@@ -39,6 +39,9 @@ or \code{tam.mml}.
 \item{items}{
   An index vector giving the items to be visualized.
 }
+\item{type}{Plot type. \code{type="expected"} plot the expected item
+	response curves while \code{type="items"} plots the response
+	curves of all item categories.}
   \item{low}{
 Lowest \eqn{\theta} value to be displayed
 }
@@ -110,9 +113,32 @@ models.
 %}
 
 \examples{
+#############################################################################
+# EXAMPLE 1: Dichotomous data
+#############################################################################
+
 data(sim.rasch)
 mod <- tam.mml(sim.rasch)
+# expected response curves
 plot(mod, items=1:5, export=FALSE)
+# item response curves
+plot(mod, items=1:5, type="items" , export=FALSE)
+
+#############################################################################
+# EXAMPLE 2: Polytomous data
+#############################################################################
+
+data(data.Students, package="CDM")
+dat <- data.Students[ , c("sc3","sc4" , "mj1" , "mj2" )]
+dat <- na.omit(dat)
+dat[ dat[,1] == 3 , 1 ] <- 2   # modify data
+dat[ 1:20, 2 ] <- 4
+
+# estimate model
+mod1 <- tam.mml( dat )
+# plot item response curves and expected response curves
+plot(mod1, type="items", export=FALSE)
+plot(mod1, type="expected", export=FALSE )
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

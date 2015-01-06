@@ -24,7 +24,7 @@ tam.mml.3pl(resp, Y = NULL, group = NULL, formulaY = NULL, dataY = NULL, ndim = 
   gammaslope.prior = NULL, userfct.gammaslope = NULL , gammaslope.constr.Npars = 0 ,
   est.guess = NULL, guess = rep(0, ncol(resp)), 
   guess.prior = NULL, skillspace = "normal", theta.k = NULL, delta.designmatrix = NULL, 
-  delta.fixed = NULL, pweights = NULL, control = list() )
+  delta.fixed = NULL, delta.inits=NULL, pweights = NULL, control = list() )
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -88,7 +88,7 @@ tam.mml.3pl(resp, Y = NULL, group = NULL, formulaY = NULL, dataY = NULL, ndim = 
   \item{variance.inits}{
      Initial covariance matrix in estimation. All matrix entries have to be
      specified and this matrix is NOT in the same format like
-     \code{variance.inits}.
+     \code{variance.fixed}.
 }
   \item{est.variance}{
      Should the covariance matrix be estimated? This argument
@@ -185,6 +185,8 @@ Fixed \eqn{\delta} values of the log-linear skill space.
 \eqn{\delta} parameter index, Second column: Group index,
 Third column: Fixed \eqn{\delta} parameter value.
 }
+\item{delta.inits}{Optional initial matrix of \eqn{\delta}
+parameters.}
   \item{pweights}{
 Optional vector of person weights.
 }
@@ -253,9 +255,10 @@ model to NAEP data}. ETS Research Report ETS RR-08-27. Princeton, ETS.
 %}
 
 
-%\note{
-%%  ~~further notes~~
-%}
+\note{
+The implementation of the model builds on pieces work of Anton Formann.
+See \url{http://www.antonformann.at/} for more information.
+}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
@@ -299,7 +302,8 @@ mod2 <- tam.mml.3pl(resp=dat , skillspace= "discrete" , est.some.slopes=FALSE ,
 summary(mod2)
 
 #*** Model 3: 2PL model
-mod3 <- tam.mml.3pl(resp=dat , skillspace= "normal" , gammaslope.des="2PL" ,control=ctl.list)
+mod3 <- tam.mml.3pl(resp=dat , skillspace= "normal" , gammaslope.des="2PL" ,
+       control=ctl.list, est.variance=FALSE )
 summary(mod3)
 
 #*** Model 4: 3PL model
@@ -312,8 +316,19 @@ est.guess[ c(3,7,9,12) ] <- c( 1 , 3 , 2 , 2 )
 guess <- .2*(est.guess > 0)
 # estimate model
 mod4 <- tam.mml.3pl(resp=dat , skillspace= "normal" , gammaslope.des="2PL" ,
-        control=ctl.list , est.guess = est.guess , guess=guess)
+        control=ctl.list , est.guess = est.guess , guess=guess, est.variance=FALSE)
 summary(mod4)
+
+#--- specification in tamaan
+tammodel <- "
+LAVAAN MODEL:
+  F1 =~ I1__I40
+  F1 ~~ 1*F1
+  I3 + I7 ?= g1
+  I9 + I12 ?= g912 * g1
+    "
+mod4a <- tamaan( tammodel , resp=dat , control=list(maxiter=20))
+summary(mod4a)
 
 #*** Model 5: 3PL model, add some prior Beta distribution
 guess.prior <- matrix( 0 , nrow=I , ncol=2 )
@@ -323,9 +338,23 @@ mod5 <- tam.mml.3pl(resp=dat , skillspace= "normal" , gammaslope.des="2PL" ,
         control=ctl.list , est.guess = est.guess , guess=guess , guess.prior=guess.prior)
 summary(mod5)
 
+#--- specification in tamaan
+tammodel <- "
+LAVAAN MODEL:
+  F1 =~ I1__I40
+  F1 ~~ 1*F1
+  I3 + I7 ?= g1
+  I9 + I12 ?= g912 * g1
+MODEL PRIOR:
+  g912 ~ Beta(5,17)
+  I3_guess ~ Beta(5,17)
+  I7_guess ~ Beta(5,17)
+    "
+mod5a <- tamaan( tammodel , resp=dat , control=list(maxiter=20))
+
 #*** Model 6: 2PL model with design matrix for item slopes
 I <- 40	     # number of items
-D <- 1       # dimension
+D <- 1       # dimensions
 maxK <- 2    # maximum number of categories
 Ngam <- 13   # number of different slope parameters
 E <- array( 0 , dim=c(I,maxK,D,Ngam) )
@@ -337,6 +366,18 @@ for (ii in 31:40){   E[ii,2,1,ii - 27 ] <- 1 }
 # estimate model
 mod6 <- tam.mml.3pl(resp= dat , control= ctl.list ,   E=E , est.variance=FALSE  )
 summary(mod6)
+
+#*** Model 6b: Truncated normal prior distribution for slope parameters
+gammaslope.prior <- matrix( 0 , nrow = Ngam , ncol=4 )
+gammaslope.prior[,1] <- 2  # mean
+gammaslope.prior[,2] <- 10  # standard deviation
+gammaslope.prior[,3] <- -Inf # lower bound
+gammaslope.prior[ 4:13,3] <- 1.2
+gammaslope.prior[,4] <- Inf  # upper bound
+# estimate model
+mod6b <- tam.mml.3pl(resp= dat , E=E , est.variance=FALSE  ,
+                gammaslope.prior=gammaslope.prior , control=ctl.list )
+summary(mod6b)
 
 #*** Model 7: 2PL model with design matrix of slopes and slope constraints
 Ngam <- dim(E)[4]   # number of gamma parameters
@@ -379,13 +420,15 @@ summary(mod8)
 
 data( data.mg , package="CDM")
 dat <- data.mg[1:1000, paste0("I",1:11)]
-               
+
+#*******************************************************
 #*** Model 1: 1-dimensional 1PL estimation, normal skill distribution
 mod1 <- tam.mml.3pl(resp=dat , skillspace="normal" , 
-         control= list( maxiter= 30 )  , gammaslope.des = "2PL" ,  
-         est.some.slopes=FALSE ,  est.variance=TRUE  )
+           control= list( maxiter= 30 )  , gammaslope.des = "2PL" ,  
+           est.some.slopes=FALSE ,  est.variance=TRUE  )
 summary(mod1)
 
+#*******************************************************
 #*** Model 2: 1-dimensional 2PL estimation, discrete skill distribution
 # define skill space
 theta.k <- matrix( seq(-5,5,len=21) )
@@ -402,6 +445,7 @@ mod2 <- tam.mml.3pl(resp=dat , skillspace="discrete" , theta.k=theta.k ,
           gammaslope.fixed=gammaslope.fixed)
 summary(mod2)
 
+#*******************************************************
 #*** Model 3: 2-dimensional 2PL estimation, normal skill distribution
 
 # define loading matrix
@@ -414,7 +458,7 @@ mod3 <- tam.mml.3pl(resp=dat , control= list(maxiter=30),
 summary(mod3)
 
 #############################################################################
-# SIMULATED EXAMPLE 3: dichotomous data with guessing
+# SIMULATED EXAMPLE 3: Dichotomous data with guessing
 #############################################################################
 
 #*** simulate data
@@ -428,6 +472,7 @@ guess[ guess.items ] <- .33
 library(sirt)
 dat <- sirt::sim.raschtype( rnorm(N) , b=b , fixed.c=guess )
 
+#*******************************************************
 #*** Model 1: Difficulty + guessing model, i.e. fix slopes to 1
 est.guess <- rep(0,I)
 est.guess[ guess.items ] <- seq(1, length(guess.items) )
@@ -436,17 +481,18 @@ guess.prior <- matrix( cbind( 5 , 17 ) , I , 2 , byrow=TRUE )
 guess.prior[ ! est.guess , ] <- 0
 # estimate model
 mod1 <- tam.mml.3pl(resp= dat , guess = guess , est.guess = est.guess , 
-        guess.prior=guess.prior , control= ctl.list ,est.variance=TRUE  ,
-        est.some.slopes=FALSE )          
+           guess.prior=guess.prior , control= ctl.list ,est.variance=TRUE  ,
+           est.some.slopes=FALSE )          
 summary(mod1)
 
+#*******************************************************
 #*** Model 2: estimate a joint guessing parameter
 est.guess <- rep(0,I)
 est.guess[ guess.items ] <- 1
 # estimate model
 mod2 <- tam.mml.3pl(resp= dat , guess = guess , est.guess = est.guess , 
-        guess.prior=guess.prior , control= ctl.list ,est.variance=TRUE  ,
-        est.some.slopes=FALSE )          
+            guess.prior=guess.prior , control= ctl.list ,est.variance=TRUE  ,
+            est.some.slopes=FALSE )          
 summary(mod2)
 
 #############################################################################
@@ -454,6 +500,7 @@ summary(mod2)
 #      See slca Simulated Example 2 in the CDM package
 #############################################################################
 
+#*******************************************************
 #*** simulate data
 set.seed(9876)
 I <- 7  # number of items
@@ -468,6 +515,9 @@ N2 <- round(.7*N)
 dat2 <- 1 * ( matrix(a2,N2,I,byrow=TRUE) > matrix( runif( N2 * I) , N2 , I ) )
 dat <- rbind( dat1 , dat2 )
 colnames(dat) <- paste0("I" , 1:I)
+
+#*******************************************************
+# estimation using tam.mml.3pl function
 
 # define design matrices
 TP <- 2     # two classes
@@ -484,16 +534,30 @@ for (ii in 1:I){
     E[ ii , 2 , 1 , ii ] <- 1    # probabilities class 1
     E[ ii , 2 , 2 , ii+I ] <- 1  # probabilities class 2
                     }
-# define A matrix for xsi parameters which does not contain any parameter contributions
-A <- array( 0 , dim=c(I,2,2) )
-xsi.fixed <- cbind( cbind(1,2) , 0 )                  
-# estimate model
-mod1 <- tam.mml.3pl(resp= dat , E=E , A=A , control= list(maxit=20) , skillspace="discrete" , 
-          theta.k=theta.k )          
+
+# estimation command
+mod1 <- tam.mml.3pl(resp= dat , E=E , control= list(maxit=20) , skillspace="discrete" , 
+          theta.k=theta.k , notA=TRUE)          
 summary(mod1)         
 # compare simulated and estimated data
 cbind( mod1$rprobs[,2,1] , a2 )  # Simulated class 2
 cbind( mod1$rprobs[,2,2] , a1 )  # Simulated class 1
+
+#*******************************************************
+#** specification with tamaan
+tammodel <- "
+ANALYSIS:
+  TYPE=LCA;
+  NCLASSES(2);   # 2 classes
+  NSTARTS(5,20); # 5 random starts with 20 iterations
+LAVAAN MODEL:
+  F =~ I1__I7
+    "    
+mod1b <- tamaan( tammodel , resp=dat )
+summary(mod1b)
+# compare with mod1    
+logLik(mod1)
+logLik(mod1b)
 
 #############################################################################
 # SIMULATED EXAMPLE 5: Located latent class model, Rasch model
@@ -512,7 +576,9 @@ TP <- length(theta0)
 theta <- theta0[ rep(1:TP, round(probs0*N)  ) ]
 library(sirt)
 dat <- sirt::sim.raschtype( theta , b1 )
+colnames(dat) <- paste0("I",1:I)
 
+#*******************************************************
 #*** Model 1: Located latent class model with 4 classes
 maxK <- 2
 Ngam <- TP
@@ -537,6 +603,18 @@ summary(mod1)
 cbind( mod1$gammaslope , theta0 )
 # compare estimated and simulated latent class proportions
 cbind( mod1$pi.k , probs0 )
+
+#----- specification using tamaan
+tammodel <- "
+ANALYSIS:
+  TYPE=LOCLCA;
+  NCLASSES(4)
+LAVAAN MODEL:
+  F =~ I1__I15
+  I8 | 0*t1
+    "
+mod1b <- tamaan( tammodel , resp=dat )
+summary(mod1b)
 
 #############################################################################
 # SIMULATED EXAMPLE 6: DINA model with two skills
@@ -621,12 +699,12 @@ dat <- rbind( dat1 , dat2 )
 
 # The idea is that each grid point class x theta is defined as new
 # dimension. If we approximate the trait distribution by 7 theta points
-# and are interested in estimating 3 latent classes, then we need
-# 7*3=21 dimensions.
+# and are interested in estimating 2 latent classes, then we need
+# 7*2=14 dimensions.
 
 #*** Model 1: Rasch model
 # theta grid
-theta.k1 <- seq( -3 , 3 , len=7 )
+theta.k1 <- seq( -5 , 5 , len=7 )
 TT <- length(theta.k1)
 #-- define theta design matrix
 theta.k <- diag(TT)
@@ -707,6 +785,20 @@ aggregate( mod1$pi.k , list( rep(1:2, each=TT)) , sum )
 # compare simulated and estimated item parameters
 cbind( b1 , b2 , - mod1$gammaslope[1:I] , - mod1$gammaslope[I + 1:I ] ) 
 
+#--- specification in tamaan
+tammodel <- "
+ANALYSIS:
+  TYPE=MIXTURE;
+  NCLASSES(2)
+  NSTARTS(5,30)
+LAVAAN MODEL:
+  F =~ I0001__I0015
+ITEM TYPE:
+  ALL(Rasch);
+    "
+mod1b <- tamaan( tammodel , resp=dat )
+summary(mod1b)
+
 #############################################################################
 # SIMULATED EXAMPLE 8: 2PL mixture distribution model
 #############################################################################
@@ -773,7 +865,7 @@ gammaslope <- c( par1 , rep(1,I) ,  scale( par1 + runif(I, - 1.4  , 1.4 ),
 # constraint matrix
 gammaslope.constr.V <- matrix( 0 , 4*I , 4 )
 # sum of item intercepts equals zero
-gammaslope.constr.V[ 1:I , 1] <- 1        # Class 1  (b)
+gammaslope.constr.V[ 1:I , 1] <- 1        # Class 1 (b)
 gammaslope.constr.V[ 2*I + 1:I , 2] <- 1  # Class 2 (b)
 # sum of item slopes equals number of items -> mean slope of 1
 gammaslope.constr.V[ I + 1:I , 3] <- 1    # Class 1 (a)
@@ -799,6 +891,50 @@ round( int , 3 )
 # simulated and estimated item slopes
 slo <- cbind( a1 , a2 ,  mod1$gammaslope[I+1:I] , mod1$gammaslope[3*I + 1:I ] ) 
 round(slo,3)
+
+#--- specification in tamaan
+tammodel <- "
+ANALYSIS:
+  TYPE=MIXTURE;
+  NCLASSES(2)
+  NSTARTS(10,25)
+LAVAAN MODEL:
+  F =~ I0001__I0020
+    "    
+mod1t <- tamaan( tammodel , resp=dat )
+summary(mod1t)
+
+
+#############################################################################
+# EXAMPLE 9: Toy example: Exact representation of an item by a factor
+#############################################################################
+
+data(data.gpcm)
+dat <- data.gpcm[,1,drop=FALSE ]   # choose first item
+# some descriptives
+( t1 <- table(dat) )
+
+# The idea is that we define an IRT model with one latent variable
+# which extactly corresponds to the manifest item.
+
+I <- 1    # 1 item
+K <- 4    # 4 categories
+TP <- 4   # 4 discrete theta points
+
+# define skill space
+theta.k <- diag(TP)
+# define loading matrix E
+E <- array( -99 , dim=c(I,K,TP,1 ) ) 
+for (vv in 1:K){
+    E[ 1, vv , vv , 1 ] <- 9
+                }               
+# estimate model
+mod1 <- tam.mml.3pl(resp= dat , E=E , skillspace="discrete" ,
+         theta.k=theta.k ,  notA=TRUE)      
+summary(mod1)
+# -> the latent distribution corresponds to the manifest distribution, because ...
+round( mod1$pi.k , 3 )
+round( t1 / sum(t1) , 3 )
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

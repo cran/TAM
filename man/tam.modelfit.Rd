@@ -164,6 +164,21 @@ summary(dat)
 #*** model fit
 res1 <- tam.modelfit( tamobj = mod1)
 summary(res1)
+
+#############################################################################
+# EXAMPLE 3: Model fit data.gpcm | Partial credit model
+#############################################################################
+
+data(data.gpcm)
+dat <- data.gpcm
+
+# estimate partial credit model
+mod1 <- tam.mml( dat)
+summary(mod1)
+
+# assess model fit
+tmod1 <- tam.modelfit( mod1 )
+summary(tmod1)
 }
 }
 

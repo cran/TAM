@@ -2,7 +2,7 @@ tam.pv <-
 function( tamobj , nplausible = 10 , 
 			ntheta = 2000 , 
 			normal.approx = FALSE , 
-            samp.regr = FALSE , np.adj = 8 ){
+            samp.regr = FALSE , theta.model = FALSE , np.adj = 8 ){
     #####################################################
     # INPUT:
     # tamobj ... result from tam analysis
@@ -17,32 +17,51 @@ function( tamobj , nplausible = 10 ,
 	# normal.approx ... use normal distribution as an 
 	#					approximation of the posterior
     ####################################################
-	# 2012-07-28:  person weights included in sampling of regression coefficients
-# a0 <- Sys.time()	
+
+a0 <- Sys.time()	
     type <- "nonparm"		# there is no type='normal' up to now implemented
-	if (class(tamobj)!= "tam.mml.3pl"){
-		guess <- rep( 0 , dim(tamobj$B)[1] )		
-		} else { guess <- tamobj$guess }	
-    B <- tamobj$B
-    A <- tamobj$A
+	latreg <- FALSE
+	if ( class(tamobj) == "tam.latreg" ){
+		theta.model <- TRUE
+		latreg <- TRUE
+		like <- tamobj$like
+				}	
+	if ( ! latreg ){
+		if (class(tamobj)!= "tam.mml.3pl"){
+			guess <- rep( 0 , dim(tamobj$B)[1] )		
+			} else { guess <- tamobj$guess }				
+		B <- tamobj$B
+		A <- tamobj$A
+		AXsi <- tamobj$AXsi		
+		xsi <- ( tamobj$xsi )[,1]		
+		maxK <- tamobj$maxK		
+				}
     Y <- tamobj$Y
 	YSD <- tamobj$YSD
     nitems <- tamobj$nitems
-    xsi <- ( tamobj$xsi )[,1]
+
     beta <- tamobj$beta
     variance <- tamobj$variance
     nstud <- tamobj$nstud
+
+		
+	if ( theta.model ){
+        ntheta <- nrow(tamobj$theta)			
+			}	
+	
 	nthetal <- rep( 1 , ntheta )
-	nnodes <- ntheta
-    AXsi <- tamobj$AXsi
+	nnodes <- ntheta    
 	ndim <- tamobj$ndim
 	pweights <- tamobj$pweights
-	maxK <- tamobj$maxK
-    # simulate theta 
+
+	#***************************
+    # define theta grid
+	#--- dim = 1
 	if ( ndim == 1 ){
 		MEAP <- mean( tamobj$person$EAP )
 		SDEAP <- sqrt( var( tamobj$person$EAP ) + mean( tamobj$person$SD.EAP^2 ) )
 				}
+	#--- dim > 1
 	if ( ndim > 1 ){
 		tp1 <- tamobj$person
 		ind <- grep("EAP\\.Dim" , colnames(tp1) )
@@ -53,127 +72,187 @@ function( tamobj , nplausible = 10 ,
 		Sigma1 <- cov2cor(variance)
 		Sigma1 <- np.adj * diag( sqrt( var1) ) %*% Sigma1 %*% diag( sqrt( var1 ))
 					}
+										
     # create pv matrix (uni- and multidimensional case)
     pv <- matrix( 0 , nrow=nstud , ncol= nplausible*ndim)     
     NPV <- nplausible
     pp <- 1
-#	if (samp.regr){
-		cat("|")
-		cat( paste( rep("*" , nplausible ) , collapse="") )
-		cat("|\n|") ; flush.console()
-#				}
-# cat("start routine") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
+	cat("|")
+	cat( paste( rep("*" , nplausible ) , collapse="") )
+	cat("|\n|") ; flush.console()
+	
+
 	###################################################
 	# routine for drawing plausible values
 	while ( pp <= NPV ){
 	
+	#*****************
+	#***** sampling of theta values. These values can also be left fixed.
+	#*****************
+	if ( ! theta.model ){
 	   #***************************
        # 1-dimensional PV imputation	   
 	   if (ndim == 1){
 			# unidimensional theta simulation
 			if ( ! normal.approx){			
-#				theta <- matrix( rnorm( ntheta , mean = MEAP , sd = SDEAP )  , ncol= 1)	
 				theta <- matrix( rnorm( ntheta , mean = MEAP , sd = np.adj*SDEAP )  , ncol= 1)	
 				theta <- theta[ order( theta[,1] ) , , drop=FALSE]
 								} else {
-				 theta <- matrix( SDEAP * seq( - 5 , 5 , len=ntheta ) + MEAP , ncol=1 )		 
+				theta <- matrix( SDEAP * seq( - 5 , 5 , len=ntheta ) + MEAP , ncol=1 )		 
 							}
-				} else {
-		#*****************************
-        # multidimensional PV imputation		
-		  # adapt for multidimensional case here!!
+						}
+	   #*****************************
+       # multidimensional PV imputation									
+	   if( ndim > 1 ){
 	      theta <- mvrnorm( ntheta , mu = mu1 , Sigma = Sigma1 )
 					}
-# cat("start prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
-		# .mml.3pl.calc_prob.v5 <-
-		#   function(iIndex, A, AXsi, B, xsi, theta, 
-		#            nnodes, maxK, recalc=TRUE , guess)					
+				}
+	 if ( theta.model ){
+	      theta <- tamobj$theta 
+						}
+
+				
+# cat("start prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
+ 
+      if ( ! latreg ){				
  	    res <- .mml.3pl.calc_prob.v5( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , xsi=xsi , theta=theta , 
  	                         nnodes=nnodes, maxK=maxK , recalc=TRUE , guess=guess)
 		rprobs <- res[["rprobs"]]
 		AXsi <- res[["AXsi"]]
+					}
 # cat("calc prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1			
+
+
 		# calculate student's prior distribution    	
 		gwt <- stud_prior.v2( theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
                           nnodes=nnodes , ndim=ndim , YSD=YSD)
 # cat("stud prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							  
+   
+   
+        #**** 
 		# posterior distribution
-		hwt <- calc_posterior.v2( rprobs=rprobs , gwt=gwt , resp=tamobj$resp , nitems=nitems , 
+		if ( ! latreg ){		
+			hwt <- calc_posterior.v2( rprobs=rprobs , gwt=gwt , resp=tamobj$resp , nitems=nitems , 
 		                          resp.ind.list=tamobj$resp.ind.list , normalization=TRUE , 
 		                          thetasamp.density=NULL , snodes=0 )$hwt
-        hwt1 <- hwt			
+						}
+		if (latreg){
+   		    hwt <- like * gwt
+			hwt <- hwt / rowSums(hwt)	 		
+					}
+					
+   	   hwt1 <- hwt			
 # cat("posterior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							  		
-#		hwt1 <- rowcumsums( hwt1)
-# cat("rowcumsums orig") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							  		
 		hwt1 <- rowCumsums.TAM(hwt1) # include this function in later versions!!
 # cat("rowcumsums TAM") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							  		
-		if (  samp.regr ){
+
+		#---------------------------------------------------------
+		# sampling of regression coefficients
+		if ( samp.regr ){
+				
 			#*****
 			# no normal approximation
 			if ( ! normal.approx){			
 				rn1 <- runif( nstud )
 				ind <- rowSums( hwt1 < outer( rn1 , nthetal ) ) +1
-#				ind <- rowSums( hwt1 < outer( rn1 , nthetal ) )
-#				ind <- ifelse( ind > ntheta , ntheta , ind )
-#				ind <- ifelse( ind == 0 , 1 , ind )
 				pv[,pp] <- theta1 <- theta[ind]				
-									}
+								}
 			#*****
 			# normal approximation in unidimensional case
-			if ( normal.approx){
+			if ( normal.approx & ( ndim == 1 ) ){
 				thetaM <- matrix( theta[,1] , nstud , ntheta , byrow=TRUE )
 				EAP <- rowSums( thetaM * hwt )
 				SDPost <- sqrt( rowSums( thetaM^2 * hwt ) - EAP^2 )
 				pv[,pp] <- theta1 <- rnorm( nstud , mean = EAP , sd = SDPost )		
-					}
-
-				pp <- pp + 1
-				#!!!				
-				# adapt for multidimensional case here!		
-				# up to now only a warning is included
-				if ( ndim > 1 ){ 
-					stop("PV imputation with sampled regression coefficients only possible for one dimension" ) 
-								}	
-				# sampling of regression coefficients
-				modlm <- lm( theta1  ~  -1 + as.matrix(Y) , weights = pweights)
-				beta <- modlm$coef			# sampled regression coefficients
-				smod <- summary(modlm)
-				variance <- smod$sigma^2	# sampled residual variance
-				vcovmod <- vcov( modlm )		
-				# sampling of a new regression coefficient from the posterior distribution				
-				beta <- mvrnorm( 1 , mu = beta , Sigma = vcovmod )
+					           }
+							   
+			 #------
+			 # normal approximation (ndim > 1)
+			 if (  normal.approx  & ( ndim > 1 ) ){			     
+			    N <- nrow(hwt)
+				MEAP <- matrix( 0 , nrow=N , ncol=ndim)	
+				SDEAP <- matrix( 0 , nrow=N , ncol=ndim)
+				nstudl <- rep(1,N)	
+				for ( dd in 1:ndim ){
+					MEAP[,dd] <- rowSums( hwt * outer( nstudl , theta[,dd] ) )
+					SDEAP[,dd] <- sqrt(rowSums( hwt * outer( nstudl , theta[,dd]^2 ) ) - MEAP[,dd]^2)					
+								}												 				
+				thetaPV <- matrix( rnorm( N * ndim ) , nrow=N , ncol=2 )
+				thetaPV <- SDEAP * thetaPV + MEAP
+				theta1 <- pv[ , (pp-1)*(ndim) + 1:ndim ] <- thetaPV			 
+									}
+									
+			pp <- pp + 1
+						
+			# bootstrap sample of persons to get sampled beta coefficients
+			if ( ndim > 1 ){
+				N <- nrow(theta1)
+				ind <- sample( 1:N , N , replace=TRUE)
+				theta1 <- theta1[ ind , ]				
+				Y1 <- Y[ ind , , drop=FALSE ]
+						} else {
+				N <- length(theta1)
+				ind <- sample( 1:N , N , replace=TRUE)
+				theta1 <- theta1[ ind ]				
+				Y1 <- Y[ ind , , drop=FALSE ]				
+								}
+			
+			modlm <- lm( theta1  ~  -1 + as.matrix(Y1) , weights = pweights)
+			beta <- modlm$coef			# sampled regression coefficients
+			if ( ndim == 1 ){
 				beta <- matrix( beta , ncol=1 )
-				# no sampling of residual variance from the posterior
-								}                  
-			#********************								
-			# no sampling of regression cofficients
-     		if ( ! samp.regr ){
+							}
+								}
+
+
+		#---------------------------------------------------------
+		# no sampling of regression cofficients
+   		if ( ! samp.regr ){
 			for ( pp in 1:nplausible ){
-			 #****
+			 #------
 			 # no normal approximation
-			 if ( ( ! normal.approx ) | ndim > 1 ){
+			 if (  ! normal.approx  ){
 				rn1 <- runif( nstud )
 				ind <- interval_index( hwt1 , rn1 )	
-				# Correction MWu 2012-09-18
                 pv[ , (pp-1)*(ndim) + 1:ndim ] <- theta[ind , ]			
 									}
-              #****									 
-			  # normal approximation
-			  if ( normal.approx & ( ndim == 1) ){
+
+			 #------
+			 # normal approximation (ndim > 1)
+			 if (  normal.approx  & ( ndim > 1 ) ){			     
+			    N <- nrow(hwt)
+				MEAP <- matrix( 0 , nrow=N , ncol=ndim)	
+				SDEAP <- matrix( 0 , nrow=N , ncol=ndim)
+				nstudl <- rep(1,N)	
+				for ( dd in 1:ndim ){
+					MEAP[,dd] <- rowSums( hwt * outer( nstudl , theta[,dd] ) )
+					SDEAP[,dd] <- sqrt(rowSums( hwt * outer( nstudl , theta[,dd]^2 ) ) - MEAP[,dd]^2)					
+								}												 				
+				thetaPV <- matrix( rnorm( N * ndim ) , nrow=N , ncol=2 )
+				thetaPV <- SDEAP * thetaPV + MEAP
+				pv[ , (pp-1)*(ndim) + 1:ndim ] <- thetaPV			 
+									}
+									
+									
+			#-------						 
+			# dim =1 and normal approximation
+			if ( normal.approx & ( ndim == 1) ){
 				thetaM <- matrix( theta[,1] , nstud , ntheta , byrow=TRUE )
 				EAP <- rowSums( thetaM * hwt )
 				SDPost <- sqrt( rowSums( thetaM^2 * hwt ) - EAP^2 )
 				pv[,pp] <- rnorm( nstud , mean = EAP , sd = SDPost )					  
 									}
-               if (pp!=nplausible){ cat("-") ; flush.console() }
-#				pv[,pp] <- theta[ind,]
-#!!!
-# adapt for multidimensional case!
+																		
+            if (pp != nplausible){ 
+					cat("-") ; flush.console() 
+									}
 								}
 			NPV <- nplausible / 2
-						}		
-			cat("-" ) ; flush.console()
-					}
+						}   # end no plausible
+		#--------------------------		
+		cat("-" ) ; flush.console()
+					}  # end while
+	##################################################	
 			cat("|\n")
 # cat("rest") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							  			
 	# label the pv matrix	
@@ -181,10 +260,10 @@ function( tamobj , nplausible = 10 ,
 					".Dim" , rep(1:ndim,nplausible) , sep="")   
     pv <- data.frame( "pid" =tamobj$pid , pv )					
     res <- list( "pv" = pv , "hwt" = hwt , "hwt1" = hwt1 ,
-                "theta" = theta  )
+                "theta" = theta , "ndim" = ndim , "nplausible" = nplausible ,
+				"pid" = tamobj$pid , "pweights" = tamobj$pweights )
+	class(res) <- "tam.pv"
     return(res)
     }
-
-	
 ##################################################################
 ##################################################################

@@ -1,12 +1,19 @@
 #*******************************************************
-# Summary for tam object                 *
+# Summary for tam object                               *
 summary.tam.mml <- summary.tam.2pl <- 
-	summary.tam.mfr <- summary.tam <- function( object , file = NULL , ...){
+	summary.tam.mfr <- summary.tam <- summary.tam.latreg <- 
+function( object , file = NULL , ...){
 	if ( ! is.null( file ) ){
 		sink( paste0( file , "__SUMMARY.Rout") , split=TRUE )
 						}
     # object      ... object from tam.mml                #
 #	object <- tamobject
+   latreg <- FALSE
+   if ( class(object) == "tam.latreg" ){
+		latreg <- TRUE 
+		object$irtmodel <- "tam.latreg"
+						}
+
 	cat("------------------------------------------------------------\n")
     d1 <- packageDescription("TAM")
 	cat( paste( d1$Package , " " , d1$Version , " (" , d1$Date , ")" , 
@@ -16,6 +23,7 @@ summary.tam.mml <- summary.tam.2pl <-
 	cat( Rsessinfo() , "\n\n")			
     cat("Multidimensional Item Response Model in TAM \n\n")
 	irtmodel <- object$irtmodel
+	
 	cat("IRT Model" , irtmodel , "\n")
 	
 	cat("------------------------------------------------------------\n")
@@ -45,8 +53,10 @@ summary.tam.mml <- summary.tam.2pl <-
 						}
 		
     cat( "Number of estimated parameters = " , object$ic$Npars , "\n" )    
-    cat( "    Item threshold parameters  = " , object$ic$Nparsxsi , "\n" )    
-    cat( "    Item slope parameters      = " , object$ic$NparsB , "\n" )    
+	if (! latreg ){
+		cat( "    Item threshold parameters  = " , object$ic$Nparsxsi , "\n" )    
+		cat( "    Item slope parameters      = " , object$ic$NparsB , "\n" )    
+				  }
     cat( "    Regression parameters      = " , object$ic$Nparsbeta , "\n" )    	
     cat( "    (Co)Variance parameters    = " , object$ic$Nparscov , "\n\n" )    		
 	
@@ -95,64 +105,67 @@ summary.tam.mml <- summary.tam.2pl <-
 	 cat("Regression Coefficients\n")
         obji <- round( object$beta , 5 )
 		print( obji )		
-	cat("------------------------------------------------------------\n")		
-		cat("Item Parameters -A*Xsi\n")
-#		cat("   Item difficulties -A*Xsi are displayed in 'AXsi_'! \n\n")
-		obji <- object$item
-		for (vv in seq(2,ncol(obji) ) ){ obji[,vv] <- round( obji[,vv] , 3) }
-		print(obji)
-	# print xsi parameters if 
-	if( ! is.null( object$formulaA)  ){
-		cat("\nItem Facet Parameters Xsi\n")
-#		cat("   Item difficulties -A*Xsi are displayed in 'AXsi_'! \n\n")
-		obji <- object$xsi.facets
-		xsi99 <- sum( object$xsi == 99 )
-		if ( xsi99 > 0 ){
-		  cat("\nSome item xsi parameters are not estimable ")
-		  cat(" which is indicated by values of 99\n\n")	
+		
+	if ( ! latreg ){		
+		cat("------------------------------------------------------------\n")		
+			cat("Item Parameters -A*Xsi\n")
+	#		cat("   Item difficulties -A*Xsi are displayed in 'AXsi_'! \n\n")
+			obji <- object$item
+			for (vv in seq(2,ncol(obji) ) ){ obji[,vv] <- round( obji[,vv] , 3) }
+			print(obji)
+		# print xsi parameters if 
+		if( ! is.null( object$formulaA)  ){
+			cat("\nItem Facet Parameters Xsi\n")
+	#		cat("   Item difficulties -A*Xsi are displayed in 'AXsi_'! \n\n")
+			obji <- object$xsi.facets
+			xsi99 <- sum( object$xsi == 99 )
+			if ( xsi99 > 0 ){
+			  cat("\nSome item xsi parameters are not estimable ")
+			  cat(" which is indicated by values of 99\n\n")	
+							}
+			for (vv in seq(3,ncol(obji) ) ){ obji[,vv] <- round( obji[,vv] , 3) }
+			print(obji)
+						}				
+		if (( object$maxK > 2 ) | ( object$printxsi) ){
+			cat("\nItem Parameters Xsi\n")
+	#		cat("   Item difficulties -A*Xsi are displayed in 'AXsi_'! \n\n")
+			obji <- object$xsi
+	#		obji[,1] <- obji[,-1]
+			for (vv in seq(1,ncol(obji) ) ){ obji[,vv] <- round( obji[,vv] , 3) }
+			print(obji)
+				}
+		#*******************
+		# output efa
+		if ( object$irtmodel %in% c("efa") ){
+		cat("------------------------------------------------------------\n")	
+		cat("\nStandardized Factor Loadings Oblimin Rotation\n")		
+		print(object$efa.oblimin)
+						}						
+		#*******************
+		# output bifactor models	
+		if ( object$irtmodel %in% c("bifactor1" , "bifactor2","efa") ){
+		cat("------------------------------------------------------------\n")	
+			if (irtmodel=="efa"){
+					cat("\nStandardized Factor Loadings (Schmid Leimann transformation)\n")		
+					obji <- object$B.SL
+							} else {
+					cat("\nStandardized Factor Loadings (Bifactor Model)\n")		
+					obji <- object$B.stand				
+								}
+			meas <- object$meas
+			for (vv in seq(1,ncol(obji) ) ){ obji[,vv] <- round( obji[,vv] , 3) }
+			print(obji)
+			cat("\nDimensionality/Reliability Statistics\n\n")	
+			cat("ECV (Omega Asymptotical)=" , round( meas["ECV(omega_a)"] ,3 ) , "\n")
+			cat("Omega Total =" , round( meas["omega_t"] ,3 ) , "\n")
+			cat("Omega Hierarchical =" , round( meas["omega_h"] ,3 ) , "\n")		
+			if (object$maxK==2){		
+			cat("Omega Total (GY) =" , round( meas["omega_tot_diff"] ,3 ) , "\n")				
+				cat( "  Omega Total GY (Green & Yang, 2009) includes item difficulties\n")
+				cat( "  and estimates the reliability of the sum score.\n")	
+								}
 						}
-		for (vv in seq(3,ncol(obji) ) ){ obji[,vv] <- round( obji[,vv] , 3) }
-		print(obji)
-					}				
-	if (( object$maxK > 2 ) | ( object$printxsi) ){
-		cat("\nItem Parameters Xsi\n")
-#		cat("   Item difficulties -A*Xsi are displayed in 'AXsi_'! \n\n")
-		obji <- object$xsi
-#		obji[,1] <- obji[,-1]
-		for (vv in seq(1,ncol(obji) ) ){ obji[,vv] <- round( obji[,vv] , 3) }
-		print(obji)
 			}
-	#*******************
-    # output efa
-	if ( object$irtmodel %in% c("efa") ){
-	cat("------------------------------------------------------------\n")	
-	cat("\nStandardized Factor Loadings Oblimin Rotation\n")		
-	print(object$efa.oblimin)
-					}						
-	#*******************
-    # output bifactor models	
-	if ( object$irtmodel %in% c("bifactor1" , "bifactor2","efa") ){
-	cat("------------------------------------------------------------\n")	
-		if (irtmodel=="efa"){
-				cat("\nStandardized Factor Loadings (Schmid Leimann transformation)\n")		
-				obji <- object$B.SL
-						} else {
-				cat("\nStandardized Factor Loadings (Bifactor Model)\n")		
-		        obji <- object$B.stand				
-							}
-		meas <- object$meas
-		for (vv in seq(1,ncol(obji) ) ){ obji[,vv] <- round( obji[,vv] , 3) }
-		print(obji)
-		cat("\nDimensionality/Reliability Statistics\n\n")	
-		cat("ECV (Omega Asymptotical)=" , round( meas["ECV(omega_a)"] ,3 ) , "\n")
-		cat("Omega Total =" , round( meas["omega_t"] ,3 ) , "\n")
-		cat("Omega Hierarchical =" , round( meas["omega_h"] ,3 ) , "\n")		
-		if (object$maxK==2){		
-		cat("Omega Total (GY) =" , round( meas["omega_tot_diff"] ,3 ) , "\n")				
-			cat( "  Omega Total GY (Green & Yang, 2009) includes item difficulties\n")
-			cat( "  and estimates the reliability of the sum score.\n")	
-							}
-					}
 	#******
 	if ( ! is.null( file ) ){
 		sink(  )

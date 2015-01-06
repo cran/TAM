@@ -32,8 +32,8 @@ tam(resp , irtmodel ="1PL" , formulaA=NULL, ...)
 tam.mml(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
     dataY = NULL, ndim = 1,  pid = NULL, xsi.fixed = NULL, xsi.inits = NULL, 
     beta.fixed = NULL, beta.inits = NULL, variance.fixed = NULL, 
-    variance.inits = NULL, est.variance = FALSE, A = NULL, B = NULL, 
-    B.fixed = NULL,  Q = NULL,  est.slopegroups = NULL, E = NULL, 
+    variance.inits = NULL, est.variance = FALSE, constraint="cases" , A = NULL, 
+    B = NULL, B.fixed = NULL,  Q = NULL,  est.slopegroups = NULL, E = NULL, 
     pweights = NULL, userfct.variance = NULL , variance.Npars = NULL , 
     control = list())
 
@@ -157,7 +157,8 @@ tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
      variables (in the first group) are standardized in 2PL estimation.
 }
 \item{constraint}{Set sum constraint for parameter identification 
-	for \code{items} or \code{cases} (applies to \code{tam.mml.mfr})
+	for \code{items} or \code{cases} (applies to 
+	\code{tam.mml} and \code{tam.mml.mfr})
 	}
   \item{A}{
      An optional array of dimension \eqn{ I \times (K+1) \times N_\xi}.
@@ -370,7 +371,9 @@ constraints for multifacet models}
 \item{beta}{Matrix of \eqn{\beta} regression coefficient estimates}
 \item{variance}{Covariance matrix. In case of multiple groups, 
     it is a vector indicating heteroscedastic variances}
-\item{item}{Data frame with item parameters}
+\item{item}{Data frame with item parameters. The column \code{xsi.item}
+denotes the item difficulty of polytomous items in the parametrization
+\code{irtmodel="PCM2"}.}
 \item{person}{Matrix with person parameter estimates. 
     \code{EAP} is the mean of the posterior distribution and \code{SD.EAP} 
     the corresponding standard deviation
@@ -518,8 +521,8 @@ See \code{\link[sirt:tam2mirt]{tam2mirt}} (\pkg{sirt}) for converting
 #############################################################################
 data(sim.rasch)
 
-#***
-# Rasch model (MML estimation)
+#************************************************************
+# Model 1: Rasch model (MML estimation)
 mod1 <- tam.mml(resp=sim.rasch) 
 # extract item parameters
 mod1$item    # item difficulties
@@ -530,27 +533,54 @@ wle1 <- tam.wle( mod1 )
 # item fit
 fit1 <- tam.fit(mod1)
 # plausible value imputation
-pv1 <- tam.pv(mod1)
+pv1 <- tam.pv(mod1, normal.approx=TRUE, ntheta=300)
 # standard errors
 se1 <- tam.se( mod1 )
 # summary
 summary(mod1)
 
-#***
-# Rasch model with fixed item difficulties from 'mod1'
+#-- specification with tamaan
+tammodel <- "
+ LAVAAN MODEL:
+   F =~ I1__I40;
+   F ~~ F
+ ITEM TYPE:
+   ALL(Rasch)
+   "
+mod1t <- tamaan( tammodel , sim.rasch)   
+summary(mod1t)
+
+#************************************************************
+# Model 1a: Rasch model with fixed item difficulties from 'mod1'
 xsi0 <- mod1$xsi$xsi
 xsi.fixed <- cbind( 1:(length(xsi0)) , xsi0 )   
         # define vector with fixed item difficulties
 mod1a <- tam.mml( resp=sim.rasch , xsi.fixed=xsi.fixed )
 summary(mod1a)
 
-# Rasch model with initial xsi parameters for items 2 (item difficulty b=-1.8),
+#************************************************************
+# Model 1b: Rasch model with initial xsi parameters for items 2 (item difficulty b=-1.8),
 # item 4 (b=-1.6) and item 40 (b=2)
 xsi.inits <- cbind( c(2,4,40) , c(-1.8,-1.6,2))
 mod1b <- tam.mml( resp=sim.rasch , xsi.inits=xsi.inits )
 
-#***
-# 1PL estimation with sum constraint on item difficulties
+#-- tamaan specification
+tammodel <- "
+ LAVAAN MODEL:
+   F =~ I1__I40
+   F ~~ F
+   # Fix item difficulties. Note that item intercepts instead of difficulties 
+   # must be specified. 
+   I2 | 1.8*t1
+   I4 | 1.6*t1   
+ ITEM TYPE:
+   ALL(Rasch)
+   "
+mod1bt <- tamaan( tammodel , sim.rasch)   
+summary(mod1bt)
+
+#************************************************************
+# Model 1c: 1PL estimation with sum constraint on item difficulties
 dat <- sim.rasch
 # modify A design matrix to include the sum constraint
 des <- designMatrices(resp=dat)
@@ -562,13 +592,21 @@ mod1c <- tam.mml( resp=dat , A=A1 , beta.fixed=FALSE ,
            control=list(fac.oldxsi=.1) ) 
 summary(mod1c)
 
-# estimate constraint='items' using tam.mml.mfr
+#************************************************************
+# Model 1d: estimate constraint='items' using tam.mml.mfr
 formulaA= ~ 0 + item
 mod1d <- tam.mml.mfr( resp=dat , formulaA=formulaA , 
                      control=list(fac.oldxsi=.1) , constraint="items") 
 summary(mod1d)
 
-# estimate constraint='items' using tam.mml.mfr
+#************************************************************
+# Model 1e: This sum constraint can also be obtained by using the argument 
+# constraint="items" in tam.mml
+mod1e <- tam.mml( resp=sim.rasch , constraint="items" )
+summary(mod1e)
+
+#************************************************************
+# Model 1d2: estimate constraint='items' using tam.mml.mfr
 # long format response data
 resp.long <- c(dat)
 
@@ -587,16 +625,28 @@ stopifnot( all(mod1d$xsi.facets$xsi == mod1d2$xsi.facets$xsi) )
 }
 
 
-#***
-# 2PL model
+#************************************************************
+# Model 2: 2PL model
 mod2 <- tam.mml.2pl(resp=sim.rasch,irtmodel="2PL") 
 
 # extract item parameters
 mod2$xsi    # item difficulties
 mod2$B      # item slopes
 
+#--- tamaan specification
+tammodel <- "
+ LAVAAN MODEL:
+   F =~ I1__I40
+   F ~~ 1*F
+   # item type of 2PL is the default for dichotomous data
+   "   
+# estimate model
+mod2t <- tamaan( tammodel , sim.rasch)   
+summary(mod2t)
+
 \dontrun{
-# 2PL with fixed item difficulties and slopes from 'mod2'
+#************************************************************	
+# Model 2a: 2PL with fixed item difficulties and slopes from 'mod2'
 xsi0 <- mod2$xsi$xsi
 xsi.fixed <- cbind( 1:(length(xsi0)) , xsi0 )   
         # define vector with fixed item difficulties
@@ -606,8 +656,8 @@ mod2a <- tam.mml( resp=sim.rasch , xsi.fixed=xsi.fixed ,
 summary(mod2a)
 mod2a$B     # inspect used slope matrix
 
-#****
-# constrained 2PL estimation
+#************************************************************
+# Model 3: constrained 2PL estimation
 # estimate item parameters in different slope groups
 # items 1-10, 21-30 group 1
 # items 11-20 group 2 and items 31-40 group 3
@@ -618,6 +668,51 @@ mod3 <- tam.mml.2pl( resp=sim.rasch , irtmodel="2PL.groups" ,
                est.slopegroups = est.slope )
 mod3$B
 summary(mod3)
+
+#--- tamaan specification (A)
+tammodel <- "
+ LAVAAN MODEL:
+   F =~ lam1*I1__I10 + lam2*I11__I20 + lam1*I21__I30 + lam3*I31__I40;   
+   F ~~ 1*F
+   "   
+# estimate model
+mod3tA <- tamaan( tammodel , sim.rasch)   
+summary(mod3tA)
+
+#--- tamaan specification (alternative B)
+tammodel <- "
+ LAVAAN MODEL:
+   F =~ a1__a40*I1__I40;
+   F ~~ 1*F
+ MODEL CONSTRAINT:
+   a1__a10  = lam1
+   a11__a20 = lam2
+   a21__a30 = lam1
+   a31__a40 = lam3         
+   "  
+mod3tB <- tamaan( tammodel , sim.rasch)   
+summary(mod3tB)
+
+#--- tamaan specification (alternative C using DO operator)
+tammodel <- "
+ LAVAAN MODEL:
+ DO(1,10,1)
+   F =~ lam1*I\%
+ DOEND
+ DO(11,20,1)
+   F =~ lam2*I\%
+ DOEND 
+ DO(21,30,1)
+   F =~ lam1*I\%
+ DOEND 
+ DO(31,40,1)
+   F =~ lam3*I\%
+ DOEND 
+   F ~~ 1*F
+   "   
+# estimate model
+mod3tC <- tamaan( tammodel , sim.rasch)   
+summary(mod3tC)
 
 #############################################################################
 # SIMULATED EXAMPLE 2: Unidimensional calibration with latent regressors
@@ -711,26 +806,89 @@ Q[cbind(1:(2*I), c( rep(1,I) , rep(2,I) ))] <- 1
 
 # (3) estimate models 
 
-# Rasch model: without regressors
+#************************************************************
+# Model 4.1: Rasch model: without regressors
 mod4_1 <- tam.mml( resp=resp , Q=Q )
 
-# Rasch model: set covariance between dimensions to zero
+#--- tamaan specification
+tammodel <- "
+  LAVAAN MODEL:
+    F1 =~ 1*I1__I20
+    F2 =~ 1*I21__I40
+    # Alternatively to the factor 1 one can use the item type Rasch
+    F1 ~~ F1
+    F2 ~~ F2
+    F1 ~~ F2
+    "
+mod4_1t <- tamaan( tammodel , resp , control=list(maxiter=10))
+summary(mod4_1t)
+
+#************************************************************
+# Model 4.1b: estimate model with sum constraint of items for each dimension
+mod4_1b <- tam.mml( resp=resp, Q=Q ,constraint="items")
+
+#************************************************************
+# Model 4.2: Rasch model: set covariance between dimensions to zero
 variance_fixed <- cbind( 1 , 2 , 0 )
 mod4_2 <- tam.mml( resp=resp , Q=Q , variance.fixed = variance_fixed )
 summary(mod4_2)
 
-# 2PL model
+#--- tamaan specification
+tammodel <- "
+  LAVAAN MODEL:
+    F1 =~ I1__I20
+    F2 =~ I21__I40
+    F1 ~~ F1
+    F2 ~~ F2
+    F1 ~~ 0*F2
+  ITEM TYPE:
+    ALL(Rasch)
+    "
+mod4_2t <- tamaan( tammodel , resp , control=list(maxiter=10))
+summary(mod4_2t)
+
+#************************************************************
+# Model 4.3: 2PL model
 mod4_3 <- tam.mml.2pl( resp=resp , Q=Q , irtmodel="2PL" )
 
-# Rasch model with 2000 quasi monte carlo nodes and a maximum of 15 iterations
+#--- tamaan specification
+tammodel <- "
+  LAVAAN MODEL:
+    F1 =~ I1__I20
+    F2 =~ I21__I40
+    F1 ~~ F1
+    F2 ~~ F2
+    F1 ~~ F2
+    "
+mod4_3t <- tamaan( tammodel , resp , control=list(maxiter=10))
+summary(mod4_3t)
+
+#************************************************************
+# Model 4.4: Rasch model with 2000 quasi monte carlo nodes and a maximum of 15 iterations
 # -> nodes are useful for more than 3 or 4 dimensions
 mod4_4 <- tam.mml( resp=resp , Q=Q , control=list(snodes=2000,maxiter=15) )
 
-# Rasch model with 2000 stochastic nodes
+#************************************************************
+# Model 4.5: Rasch model with 2000 stochastic nodes
 mod4_5 <- tam.mml( resp=resp, Q=Q,control=list(snodes=2000,QMC=FALSE,maxiter=15))
 
-# estimate two dimensional Rasch model with regressors
+#************************************************************
+# Model 4.6: estimate two dimensional Rasch model with regressors
 mod4_6 <- tam.mml( resp=resp , Y=Y , Q=Q )
+
+#--- tamaan specification
+tammodel <- "
+  LAVAAN MODEL:
+    F1 =~ I1__I20
+    F2 =~ I21__I40
+    F1 ~~ F1
+    F2 ~~ F2
+    F1 ~~ F2
+  ITEM TYPE:
+    ALL(Rasch)
+    "
+mod4_6t <- tamaan( tammodel , resp , Y=Y , control=list(maxiter=10))
+summary(mod4_6t)
 
 #############################################################################
 # SIMULATED EXAMPLE 5: 2-dimensional estimation with within item dimensionality
@@ -740,7 +898,7 @@ library(mvtnorm)
 set.seed(4762)
 N <- 2000 # 2000 persons
 Y <- rnorm( N )
-theta <- rmvnorm( N,mean=c(0,0), sigma=matrix( c(1,.5,.5,1) , 2 , 2 ))
+theta <- mvtnorm::rmvnorm( N,mean=c(0,0), sigma=matrix( c(1,.5,.5,1) , 2 , 2 ))
 I <- 10
 # 10 items load on the first dimension
 p1 <- plogis( outer( theta[,1] , seq( -2 , 2 , len=I ) , "-" ) )
@@ -766,6 +924,18 @@ summary(mod5)
 mod5$item
 # item loadings
 mod5$B
+
+#--- tamaan specification
+tammodel <- "
+  LAVAAN MODEL:
+    F1 =~ I1__I10 + I21__I40
+    F2 =~ I11__I20 + I21__I40
+    F1 ~~ 1*F1
+    F2 ~~ F2
+    F1 ~~ 1*F2
+    "
+mod5t <- tamaan( tammodel , resp ,  control=list(maxiter=10))
+summary(mod5t)
 
 #############################################################################
 # EXAMPLE 6: ordered data - Generalized partial credit model
@@ -819,10 +989,13 @@ A1 <- A1[ , , -3] # remove Benefit xsi item parameter
 mod6_6b <- tam.mml( resp=data.gpcm , A=A1 , beta.fixed=FALSE )
 summary(mod6_6b)
 
+# estimate model with argument constraint="items"
+mod6_6c <- tam.mml( resp=data.gpcm , irtmodel="PCM2" , constraint="items")
+
 # estimate mod6_6 using tam.mml.mfr
-mod6_6c <- tam.mml.mfr( resp=data.gpcm , formulaA= ~ 0 + item + item:step , 
+mod6_6d <- tam.mml.mfr( resp=data.gpcm , formulaA= ~ 0 + item + item:step , 
     control=list(fac.oldxsi=.1)  , constraint="items" ) 
-summary(mod6_6c)
+summary(mod6_6d)
 
 # Ex 6.7: Rating scale model: Conquest parametrization 'item+step'
 mod6_7 <- tam.mml( resp=data.gpcm , irtmodel="RSM" )
@@ -862,6 +1035,44 @@ summary(mod6_8a)
 mod6_8b <- tam.mml.mfr( resp=dat , formulaA= ~ 0 + item + item:step , 
                         control=list(fac.oldxsi=.1), constraint="items" ) 
 summary(mod6_8b)
+
+#***
+# Ex 6.9: sum constraint on item difficulties for irtmodel="PCM"
+
+data(data.timssAusTwn.scored)
+dat <- data.timssAusTwn.scored[,2:11]
+dat[ dat == 9 ] <- NA
+
+# obtain the design matrix for the PCM parametrization and
+# the number of categories for each item
+maxKi <- apply(dat, 2, max, na.rm = TRUE)
+des <- designMatrices(resp = dat)
+A1 <- des$A
+
+# define the constrained item category and remove the respective parameter
+(par <- unlist( strsplit(dimnames(A1)[[3]][dim(A1)[3]], split = "_") ))
+A1 <- A1[,,-dim(A1)[3]]
+  
+# the item category loads on every other item category parameter with 
+# opposing margin, balancing the number of categories for each item
+item.id <- which(colnames(dat) == par[1])
+cat.id <- maxKi[par[1]]+1   
+loading <- 1/rep(maxKi, maxKi)
+loading <- loading [-which(names(loading)==par[1])[1]]
+A1[item.id, cat.id, ] <- loading
+A1[item.id,,]
+  
+# estimate model
+mod6_9 <- tam.mml( resp=dat , A=A1 , beta.fixed=FALSE )
+summary(mod6_9)
+
+## extract fixed item category parameter
+# calculate mean for each item
+ind.item.cat.pars <- sapply(colnames(dat), grep, rownames(mod6_8$xsi))
+item.means <- lapply(ind.item.cat.pars, function(ii) mean(mod6_8$xsi$xsi[ii]))
+
+# these sum up to the negative of the fixed parameter 
+fix.par <- -sum( unlist(item.means), na.rm=TRUE)
 
 #############################################################################
 # SIMULATED EXAMPLE 7: design matrix for slopes for the
@@ -1128,6 +1339,29 @@ beta.fixed <- cbind( 1 , 2 , 0 )
 mod13a <- tam.mml( resp=data.long[,-1] , Q=Q , A=A1 , beta.fixed=beta.fixed)
 summary(mod13a)
 
+#--- tamaan specification
+tammodel <- "
+  LAVAAN MODEL:
+    T1 =~ 1*I1T1__I6T1
+    T2 =~ 1*I3T2__I8T2
+    T1 ~~ T1
+    T2 ~~ T2
+    T1 ~~ T2
+    # constraint on item difficulties
+    I3T1 + I3T2 | b3*t1
+    I4T1 + I4T2 | b4*t1
+    I5T1 + I5T2 | b5*t1
+    I6T1 + I6T2 | b6*t1            
+    "
+# The constraint on item difficulties can be more efficiently written as
+  ##       DO(3,6,1)
+  ##         I%T1 + I%T2 | b%*t1
+  ##       DOEND    
+# estimate model    
+mod13at <- tamaan( tammodel , resp = data.long ,  beta.fixed=beta.fixed ,
+                 control=list(maxiter=10))
+summary(mod13at)
+
 #***
 # Model 13b: invariant item difficulties with zero mean item difficulty
 #           of anchor items
@@ -1139,7 +1373,7 @@ dimnames(A1)[[3]] <- substring( dimnames(A1)[[3]],1,2)
 A1[7,2,3] <- -1     # difficulty(I3T1) = difficulty(I3T2)
 A1[8,2,4] <- -1     # I4T1 = I4T2
 A1[9,2,5] <- -1
-A1[6,2,3] <- A1[6,2,4] <- A1[6,2,5] <- 1  # I6T1=-(I3T1+I4T1+I5T1)
+A1[6,2,3] <- A1[6,2,4] <- A1[6,2,5] <- 1     # I6T1=-(I3T1+I4T1+I5T1)
 A1[10,2,3] <- A1[10,2,4] <- A1[10,2,5] <- 1  # I6T2=-(I3T2+I4T2+I5T2)
 A1[,2,]
   ##      I1 I2 I3 I4 I5 I7 I8
@@ -1220,7 +1454,6 @@ mod13c <- tam.mml( resp=dat[,-1] , Q=Q , A=A1 , beta.fixed=beta.fixed,
 summary(mod13c)
 wle.mod13c <- tam.wle(mod13c) # WLEs of dimension T1 and T2
 
-
 #############################################################################
 # EXAMPLE 14: Facet model with latent regression
 #############################################################################
@@ -1298,7 +1531,7 @@ mod15b <- tam.mml.mfr(resp = data[,-c(1:2)],facets=data[,"group",drop=FALSE],
             
 #############################################################################
 # EXAMPLE 16: Differential item function for polytomous items and
-#       differing number of response options per item
+#             differing number of response options per item
 #############################################################################            
 
 data(data.timssAusTwn.scored)
@@ -1315,7 +1548,7 @@ des2 <- designMatrices.mfr2( resp=resp , facets=facets , formulaA = ~item*step +
 resp2 <- des2$gresp$gresp.noStep
 # A design matrix
 A <- des2$A$A.3d
-	# redundant xsi parameters to be eliminated from design matrix
+	# redundant xsi parameters must be eliminated from design matrix
 xsi.elim <- des2$xsi.elim
 A <- A[ , , - xsi.elim[,2] ]
 # extract loading matrix B
@@ -1326,8 +1559,9 @@ summary(mod1)
 # The sum of all DIF parameters is set to zero. The DIF parameter for the last
 # item is therefore obtained 
 xsi1 <- mod1$xsi
-difxsi <- xsi1[ intersect( grep("cnt",rownames(xsi1)),grep("M03" ,rownames(xsi1))) , ]
-- colSums(difxsi)		# this is the DIF effect of the remaining item
+difxsi <- xsi1[ intersect( grep("cnt",rownames(xsi1)),
+              grep("M03" ,rownames(xsi1))) , ]   - colSums(difxsi)	
+    # this is the DIF effect of the remaining item
 
 #############################################################################
 # SIMULATED EXAMPLE 17: Several multidimensional and subdimension models
@@ -1522,6 +1756,20 @@ mod6 <- tam.mml.3pl( dat, E=E, Q=Q2, variance.fixed=variance.fixed2,  skillspace
                 userfct.gammaslope = gammaconstr , gammaslope.constr.Npars = 1 , 
                 control=list(maxiter=maxit , QMC=TRUE , snodes=snodes ) )
 summary(mod6)
+
+#############################################################################
+# EXAMPLE 18: Partial credit model with dimension-specific sum constraints
+#             on item difficulties
+#############################################################################
+
+data(data.Students, package="CDM")
+dat <- data.Students[ , c( paste0("sc",1:4) , paste0("mj",1:4) ) ]
+# specify dimensions in Q-matrix
+Q <- matrix( 0 ,  nrow=8 , ncol=2 )
+Q[1:4,1] <- Q[5:8,2] <- 1
+# partial credit model with some constraint on item parameters
+mod1 <- tam.mml( dat , Q=Q , irtmodel="PCM2" , constraint="items")
+summary(mod1)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

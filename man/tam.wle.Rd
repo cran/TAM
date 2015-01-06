@@ -73,7 +73,7 @@ tam.jml.WLE(tamobj, resp, resp.ind, A, B, nstud, nitems, maxK, convM,
 }
 \item{xsi}{Parameter vector \eqn{\xi} (applies only to \code{tam.jml.WLE})
 }
-\item{theta.fixed}{Matrix for fixed person parameters \eqn{theta}. The first
+\item{theta.fixed}{Matrix for fixed person parameters \eqn{\theta}. The first
 	column includes the index whereas the second column includes
 the fixed value.}
 \item{\dots}{Further arguments to be passed}
@@ -101,6 +101,10 @@ For \code{tam.jml.WLE}, it is a list with following entries:
 }
 
 \references{
+Penfield, R. D., & Bergeron, J. M. (2005). Applying a weighted maximum 
+likelihood latent trait estimator to the generalized partial credit model. 
+\emph{Applied Psychological Measurement}, \bold{29}, 218-233. 	
+	
 Warm, T. A. (1989). Weighted likelihood estimation of ability in item 
 response theory. \emph{Psychometrika}, \bold{54}, 427-450.
 }
@@ -115,9 +119,13 @@ response theory. \emph{Psychometrika}, \bold{54}, 427-450.
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-%\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-%}
+\seealso{
+See the \code{\link[PP:PP_gpcm]{PP_gpcm}} (\pkg{PP}) function
+in the \pkg{PP} package for more person
+parameter estimators for the partial credit model (Penfield & Bergeron, 2005).
+	
+See the S3 method \code{\link{IRT.factor.scores.tam}}.	
+}
 
 \examples{
 #############################################################################
@@ -193,6 +201,84 @@ summary(wmod)
 # (1) Note that estimated WLE reliabilities are not trustworthy in this example.
 # (2) If cases do not possess any observations on dimensions, then WLEs
 #     and their corresponding standard errors are set to NA.
+
+#############################################################################
+# EXAMPLE 3: Partial credit model | Comparison WLEs with PP package
+#############################################################################
+
+library(PP)
+data(data.gpcm)
+dat <- data.gpcm
+I <- ncol(dat)
+
+#****************************************
+#*** Model 1: Partial Credit Model
+
+# estimation in TAM
+mod1 <- tam.mml( dat )
+summary(mod1)
+
+#-- WLE estimation in TAM
+tamw1 <- tam.wle( mod1 )
+
+#-- WLE estimation with PP package
+# convert AXsi parameters into thres parameters for PP
+AXsi0 <- - mod1$AXsi[,-1]
+b <- AXsi0
+K <- ncol(AXsi0)
+for (cc in 2:K){ 
+    b[,cc] <- AXsi0[,cc] - AXsi0[,cc-1]
+                }
+# WLE estimation in PP
+ppw1 <- PP::PP_gpcm( respm = as.matrix(dat) ,  thres = t(b) , slopes = rep(1,I) )
+
+#-- compare results
+dfr <- cbind( tamw1[ , c("theta","error") ] , ppw1$resPP)
+head( round(dfr,3))
+  ##      theta error resPP.estimate resPP.SE nsteps
+  ##   1 -1.006 0.973         -1.006    0.973      8
+  ##   2 -0.122 0.904         -0.122    0.904      8
+  ##   3  0.640 0.836          0.640    0.836      8
+  ##   4  0.640 0.836          0.640    0.836      8
+  ##   5  0.640 0.836          0.640    0.836      8
+  ##   6 -1.941 1.106         -1.941    1.106      8
+plot( dfr$resPP.estimate , dfr$theta , pch=16 , xlab="PP" , ylab="TAM")
+lines( c(-10,10) , c(-10,10) )
+
+#****************************************
+#*** Model 2: Generalized partial Credit Model
+
+# estimation in TAM
+mod2 <- tam.mml.2pl( dat , irtmodel="GPCM" )
+summary(mod2)
+
+#-- WLE estimation in TAM
+tamw2 <- tam.wle( mod2 )
+
+#-- WLE estimation in PP
+# convert AXsi parameters into thres and slopes parameters for PP
+AXsi0 <- - mod2$AXsi[,-1]
+slopes <- mod2$B[,2,1]
+K <- ncol(AXsi0)
+slopesM <- matrix( slopes , I , ncol=K )
+AXsi0 <- AXsi0 / slopesM 
+b <- AXsi0
+for (cc in 2:K){ 
+    b[,cc] <- AXsi0[,cc] - AXsi0[,cc-1]
+                }
+# estimation in PP
+ppw2 <- PP::PP_gpcm( respm = as.matrix(dat) ,  thres = t(b) , slopes = slopes )
+
+#-- compare results
+dfr <- cbind( tamw2[ , c("theta","error") ] , ppw2$resPP)
+head( round(dfr,3))
+  ##      theta error resPP.estimate resPP.SE nsteps
+  ##   1 -0.476 0.971         -0.476    0.971     13
+  ##   2 -0.090 0.973         -0.090    0.973     13
+  ##   3  0.311 0.960          0.311    0.960     13
+  ##   4  0.311 0.960          0.311    0.960     13
+  ##   5  1.749 0.813          1.749    0.813     13
+  ##   6 -1.513 1.032         -1.513    1.032     13
 }
 }
 

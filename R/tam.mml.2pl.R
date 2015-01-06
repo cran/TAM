@@ -63,7 +63,8 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   }
   if ( !is.null(con$seed)){ set.seed( con$seed )	 }
   fac.oldxsi <- max( 0 , min( c( fac.oldxsi , .95 ) ) )
-
+	
+	resp <- add.colnames.resp(resp)
   
   if (progress){ 
       cat(disp)	
@@ -142,7 +143,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   design <- designMatrices( modeltype="PCM" , maxKi=NULL , resp=resp , 
                             A=A , B=B , Q=Q , R=R, ndim=ndim )
   A <- design$A
-  B <- design$B
+  B <- design$B  
   cA <- design$flatA
   cA[is.na(cA)] <- 0
   if (progress){ 
@@ -388,13 +389,13 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 			basispar[,dd] <- basispar1
 						}
 			   }
-	
    if ( irtmodel %in% c("2PL","GPCM" , "GPCM.design","2PL.groups") ){
 	if ( ! is.null(B.fixed) ){
-			B[ B.fixed[,1:3] ] <- B.fixed[,4]	
-			B_orig[ B.fixed[,1:3] ] <- 0
+			B[ B.fixed[,1:3,drop=FALSE] ] <- B.fixed[,4]	
+			B_orig[ B.fixed[,1:3,drop=FALSE] ] <- 0
 						}
 						}
+						
   #---end 2PL---
  
   ##**SE

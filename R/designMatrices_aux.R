@@ -235,7 +235,7 @@ rownames.design2 <- function(X){
 ####################################################
 # create ConQuest parametrization for 
 # partial credit model
-.A.PCM2 <- function( resp , Kitem=NULL){
+.A.PCM2 <- function( resp , Kitem=NULL , constraint = "cases" , Q=NULL ){
   if ( is.null(Kitem) ){ 
     Kitem <- apply( resp , 2 , max , na.rm=T ) + 1
   }
@@ -261,6 +261,34 @@ rownames.design2 <- function(X){
   }
   dimnames(A)[[1]] <- colnames(resp)
   vars <- colnames(resp)
+  # constraints
+  unidim <- TRUE
+  if ( ! is.null(Q) ){
+	unidim <- ncol(Q) == 1 
+				}
+  if ( constraint == "items" ){  
+     if ( unidim ){	
+		I <- ncol(resp)
+		x1 <- matrix( - A[I,,I] , nrow=dim(A)[2] , ncol=I-1 , byrow=FALSE )
+		A[ I ,, seq(1,I-1) ] <- x1
+		A <- A[,,-I]
+		vars <- vars[ - I ]
+					}
+	 if (!unidim){	
+          rem.pars <- NULL	 
+			D <- ncol(Q)
+			for (dd in 1:D){
+				ind.dd <- which( Q[,dd] != 0 )
+				I <- ind.dd[ length(ind.dd) ]				
+				x1 <- matrix( - A[I,,I] , nrow=dim(A)[2] , ncol= length(ind.dd)-1 , byrow=FALSE )
+				A[ I ,, ind.dd[ - length(ind.dd) ] ] <- x1
+	
+                rem.pars <- c(rem.pars , I )
+						}
+        vars <- vars[ - rem.pars ]
+		A <- A[,, - rem.pars ]		
+					}
+					}					
   vars <- c(vars , unlist( sapply( (1:I)[Kitem>2] , FUN = function(ii){
     paste0( colnames(resp)[ii] , "_step" , 1:(Kitem[ii] - 2) ) } )	) )
   dimnames(A)[[3]] <- vars			
@@ -271,8 +299,7 @@ rownames.design2 <- function(X){
 
 
 ####################################################
-# create ConQuest parametrization for 
-# partial credit model
+# dispersion model
 .A.PCM3 <- function( resp , Kitem =NULL ){
   if ( is.null(Kitem) ){
     Kitem <- apply( resp , 2 , max , na.rm=T ) + 1

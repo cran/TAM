@@ -76,6 +76,8 @@ tam.mml.mfr <-
       con1a$snodes <- snodes <- 0
     }
     
+		resp <- add.colnames.resp(resp)
+		
     resp <- as.matrix(resp)
     nullY <- is.null(Y)
     

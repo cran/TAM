@@ -1,3 +1,5 @@
+
+
 ##################################
 # Information criteria
 .mml.3pl.TAM.ic <- function( nstud , deviance , xsi , xsi.fixed ,
@@ -5,8 +7,10 @@
 	B_orig=NULL , B.fixed , E , est.variance , resp ,
 	est.slopegroups=NULL , skillspace , delta , delta.fixed , est.guess , fulldesign ,
 	est.some.slopes , gammaslope , gammaslope.fixed, gammaslope.constr.V ,
-	gammaslope.constr.Npars , gammaslope.center.index  ){
+	gammaslope.constr.Npars , gammaslope.center.index ,
+    gammaslope.prior , numdiff.parm ){
   #***Model parameters
+  h <- numdiff.parm
   ic <- data.frame("n" = nstud , "deviance" = deviance )
   dev <- deviance
 	# xsi parameters
@@ -27,8 +31,18 @@
 	ic$NparsB <- ic$NparsB - gammaslope.constr.Npars
 	if ( ! is.null(gammaslope.center.index ) ){
 		ic$NparsB <- ic$NparsB - max( gammaslope.center.index )
-	
-						}	
+						}
+    # non-active gammaslope parameters
+	ic$Ngamma.nonactive <- 0
+	if ( ! is.null(gammaslope.prior ) ){
+	     if ( ncol(gammaslope.prior) > 2 ){
+			  ic$Ngamma.nonactive <- ic$Ngamma.nonactive + 
+						sum( gammaslope < gammaslope.prior[,3] + 3*h )
+			  ic$Ngamma.nonactive <- ic$Ngamma.nonactive + 
+						sum( gammaslope > gammaslope.prior[,4] - 3*h )	
+							}
+					}
+						
 	# beta regression parameters
 	ic$Nparsbeta <- 0
 	ic$Nparscov <- 0
@@ -57,9 +71,11 @@
 						}
 	# total number of parameters
 	ic$Npars <- ic$np <- ic$Nparsxsi + ic$NparsB + ic$Nparsbeta + ic$Nparscov + 
-		          ic$Nguess + ic$Ndelta	
+		          ic$Nguess + ic$Ndelta	- ic$Ngamma.nonactive
     	# AIC
         ic$AIC <- dev + 2*ic$np
+		# AIC3
+		ic$AIC3 <- dev + 3*ic$np		
         # BIC
         ic$BIC <- dev + ( log(ic$n) )*ic$np
 		# adjusted BIC 
@@ -70,42 +86,3 @@
         ic$AICc <- ic$AIC + 2*ic$np * ( ic$np + 1 ) / ( ic$n - ic$np - 1 )	  
 	return(ic)
 	}
-##################################################
-# create table of item parameters
-.mml.3pl.TAM.itempartable <- function( resp , maxK , AXsi , B , ndim ,
-			resp.ind , rprobs,n.ik,pi.k , guess , est.guess ,
-			order.items=FALSE){
-				
-	item1 <- data.frame( "item" = colnames(resp) )
-#	item1 <- data.frame( "item" = dimnames(B)[[1]] )
-	item1$N <- colSums(resp.ind )
-	item1$M <- colSums( resp.ind * resp , na.rm=TRUE) / colSums( resp.ind )
-	#****
-	# Item fit
-	# probs ... [ classes , items , categories ]
-	probs <- aperm( rprobs , perm=c(3,1,2))
-	pi.k <- matrix( pi.k , ncol=1 )
-    if ( is.null( est.guess) ){ est.guess <- 0 }
-	item1$est.guess <- est.guess
-	item1$guess <- guess
-#	res <- .tam.itemfit.rmsea( n.ik , pi.k , probs )
-	#####
-	# Exploratory analyses show that item fit rmsea
-	# does not seem to be sensitive
-#	item1$rmsea <- res
-	for (kk in 1:(maxK-1)){ # kk <- 1
-		item1[ , paste0("AXsi_.Cat" , kk) ] <- - AXsi[,kk+1]
-						}
-	for (kk in 1:(maxK-1)){ # kk <- 1
-		for (dd in 1:ndim){
-			item1[ , paste0("B.Cat" , kk,".Dim",dd) ] <- B[,kk+1,dd]
-							}
-					}				
-    item1 <- item1[ item1$N > 0 , ]	
-	if ( order.items ){
-		item1 <- item1[ order( paste( item1$item)) , ]		
-					}
-	rownames(item1) <- NULL
-	return(item1)
-		}
-#######################################################

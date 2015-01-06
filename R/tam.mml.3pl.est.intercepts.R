@@ -22,7 +22,8 @@
 								 guess=guess )					
           rprobs <- res.p[["rprobs"]]
           rprobs0 <- res.p$rprobs0		  
-        }     
+        }
+
         res <- .mml.3pl.calc_exp_TK3( rprobs , A , np , est.xsi.index , itemwt ,
                              indexIP.no , indexIP.list2 , rprobs0 , guess ,
 							 n.ik , N.ik )
@@ -35,7 +36,7 @@
         diff <- as.vector(ItemScore) - xbar
         #Compute the Newton-Raphson derivative for the equation to be solved
         deriv <- xbar2 - xxf 	
-		
+
 		#***********************
 		# xsi prior
 		  if ( ! is.null(xsi.prior) ){
@@ -68,7 +69,7 @@
         se.xsi <- sqrt( 1 / abs(deriv) )
         if ( ! is.null( xsi.fixed) ){ se.xsi[ xsi.fixed[,1] ] <- 0 } 
         ##**
-        
+
         xsi <- xsi+increment   # update parameter p
         #	  est.xsi.index <- which( abs(increment) > convM )
         if ( max(abs(increment)) < convM ) { converge <- TRUE }
@@ -101,11 +102,11 @@
 	NXSI <- dim(A)[3]
 	NI <- dim(A)[1]
 	# restructure rprobs and AL	
-	AL <- matrix( A , NI*CC , NXSI )	
+	AL <- matrix( A , nrow=NI*CC , ncol=NXSI )	
 	AL[ is.na(AL) ] <- 0
-	rprobsL <- matrix( rprobs , NI*CC , TP )
+	rprobsL <- matrix( rprobs , nrow=NI*CC , ncol=TP )
 	rprobsL[ is.na(rprobsL) ] <- 0
-	rprobsL0 <- matrix( rprobs0 , NI*CC , TP )
+	rprobsL0 <- matrix( rprobs0 , nrow=NI*CC , ncol=TP )
 	rprobsL0[ is.na(rprobsL0) ] <- 0
 	# use nik
 	nik <- as.vector(n.ik)
@@ -114,8 +115,9 @@
 	#******
 	# Call .mml.3pl function  (define CALL)	
 	res <- .Call("mml3pl_tam_calcexp" ,  np , rprobsL , AL ,	indexIP.no , 
-			indexIP.list2 , est.xsi.index , CC , itemwt , rprobsL0 , 
-			guess , nik , ni , PACKAGE="TAM")	
+			    indexIP.list2 , est.xsi.index , CC , itemwt , rprobsL0 , 
+			    guess , nik , ni , PACKAGE="TAM")
+			
 	return(res)
 		}
 		

@@ -6,12 +6,14 @@ Plausible Value Imputation
 }
 \description{
 Plausible value imputation for objects of the classes \code{tam} and \code{tam.mml}
-(Adams & Wu, 2007).
+(Adams & Wu, 2007). For converting generated plausible values into
+a list of multiply imputed datasets see \code{\link{tampv2datalist}}
+and the Examples 2 and 3 of this function.
 }
 
 \usage{
 tam.pv(tamobj, nplausible = 10, ntheta = 2000, normal.approx = FALSE, 
-    samp.regr = FALSE , np.adj=8 )
+    samp.regr = FALSE, theta.model=FALSE, np.adj=8 )
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -36,15 +38,20 @@ tam.pv(tamobj, nplausible = 10, ntheta = 2000, normal.approx = FALSE,
      The default is \code{FALSE}. In the case \code{normal.approx=TRUE}
      (normal distribution approximation), the number of ability nodes 
      \code{ntheta} can be substantially smaller than 2000, say 200 or 500.
-     Note that normal approximation is only implemented for unidimensional
-     models.
+     The normal approximation is implemented for unidimensional and
+     multidimensional models.
 }
   \item{samp.regr}{
      An optional logical indicating whether regression coefficients 
      should be fixed in the plausible value imputation or
      also sampled from their posterior distribution? 
-     The default is \code{FALSE}. Note that sampling of regression
-     coefficients is only implemented for unidimensional models.
+     The default is \code{FALSE}. Sampled regression coefficients are
+     obtained by nonparametric bootstrap.
+}
+\item{theta.model}{Logical indicating whether the theta grid from the
+	\code{tamobj} object should be used for plausible value
+	imputation. In case of \code{normal.approx=TRUE}, this should
+	be sufficient in many applications.
 }
   \item{np.adj}{
      This parameter defines the "spread" of the random theta values
@@ -163,9 +170,122 @@ mod2b <- tam.mml( resp=dat[,items] , B=mod2a$B , xsi.fixed=xsi.fixed , Y=Y)
 # plausible value imputation with normality assumption
 # and ignoring uncertainty about regression coefficients
 #    -> the default is samp.regr=FALSE
-pv2c <- tam.pv( mod2b , nplausible=10 , ntheta=500 )
+pv2c <- tam.pv( mod2b , nplausible=10 , ntheta=500 , normal.approx=TRUE )
 # sampling of regression coefficients
 pv2d <- tam.pv( mod2b , nplausible=10 , ntheta=500 , samp.regr=TRUE)
+# sampling of regression coefficients, normal approximation using the
+# theta grid from the model
+pv2e <- tam.pv( mod2b , samp.regr=TRUE , theta.model=TRUE , normal.approx=TRUE)
+
+#--- create list of multiply imputed datasets with plausible values
+# define dataset with covariates to be matched
+Y <- dat[ , c("idstud" , "idschool" , "female" , "hisei" , "migra") ]
+# define plausible value names
+pvnames <- c("PVREAD")
+# create list of imputed datasets
+datlist1 <- tampv2datalist( pv2e , pvnames = pvnames , Y=Y , Y.pid="idstud")
+str(datlist1)
+
+# create a matrix of covariates with different set of students than in pv2e
+Y1 <- Y[ seq( 1 , 600 , 2 ) , ]
+# create list of multiply imputed datasets
+datlist2 <- tampv2datalist( pv2e , pvnames = c("PVREAD"), Y=Y1 , Y.pid="idstud")
+
+#--- fit some models in lavaan and semTools
+library(lavaan)
+library(semTools)
+
+#*** Model 1: Linear regression
+lavmodel <- "
+   PVREAD ~ migra + hisei
+   PVREAD ~~ PVREAD
+        "
+mod1 <- semTools::lavaan.mi( lavmodel , data = datlist1 , m=0)        
+summary(mod1 , standardized=TRUE, rsquare=TRUE)
+
+# apply lavaan for third imputed dataset
+mod1a <- lavaan::lavaan( lavmodel , data = datlist1[[3]] )        
+summary(mod1a , standardized=TRUE, rsquare=TRUE)
+
+# compare with mod1 by looping over all datasets
+mod1b <- lapply( datlist1 , FUN = function(dat0){
+    mod1a <- lavaan( lavmodel , data = dat0 )        
+    coef( mod1a)
+        } )
+mod1b        
+mod1b <- matrix( unlist( mod1b ) , ncol= length( coef(mod1)) , byrow=TRUE )
+mod1b
+round( colMeans(mod1b) , 3 )
+coef(mod1)   # -> results coincide
+
+#*** Model 2: Path model
+lavmodel <- "
+   PVREAD ~ migra + hisei
+   hisei ~ migra
+   PVREAD ~~ PVREAD
+   hisei ~~ hisei
+        "
+mod2 <- semTools::lavaan.mi( lavmodel , data = datlist1 )        
+summary(mod2 , standardized=TRUE, rsquare=TRUE)
+# fit statistics
+inspect( mod2 , what="fit")
+
+#--- using mice
+library(mice)
+library(miceadds)
+# convert datalist into a mids object
+mids1 <- miceadds::datalist2mids( datlist1 )
+# fit linear regression
+mod1c <- with( mids1 , lm( PVREAD ~ migra + hisei ) )
+summary( pool(mod1c) )
+
+#############################################################################
+# SIMULATED EXAMPLE 3: Multidimensional plausible value imputation
+#############################################################################
+
+# (1) simulate some data
+set.seed(6778)
+library(mvtnorm)
+N <- 1000      
+Y <- cbind( rnorm( N ) , rnorm(N) )
+theta <- rmvnorm( N,mean=c(0,0), sigma=matrix( c(1,.5,.5,1) , 2 , 2 ))
+theta[,1] <- theta[,1] + .4 * Y[,1] + .2 * Y[,2]  # latent regression model
+theta[,2] <- theta[,2] + .8 * Y[,1] + .5 * Y[,2]  # latent regression model
+I <- 20
+p1 <- plogis( outer( theta[,1] , seq( -2 , 2 , len=I ) , "-" ) )
+resp1 <- 1 * ( p1 > matrix( runif( N*I ) , nrow=N , ncol=I ) )
+p1 <- plogis( outer( theta[,2] , seq( -2 , 2 , len=I ) , "-" ) )
+resp2 <- 1 * ( p1 > matrix( runif( N*I ) , nrow=N , ncol=I ) )
+resp <- cbind(resp1,resp2)
+colnames(resp) <- paste("I" , 1:(2*I), sep="")
+  
+# (2) define loading Matrix
+Q <- array( 0 , dim = c( 2*I , 2 ))
+Q[cbind(1:(2*I), c( rep(1,I) , rep(2,I) ))] <- 1
+
+# (3) fit latent regression model
+mod <- tam.mml( resp=resp , Y=Y , Q=Q , control=list(maxiter=5) )
+
+# (4) draw plausible values with normal approximation using the orginal theta grid
+pv1 <- tam.pv( mod , normal.approx=TRUE , theta.mod = TRUE )
+
+# (5) convert plausible values to list of imputed datasets
+Y1 <- data.frame(Y)
+colnames(Y1) <- paste0("Y",1:2)
+pvnames <- c("PVFA","PVFB")
+# create list of imputed datasets
+datlist1 <- tampv2datalist( pv1 , pvnames = pvnames , Y=Y1 )
+str(datlist1)
+
+# (6) apply statistical models
+library(semTools)
+# define linear regression
+lavmodel <- "
+   PVFA ~ Y1 + Y2
+   PVFA ~~ PVFA
+        "
+mod1 <- semTools::lavaan.mi( lavmodel , data = datlist1 )        
+summary(mod1 , standardized=TRUE, rsquare=TRUE)
 }
 }
 

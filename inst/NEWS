@@ -26,20 +26,85 @@ mailto:
 Alexander Robitzsch
 a.robitzsch@bifie.at
 
-For reporting a bug, please provide always a reproducible R script 
+For reporting a bug, please always provide a reproducible R script 
 and (if necessary) a corresponding dataset.
 
 URL:
 ----
-For development versions see
+For TAM development versions see
 https://sites.google.com/site/alexanderrobitzsch/software
 
-For tutorials see
+For TAM tutorials see
 http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
+
+-------------------------------------------------------
+Changes in Version 1.3   (2015-01-06)
+-------------------------------------------------------
+
+Features:
+* included option for sum constraints on item intercepts
+  (constraint="items") in 'tam.mml'.
+  For polytomous data, this option automatically specifies
+  irtmodel="PCM2".
+* included truncated normal prior distributions for
+  gammaslope parameters in 'tam.mml.3pl'
+* included 'tamaan' and 'tamaanify' functions for more
+  more convenient model specifications in TAM
+* included 'doparse' function as a shortcut for writing
+  loops in model syntax
+* included item-category specific curves in 'plot.tam' using  
+  the argument type="items" (suggested by Cheng-Hsuan Li and
+  Michal Modzelewski)
+* plot function for type="items" now also works for multidimensional
+  item response models with between item dimensionality
+* included normal approximation and sampling of regression 
+  coefficients for plausible value imputation ('tam.pv') for 
+  multidimensional item response models. 
+  The theta grid can also be fixed (argument theta.model=TRUE)
+  and is taken from the fitted model.
+* included the function 'tampv2datalist' for converting plausible
+  values and a set of covariates into a list of multiply imputed
+  datasets 
+* included the function 'tam.latreg' which performs a latent
+  regression model in which only the individual likelihood is 
+  needed as an input
+
+Bug fixes:
+* corrected algorithmic stopping criteria in 'tam.mml.3pl'
+* fixed a bug in 'tam.mml.2pl' when design matrix B.fixed 
+  for fixed loadings contains only one row
+* another bug was fixed by Michal Modzelewski in data preparation
+  in the multi-facet function 'tam.mml.mfr'
+* fixed a bug in estimation routines if a dataset resp is provided
+  without column names (thanks to Alec Nyce)
+
+Notes:
+* included parametrization of mean item intercept (irtmodel="PCM2")
+  in output of tam.mml and tam.mml.2pl (value item$xsi.item)
+* included nonlinear terms in lavaan syntax in 'lavaanify.IRT'
+* included option for initial delta parameters in 'tam.mml.3pl'
+* added AIC3 information criterion in summary
+* included datasets data.geiser and data.janssen for latent
+  class analysis and mixture Rasch analysis (thanks to
+  Christian Geiser and Anne Janssen)
+* included Example 3 in 'tam.wle' comparing WLE person parameter
+  estimates from the  TAM and the PP package
+* included Example 3 in 'tam.threshold' for creating Wright maps
+  with the WrightMap package
+
+Datasets included or modified:
+* data.geiser, data.janssen, data.janssen2
+
+Examples included or modified:
+* tam.modelfit (3), tam.mml (1,4,5,6,13,18), lavaanify.IRT (3,4),
+  tam.mml.3pl (1.6b,4,7,8,9), tamaanify (1,2), tamaan (1,2), 
+  plot.tam (1,2), tam.wle (3), tam.threshold (3), tam.pv (2,3),
+  tam.latreg (1)
 
 -------------------------------------------------------
 Changes in Version 1.2   (2014-11-22)
@@ -92,7 +157,6 @@ Notes:
 * added value of the individual likelihood in 'tam.mml',
   'tam.mml.2pl' and 'tam.mml.3pl'
 
-
 Datasets included or modified:
 * rating dataset data.exJ03 (provided by Matt Barney)
 
@@ -100,7 +164,6 @@ Examples included or modified:
 * tam.fit (4), tam.threshold (2), tam.mml.3pl (7,8), lavaanify.IRT (1,2),
   tam.jml (1,4), IRT.likelihood.tam (1), IRT.factor.scores (1),
   IRT.irfprob (1)
-
 
 -------------------------------------------------------
 Changes in Version 1.1   (2014-10-19)

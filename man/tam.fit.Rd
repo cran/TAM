@@ -61,12 +61,12 @@ In case of \code{tam.mml.fit} a data frame with four columns:
 \item{Outfit}{Item outfit statistic}
 \item{Outfit_t}{The \eqn{t} value for the outfit statistic}
 \item{Outfit_p}{Significance \eqn{p} value for outfit statistic}
-\item{Outfit_phom}{Significance \eqn{p} value for outfit statistic, 
+\item{Outfit_pholm}{Significance \eqn{p} value for outfit statistic, 
 adjusted for multiple testing according to the Holm procedure}
 \item{Infit}{Item infit statistic}
 \item{Infit_t}{The \eqn{t} value for the infit statistic}
 \item{Infit_p}{Significance \eqn{p} value for infit statistic}
-\item{Infit_phom}{Significance \eqn{p} value for infit statistic, 
+\item{Infit_pholm}{Significance \eqn{p} value for infit statistic, 
 adjusted for multiple testing according to the Holm procedure}
 }
 
