@@ -55,6 +55,8 @@ tam.mml.3pl <-
 	est.slopegroups <- NULL	
 	init.gammaslope <- ( ! is.null( gammaslope ) )
 	
+	
+	resp <- as.matrix(resp)
 	resp <- add.colnames.resp(resp)
 	
 	#********************
@@ -115,7 +117,7 @@ tam.mml.3pl <-
     if ( is.null(group) ){ 
 	  group1 <- rep(1,nrow(resp) )
     }   	
-    resp <- as.matrix(resp)
+    
     nullY <- is.null(Y)
     
     # define design matrix in case of PCM2
@@ -123,8 +125,15 @@ tam.mml.3pl <-
       A <- .A.PCM2( resp ) 
     }  
 
-
+    
+	
+	
 	# manage guessing parameters
+	if ( is.null(guess) ){
+	   guess <- rep( 0 , ncol(resp) )
+						}
+	
+	
 	if ( ! is.null(est.guess) ){
 #	    guess <- rep(0,ncol(resp))
 		h1 <- setdiff( unique(est.guess) , 0 )
@@ -135,7 +144,12 @@ tam.mml.3pl <-
     
     nitems <- ncol(resp)       # number of items
     nstud <- nrow(resp)        # number of students
-    if ( is.null( pweights) ){
+    
+	#*****
+	nstud100 <- sum(1*( rowSums( 1 - is.na(resp) ) > 0 ))
+  
+  
+	if ( is.null( pweights) ){
       pweights <- rep(1,nstud) # weights of response pattern
     }
     
@@ -604,7 +618,7 @@ a0 <- Sys.time()
                 					  }
 							}
 									
-	# cat("stud prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1				
+#	 cat("stud prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1				
 	  
 	  
 	  #******************************************
@@ -697,11 +711,12 @@ a0 <- Sys.time()
       
 	  ######################################
 	  # calculation of expected counts
-
+	  
 		res <- .mml.3pl.expected.counts( datindw , nitems , maxK , ntheta , hwt)
 		n.ik <- res$n.ik
 		N.ik <- res$N.ik
 		
+# cat("expected counts") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
 		
       ######################################
       # M-step item intercepts
@@ -718,13 +733,13 @@ a0 <- Sys.time()
       ###############################################
 	  # M-step item slopes	  
       if ( est.some.slopes){
-          oldgamma <- gammaslope	  
+          oldgamma <- gammaslope		  
 		  res <- .mml.3pl.est.slopes( max.increment , np , 
 				Msteps , nitems , A , AXsi , B , xsi , guess , theta , nnodes , maxK ,
 				progress ,ItemScore , fac.oldxsi , rprobs , xsi.fixed , convM , rprobs0 ,
 				n.ik , N.ik , gammaslope , E , FdesM , dimFdes ,
 				gammaslope.fixed , gammaslope.prior , maxgamma = maxgamma )	
-
+				
 		  gammaslope <- res$gammaslope	
 		  se.gammaslope <- res$se.gammaslope
 		  gammaslope.change <- res$gammachange	
@@ -886,7 +901,7 @@ a0 <- Sys.time()
       #****		
     } 
     ##*** Information criteria
-    ic <- .mml.3pl.TAM.ic( nstud , deviance , xsi , xsi.fixed ,
+    ic <- .mml.3pl.TAM.ic( nstud=nstud100 , deviance , xsi , xsi.fixed ,
                    beta , beta.fixed , ndim , variance.fixed , G ,
                    irtmodel ,B_orig=B_orig ,  B.fixed , E , est.variance , resp ,
                    est.slopegroups , skillspace , delta , delta.fixed , est.guess ,

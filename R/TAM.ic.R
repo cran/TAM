@@ -10,6 +10,7 @@
 	# c("2PL","GPCM","GPCM.design","2PL.groups") )	
 # Revalpr( "unique(group)")
   #***Model parameters
+#  nstud <- sum( 1*(rowSums( 1 - is.na(resp) ) > 0  ) )
   ic <- data.frame("n" = nstud , "deviance" = deviance )
   dev <- deviance
 	# xsi parameters

@@ -140,6 +140,7 @@ tamaan.3pl.mixture <- function( res0 , anal.list , con , ... ){
 		
 		ipar$est <- gammaslope[ ipar$index ]
 		# res$itempartable1_MIXTURE <- ipar
+		res$gammaslope <- gammaslope
 		
 		# second item parameter table
 		ipar2 <- ipar[ ipar$Class == 1 , c("item" , "parm0")]
@@ -149,7 +150,7 @@ tamaan.3pl.mixture <- function( res0 , anal.list , con , ... ){
 			ipar2[ , paste0("Cl" , cl ) ] <- ipar[ ipar$Class == cl , "est" ]
 						}
 		res$itempartable_MIXTURE <- ipar2
-		
+
 		res$tamaan.method <- "tam.mml.3pl"
         return(res)
 			}

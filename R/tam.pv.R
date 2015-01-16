@@ -152,10 +152,14 @@ a0 <- Sys.time()
 				
 			#*****
 			# no normal approximation
-			if ( ! normal.approx){			
+			if ( ! normal.approx){	
 				rn1 <- runif( nstud )
-				ind <- rowSums( hwt1 < outer( rn1 , nthetal ) ) +1
-				pv[,pp] <- theta1 <- theta[ind]				
+				ind <- rowSums( hwt1 < outer( rn1 , nthetal ) ) +1				
+				if (ndim==1){
+					pv[,pp] <- theta1 <- theta[ind]	
+							} else {
+					theta1 <- pv[ , (pp-1)*(ndim) + 1:ndim ] <- theta[ ind , ]
+									}
 								}
 			#*****
 			# normal approximation in unidimensional case
@@ -186,7 +190,7 @@ a0 <- Sys.time()
 						
 			# bootstrap sample of persons to get sampled beta coefficients
 			if ( ndim > 1 ){
-				N <- nrow(theta1)
+				N <- nrow(theta1)			
 				ind <- sample( 1:N , N , replace=TRUE)
 				theta1 <- theta1[ ind , ]				
 				Y1 <- Y[ ind , , drop=FALSE ]

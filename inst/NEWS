@@ -41,6 +41,46 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
+-------------------------------------------------------
+Changes in Version 1.4   (2015-01-15)
+-------------------------------------------------------
+
+Features:
+* included function 'cfa.extract.itempars' for extracting
+  item parameters from a fitted confirmatory factor analysis
+  with the cfa function in lavaan package
+* included the function 'IRTLikelihood.cfa' for extracting 
+  the individual likelihood from fitted confirmatory factor
+  analyses
+* included an S3 method 'IRT.WrightMap' which is a wrapper
+  to the WrightMap package
+
+Bug fixes:
+* fixed a bug for item response dataset with only one column
+* fixed a bug in tamaan function when applied to TYPE="TRAIT"
+  and models without guessing parameters
+* fixed a bug in plot.ctt function for input of item response
+  data with only one columns (thanks to Michal Modzelewski)
+
+Notes:
+* added item types 'PCM(kk)' and 'GPCM(kk)' for smoothing
+  item intercepts in tamaan function
+* included a summary method for 'tam.fit'  
+* included 'MEASERR' convenience method for single indicators
+  with measurement errors in 'lavaanify.IRT'
+* changed some internal handling in 'lavaanify.IRT' due to
+  announced changes in lavaan 0.5-18 in 'lavaanify'
+* changed equality constraints in the section "MODEL CONSTRAINT"
+  in 'tamaanify' to the usage of "==" instead of "=" (as in lavaan)
+
+Datasets included or modified:
+* data.ctest2
+
+Examples included or modified:
+* cfa.extract.itempars (1), IRTLikelihood.cfa (1),
+  tamaan (2), tam.fit (1,2), data.geiser (2), tam.latreg (2,3),
+  IRT.WrightMap (1,2,3,4), data.cqc (1,2,3), lavaanify.IRT (6)
+
 
 -------------------------------------------------------
 Changes in Version 1.3   (2015-01-06)

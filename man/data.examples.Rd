@@ -122,7 +122,7 @@ to fix convergence problems using arguments \code{increment.factor} and
 
 %% Example data.exJ03
 \item Data \code{data.exJ03} for Example 4 in \code{\link{tam.jml}} 
-has the following format:
+has the following format: 
 
 \code{List of 2} \cr
 \code{ $ resp:'data.frame':   40 obs. of  20 variables:} \cr
@@ -135,7 +135,8 @@ has the following format:
 \code{  ..$ rater : int [1:40] 40 40 96 96 123 123 157 157 164 164 ...} \cr
 \code{  ..$ gender: int [1:40] 2 2 1 1 1 1 2 2 2 2 ...} \cr
 \code{  ..$ region: num [1:40] 1 1 1 1 2 2 1 1 1 1 ...} \cr
-\code{  ..$ leader: int [1:40] 1 2 1 2 1 2 1 2 1 2 ...} \cr
+\code{  ..$ leader: int [1:40] 1 2 1 2 1 2 1 2 1 2 ...} 
+
 It is a rating dataset (a subset of a dataset provided by Matt Barney). \cr
 
 } %% end itemize

@@ -64,6 +64,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   if ( !is.null(con$seed)){ set.seed( con$seed )	 }
   fac.oldxsi <- max( 0 , min( c( fac.oldxsi , .95 ) ) )
 	
+    resp <- as.matrix(resp)	
 	resp <- add.colnames.resp(resp)
   
   if (progress){ 
@@ -74,7 +75,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
     con1a$QMC <- QMC <- FALSE
 	con1a$snodes <- snodes <- 0
 					}   
-  resp <- as.matrix(resp)
+  
   nullY <- is.null(Y)
   
   # define design matrix in case of PCM2
@@ -88,6 +89,10 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   
   nitems <- ncol(resp)       # number of items
   nstud <- nrow(resp)        # number of students
+
+	#*****
+	nstud100 <- sum(1*( rowSums( 1 - is.na(resp) ) > 0 ))
+  
   if ( is.null( pweights) ){
     pweights <- rep(1,nstud) # weights of response pattern
   }
@@ -726,7 +731,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 			}
 
 	##*** Information criteria
-	ic <- .TAM.ic( nstud , deviance , xsi , xsi.fixed ,
+	ic <- .TAM.ic( nstud=nstud100 , deviance , xsi , xsi.fixed ,
 		beta , beta.fixed , ndim , variance.fixed , G ,
 		irtmodel ,B_orig=B_orig ,  B.fixed , E , est.variance , resp ,
 		est.slopegroups , variance.Npars=variance.Npars , group )

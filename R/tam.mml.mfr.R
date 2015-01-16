@@ -76,9 +76,9 @@ tam.mml.mfr <-
       con1a$snodes <- snodes <- 0
     }
     
-		resp <- add.colnames.resp(resp)
-		
-    resp <- as.matrix(resp)
+	resp <- as.matrix(resp)
+	resp <- add.colnames.resp(resp)		
+    
     nullY <- is.null(Y)
     
     if ( ! is.null(facets) ){ facets <- as.data.frame(facets) }
@@ -227,7 +227,8 @@ tam.mml.mfr <-
     # calculate ndim if only B or Q are supplied
     if ( ! is.null(B) ){ ndim <- dim(B)[3] } 
     if ( ! is.null(Q) ){ ndim <- dim(Q)[2] }
-    
+   
+	
     betaConv <- FALSE         #flag of regression coefficient convergence
     varConv <- FALSE          #flag of variance convergence
     nnodes <- length(nodes)^ndim

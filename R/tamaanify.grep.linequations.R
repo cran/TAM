@@ -5,7 +5,7 @@
 # grep list of linear equations
 tamaanify.grep.linequations <- function( syn2 ){		
 		# split syntax in matrix format				
-		syn3 <- strsplit( paste0(syn2) , split="=" , fixed=TRUE )
+		syn3 <- strsplit( paste0(syn2) , split="==" , fixed=TRUE )
 		syn3a <- unlist(lapply( syn3 , FUN = function(ll){ ll[1] } ))
 		syn3b <- unlist(lapply( syn3 , FUN = function(ll){ ll[2] } ))
 		L1 <- length(syn3a)

@@ -154,16 +154,16 @@ LAVAAN MODEL:
 MODEL CONSTRAINT:
   # defined parameters
   # only linear combinations are permitted
-  b2 = 1.3*b1 + (-0.6)*b3
-  a1 = q1
-  a2 = q2 + t
-  a3 = q1 + 2*t
-  a4 = q2 + 3*t
+  b2 == 1.3*b1 + (-0.6)*b3
+  a1 == q1
+  a2 == q2 + t
+  a3 == q1 + 2*t
+  a4 == q2 + 3*t
   # linear constraints for loadings
-  lam2 = 1.1*lam1
-  lam3 = 0.9*lam1 + (-.1)*lam0
-  lam8 = lam0
-  lam9 = lam0
+  lam2 == 1.1*lam1
+  lam3 == 0.9*lam1 + (-.1)*lam0
+  lam8 == lam0
+  lam9 == lam0
     "
 mod4 <- tamaan( tammodel , resp=dat , control=list(maxiter=5) )
 summary(mod4)
@@ -298,11 +298,11 @@ LAVAAN MODEL:
   act1 + act3 | a13_t1 * t1 
   act1 + act3 | a13_t2 * t2
 MODEL CONSTRAINT:  
-  a1 = q0
-  a2 = q0
-  a3 = q0    + q1
-  a4 =    q2
-  a5 =    q2 + q1
+  a1 == q0
+  a2 == q0
+  a3 == q0    + q1
+  a4 ==    q2
+  a5 ==    q2 + q1
     "
 # estimate
 mod3 <- tamaan( tammodel , dat , control=list(maxiter=300 )  )
@@ -340,8 +340,8 @@ tammodel <- "
     DOEND
   MODEL CONSTRAINT:
     DO(1,5,1) 
-      b\%_1 = delta\% + tau\%_1
-      b\%_2 = 2*delta\%
+      b\%_1 == delta\% + tau\%_1
+      b\%_2 == 2*delta\%
     DOEND  
   ITEM TYPE:
     ALL(PCM)
@@ -373,9 +373,9 @@ tammodel <- "
     DOEND
   MODEL CONSTRAINT:
     DO(1,4,1) 
-      b\%_1 = delta\% + step1
-      b\%_2 = 2*delta\% + step1 + step2
-      b\%_3 = 3*delta\%      
+      b\%_1 == delta\% + step1
+      b\%_2 == 2*delta\% + step1 + step2
+      b\%_3 == 3*delta\%      
     DOEND  
   ITEM TYPE:
     ALL(PCM)
@@ -386,6 +386,28 @@ summary(mod6)
 # compare with RSM in tam.mml
 mod6b <- tam.mml( dat1 , irtmodel="RSM" )
 summary(mod6b)
+
+#*********************************************************************
+#*** Model 7: Partial credit model with Fourier basis for
+#             item intercepts (Thissen, Cai & Bock, 2010)
+# see ?tamaanify manual
+
+# define tamaan model
+tammodel <- "
+LAVAAN MODEL:
+   mj =~ mj1__mj4
+   mj ~~ 1*mj
+ITEM TYPE:
+  mj1(PCM,2)
+  mj2(PCM,3)
+  mj3(PCM)
+  mj4(PCM,1)
+   " 
+# estimate model
+mod7 <- tamaan( tammodel , dat )
+summary(mod7)
+# -> This function can also be applied for the generalized partial credit
+#    model (GPCM). 
 }	
 }
 

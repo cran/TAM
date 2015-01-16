@@ -5,6 +5,14 @@ lavaanify.IRT <- function( lavmodel , items=NULL , data = NULL , include.residua
           doparse=TRUE ){
  a0 <- Sys.time()
  
+    #*** check for input errors of data
+	ind <- is.matrix( items ) | is.data.frame( items )
+    if ( ind ){
+	    items <- colnames(items)
+				}
+
+	#***
+ 
 	if ( doparse ){
 	   lavmodel <- doparse( lavmodel )
 					}
@@ -12,25 +20,29 @@ lavaanify.IRT <- function( lavmodel , items=NULL , data = NULL , include.residua
     if ( is.null(items) ){
              items <- colnames(data)
 					}	
+	# grep for MEASERR
+	lavmodel <- lavaanify.grep.MEASERR( lavmodel )										
+	
 	# grep for nonlinear terms
 	res <- lavaanify.grep.nonlinear( lavmodel , items )
+	
 	lavmodel <- res$lavmodel
 	nonlin_factors <- res$nonlin_factors
 	nonlin_syntable <- res$nonlin_syntable
 	items <- res$items
-    res <- lavaanify.sirt.v1( lavmodel = lavmodel )		
-# cat("\n*** sirt.v1 first") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
-	ind <- grep( "__" , lavmodel )
+    res <- lavaanify.sirt.v1( lavmodel = lavmodel )	
+	
+	ind <- grep( "__[A-Z,a-z]" , lavmodel )
+	
 	if ( length(ind) > 0 ){
 		res <- lavpartable.grep.underbrace( lavpartable=res$lavpartable , items )		
-# cat("\n*** grep under") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1			
+		
  		res <- remove.duplicated.variances.lavsyn(res , items)	
- #cat("\n*** remove dupl") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1					
 		res <- lavaanify.sirt.v1( lavmodel = res)
  #cat("\n*** sirt.v1 second") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1					
 		lavpar <- res$lavpartable
 		lavsyn <- res$lavaan.syntax
-		
+
 		lavpar0 <- lavpar
 		ind1 <- which( paste(lavpar$op) == "?="  )
 		ind2 <- which( !( paste(lavpar$rhs) %in% c("g1","s1")  ) )
@@ -48,6 +60,7 @@ lavaanify.IRT <- function( lavmodel , items=NULL , data = NULL , include.residua
 		res$lavaan.syntax <- lavsyn1
  # cat("rest ind") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							
 				}
+		
 
 	#****************
 	# estimate residual variances

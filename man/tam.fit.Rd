@@ -3,6 +3,7 @@
 \alias{tam.fit}
 \alias{tam.mml.fit}
 \alias{tam.jml.fit}
+\alias{summary.tam.fit}
 
 \title{
 Item Infit and Outfit Statistic
@@ -21,6 +22,8 @@ tam.mml.fit(tamobj, FitMatrix=NULL, Nsimul=NULL,progress=TRUE,
    useRcpp=TRUE, seed=123, fit.facets=TRUE)
 
 tam.jml.fit(tamobj)
+
+\method{summary}{tam.fit}(object, \dots)
 }
 
 %% tam.jml.fit(tamobj, resp, resp.ind, A, B, nstud, nitems, maxK, ItemScore, 
@@ -48,6 +51,7 @@ The latter is consistent with \pkg{TAM} (<=1.1).}
 \item{seed}{Fixed simulation seed.}
 \item{fit.facets}{An optional logical indicating whether
 fit for all facet parameters should be computed.}
+\item{object}{Object of class \code{tam.fit}}
 \item{\dots}{Further arguments to be passed}
 }
 
@@ -57,7 +61,8 @@ Item fit is automatically calculated in JML estimation using
 }
 
 \value{
-In case of \code{tam.mml.fit} a data frame with four columns:
+In case of \code{tam.mml.fit} a data frame as entry \code{itemfit} 
+with four columns:
 \item{Outfit}{Item outfit statistic}
 \item{Outfit_t}{The \eqn{t} value for the outfit statistic}
 \item{Outfit_p}{Significance \eqn{p} value for outfit statistic}
@@ -72,7 +77,7 @@ adjusted for multiple testing according to the Holm procedure}
 
 \references{
 Adams, R. J., & Wu, M. L. (2007). The mixed-coefficients multinomial logit model.
-A generalized form of the Rasch model. In M. von Davier & C. H. Carstensen (Eds.):
+A generalized form of the Rasch model. In M. von Davier & C. H. Carstensen (Eds.).
 \emph{Multivariate and mixture distribution Rasch models: Extensions and applications}
 (pp. 55-76). New York: Springer.
 }
@@ -87,9 +92,12 @@ A generalized form of the Rasch model. In M. von Davier & C. H. Carstensen (Eds.
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-%\seealso{
+\seealso{
+Item fit and person fit based on estimated person parameters can be 
+calculated using the \code{\link[sirt:pcm.fit]{pcm.fit}} function
+in the \pkg{sirt} package (see Example 1 and Example 2).
+}
 %% ~~objects to See Also as \code{\link{help}}, ~~~
-%}
 
 \examples{
 #############################################################################
@@ -101,12 +109,26 @@ data(sim.rasch)
 mod1 <- tam.mml(resp=sim.rasch) 
 # item fit
 fit1 <- tam.fit( mod1 )
-  ##   > print( round( fit1 ,3 ))
-  ##       Outfit Outfit_t Infit Infit_t
-  ##   I1   0.951   -1.549 0.994  -0.135
-  ##   I2   1.033    1.040 1.028   0.755
-  ##   I3   1.012    0.387 1.009   0.273
-  ##   I4   1.041    1.296 1.057   1.614
+summary(fit1)
+  ##   > summary(fit1)
+  ##      parameter Outfit Outfit_t Outfit_p Infit Infit_t Infit_p
+  ##   1         I1  0.966   -0.409    0.171 0.996  -0.087   0.233
+  ##   2         I2  1.044    0.599    0.137 1.029   0.798   0.106
+  ##   3         I3  1.022    0.330    0.185 1.012   0.366   0.179
+  ##   4         I4  1.047    0.720    0.118 1.054   1.650   0.025
+
+#--------
+# infit and oufit based on estimated WLEs
+library(sirt)
+
+# estimate WLE
+wle <- tam.wle(mod1)
+# extract item parameters
+b1 <- - mod1$AXsi[ , -1 ]
+# assess item fit and person fit
+fit1a <- sirt::pcm.fit(b=b1, theta=wle$theta , sim.rasch )
+fit1a$item       # item fit statistic
+fit1a$person     # person fit statistic
 
 \dontrun{
 #############################################################################
@@ -114,20 +136,27 @@ fit1 <- tam.fit( mod1 )
 #############################################################################
 
 data( data.gpcm )
+dat <- data.gpcm
+
 # estimate partial credit model in ConQuest parametrization 'item+item*step'
-mod2 <- tam.mml( resp=data.gpcm , irtmodel="PCM2" )
+mod2 <- tam.mml( resp=dat , irtmodel="PCM2" )
 summary(mod2)
 # estimate item fit
 fit2 <- tam.fit(mod2)
-  ## > round( fit2 ,3 )
-  ##                 Outfit Outfit_t Infit Infit_t
-  ##   Comfort        0.968   -0.426 0.967  -0.375
-  ##   Work           1.061    0.867 1.054   0.695
-  ##   Benefit        0.984   -0.196 0.987  -0.165
-  ##   Comfort_step1  0.932   -0.946 0.955  -0.728
-  ##   [...]
+summary(fit2)
+
 #  => The first three rows of the data frame correspond to the fit statistics
 #     of first three items Comfort, Work and Benefit.
+
+#--------
+# infit and oufit based on estimated WLEs
+# compute WLEs
+wle <- tam.wle(mod2)
+# extract item parameters
+b1 <- - mod2$AXsi[ , -1 ]
+# assess fit
+fit1a <- sirt::pcm.fit(b=b1 , theta=wle$theta , dat)
+fit1a$item
 
 #############################################################################
 # SIMULATED EXAMPLE 3: Fit statistic testing for local independence
@@ -166,7 +195,7 @@ F[,,4] <- mod1$A[,,22] + mod1$A[,,23]
 F[,,5] <- mod1$A[,,30] + mod1$A[,,31]
 F[,,6] <- mod1$A[,,32] + mod1$A[,,33]
 fit <- tam.fit(mod1, FitMatrix=F)
-fit
+summary(fit)
 
 #############################################################################
 # SIMULATED EXAMPLE 4: Fit statistic testing for items with differing slopes
@@ -186,7 +215,7 @@ dat <- sirt::sim.raschtype( rnorm(N) , b=b , fixed.a=a )
 #*** estimate Rasch model
 mod1 <- tam.mml(resp=dat) 
 #*** assess item fit by infit and outfit statistic
-fit1 <- tam.fit( mod1 )
+fit1 <- tam.fit( mod1 )$itemfit
 round( cbind( "b"=mod1$item$AXsi_.Cat1 , fit1 )[1:7,], 3 ) 
 
 #*** compute item fit statistic in mirt package

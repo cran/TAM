@@ -16,7 +16,52 @@ tamaanify.create.A <- function( res ){
 	if (K2==2){
 	   dimnames(A)[[3]] <- paste0( dimnames(A)[[3]] , "_Cat1")
 				}
-	
+
+				
+	#*********************************************
+	# loop over items for smoothed nominal response models
+	smooth.nrm <- FALSE
+	itemtable <- res$items	
+	items.ind <- grep( "," , paste(itemtable$itemtype) , fixed=TRUE )
+	for (ii in items.ind ){	
+		# ii <- ind[1]
+		smooth.nrm <- TRUE
+		itemtype.ii <- paste( itemtable[ ii , "itemtype"] )
+		itemtype.ii <- strsplit( itemtype.ii , split="," , fixed=TRUE )[[1]]
+		maxK.ii <- itemtable[ii,"ncat"] - 1
+		if ( itemtype.ii[1] %in% c("GPCM" , "PCM" )){
+			n_order <- as.numeric( itemtype.ii[2] )
+						}
+		if ( ! ( itemtype.ii[1] %in% c("GPCM" , "PCM" ) ) ){
+			stop(paste0("Only item types 'GPCM' or 'PCM' are allowed \n  for ",
+					"smoothing item intercepts.") )
+						}
+		# extend it to nominal response model!!
+		item.ii <- paste(itemtable[ii , "item" ])
+		ind1 <- which( dimnames(A)[[3]] == paste0( item.ii , "_Cat1") )
+		A[ ii , 1 + 0:maxK.ii , ind1 ] <- - ( 0:maxK.ii )
+		dimnames(A)[[3]][ind1] <- paste0( item.ii , "_lin" )
+		
+		# further fourier terms
+		if ( n_order > 1){
+			for (ff in 2:n_order){
+		#		ff <- 2
+				ind1 <- which( dimnames(A)[[3]] == paste0( item.ii , "_Cat",ff) )
+				A[ ii , 1 + 0:maxK.ii , ind1 ] <- 
+						- sin( 3.141593 *( 0:maxK.ii ) * (ff - 1 ) / maxK.ii )
+				dimnames(A)[[3]][ind1] <- paste0( item.ii , "_four" , ff-1)
+							}
+						}
+		if ( n_order < maxK.ii ){
+			for (ff in (n_order+1):maxK.ii){
+				ind1 <- which( dimnames(A)[[3]] == paste0( item.ii , "_Cat",ff) )
+				var.ii <- dimnames(A)[[3]][ind1]
+				A <- A[ , , -c(ind1) ]
+							}	
+						}
+				}
+			
+
 	#**********************************		
 	#*********************************************
 	#****** xsi parameter fixings	
@@ -62,11 +107,12 @@ tamaanify.create.A <- function( res ){
 	
 	labs <- unique( paste0( lavpartable0$label ))	
 	NL <- length(labs)
+
 	for (ll in 1:NL){
 		# ll <- 1	
 		labs.ll <- labs[ll]
 		lav.ll <- lavpartable0[ paste0(lavpartable0$label) == labs[ll] , ]
-		t11 <- as.numeric( substring(lav.ll[ 1 , "rhs" ],2,2)) +1 
+		t11 <- as.numeric( substring(lav.ll[ 1 , "rhs" ],2)) +1 
 		i11 <- paste0(lav.ll$lhs)
 		if ( length(i11) > 1 ){
 			A00 <- A
@@ -78,11 +124,14 @@ tamaanify.create.A <- function( res ){
 			A <- A00	
 			A <- A[ , , - which(A11>0) ]		
 				}
+
+
 		}
-
 		ind <- match( paste(dimnames(A)[[3]]) , paste( lavpartable0$label2a) )
-		dimnames(A)[[3]] <- paste(lavpartable0[ ind , "label" ])
-
+		if ( ! smooth.nrm ){
+			dimnames(A)[[3]] <- paste(lavpartable0[ ind , "label" ])
+						}
+						
 	#***********************
 	# model constraint thresholds	
 	

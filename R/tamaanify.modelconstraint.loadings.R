@@ -5,6 +5,7 @@ tamaanify.modelconstraints.loadings <- function(res){
 	mdfr <- res$MODELCONSTRAINT.dfr
 	lav1 <- res$lavpartable
 	Q <- res$Q
+
 	
 	if ( ! is.null( mdfr ) ){
 		mdfr <- mdfr[ grep( "=~" , paste(mdfr$fullsyn) , fixed=TRUE) , ]
@@ -49,7 +50,6 @@ tamaanify.modelconstraints.loadings <- function(res){
 							}
 			res$L <- A	
 			res$method <- "tam.mml.3pl"
-
 			
 			#*******************************************
 			# definition of E design matrix

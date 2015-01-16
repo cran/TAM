@@ -1,8 +1,8 @@
 Package: TAM
 Type: Package
 Title: Test Analysis Modules
-Version: 1.3
-Date: 2015-01-06
+Version: 1.4-1
+Date: 2015-01-15
 Author: Thomas Kiefer [aut], Alexander Robitzsch [aut, cre], Margaret Wu [aut]
 Maintainer: Alexander Robitzsch <a.robitzsch@bifie.at>
 Authors@R: c(person("Thomas", "Kiefer", role = c("aut"), email =
@@ -18,15 +18,14 @@ Description:
   Cognitive Diagnostic Models). Latent regression models and
   plausible value imputation are also supported.
 Depends: R (>= 2.15.1), CDM (>= 4.1), MASS
-Imports: Rcpp, mirt (>= 1.7), lavaan (>= 0.5-17), tensor, sfsmisc,
-        GPArotation, psych, lattice, mvtnorm, msm
-Suggests: sirt (>= 1.0), PP (>= 0.5-3), WrightMap (>= 1.1), semTools
-        (>= 0.4-6)
+Imports: Rcpp, mirt (>= 1.7), lavaan (>= 0.5-17), WrightMap (>= 1.1),
+        tensor, sfsmisc, GPArotation, psych, lattice, mvtnorm, msm
+Suggests: sirt (>= 1.0), PP (>= 0.5-3), semTools (>= 0.4-6)
 LinkingTo: Rcpp, RcppArmadillo
 License: GPL (>= 2)
 URL: http://www.edmeasurementsurveys.com/TAM/Tutorials/,
         https://sites.google.com/site/alexanderrobitzsch/software
-Packaged: 2015-01-06 16:30:41 UTC; robitzsch
+Packaged: 2015-01-15 19:55:44 UTC; robitzsch
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2015-01-06 18:33:54
+Date/Publication: 2015-01-16 06:42:26

@@ -59,12 +59,24 @@ For specification of the syntax, see \code{\link{lavaanify.IRT}}. \cr
 \code{MODEL CONSTRAINTS:} \cr
 Linear constraints can be specified by using conventional
 specification in \R syntax. All terms must be combined
-with the \code{+} operator. \cr
+with the \code{+} operator. Equality constraints are
+set by using the \code{==} operator as in \pkg{lavaan}. \cr
 
 \code{ITEM TYPE:} \cr
 The following item types can be defined: Rasch model (\code{Rasch}), 
 the 2PL model (\code{2PL}), partial credit model (\code{PCM})
-and the generalized partial credit model (\code{GPCM}). \cr
+and the generalized partial credit model (\code{GPCM}).
+
+The item intercepts can also be smoothed for the \code{PCM}
+and the \code{GPCM} by using a Fourier basis proposed by
+Thissen, Cai and Bock (2010). For an item with a maximum
+of score of \eqn{K}, a smoothed partial credit model
+is requested by \code{PCM(kk)} where \code{kk} is an
+integer between 1 and \eqn{K}. With \code{kk}=1, only a linear
+function is used. The subsequent integers correspond to
+Fourier functions with decreasing periods. 
+See Example 2, Model 7 of the \code{\link{tamaan}}
+function. \cr
 
 \emph{TO BE IMPLEMENTED: beta item response model, nominal item response model,
 smoothed nominal item response model, nonparametric B-spline
@@ -76,7 +88,7 @@ latent class approximation of factor models}
 \code{PRIOR:} \cr
 Possible prior distributions: Normal distribution \code{N(mu,sd)}, 
 truncated normal distribution \code{TN(mu,sd,low,upp)} and 
-Beta distribution \code{B(a,b)}. 
+Beta distribution \code{Beta(a,b)}. 
 Parameter labels and prior specification must be separated
 by \code{~}.\cr
 
@@ -139,6 +151,12 @@ Psychology}, \bold{42}, 37-54.
 Hojtink, H., & Molenaar, I. W. (1997). A multidimensional item response model: 
 Constrained latent class analysis using the Gibbs sampler and posterior 
 predictive checks. \emph{Psychometrika}, \bold{62(2)}, 171-189.
+
+Thissen, D., Cai, L., & Bock, R. D. (2010).
+The nominal categories item response model.
+In M. L. Nering & Ostini, R. (Eds.).
+\emph{Handbook of Polytomous Item Reponse Models} 
+(pp. 43-75). New York: Routledge.
 
 Shojima, K. (2007). \emph{Latent rank theory: Estimation of item reference 
 profile by marginal maximum likelihood method with EM algorithm}.
@@ -235,21 +253,21 @@ LAVAAN MODEL:
 MODEL CONSTRAINT:
   # defined parameters
   # only linear combinations are permitted
-  b2 = 1.3*b1 + (-0.6)*b3
-  a1 = q1
-  a2 = q2 + t
-  a3 = q1 + 2*t
-  a4 = q2 + 3*t
+  b2 == 1.3*b1 + (-0.6)*b3
+  a1 == q1
+  a2 == q2 + t
+  a3 == q1 + 2*t
+  a4 == q2 + 3*t
   # linear constraints for loadings
-  lam2 = 1.1*lam1
-  lam3 = 0.9*lam1 + (-.1)*lam0
-  lam8 = lam0
-  lam9 = lam0
+  lam2 == 1.1*lam1
+  lam3 == 0.9*lam1 + (-.1)*lam0
+  lam8 == lam0
+  lam9 == lam0
     "
 # parse syntax    
 mod1 <- tamaanify( tammodel , resp=dat)
-mod1$A     # design matrix A for intercepts
-mod1$L     # design matrix L for loadings
+mod1$A          # design matrix A for intercepts
+mod1$L[,1,]     # design matrix L for loadings
 }
 
 #############################################################################
@@ -286,11 +304,11 @@ tammodel <- "
     F =~ a1__a5*act1__act5
     F ~~ F
   MODEL CONSTRAINT:
-      a1 = delta +
+      a1 == delta +
                 tau1
-      a2 = delta
-      a3 = delta + z1
-      a4 = 1.1*delta +
+      a2 == delta
+      a3 == delta + z1
+      a4 == 1.1*delta +
               2*tau1
                 + (-0.2)*z1
   "

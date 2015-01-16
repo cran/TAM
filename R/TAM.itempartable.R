@@ -6,17 +6,14 @@
 .TAM.itempartable <- function( resp , maxK , AXsi , B , ndim ,
 			resp.ind , rprobs,n.ik,pi.k){
 				
-#	item1 <- data.frame( "item" = colnames(resp) )
 	item1 <- data.frame( "item" = dimnames(B)[[1]] )
 	item1$N <- colSums(resp.ind )
 	item1$M <- colSums( resp.ind * resp , na.rm=TRUE) / colSums( resp.ind )
 	
 	maxKi <- rowSums( 1 - is.na( AXsi ) ) - 1
 	I <- nrow(item1)
-# Revalpr("AXsi")
 
-# stop()	
-	item1$xsi.item <- AXsi[ cbind(1:I , maxKi+1) ] / maxKi
+	item1$xsi.item <- - AXsi[ cbind(1:I , maxKi+1) ] / maxKi
 #	item1$xsi.item <- AXsi[ cbind(1:I , maxKi+1) ] 
 
 	

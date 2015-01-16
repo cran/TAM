@@ -110,9 +110,11 @@ A generalized form of the Rasch model. In M. von Davier & C. H. Carstensen (Eds.
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-%\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-%}
+\seealso{
+See \code{\link{tam.latreg}} for further examples of 
+fitting latent regression models and drawing plausible values
+from models which provides asn individual likelihood as an input. 
+}
 
 \examples{
 #############################################################################
@@ -286,6 +288,167 @@ lavmodel <- "
         "
 mod1 <- semTools::lavaan.mi( lavmodel , data = datlist1 )        
 summary(mod1 , standardized=TRUE, rsquare=TRUE)
+
+
+#############################################################################
+# SIMULATED EXAMPLE 4: Plausible value imputation with measurement 
+#                      errors in covariates
+#############################################################################
+
+library(sirt)
+set.seed(7756)
+N <- 2000    # number of persons
+I <- 10     # number of items
+
+# simulate covariates
+X <- mvrnorm( N , mu=c(0,0) , Sigma = matrix( c(1,.5,.5,1) ,2 ,2 ) )
+colnames(X) <- paste0("X",1:2)
+# second covariate with measurement error with variance var.err
+var.err <- .3
+X.err <- X
+X.err[,2] <-X[,2] + rnorm(N, sd = sqrt(var.err) )
+# simulate theta
+theta <- .5*X[,1] + .4*X[,2] + rnorm( N , sd = .5 )
+# simulate item responses
+itemdiff <- seq( -2 , 2 , length=I)  # item difficulties
+dat <- sirt::sim.raschtype( theta , b = itemdiff )
+
+#***********************
+#*** Model 0: Regression model with true variables
+mod0 <- lm( theta ~ X )
+summary(mod0)
+
+#***********************
+#*** Model 1: latent regression model with true covariates X
+xsi.fixed <- cbind( 1:I , itemdiff )
+mod1 <- tam.mml( dat , xsi.fixed=xsi.fixed , Y=X)
+summary(mod1)
+
+# draw plausible values
+res1a <- tam.pv( mod1 , normal.approx=TRUE , ntheta=200 , samp.regr=TRUE)
+# create list of multiply imputed datasets
+library(miceadds)
+datlist1a <- tampv2datalist( res1a , Y=X ) 
+imp1a <- miceadds::datalist2mids( datlist1a )
+
+# fit linear model
+# linear regression with measurement errors in X
+lavmodel <- "
+   PV.Dim1 ~ X1 + X2true
+   X2true =~ 1*X2
+   X2 ~~ 0.3*X2  # = var.err
+   PV.Dim1 ~~ PV.Dim1
+   X2true ~~ X2true
+        "              
+mod1a <- semTools::lavaan.mi( lavmodel , datlist1a)
+summary(mod1a , standardized=TRUE, rsquare=TRUE)
+
+#***********************
+#*** Model 2: latent regression model with error-prone covariates X.err
+mod2 <- tam.mml( dat , xsi.fixed=xsi.fixed , Y=X.err)
+summary(mod2)
+
+#***********************
+#*** Model 3: Adjustment of covariates
+
+cov.X.err <- cov( X.err )
+# matrix of variance of measurement errors
+measerr <- diag( c(0,var.err) )
+# true covariance matrix
+cov.X <- cov.X.err - measerr
+# mean of X.err
+mu <- colMeans(X.err)
+muM <- matrix( mu , nrow=nrow(X.err) , ncol=ncol(X.err) , byrow=TRUE)
+# reliability matrix
+W <- solve( cov.X.err ) \%*\% cov.X
+ident <- diag(2)
+# adjusted scores of X
+X.adj <- ( X.err - muM ) \%*\% W   + muM \%*\% ( ident - W )
+
+# fit latent regression model
+mod3 <- tam.mml( dat , xsi.fixed=xsi.fixed , Y=X.adj)
+summary(mod3)
+
+# draw plausible values
+res3a <- tam.pv( mod3 , normal.approx=TRUE , ntheta=200 , samp.regr=TRUE)
+
+# create list of multiply imputed datasets
+library(semTools)
+
+#*** PV dataset 1
+# datalist with error-prone covariates
+datlist3a <- tampv2datalist( res3a , Y=X.err ) 
+# datalist with adjusted covariates
+datlist3b <- tampv2datalist( res3a , Y=X.adj ) 
+
+# linear regression with measurement errors in X
+lavmodel <- "
+   PV.Dim1 ~ X1 + X2true
+   X2true =~ 1*X2
+   X2 ~~ 0.3*X2  # = var.err
+   PV.Dim1 ~~ PV.Dim1
+   X2true ~~ X2true
+        "              
+mod3a <- semTools::lavaan.mi( lavmodel , datlist3a)
+summary(mod3a , standardized=TRUE, rsquare=TRUE)
+
+lavmodel <- "
+   PV.Dim1 ~ X1 + X2
+   PV.Dim1 ~~ PV.Dim1
+        "     
+mod3b <- semTools::lavaan.mi( lavmodel , datlist3b)
+summary(mod3b , standardized=TRUE, rsquare=TRUE)
+# => mod3b leads to the correct estimate.
+
+#*********************************************
+# plausible value imputation for abilities and error-prone
+# covariates using the mice package
+
+library(mice)
+library(miceadds)
+
+# creating the likelihood for plausible value for abilities
+mod11 <- tam.mml( dat , xsi.fixed = xsi.fixed )
+likePV <- IRT.likelihood(mod11)
+# creating the likelihood for error-prone covariate X2
+lavmodel <- "
+  X2true =~ 1*X2
+  X2 ~~ 0.3*X2
+    "
+mod12 <- lavaan::cfa( lavmodel , data = as.data.frame(X.err) )
+summary(mod12)
+likeX2 <- IRTLikelihood.cfa( data= X.err , cfaobj=mod12)
+str(likeX2)
+
+#-- create data input for mice package
+data <- data.frame( "PVA" = NA , "X1" = X[,1] , "X2" = NA  ) 
+vars <- colnames(data)
+V <- length(vars)
+predictorMatrix <- 1 - diag(V)
+rownames(predictorMatrix) <- colnames(predictorMatrix) <- vars
+imputationMethod <- rep("norm" , V )
+names(imputationMethod) <- vars
+imputationMethod[c("PVA","X2")] <- "2l.plausible.values"
+
+#-- create argument lists for plausible value imputation
+# likelihood and theta grid of plausible value derived from IRT model
+like <- list( "PVA" = likePV  , "X2" = likeX2 )
+theta <- list( "PVA" = attr(likePV,"theta") ,
+                "X2" = attr(likeX2 , "theta") )                     
+#-- initial imputations
+data.init <- data
+data.init$PVA <- mod11$person$EAP
+data.init$X2 <- X.err[,"X2"]
+
+#-- imputation using the mice and miceadds package
+imp1 <- mice::mice( as.matrix(data) , predictorMatrix = predictorMatrix , m = 4, maxit = 6 ,  
+             imputationMethod = imputationMethod ,  allow.na = TRUE ,
+             theta=theta , like=like , data.init=data.init )
+summary(imp1)
+
+# compute linear regression
+mod4a <- with( imp1 , lm( PVA ~ X1 + X2 ) )
+summary( pool(mod4a) )
 }
 }
 

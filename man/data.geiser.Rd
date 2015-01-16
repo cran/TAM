@@ -113,18 +113,84 @@ ANALYSIS:
 LAVAAN MODEL:
   F =~ mrt1__mrt12
     "    
-mod4 <- tamaan( tammodel , resp=dat  )
+mod4 <- tamaan( tammodel , resp=dat )
 summary(mod4)
 
 # compare different models
 AIC(mod1); AIC(mod2); AIC(mod3); AIC(mod4)
 BIC(mod1); BIC(mod2); BIC(mod3); BIC(mod4)
+# more condensed form
+IRT.compareModels(mod1, mod2, mod3, mod4)
 
 #############################################################################
 # EXAMPLE 2: Rasch model and mixture Rasch model (Geiser & Eid, 2010)
 #############################################################################
 
-### TO BE INCLUDED
+data(data.geiser)
+dat <- data.geiser
+
+#*********************************************************************
+#*** Model 1: Rasch model
+tammodel <- "
+LAVAAN MODEL:
+  F =~ mrt1__mrt6
+  F ~~ F
+ITEM TYPE:
+  ALL(Rasch);
+    "    
+mod1 <- tamaan( tammodel , resp=dat  )
+summary(mod1)
+
+#*********************************************************************
+#*** Model 2: Mixed Rasch model with two classes
+tammodel <- "
+ANALYSIS:
+  TYPE=MIXTURE ;
+  NCLASSES(2);
+  NSTARTS(20,25);
+LAVAAN MODEL:
+  F =~ mrt1__mrt6
+  F ~~ F
+ITEM TYPE:
+  ALL(Rasch);
+    "    
+mod2 <- tamaan( tammodel , resp=dat  )
+summary(mod2)
+
+# plot item parameters
+ipars <- mod2$itempartable_MIXTURE[ 1:6 , ]
+plot( 1:6 , ipars[,3] , type="o" , ylim=c(-3,2) , pch=16 ,
+        xlab="Item" , ylab="Item difficulty")
+lines( 1:6 , ipars[,4] , type="l", col=2 , lty=2)
+points( 1:6 , ipars[,4] ,  col=2 , pch=2)
+
+#*********************************************************************
+#*** Model 3: Mixed Rasch model with three classes
+tammodel <- "
+ANALYSIS:
+  TYPE=MIXTURE ;
+  NCLASSES(3);
+  NSTARTS(20,25);
+LAVAAN MODEL:
+  F =~ mrt1__mrt6
+  F ~~ F
+ITEM TYPE:
+  ALL(Rasch);
+    "    
+mod3 <- tamaan( tammodel , resp=dat  )
+summary(mod3)
+
+# plot item parameters
+ipars <- mod3$itempartable_MIXTURE[ 1:6 , ]
+plot( 1:6 , ipars[,3] , type="o" , ylim=c(-3.7,2) , pch=16 ,
+        xlab="Item" , ylab="Item difficulty")
+lines( 1:6 , ipars[,4] , type="l", col=2 , lty=2)
+points( 1:6 , ipars[,4] ,  col=2 , pch=2)
+lines( 1:6 , ipars[,5] , type="l", col=3 , lty=3)
+points( 1:6 , ipars[,5] ,  col=3 , pch=17)
+
+# model comparison
+IRT.compareModels( mod1 , mod2 , mod3 )
 }
 }
 \keyword{datasets}

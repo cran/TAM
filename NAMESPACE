@@ -24,7 +24,10 @@ export(designMatrices, .A.matrix, designMatrices.mfr,
        tamaanify ,
        doparse,
        tampv2datalist,
-       tam.latreg
+       tam.latreg ,
+       cfa.extract.itempars,
+       IRTLikelihood.cfa ,
+       IRT.WrightMap
        )
 
 
@@ -63,12 +66,12 @@ S3method( plot , tam.jml )
 #### summary
 S3method(summary, tam )
 S3method(summary, tam.mml )
-S3method(summary, tam.mml.3pl)
+S3method(summary, tam.mml.3pl )
 S3method(summary, tam.modelfit )
 S3method(summary, tam.jml )
-S3method(summary, tamaan)
-S3method(summary, tam.latreg)
-
+S3method(summary, tamaan )
+S3method(summary, tam.latreg )
+S3method(summary, tam.fit )
 
 
 ########################################
@@ -104,6 +107,12 @@ S3method(IRT.posterior, tam.mml.3pl)
 S3method(IRT.posterior, tamaan)
 
 
+#### IRT.WrightMap
+S3method(IRT.WrightMap, tam.mml )
+# S3method(IRT.posterior, tam )
+# S3method(IRT.posterior, tam.mml.3pl)
+S3method(IRT.WrightMap, tamaan)
+
 
 
 
@@ -124,3 +133,4 @@ import(lavaan)
 importFrom(utils,packageDescription)
 importFrom(msm,dtnorm)
 importFrom(msm,rtnorm)
+importFrom(WrightMap,wrightMap)

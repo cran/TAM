@@ -1,7 +1,7 @@
 
 ###################################################################
 # latent regression
-tam.latreg <- function( like , theta , Y=NULL , group=NULL , 
+tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL , 
 				formulaY = NULL , dataY = NULL , 
 				beta.fixed = NULL , beta.inits = NULL , 
 				variance.fixed = NULL , variance.inits = NULL , 
@@ -31,8 +31,14 @@ tam.latreg <- function( like , theta , Y=NULL , group=NULL ,
       assign( names(con)[cc] , con1[[cc]] , envir = e1 ) 
     }
     
+	if ( is.null(theta) ){
+	   theta <- attr( like , "theta" )
+						}
+
+						
     nodes <- theta 
-	ndim <- ncol(theta)
+	ndim <- ncol(theta)		 
+
 	
     if (progress){ 
       cat(disp)	
@@ -59,15 +65,22 @@ tam.latreg <- function( like , theta , Y=NULL , group=NULL ,
     }  	  
     
     #!! check dim of person ID pid
-    if ( is.null(pid) ){ pid <- seq(1,nstud) }else{ pid <- unname(c(unlist(pid))) }
+    if ( is.null(pid) ){ 
+			pid <- seq(1,nstud) 
+				} else { 
+			pid <- unname(c(unlist(pid))) 
+						}
        
     # normalize person weights to sum up to nstud
     pweights <- nstud * pweights / sum(pweights)
         
     betaConv <- FALSE         #flag of regression coefficient convergence
     varConv <- FALSE          #flag of variance convergence
-    nnodes <- length(nodes)^ndim
-    if ( snodes > 0 ){ nnodes <- snodes }
+    # nnodes <- length(nodes)^ndim
+	nnodes <- nrow(nodes)
+
+	
+	if ( snodes > 0 ){ nnodes <- snodes }
     
     #****
     # display number of nodes
@@ -87,7 +100,6 @@ tam.latreg <- function( like , theta , Y=NULL , group=NULL ,
         cat("      @ Maybe you want to use Quasi Monte Carlo integration with fewer nodes.\n")		
       }
     }
-	
 	
     #*********
     # variance inits  
@@ -177,7 +189,7 @@ tam.latreg <- function( like , theta , Y=NULL , group=NULL ,
     
     # nodes
     if ( snodes == 0 ){ 
-      theta <- as.matrix( expand.grid( as.data.frame( matrix( rep(nodes, ndim) , ncol = ndim ) ) ) )
+#      theta <- as.matrix( expand.grid( as.data.frame( matrix( rep(nodes, ndim) , ncol = ndim ) ) ) )
       #we need this to compute sumsig2 for the variance
       #    theta2 <- matrix(theta.sq(theta), nrow=nrow(theta),ncol=ncol(theta)^2)            
       theta2 <- matrix(theta.sq2(theta), nrow=nrow(theta),ncol=ncol(theta)^2)            

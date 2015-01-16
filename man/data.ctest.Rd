@@ -1,6 +1,7 @@
 \name{data.ctest}
 \alias{data.ctest}
 \alias{data.ctest1}
+\alias{data.ctest2}
 
 \docType{data}
 \title{
@@ -15,6 +16,7 @@ Some C-Test datasets.
 
 \usage{
 data(data.ctest1)
+data(data.ctest2)
 }
 
 
@@ -45,7 +47,37 @@ at two time points. The format is
 \code{ $ D04T2  : int  1 0 1 1 1 0 1 0 1 1 ...} \cr
 \code{ $ D05T2  : int  1 0 1 1 1 1 1 1 1 1 ...} \cr
 
+\item The dataset \code{data.ctest2} contains two datasets
+(\code{$data1} containing item responses, \code{$data2}
+containing sum scores of each C-test) and
+a data frame \code{$ITEM} with item informations. 
 
+\code{List of 3} \cr
+\code{ $ data1:'data.frame':  933 obs. of  102 variables:} \cr
+\code{  ..$ idstud: num [1:933] 10001 10002 10003 10004 10005 ...} \cr
+\code{  ..$ female: num [1:933] 1 1 0 0 0 0 1 1 0 1 ...} \cr
+\code{  ..$ A101  : int [1:933] NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{  ..$ A102  : int [1:933] NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{  ..$ A103  : int [1:933] NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{  ..$ A104  : int [1:933] NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{  ..$ A105  : int [1:933] NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{  ..$ A106  : int [1:933] NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{  ..$ E115  : int [1:933] NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{  ..$ E116  : int [1:933] NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{  ..$ E117  : int [1:933] NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{  .. [list output truncated]} \cr
+\code{ $ data2:'data.frame':  933 obs. of  7 variables:} \cr
+\code{  ..$ idstud: num [1:933] 10001 10002 10003 10004 10005 ...} \cr
+\code{  ..$ female: num [1:933] 1 1 0 0 0 0 1 1 0 1 ...} \cr
+\code{  ..$ A     : num [1:933] NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{  ..$ B     : num [1:933] 16 14 15 13 17 11 11 18 19 13 ...} \cr
+\code{  ..$ C     : num [1:933] 17 15 17 14 17 13 9 15 17 12 ...} \cr
+\code{  ..$ D     : num [1:933] NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{  ..$ E     : num [1:933] NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{ $ ITEM :'data.frame':  100 obs. of  3 variables:} \cr
+\code{  ..$ item   : chr [1:100] "A101" "A102" "A103" "A104" ...} \cr
+\code{  ..$ ctest  : chr [1:100] "A" "A" "A" "A" ...} \cr
+\code{  ..$ testlet: int [1:100] 1 1 2 2 2 3 3 3 NA 4 ...} \cr
 }	
 }
 

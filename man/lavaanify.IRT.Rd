@@ -24,6 +24,12 @@ regressions (\code{~}) (see Example 3).
 
 It is also possible to construct the syntax using a loop by making use
 of the \code{DO} statement, see \code{\link{doparse}} for specification.
+
+The operators \code{MEASERR1} and \code{MEASERR0} can be used for
+model specification for variables which contains known measurement
+error (see Example 6). While \code{MEASERR1} can be used for endogeneous
+variables, \code{MEASERR0} is the spcification for exogeneous variables.
+
 }
 
 \usage{
@@ -87,6 +93,8 @@ See \code{\link{doparse}} for the \code{DO} and \code{DO2} statements.
 }
 
 \examples{
+library(lavaan)	
+	
 #############################################################################
 # EXAMPLE 1: lavaan syntax with guessing and slipping parameters
 #############################################################################
@@ -223,7 +231,7 @@ lavmodel <- "
 # process lavaan syntax   
 res <- lavaanify.IRT( lavmodel , data = dat )
 # estimate lavaan model 
-mod1 <- lavaan( model= res$lavaan.syntax , data=dat)
+mod1 <- lavaan::lavaan( model= res$lavaan.syntax , data=dat)
 summary(mod1 , standardized=TRUE , fit.measures = TRUE , rsquare=TRUE )
 }
 
@@ -250,6 +258,35 @@ lavmodel <- "
    "
 res <- lavaanify.IRT( lavmodel , items = paste("I",1:6) )   
 cat(res$lavaan.syntax)
+
+#############################################################################
+# EXAMPLE 6: Single indicator models with measurement error (MEASERR operator)
+#############################################################################
+
+# define lavaan model
+lavmodel <- "
+  ytrue ~ xtrue + z
+  # endogeneous variable error-prone y with error variance .20
+  MEASERR1(ytrue,y,.20)
+  # exogeneous variable error-prone x with error variance .35  
+  MEASERR0(xtrue,x,.35)
+  ytrue ~~ ytrue
+    "  
+# observed items
+items <- c("y","x","z")
+# lavaanify
+res <- lavaanify.IRT( lavmodel , items )
+cat(res$lavaan.syntax)
+  ##   > cat(res$lavaan.syntax)
+  ##   ytrue~xtrue
+  ##   ytrue~z
+  ##   ytrue=~1*y
+  ##   y~~0.2*y
+  ##   xtrue=~1*x
+  ##   x~~0.35*x
+  ##   xtrue~~xtrue
+  ##   ytrue~~ytrue
+  ##   z~~z 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

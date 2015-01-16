@@ -65,6 +65,7 @@ tam.mml <-
     }
     fac.oldxsi <- max( 0 , min( c( fac.oldxsi , .95 ) ) )  
     
+	resp <- as.matrix(resp)
 	resp <- add.colnames.resp(resp)
 	
     if (progress){ 
@@ -92,7 +93,7 @@ tam.mml <-
     
     
     if ( !is.null(con$seed)){ set.seed( con$seed )	 }
-    resp <- as.matrix(resp)
+    
     nullY <- is.null(Y)
     
     nitems <- ncol(resp)       # number of items
@@ -100,6 +101,9 @@ tam.mml <-
       colnames(resp) <- paste0( "I" , 100+1:nitems )
     }
     nstud <- nrow(resp)        # number of students
+	#*****
+	nstud1 <- sum(1*( rowSums( 1 - is.na(resp) ) > 0 ))
+	
     if ( is.null( pweights) ){
       pweights <- rep(1,nstud) # weights of response pattern
     }
@@ -454,17 +458,15 @@ tam.mml <-
         theta2 <- matrix( theta.sq2(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
       }			
       olddeviance <- deviance
-      # a0 <- Sys.time()	
+# a0 <- Sys.time()	
       # calculation of probabilities
       res <- calc_prob.v5(iIndex=1:nitems , A=A , AXsi=AXsi , B=B , xsi=xsi , theta=theta , 
                           nnodes=nnodes , maxK=maxK , recalc=TRUE )	
       rprobs <- res[["rprobs"]]
       AXsi <- res[["AXsi"]]
-      
-      #***	
-      # print(AXsi)	
+	  
+      #***	      
       # AXsi[ is.na(AXsi) ] <- 0
-      # print(AXsi)	
       
       # cat("calc_prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
       
@@ -737,7 +739,7 @@ tam.mml <-
 #    cat("se.axsi") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
     
     ##*** Information criteria
-    ic <- .TAM.ic( nstud , deviance , xsi , xsi.fixed ,
+    ic <- .TAM.ic( nstud=nstud1 , deviance , xsi , xsi.fixed ,
                    beta , beta.fixed , ndim , variance.fixed , G ,
                    irtmodel , B_orig=NULL , B.fixed , E , est.variance =TRUE ,
                    resp ,  est.slopegroups=NULL , 

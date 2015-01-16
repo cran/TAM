@@ -5,8 +5,8 @@ tam.fit <- function( tamobj, ... ){
   if(class(tamobj) == "tam.jml"){
     res <- tam.jml.fit( tamobj, ...)
   }
-  
-  return( res )
+  class(res) <- "tam.fit"
+  return(res)
 }
 
 tam.mml.fit <-
@@ -219,20 +219,21 @@ tam.mml.fit <-
     }
     if (progress){ cat("|\n") ; flush.console() }
     res <- data.frame(
-#	    "parameter" = dimnames(FitMatrix)[[3]] ,
-					"Outfit" = Outfit , 
+	    "parameter" = dimnames(FitMatrix)[[3]] ,
+					  "Outfit" = Outfit , 
                       "Outfit_t" = Outfit_t, 
 					  "Outfit_p" = pnorm(-abs(Outfit_t)) /2 ,
 					  "Outfit_pholm" =NA , 
 					  "Infit" = Infit , 
                       "Infit_t" = Infit_t,  
 					  "Infit_p" = pnorm(-abs(Infit_t)) /2 ,
-					  "Infit_pholm" =NA ,
-					  row.names = dimnames(FitMatrix)[[3]])
+					  "Infit_pholm" =NA 
+							)
 	res$Outfit_pholm <- p.adjust( res$Outfit_p , method="holm")
 	res$Infit_pholm <- p.adjust( res$Infit_p , method="holm")
     #data.frame( "Outfit" = round(Outfit,2) , "Outfit_t" = round(Outfit_t,1), "Infit" = round(Infit,2), Infit_t = round(Infit_t,1) )    
- #   class(res) <- "tam.fit"
+    res <- list( "itemfit" = res )
+    class(res) <- "tam.fit"	
 	return(res)
   }
 

@@ -57,6 +57,8 @@ tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
 
 \method{summary}{tam.mml}(object,file=NULL,\dots)    
 }
+
+
 %% USAGE
 %%tam.jml(resp, group = NULL, disattenuate = FALSE, bias = TRUE, 
 %%    xsi.fixed = NULL, xsi.inits = NULL,  A = NULL, B = NULL, Q = NULL, 
@@ -503,10 +505,9 @@ For model comparisons see \code{\link{anova.tam}}.
 See \code{\link[sirt:tam2mirt]{tam2mirt}} (\pkg{sirt}) for converting
 \code{tam} objects into objects of class 
 \code{\link[mirt:mirt]{mirt}} in the \pkg{mirt} package.
-
-\code{\link{logLik.tam}}, \code{\link{anova.tam}}
 }
 
+%% \code{\link{logLik.tam}}, \code{\link{anova.tam}}
 
 
 
@@ -685,10 +686,10 @@ tammodel <- "
    F =~ a1__a40*I1__I40;
    F ~~ 1*F
  MODEL CONSTRAINT:
-   a1__a10  = lam1
-   a11__a20 = lam2
-   a21__a30 = lam1
-   a31__a40 = lam3         
+   a1__a10  == lam1
+   a11__a20 == lam2
+   a21__a30 == lam1
+   a31__a40 == lam3         
    "  
 mod3tB <- tamaan( tammodel , sim.rasch)   
 summary(mod3tB)
@@ -1355,7 +1356,7 @@ tammodel <- "
     "
 # The constraint on item difficulties can be more efficiently written as
   ##       DO(3,6,1)
-  ##         I%T1 + I%T2 | b%*t1
+  ##         I\%T1 + I\%T2 | b\%*t1
   ##       DOEND    
 # estimate model    
 mod13at <- tamaan( tammodel , resp = data.long ,  beta.fixed=beta.fixed ,

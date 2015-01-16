@@ -7,7 +7,7 @@ plotctt <- function( resp , theta , Ncuts = NULL , ask =FALSE , ... ){
 		cuts <- quantile( theta , seq( stepw , 1-stepw , length=Ncuts-1 ) , na.rm=TRUE)
 		eps <- .001
 		cuts <- round( c( min(theta, na.rm=TRUE) - eps  , cuts , max( theta , na.rm=TRUE ) + eps ) , 2 )	
-		resp <- resp[ ! is.na( theta) , ]
+		resp <- resp[ ! is.na( theta) , , drop=FALSE ]
 		theta <- theta[ !is.na(theta) ]
 		theta.cuts <- cut( theta , cuts )
 				} else { theta.cuts <- theta }

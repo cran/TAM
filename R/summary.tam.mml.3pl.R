@@ -39,6 +39,7 @@ summary.tam.mml.3pl <- function( object , file = NULL , ...){
 	cat( "\nDeviance = " , round( object$deviance , 2 ) , " | " )
     cat( "Log Likelihood = " , round( -object$deviance/2 , 2 ) , "\n" )	
     cat( "Number of persons = " , object$nstud , "\n" )    
+    cat( "Number of persons used = " , object$ic$n , "\n" ) 
 	
 	if( ! is.null( object$formulaA)  ){	
 	    cat( "Number of generalized items = " , object$nitems , "\n" )    

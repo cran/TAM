@@ -56,5 +56,5 @@ tam.threshold <- function (tamobj, prob.lvl=0.5)
   threshold[threshold == -99] <- NA
   rownames(threshold) <- colnames(tamobj$resp)
   colnames(threshold) <- paste0("Cat" , 1:ncol(threshold))
-  return (threshold)
+  return(threshold)
 }

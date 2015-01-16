@@ -10,7 +10,7 @@ Conversion of Plausible Value Object into Datalist
 Converts a \code{\link{tam.pv}} object and a matrix of covariates
 into a list of multiply imputed datasets. This list can be conveniently
 analyzed by \R packages such as \pkg{semTools}, \pkg{Zelig}, \pkg{mice}
-or \code{BIFIEsurvey}.
+or \pkg{BIFIEsurvey}.
 }
 
 \usage{

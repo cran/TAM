@@ -3,9 +3,15 @@
 # define R function (method)
 tamaanify.define.method <- function(res , tam.method ){
 
-	m1 <- mean( paste0( res$items$itemtype ) %in% c("Rasch" , "PCM" ) )
+	itemtypes <- paste0( res$items$itemtype )
+	l1 <- strsplit( itemtypes , split="," , fixed=TRUE )
+	itemtypes <- unlist( lapply( l1 , FUN = function(ll){ ll[1] } ) )
+
+	m1 <- mean(  itemtypes %in% c("Rasch" , "PCM" ) )
 	
-	if ( m1 == 1 ){  res$method <- "tam.mml" }
+	if ( m1 == 1 ){  
+			res$method <- "tam.mml" 
+					}
 	if ( ! is.null(tam.method) ){
 		res$method <- tam.method 
 					}				

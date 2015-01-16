@@ -3,7 +3,7 @@
 
 ############################################################
 # process lavaan model
-taamanify.proc.lavaanmodel <- function(res , resp ){
+tamaanify.proc.lavaanmodel <- function(res , resp ){
     tam1 <- res$tammodel.dfr
 	ind1 <- which( paste(tam1$syn) == "LAVAANMODEL:" )
 	index1 <- tam1$part_begin[ ind1 ]

@@ -117,7 +117,6 @@
 	res <- .Call("mml3pl_tam_calcexp" ,  np , rprobsL , AL ,	indexIP.no , 
 			    indexIP.list2 , est.xsi.index , CC , itemwt , rprobsL0 , 
 			    guess , nik , ni , PACKAGE="TAM")
-			
 	return(res)
 		}
 		

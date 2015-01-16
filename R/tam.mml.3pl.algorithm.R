@@ -61,7 +61,7 @@
 .mml.3pl.expected.counts <- function( datindw , nitems , maxK , ntheta , hwt){
 			# calculate expected counts
 			n.ik <- array( 0 , dim=c(nitems , maxK , ntheta ) )
-			N.ik <- array( 0 , dim=c( nitems , ntheta ) )
+			N.ik <- array( 0 , dim=c( nitems , ntheta ) )	
 			for (kk in 1:maxK){   # kk <- 1
 				dkk <- datindw[[kk]]
 				g1 <- crossprod( dkk , hwt ) 

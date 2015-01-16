@@ -2,6 +2,9 @@ tam.wle <- function( tamobj, ... ){
   if(class(tamobj) == "tam.mml"){
     res <- tam.mml.wle2( tamobj, ...)
   }
+  if(class(tamobj) == "tamaan"){
+    res <- tam.mml.wle2( tamobj, ...)
+  }
   if(class(tamobj) == "tam.jml"){
     res <- tam.jml.WLE( tamobj, ...)
   }
