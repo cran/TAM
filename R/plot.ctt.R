@@ -1,7 +1,8 @@
 
 #########################################################################
 # plot function for empirical item characteristic curves
-plotctt <- function( resp , theta , Ncuts = NULL , ask =FALSE , ... ){
+plotctt <- function( resp , theta , Ncuts = NULL , ask =FALSE , 
+		col.list = NULL , package="lattice" , ... ){
 	if ( ! is.null(Ncuts) ){
 		stepw <- 1/Ncuts
 		cuts <- quantile( theta , seq( stepw , 1-stepw , length=Ncuts-1 ) , na.rm=TRUE)
@@ -12,6 +13,12 @@ plotctt <- function( resp , theta , Ncuts = NULL , ask =FALSE , ... ){
 		theta.cuts <- cut( theta , cuts )
 				} else { theta.cuts <- theta }
 	I <- ncol(resp)
+	# colors 
+	if ( is.null( col.list) ){
+		col.list <- 2:1000
+					}
+		
+	
 	par( mfrow=c(1,1))
 	for (ii in 1:I){
 		# ii <- 25		
@@ -30,14 +37,41 @@ plotctt <- function( resp , theta , Ncuts = NULL , ask =FALSE , ... ){
 						}				
 		main <- paste0('Trace lines for item ', item)
 		vkey <- paste0("Cat " , unique.y)
-		print( 
-			lattice::xyplot( prob ~ theta.cut , data=dfr , group=cat , ylim=c(-.1 , 1.1) , type="o" ,  
-				auto.key= TRUE  ,       
-				par.settings = list(superpose.symbol = list(pch = 1:L1))	,			
-				ylab = expression(P(theta)), xlab = expression(theta) , main=main , lty=1:L1 , pch=1:L1 ,
-				...
-							)  
+		#***********************************
+		# package lattice
+		if (package=="lattice"){
+			print( 
+				lattice::xyplot( prob ~ theta.cut , data=dfr , group=cat , ylim=c(-.1 , 1.1) , type="o" ,  
+					auto.key= TRUE  ,       
+					par.settings = list(superpose.symbol = list(pch = 1:L1))	,			
+					ylab = expression(P(theta)), xlab = expression(theta) , main=main , lty=1:L1 , pch=1:L1 ,
+					...
+								)  
 					)
+					}
+		#***********************************
+		# package graphics
+		if ( package == "graphics" ){
+		       kk <- 1
+		       dfr1a <- dfr[ dfr$cat == unique.y[1] , ] 
+			   	K <- L1		   
+				plot( 1:Ncuts , dfr1a$prob , ylim=c(-.1,1.1) , 	
+						ylab = expression(P(theta)), xlab = expression(theta) ,
+						col=col.list[kk] , pch = kk , type="o" , main=main , axes=FALSE , ...
+									)
+				axis(2)
+				axis(1,at=1:Ncuts,labels=paste( dfr1a$theta.cut) )										
+		      for (kk in seq(2,K) ){
+				dfr1a <- dfr[ dfr$cat == unique.y[kk] , ]		
+				lines( 1:Ncuts , dfr1a$prob , pch=kk , col=col.list[kk] )					
+				points( 1:Ncuts , dfr1a$prob , pch=kk , col= col.list[kk] )										
+									}
+			legend( 1 , 1.1 , vkey , pch = 1:K , col= col.list[1:K] ,
+						horiz =TRUE , lty= 1)
+
+					}
+		#************* end			
+					
 		par( ask=ask )
 # stop()		
 			}

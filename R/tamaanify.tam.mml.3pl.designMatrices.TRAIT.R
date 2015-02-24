@@ -9,10 +9,10 @@ tamaanify.tam.mml.3pl.designMatrices.TRAIT <- function( res ){
 
 	#*****
 	# gammaslope parameters
-	res$gammaslope.fixed <- NULL
+	# res$gammaslope.fixed <- NULL
 	res$gammaslope.prior <- NULL
 	res$gammaslope.des <- "2PL"
-	 
+	
 	#*****
 	# guessing parameters	
 	res$est.guess <- NULL

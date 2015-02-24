@@ -1,5 +1,5 @@
 
-
+#############################################################
 calc_exp_TK <-
 function(rprobs , A , itemwt , p , ip , 
                         nitems , resp.ind){

@@ -17,17 +17,17 @@ or \code{tam.mml}.
 \method{plot}{tam}(x, items=1:x$nitems, type="expected", low=-3, high=3, ngroups=6, 
                    wle=NULL, export=TRUE, export.type="png", 
                    export.args=list(), observed=TRUE, overlay=FALSE , 
-                   ask=FALSE, ...)
+                   ask=FALSE,  ...)
 	
 \method{plot}{tam.mml}(x, items=1:x$nitems, type="expected", low=-3, high=3, ngroups=6, 
                        wle=NULL, export=TRUE, export.type="png", 
                        export.args=list(), observed=TRUE, overlay=FALSE , 
-                       ask=FALSE, ...)
+                       ask=FALSE,  ...)
      
 \method{plot}{tam.jml}(x, items=1:x$nitems, type="expected", low=-3, high=3, ngroups=6, 
                        wle=NULL, export=TRUE, export.type="png", 
                        export.args=list(), observed=TRUE, overlay=FALSE , 
-                       ask=FALSE, ...)
+                       ask=FALSE,   ...)
 }
 %- maybe also 'usage' for other objects documented here.
 
@@ -84,6 +84,9 @@ of the working directory.
 }
 }
 
+%\item{package}{Used \R package for plot. Can be \code{"lattice"} or
+%\code{"graphics"}.}
+
 \details{
 This plot method does not work for multidimensional item response
 models.
@@ -108,9 +111,10 @@ models.
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-%\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-%}
+\seealso{
+See \code{\link[CDM:IRT.irfprobPlot]{IRT.irfprobPlot}} (\pkg{CDM})
+for a general plot method.
+}
 
 \examples{
 #############################################################################
@@ -123,6 +127,8 @@ mod <- tam.mml(sim.rasch)
 plot(mod, items=1:5, export=FALSE)
 # item response curves
 plot(mod, items=1:5, type="items" , export=FALSE)
+# plot with graphics package
+plot(mod, items=1:5, type="items" , export=FALSE , ask=TRUE , package="graphics")
 
 #############################################################################
 # EXAMPLE 2: Polytomous data

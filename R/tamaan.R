@@ -16,6 +16,8 @@ tamaan <- function( tammodel , resp , tam.method=NULL,
 	s0 <- Sys.time()	
 	res0 <- tamaanify( tammodel=tammodel , resp=resp , tam.method=tam.method ,
 			doparse=doparse )
+	
+			
 	anal.list <- res0$ANALYSIS.list
 	resp <- res0$resp
 	#*** attach control elements (see tam.mml)
@@ -46,7 +48,7 @@ tamaan <- function( tammodel , resp , tam.method=NULL,
     for (cc in 1:Lcon ){
       assign( names(con)[cc] , con1[[cc]] , envir = e1 ) 
         }
-
+		
 	#******************************
 	# tam.mml
     if ( res0$method == "tam.mml" ){
@@ -57,7 +59,7 @@ tamaan <- function( tammodel , resp , tam.method=NULL,
 						}
 	#******************************
 	# tam.mml.2pl
-    if ( res0$method == "tam.mml.2pl" ){
+    if ( res0$method == "tam.mml.2pl" ){	
 		res <- tam.mml.2pl( resp=res0$resp , A=res0$A , xsi.fixed=res0$xsi.fixed ,
 					Q=res0$Q , variance.fixed=res0$variance.fixed ,
 					B.fixed=res0$B.fixed , est.variance=res0$est.variance,

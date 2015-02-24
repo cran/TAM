@@ -63,7 +63,7 @@ scores (score of zero or maximum score. The default is a value of 0.3}
      all parameters must be specified and the vector is not of the
      same format as \code{xsi.fixed}.
 }
-\item{theta.fixed}{Matrix for fixed person parameters \eqn{theta}. The first
+\item{theta.fixed}{Matrix for fixed person parameters \eqn{\theta}. The first
 	column includes the index whereas the second column includes
 the fixed value. This argument only applies to \code{tam.jml}.}
   \item{A}{

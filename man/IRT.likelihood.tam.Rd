@@ -4,11 +4,13 @@
 \alias{IRT.likelihood.tam.mml}
 \alias{IRT.likelihood.tam.mml.3pl}
 \alias{IRT.likelihood.tamaan}
+\alias{IRT.likelihood.tam.latreg}
 
 \alias{IRT.posterior.tam}
 \alias{IRT.posterior.tam.mml}
 \alias{IRT.posterior.tam.mml.3pl}
 \alias{IRT.posterior.tamaan}
+\alias{IRT.posterior.tam.latreg}
 
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
@@ -35,6 +37,9 @@ fitted in \pkg{TAM}. See \code{\link[CDM:IRT.likelihood]{IRT.likelihood}}
 
 \method{IRT.likelihood}{tamaan}(object, \dots)
 \method{IRT.posterior}{tamaan}(object, \dots)
+
+\method{IRT.likelihood}{tam.latreg}(object, \dots)
+\method{IRT.posterior}{tam.latreg}(object, \dots)
 }
 
 
@@ -42,7 +47,8 @@ fitted in \pkg{TAM}. See \code{\link[CDM:IRT.likelihood]{IRT.likelihood}}
 \arguments{
   \item{object}{
 Object of class \code{\link{tam}}, \code{\link{tam.mml}},
-\code{\link{tam.mml.3pl}} or \code{\link{tamaan}}.
+\code{\link{tam.mml.3pl}}, \code{\link{tamaan}}
+or \code{\link{tam.latreg}}.
 }
 \item{\dots}{Further arguments to be passed}
 }

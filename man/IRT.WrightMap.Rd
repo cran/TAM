@@ -1,5 +1,5 @@
 \name{IRT.WrightMap}
-\alias{IRT.WrightMap}
+% \alias{IRT.WrightMap}
 \alias{IRT.WrightMap.tam.mml}
 \alias{IRT.WrightMap.tamaan}
 %- Also NEED an '\alias' for EACH other topic documented here.
@@ -18,13 +18,12 @@ objects in \pkg{TAM}.
 
 
 \usage{
-IRT.WrightMap(object, prob.lvl= .5, type="PV", \dots)
-
 \method{IRT.WrightMap}{tam.mml}(object, prob.lvl= .5, type="PV", \dots)
 
 \method{IRT.WrightMap}{tamaan}(object, prob.lvl= .5, type="PV", \dots)
 }
 %- maybe also 'usage' for other objects documented here.
+% IRT.WrightMap(object, prob.lvl= .5, type="PV", \dots)
 
 \arguments{
   \item{object}{

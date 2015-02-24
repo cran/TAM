@@ -6,7 +6,7 @@
 Test Analysis Modules
 }
 \description{
-  The package includes marginal and joint maximum likelihood
+  Includes marginal and joint maximum likelihood
   estimation of uni- and multidimensional item response models 
   (Rasch, 2PL, 3PL, Generalized Partial Credit, Multi Facets,
   Nominal Item Response, Structured Latent Class Analysis,
@@ -18,7 +18,7 @@ Test Analysis Modules
 \tabular{ll}{
 Package: \tab \pkg{TAM}\cr
 Type: \tab Package\cr
-Version: \tab 1.4\cr
+Version: \tab 1.5\cr
 Publication Year: \tab 2015\cr
 License: \tab GPL (>=2.0)\cr
 URL: \tab \url{http://www.edmeasurementsurveys.com/TAM/Tutorials/}\cr

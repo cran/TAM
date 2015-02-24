@@ -1,15 +1,37 @@
 \name{tam.modelfit}
 \alias{tam.modelfit}
 \alias{summary.tam.modelfit}
+
+\alias{IRT.modelfit.tam.mml}
+\alias{IRT.modelfit.tam.mml.3pl}
+\alias{IRT.modelfit.tamaan}
+
+\alias{summary.IRT.modelfit.tam.mml}
+\alias{summary.IRT.modelfit.tam.mml.3pl}
+\alias{summary.IRT.modelfit.tamaan}
+
+\alias{tam.modelfit.IRT}
+\alias{tam.modelfit.args}
+
+
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Q3 and Adjusted Q3 Statistic and Further Model Fit Statistics
+Model Fit Statistics in \pkg{TAM}
 }
 \description{
-This function computes the Q3 statistic (Yen, 1984) and an
-adjusted variant of it (see Details). In addition,
-some effect sizes of model fit (\code{MADaQ3}, \eqn{MADRESIDCOV},
-\eqn{SRMR}) are implemented.
+This function computes several model fit statistics.
+It includes the Q3 statistic (Yen, 1984) and an
+adjusted variant of it (see Details). Effect sizes of model fit 
+(\code{MADaQ3}, \eqn{MADRESIDCOV},
+\eqn{SRMR}) are also available.
+
+The function \code{IRT.modelfit} is a wrapper to \code{tam.modelfit},
+but allows convenient model comparisons by using the
+\code{\link[CDM:IRT.compareModels]{IRT.compareModels}} (\pkg{CDM}) function.
+
+The \code{tam.modelfit} function can also be used for fitted
+models outside the \pkg{TAM} package by applying 
+\code{tam.modelfit.IRT} or \code{tam.modelfit.args}.
 }
 
 
@@ -17,6 +39,18 @@ some effect sizes of model fit (\code{MADaQ3}, \eqn{MADRESIDCOV},
 tam.modelfit(tamobj, progress = TRUE)
 
 \method{summary}{tam.modelfit}(object,...)
+
+\method{IRT.modelfit}{tam.mml}(object, \dots)
+\method{IRT.modelfit}{tam.mml.3pl}(object, \dots)
+\method{IRT.modelfit}{tamaan}(object, \dots)
+
+\method{summary}{IRT.modelfit.tam.mml}(object, \dots)
+\method{summary}{IRT.modelfit.tam.mml.3pl}(object, \dots)
+\method{summary}{IRT.modelfit.tamaan}(object, \dots)
+
+tam.modelfit.IRT( object , progress=TRUE )
+
+tam.modelfit.args( resp , probs , theta , post , progress=TRUE )
 }
 
 
@@ -29,8 +63,13 @@ Object of class \code{tam}
 An optional logical indicating whether progress should
 be displayed
 }
-
-\item{object}{Object of class \code{tam.modelfit}}
+\item{object}{Object of class \code{tam.modelfit} (for \code{summary})
+  or objects for which \code{IRT.data}, \code{IRT.irfprob}
+and \code{IRT.posterior} have been defined (for \code{tam.modelfit.IRT}).}
+\item{resp}{Dataset with item responses}
+\item{probs}{Array with item response functions evaluated at \code{theta}}
+\item{theta}{Matrix with used \eqn{\bold{\theta}} grid}
+\item{post}{Individual posterior distribution}
 \item{\dots}{Further arguments to be passed}
 }
 
@@ -139,15 +178,30 @@ performance of the three-parameter logistic model.
 data(data.cqc01)
 dat <- data.cqc01
 
-#*** estimation
+#*****************************************************
+#*** Model 1: Rasch model
 mod1 <- tam.mml( dat )
-#*** model fit
+# assess model fit
 res1 <- tam.modelfit( tamobj = mod1 )
 summary(res1)
 # display item pairs with five largest adjusted Q3 statistics
 res1$stat.itempair[1:5,c("item1","item2","aQ3","p","p.holm")]
 
 \dontrun{
+# IRT.modelfit
+fmod1 <- IRT.modelfit(mod1)
+summary(fmod1)
+
+#*****************************************************
+#*** Model 2: 2PL model
+mod2 <- tam.mml.2pl( dat )
+# IRT.modelfit
+fmod2 <- IRT.modelfit(mod2)
+summary(fmod2)
+
+# model comparison
+IRT.compareModels(fmod1 , fmod2 )
+
 #############################################################################
 # SIMULATED EXAMPLE 2: Rasch model
 #############################################################################

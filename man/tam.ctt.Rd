@@ -17,7 +17,8 @@ tam.ctt(resp, wlescore=NULL, pvscores=NULL, group=NULL , progress=TRUE)
 tam.ctt2(resp, wlescore=NULL, group=NULL , allocate=30 , progress=TRUE)
 tam.ctt3(resp, wlescore=NULL, group=NULL , allocate=30 , progress=TRUE)
 
-plotctt( resp , theta , Ncuts = NULL , ask = FALSE , ... )
+plotctt( resp , theta , Ncuts = NULL , ask = FALSE , col.list=NULL ,
+       package="lattice" , ... )
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -49,6 +50,9 @@ should be displayed.
   A logical which asks for changing the graphic from item to item.
   The default is \code{FALSE}.
 }
+\item{col.list}{Optional vector of colors for plotting}
+\item{package}{Package used for plotting. Can be \code{"lattice"}
+or \code{"graphics"}.}
 \item{\dots}{
   Further arguments to be passed.
 }
@@ -118,6 +122,13 @@ stat1c <- tam.ctt3( resp=data.mc$raw , wlescore=w1$theta )  # faster
 
 # plot empirical item response curves
 plotctt( resp=data.mc$raw , theta = w1$theta , Ncuts =5 , ask=TRUE)
+# use graphics for plot
+plotctt( resp=data.mc$raw , theta = w1$theta , Ncuts =5 , ask=TRUE , package="graphics")
+# change colors
+col.list <- c( "darkred" ,  "darkslateblue" , "springgreen4" , "darkorange" , 
+                "hotpink4" , "navy" )
+plotctt( resp=data.mc$raw , theta = w1$theta , Ncuts =5 , ask=TRUE , 
+        package="graphics" , col.list = col.list )      
 
 # CTT results for scored data
 stat2 <- tam.ctt( resp=data.mc$scored , wlescore=w1$theta , pvscores=p1[,-1] )

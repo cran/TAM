@@ -802,6 +802,11 @@ tam.mml.mfr <-
 	#****
 	# look for non-estimable xsi parameters
 #    xsi[ xsi == 99 ] <- NA	
+
+	#******
+	# generate input for fixed parameters
+	xsi.fixed.estimated <- generate.xsi.fixed.estimated( xsi , A )
+	B.fixed.estimated <- generate.B.fixed.estimated(B)
 	
 	
     ##**SE  
@@ -998,7 +1003,10 @@ tam.mml.mfr <-
                  "se.AXsi" = se.AXsi , 
                  "nstud" = nstud , "resp.ind.list" = resp.ind.list ,
                  "hwt" = hwt , "like" = res.like , "ndim" = ndim ,
-                 "xsi.fixed" = xsi.fixed , "beta.fixed" = beta.fixed , "Q"=Q,
+                 "xsi.fixed" = xsi.fixed , 
+				 "xsi.fixed.estimated" = xsi.fixed.estimated , 
+				 "B.fixed.estimated" = B.fixed.estimated , 
+				 "beta.fixed" = beta.fixed , "Q"=Q,
                  "formulaA"=formulaA , "facets"=facets ,
 				 "xsi.constr" = xsi.constr , 
                  "variance.fixed" = variance.fixed ,

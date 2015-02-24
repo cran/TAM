@@ -9,8 +9,10 @@ doparse <- function(model){
    dels <- c("")
    for (vv in 1:10){ 
 		dels <- c( dels , paste0( rep( " " , vv ) , collapse="")  )
-		}	
+		}
    syn <- syn[ ! ( syn %in% dels )]
+   
+    
    #***************
    # delete lines beginning with "#" and so on
 #   lin <- c("#" , " #" , "  #" , "    #")
@@ -24,7 +26,7 @@ doparse <- function(model){
    if ( length(ind) > 0 ){
      syn <- syn[ - ind ]
 					}
-   
+
    #***************
    # process syntax	
    S1 <- length(syn)

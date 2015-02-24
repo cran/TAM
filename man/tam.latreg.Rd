@@ -208,6 +208,14 @@ pvnames <- c("PVREAD")
 datlist <- tampv2datalist( pv2, pvnames = pvnames , Y=X , Y.pid="idstud")
 str(datlist)
 
+# regression using semTools package
+library(semTools)
+lavmodel <- "
+   PVREAD ~ hisei + female
+           "                           
+mod1a <- semTools::sem.mi( lavmodel , datlist)
+summary(mod1a , standardized=TRUE, rsquare=TRUE)
+
 #############################################################################
 # EXAMPLE 3: data.Students - fitted confirmatory factor analysis in lavaan
 #############################################################################

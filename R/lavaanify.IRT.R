@@ -12,7 +12,6 @@ lavaanify.IRT <- function( lavmodel , items=NULL , data = NULL , include.residua
 				}
 
 	#***
- 
 	if ( doparse ){
 	   lavmodel <- doparse( lavmodel )
 					}
@@ -22,10 +21,8 @@ lavaanify.IRT <- function( lavmodel , items=NULL , data = NULL , include.residua
 					}	
 	# grep for MEASERR
 	lavmodel <- lavaanify.grep.MEASERR( lavmodel )										
-	
 	# grep for nonlinear terms
 	res <- lavaanify.grep.nonlinear( lavmodel , items )
-	
 	lavmodel <- res$lavmodel
 	nonlin_factors <- res$nonlin_factors
 	nonlin_syntable <- res$nonlin_syntable
@@ -39,7 +36,7 @@ lavaanify.IRT <- function( lavmodel , items=NULL , data = NULL , include.residua
 		
  		res <- remove.duplicated.variances.lavsyn(res , items)	
 		res <- lavaanify.sirt.v1( lavmodel = res)
- #cat("\n*** sirt.v1 second") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1					
+# cat("\n*** sirt.v1 second") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1					
 		lavpar <- res$lavpartable
 		lavsyn <- res$lavaan.syntax
 

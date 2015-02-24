@@ -169,11 +169,11 @@ a0 <- Sys.time()
 				SDPost <- sqrt( rowSums( thetaM^2 * hwt ) - EAP^2 )
 				pv[,pp] <- theta1 <- rnorm( nstud , mean = EAP , sd = SDPost )		
 					           }
-							   
+
 			 #------
 			 # normal approximation (ndim > 1)
 			 if (  normal.approx  & ( ndim > 1 ) ){			     
-			    N <- nrow(hwt)
+			    N <- nrow(hwt)			
 				MEAP <- matrix( 0 , nrow=N , ncol=ndim)	
 				SDEAP <- matrix( 0 , nrow=N , ncol=ndim)
 				nstudl <- rep(1,N)	
@@ -181,7 +181,7 @@ a0 <- Sys.time()
 					MEAP[,dd] <- rowSums( hwt * outer( nstudl , theta[,dd] ) )
 					SDEAP[,dd] <- sqrt(rowSums( hwt * outer( nstudl , theta[,dd]^2 ) ) - MEAP[,dd]^2)					
 								}												 				
-				thetaPV <- matrix( rnorm( N * ndim ) , nrow=N , ncol=2 )
+				thetaPV <- matrix( rnorm( N * ndim ) , nrow=N , ncol=ndim )
 				thetaPV <- SDEAP * thetaPV + MEAP
 				theta1 <- pv[ , (pp-1)*(ndim) + 1:ndim ] <- thetaPV			 
 									}
@@ -223,7 +223,7 @@ a0 <- Sys.time()
 
 			 #------
 			 # normal approximation (ndim > 1)
-			 if (  normal.approx  & ( ndim > 1 ) ){			     
+			 if (  normal.approx  & ( ndim > 1 ) ){		
 			    N <- nrow(hwt)
 				MEAP <- matrix( 0 , nrow=N , ncol=ndim)	
 				SDEAP <- matrix( 0 , nrow=N , ncol=ndim)
@@ -232,7 +232,7 @@ a0 <- Sys.time()
 					MEAP[,dd] <- rowSums( hwt * outer( nstudl , theta[,dd] ) )
 					SDEAP[,dd] <- sqrt(rowSums( hwt * outer( nstudl , theta[,dd]^2 ) ) - MEAP[,dd]^2)					
 								}												 				
-				thetaPV <- matrix( rnorm( N * ndim ) , nrow=N , ncol=2 )
+				thetaPV <- matrix( rnorm( N * ndim ) , nrow=N , ncol=ndim )
 				thetaPV <- SDEAP * thetaPV + MEAP
 				pv[ , (pp-1)*(ndim) + 1:ndim ] <- thetaPV			 
 									}

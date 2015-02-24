@@ -65,7 +65,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   fac.oldxsi <- max( 0 , min( c( fac.oldxsi , .95 ) ) )
 	
     resp <- as.matrix(resp)	
-	resp <- add.colnames.resp(resp)
+	resp0 <- resp <- add.colnames.resp(resp)
   
   if (progress){ 
       cat(disp)	
@@ -85,6 +85,10 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
     if (( irtmodel=="PCM2" ) & ( is.null(A)) ){ 
       A <- .A.PCM2( resp ) 
     }    
+  
+  if ( ! is.null( variance.fixed ) ){
+			est.variance <- TRUE			
+				}
   
   
   nitems <- ncol(resp)       # number of items
@@ -423,7 +427,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   disp <- "....................................................\n"
   # define progress bar for M step
   mpr <- round( seq( 1 , np , len = 10 ) )
-
+    
   ##############################################################   
   #Start EM loop here
   while ( ( (!betaConv | !varConv)  | ((a1 > conv) | (a4 > conv) | (a02 > convD)) )  & (iter < maxiter) ) { 
@@ -487,6 +491,8 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 # cat("m step regression") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
 	
     variance <- resr$variance	
+
+	
 	if( ndim == 1 ){  # prevent negative variance
 			variance[ variance < min.variance ] <- min.variance 
 				}
@@ -517,10 +523,14 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 	    if (  ncol(variance) > 1 ){
 		diag(variance) <- diag(variance)+10^(-14)	  
 							}
-						}
+						}					
       if ( ! est.variance ){ 
-		if ( G == 1 ){ variance <- cov2cor(variance)  } # fix variance at 1  
-		if ( G > 1 ){ variance[ group == 1 ] <- 1 }     
+		if ( G == 1 ){ 
+				variance <- cov2cor(variance)  
+						} # fix variance at 1  
+		if ( G > 1 ){ 
+				variance[ group == 1 ] <- 1 
+						}     
 				# fix variance of first group to 1
 							}
     }
@@ -706,7 +716,13 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 		se.xsi.min -> se.xsi	
 		se.B.min -> se.B		
   #******
-    ##**SE  
+
+	#******
+	# generate input for fixed parameters
+	xsi.fixed.estimated <- generate.xsi.fixed.estimated( xsi , A )
+	B.fixed.estimated <- generate.B.fixed.estimated(B)
+
+  ##**SE  
   # standard errors of AXsi parameters
   # check for missing entries in A
 	se.AXsi <- 0*AXsi
@@ -856,7 +872,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
                "post" = hwt ,  "rprobs" = rprobs , "itemweight" = itemwt ,
                "theta" = theta , 
 			   "n.ik" = n.ik , "pi.k" = pi.k ,
-			   "Y" = Y , "resp" = resp , 
+			   "Y" = Y , "resp" = resp0 , 
                "resp.ind" = resp.ind , "group" = group , 
 			   "G" = if ( is.null(group)){1} else { length(unique( group ) )} , 
 			   "groups" = if ( is.null(group)){1} else { groups } , 			   			   
@@ -870,8 +886,12 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
                "nstud" = nstud , "resp.ind.list" = resp.ind.list ,
                "hwt" = hwt , "like" = res.like , 
 			   "ndim" = ndim ,
-               "xsi.fixed" = xsi.fixed , "beta.fixed" = beta.fixed, "Q" = Q, 
-			   "B.fixed" = B.fixed , "est.slopegroups" = est.slopegroups , "E" = E , "basispar" = basispar,
+               "xsi.fixed" = xsi.fixed ,
+				 "xsi.fixed.estimated" = xsi.fixed.estimated , 
+			   "beta.fixed" = beta.fixed, "Q" = Q, 
+			   "B.fixed" = B.fixed , 
+			   	"B.fixed.estimated" = B.fixed.estimated , 
+			   "est.slopegroups" = est.slopegroups , "E" = E , "basispar" = basispar,
                "variance.fixed" = variance.fixed ,
                "nnodes" = nnodes , "deviance" = deviance ,
 			   "ic" = ic , 

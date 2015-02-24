@@ -74,11 +74,13 @@ function( resp , hwt ,  resp.ind ,
 		beta[ beta.fixed[,1:2,drop=FALSE] ] <- beta.fixed[,3] 
 		beta <- as.matrix( beta , ncol=ndim )	
 					}
+
 	# fixed covariance matrix entries
 	if ( ! is.null(variance.fixed) ){ 
 		variance[ variance.fixed[,1:2,drop=FALSE] ] <- variance.fixed[,3]  	
 		variance[ variance.fixed[,c(2,1),drop=FALSE] ] <- variance.fixed[,3]  		
-				}		
+				}				
+				
 	if ( G> 1){	# begin multiple groups
 		if ( snodes > 0 ){ 
 				hwt <- hwt / snodes 

@@ -1,6 +1,4 @@
 
-
-
 ############################################################
 # process lavaan model
 tamaanify.proc.lavaanmodel <- function(res , resp ){

@@ -10,7 +10,6 @@ tamaan.3pl.trait <- function( res0 , anal.list , con , ... ){
 		delta.inits <- res0$delta.inits					
 
 
-
 		res <- tam.mml.3pl(resp= res0$resp , 
 						E=res0$E , 
 						skillspace= res0$skillspace , 

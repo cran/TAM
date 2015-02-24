@@ -97,7 +97,7 @@ plot.tam <- function(x, items=1:x$nitems, type="expected" ,
     if ( type=="expected"){
 		if (i==1 || !overlay) {
 		  ylim2 <- c(0,max( tamobj$resp[,i] , na.rm=TRUE ) )
-		  plot(theta, expScore[,i], ,col=12, type="l", lwd=3, las=1, ylab="Score", xlab="Ability",
+		  plot(c(theta), expScore[,i], ,col=12, type="l", lwd=3, las=1, ylab="Score", xlab="Ability",
 			   #         main=paste("Expected Scores Curve - Item ", i)
 			   main=paste("Expected Scores Curve - Item ", colnames(tamobj$resp)[i] )	 ,
 			   ylim=ylim2 , ...

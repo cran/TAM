@@ -5,8 +5,32 @@ tamaanify.modelconstraints.loadings <- function(res){
 	mdfr <- res$MODELCONSTRAINT.dfr
 	lav1 <- res$lavpartable
 	Q <- res$Q
-
+	#*** create further model constraints if there are equalities
+	lav1 <- lav1[ grep( "=~" , paste(lav1$fullsyn) , fixed=TRUE) , ]
+	lav1$label_ren <- paste0( lav1$rhs , "_" , lav1$lhs , "_load")
 	
+	labels1 <- paste(lav1$label)
+	t1 <- table(labels1)
+	t1 <- t1[ t1 > 1]
+	labels1 <- sort( names(t1) )
+	AL <- length(labels1)
+	if (AL>0){
+	for (aa in 1:AL){	
+#		aa <- 1
+		lab.aa <- labels1[aa]
+		ind.aa <- which( paste(lav1$label) == lab.aa ) 
+		dfr.aa <- data.frame( "index" = 999 , 
+				"syn" = paste0( lav1$label_ren[ind.aa] , "==" , lab.aa ) )
+		dfr.aa$derived <- 1			
+		dfr.aa$trafopar <- lav1$label_ren[ind.aa]	
+		dfr.aa$expanded <- 0
+		dfr.aa <- cbind( dfr.aa , lav1[ ind.aa , c("lhs" , "op" , "rhs" , "fullsyn") ] )
+		mdfr <- rbind( mdfr , dfr.aa )
+		lav1[ ind.aa , "label" ] <- lav1[ ind.aa , "label_ren" ]		
+						}
+				}
+	
+
 	if ( ! is.null( mdfr ) ){
 		mdfr <- mdfr[ grep( "=~" , paste(mdfr$fullsyn) , fixed=TRUE) , ]
 		lav1 <- lav1[ grep( "=~" , paste(lav1$fullsyn) , fixed=TRUE) , ]
@@ -87,7 +111,7 @@ tamaanify.modelconstraints.loadings <- function(res){
 				gammaslope.fixed <- rbind( gammaslope.fixed , gsf )
 								}
 			res$gammaslope.fixed <- gammaslope.fixed							
-							}												
+							}																		
 					}										
 	return(res)
 	}

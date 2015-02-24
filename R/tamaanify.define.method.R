@@ -18,7 +18,17 @@ tamaanify.define.method <- function(res , tam.method ){
 	al <- res$ANALYSIS.list$type
 	if ( al %in% c("LCA", "LOCLCA","MIXTURE" , "OLCA") ){
 		res$method <- "tam.mml.3pl"
-						}																	
+						}	
+	#--------------------------------
+    #**** choose generalized partial credit model
+	if ( res$method %in% c("tam.mml.2pl" ) ){	
+         items <- res$items
+		 m1 <- mean( items$itemtype %in% c( "GPCM" ) )
+		 if (m1==1){
+		     res$irtmodel <- "GPCM"
+					}
+					}
+					
 	return(res)
 			}
 ###################################################			

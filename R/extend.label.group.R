@@ -26,9 +26,7 @@ extend.label.group <- function( label.group ){
 			ii0 <- ii0+1 
 				}	
 					}
-	if (ii0==M1){ ii0 <- ii0-1 }
-	
-	
+	if (ii0==M1){ ii0 <- ii0-1 }		
 #    for (mm in 1:M1){
 #        if ( substring( str1[1] , mm , mm) == substring( str1[2] , mm , mm) ){
 #            ii <- ii + 1 
@@ -36,7 +34,6 @@ extend.label.group <- function( label.group ){
 #            break 
 #                    }
 #            }
-
 	ii <- ii0
     l1 <- as.numeric( substring( str1 , ii+1 )    )
     str2 <- seq( l1[1] , l1[2] )

@@ -150,7 +150,7 @@ tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
   \item{variance.inits}{
      Initial covariance matrix in estimation. All matrix entries have to be
      specified and this matrix is NOT in the same format like
-     \code{variance.inits}.
+     \code{variance.fixed}.
 }
   \item{est.variance}{
      Should the covariance matrix be estimated? This argument
@@ -417,7 +417,12 @@ are displayed.
 \item{like}{Individual likelihood}
 \item{ndim}{Number of dimensions}
 \item{xsi.fixed}{Fixed \eqn{\xi} parameters}
+\item{xsi.fixed.estimated}{Matrix of estimated \eqn{xi} parameters 
+	in form of \code{xsi.fixed} which can 
+	be used for parameter fixing in subsequent estimations.}
 \item{B.fixed}{Fixed loading parameters (only applies to \code{tam.mml.2pl})}
+\item{B.fixed.estimated}{Matrix of estimated \eqn{B} parameters
+   in the same format as \code{B.fixed}.}
 \item{est.slopegroups}{An index vector of item groups of common slope 
 parameters (only applies to \code{tam.mml.2pl})}
 \item{E}{Design matrix for estimated item slopes in the generalized partial 
@@ -466,7 +471,7 @@ Data Analysis}, \bold{51}, 5765-5775.
 
 Wu, M. L., Adams, R. J., Wilson, M. R. & Haldane, S. (2007).
 \emph{ACER ConQuest Version 2.0}. Mulgrave.
-\url{https://shop.acer.edu.au/acer-shop/group/CON3}
+https://shop.acer.edu.au/acer-shop/group/CON3.
 }
 
 %\author{
@@ -558,6 +563,11 @@ xsi.fixed <- cbind( 1:(length(xsi0)) , xsi0 )
         # define vector with fixed item difficulties
 mod1a <- tam.mml( resp=sim.rasch , xsi.fixed=xsi.fixed )
 summary(mod1a)
+
+# Usage of the output value mod1$xsi.fixed.estimated has the right format
+# as the input of xsi.fixed
+mod1aa <- tam.mml( resp=sim.rasch , xsi.fixed= mod1$xsi.fixed.estimated )
+summary(mod1b)
 
 #************************************************************
 # Model 1b: Rasch model with initial xsi parameters for items 2 (item difficulty b=-1.8),
@@ -932,8 +942,8 @@ tammodel <- "
     F1 =~ I1__I10 + I21__I40
     F2 =~ I11__I20 + I21__I40
     F1 ~~ 1*F1
-    F2 ~~ F2
-    F1 ~~ 1*F2
+    F1 ~~ F2
+    F2 ~~ 1*F2
     "
 mod5t <- tamaan( tammodel , resp ,  control=list(maxiter=10))
 summary(mod5t)
@@ -943,15 +953,26 @@ summary(mod5t)
 #############################################################################
 data( data.gpcm )
 
+#************************************************************
 # Ex6.1: Nominal response model (irtmodel="2PL")
 mod6_1 <- tam.mml.2pl( resp=data.gpcm , irtmodel="2PL" , control=list( maxiter=200) )
 mod6_1$item # item intercepts
 mod6_1$B    # for every category a separate slope parameter is estimated
 
+# reestimate the model with fixed item parameters
+mod6_1a <- tam.mml.2pl( resp=data.gpcm , irtmodel="2PL" , 
+       xsi.fixed = mod6_1$xsi.fixed.estimated,  B.fixed = mod6_1$B.fixed.estimated )
+
+# estimate the model with initial item parameters from mod6_1
+mod6_1b <- tam.mml.2pl( resp=data.gpcm , irtmodel="2PL" , 
+       xsi.inits = mod6_1$xsi.fixed.estimated,  B = mod6_1$B )
+       
+#************************************************************
 # Ex6.2: Generalized partial credit model
 mod6_2 <- tam.mml.2pl( resp= data.gpcm , irtmodel="GPCM" , control=list( maxiter=200) )
-mod6_2$B    # joint slope parameter for all categories
+mod6_2$B[,2,]    # joint slope parameter for all categories
 
+#************************************************************
 # Ex6.3: some fixed entries of slope matrix B
 # B: nitems x maxK x ndim  
 #   ( number of items x maximum number of categories x number of dimensions)
@@ -967,15 +988,18 @@ mod6_3 <- tam.mml.2pl( resp=data.gpcm , irtmodel="2PL" , B.fixed = B.fixed ,
                  control=list( maxiter=200) )
 mod6_3$B
 
+#************************************************************
 # Ex 6.4: estimate the same model, but estimate variance
 mod6_4 <- tam.mml.2pl( resp=data.gpcm , irtmodel="2PL" , B.fixed = B.fixed , 
                est.variance = TRUE , control=list( maxiter=350) )
 mod6_4$B
 
+#************************************************************
 # Ex 6.5: partial credit model
 mod6_5 <- tam.mml( resp=data.gpcm ,control=list( maxiter=200) )
 mod6_5$B
 
+#************************************************************
 # Ex 6.6: partial credit model: Conquest parametrization 'item+item*step'
 mod6_6 <- tam.mml( resp=data.gpcm , irtmodel="PCM2" )
 summary(mod6_6)
@@ -998,11 +1022,12 @@ mod6_6d <- tam.mml.mfr( resp=data.gpcm , formulaA= ~ 0 + item + item:step ,
     control=list(fac.oldxsi=.1)  , constraint="items" ) 
 summary(mod6_6d)
 
+#************************************************************
 # Ex 6.7: Rating scale model: Conquest parametrization 'item+step'
 mod6_7 <- tam.mml( resp=data.gpcm , irtmodel="RSM" )
 summary(mod6_7)
 
-#***
+#************************************************************
 # Ex 6.8: sum constraint on item difficulties 
 #         partial credit model: ConQuest parametrization 'item+item*step' 
 #         polytomous scored TIMMS data
@@ -1037,7 +1062,7 @@ mod6_8b <- tam.mml.mfr( resp=dat , formulaA= ~ 0 + item + item:step ,
                         control=list(fac.oldxsi=.1), constraint="items" ) 
 summary(mod6_8b)
 
-#***
+#************************************************************
 # Ex 6.9: sum constraint on item difficulties for irtmodel="PCM"
 
 data(data.timssAusTwn.scored)
@@ -1074,6 +1099,27 @@ item.means <- lapply(ind.item.cat.pars, function(ii) mean(mod6_8$xsi$xsi[ii]))
 
 # these sum up to the negative of the fixed parameter 
 fix.par <- -sum( unlist(item.means), na.rm=TRUE)
+
+#************************************************************
+# Ex 6.10: Generalized partial credit model with equality constraints
+#          on item discriminations
+
+data(data.gpcm)
+dat <- data.gpcm
+
+# Ex 6.10a: set all slopes of three items equal to each other
+E <- matrix( 1 , nrow=3 , ncol=1 )
+mod6_10a <- tam.mml.2pl( dat , irtmodel="GPCM.design" , E=E  )
+summary(mod6_10a)
+mod6_10a$B[,,]   
+
+# Ex 6.10b: equal slope for first and third item
+E <- matrix( 0 , nrow=3 , ncol=2 )
+E[c(1,3),1] <- 1
+E[ 2, 2 ] <- 1
+mod6_10b <- tam.mml.2pl( dat , irtmodel="GPCM.design" , E=E  )
+summary(mod6_10b)
+mod6_10b$B[,,]   
 
 #############################################################################
 # SIMULATED EXAMPLE 7: design matrix for slopes for the

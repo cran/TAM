@@ -41,8 +41,54 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
+
 -------------------------------------------------------
-Changes in Version 1.4   (2015-01-15)
+Changes in Version 1.5   (2015-02-24)  --  CRAN 1.5-2
+-------------------------------------------------------
+
+Features:
+* included S3 methods 'IRT.expectedCounts', 'IRT.modelfit',
+  'predict' and 'IRT.data' for fitted models in TAM
+* included item fit statistic on item level 'msq.itemfit' 
+  as an alternative to the simulation based 'tam.fit' function 
+* included linear approximation for confirmatory factor analysis  
+  'IRT.linearCFA'
+
+Bug fixes:
+* fixed a bug in plausible value imputation in multidimensional
+  models and normal approximation (reported by Dan Su)
+* changed resp in output of 'tam.mml', 'tam.mml.2pl' and
+  'tam.mml.3pl' to output the original used data with missings
+  (thanks to Matthias Trendtel)
+* extended tam.modelfit to handle multi matrix design appropriately
+* changed defaults in 'est.variance' if 'variance.fixed' is provided
+  in 'tam.mml.2pl'. The previous default led to bugs in the
+  tamaan function. (reported by Christoph Duchhardt)
+
+Notes:
+* added output values 'xsi.fixed.estimated', 'B.fixed.estimated'
+  for default item parameter fixings in tam.mml, tam.mml.2pl, 
+  tam.mml.mfr and tam.mml.3pl (suggested by Matthias Trendtel)
+* extended tan.modelfit function for more flexible input to
+  allow for assessing model fit for objects which were not
+  fitted in TAM ('tam.modelfit.IRT', 'tam.modelfit.args')
+* added 'IRT.likelihood' and 'IRT.posterior' S3 method for 
+  object of class 'tam.latreg'
+* extended 'plotctt' and 'plot.tam' the using graphics package
+  in addition to lattice (suggested by Michal Modzelewski)
+* included function for computing Thurstonian thresholds ('IRT.threshold')   
+
+
+Datasets included or modified:
+* ---
+
+Examples included or modified:
+* tam.mml (1,5t,6), IRT.expectedCounts.tam (1), tam.modelfit (1),
+  predict (1), msq.itemfit (1), IRT.linearCFA (1,2),
+  IRT.threshold (1,2)
+
+-------------------------------------------------------
+Changes in Version 1.4   (2015-01-15)  --  CRAN 1.4-1
 -------------------------------------------------------
 
 Features:
@@ -81,9 +127,8 @@ Examples included or modified:
   tamaan (2), tam.fit (1,2), data.geiser (2), tam.latreg (2,3),
   IRT.WrightMap (1,2,3,4), data.cqc (1,2,3), lavaanify.IRT (6)
 
-
 -------------------------------------------------------
-Changes in Version 1.3   (2015-01-06)
+Changes in Version 1.3   (2015-01-06)  --  CRAN 1.3-xx
 -------------------------------------------------------
 
 Features:
@@ -336,7 +381,7 @@ Changes in Versions 1.0 (2014-02-02)
 -------------------------------------------------------
 
 x updated DESCRIPTION and NAMESPACE due to changes in Rcpp
-x change in package maintenance: now Thomas Kiefer is
+x change in package maintenance: Thomas Kiefer is now
   the package maintainer
 x fixed a bug in item labeling in tam.se
   (thanks to Sebastian Weirich)
@@ -468,8 +513,7 @@ x included two helper functions written in Rcpp in
   plausible value imputation function tam.pv for
   better performance
 x included S3 plot method
-x included data.numeracy and data.timssAusTwn
-  datasets
+x included data.numeracy and data.timssAusTwn datasets
 
 -------------------------------------------------------
 Changes in Versions 0.4 (2013-07-01) 

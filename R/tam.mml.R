@@ -66,7 +66,8 @@ tam.mml <-
     fac.oldxsi <- max( 0 , min( c( fac.oldxsi , .95 ) ) )  
     
 	resp <- as.matrix(resp)
-	resp <- add.colnames.resp(resp)
+	resp0 <- resp <- add.colnames.resp(resp)
+	
 	
     if (progress){ 
       cat(disp)	
@@ -720,8 +721,12 @@ tam.mml <-
     } else {
       se.xsiD <- matrix( se.xsi^2,1,1)
     }
-    # Reval("print(se.xsi)")
-    # Reval( "print(se.xsiD)") 
+		
+	#******
+	# generate input for fixed parameters
+	xsi.fixed.estimated <- generate.xsi.fixed.estimated( xsi , A )
+	B.fixed.estimated <- generate.B.fixed.estimated(B)
+	
     #*******
     # A1 [ items ,categs , params ]  -> xsi design matrix
     # se.xsiD  [ params , params ]
@@ -868,7 +873,7 @@ tam.mml <-
                  "post" = hwt ,  "rprobs" = rprobs , "itemweight" = itemwt ,
                  "theta" = theta , 
                  "n.ik" = n.ik , "pi.k" = pi.k ,
-                 "Y" = Y , "resp" = resp , 
+                 "Y" = Y , "resp" = resp0 , 
                  "resp.ind" = resp.ind , "group" = group , 
                  "G" = if ( is.null(group)){1} else { length(unique( group ) )} , 
                  "groups" = if ( is.null(group)){1} else { groups } , 			   
@@ -882,7 +887,10 @@ tam.mml <-
                  "nstud" = nstud , "resp.ind.list" = resp.ind.list ,
                  "hwt" = hwt ,  "like" = res.like , 
 				 "ndim" = ndim ,
-                 "xsi.fixed" = xsi.fixed , "beta.fixed" = beta.fixed , "Q" = Q  ,
+                 "xsi.fixed" = xsi.fixed , 
+				 "xsi.fixed.estimated" = xsi.fixed.estimated , 
+				 "B.fixed.estimated" = B.fixed.estimated ,
+				 "beta.fixed" = beta.fixed , "Q" = Q  ,
                  "variance.fixed" = variance.fixed ,
                  "nnodes" = nnodes , "deviance" = deviance ,
                  "ic" = ic , 

@@ -115,7 +115,7 @@ for elaborate functionality for communication of ConQuest with \R.
 \references{
 Wu, M. L., Adams, R. J., Wilson, M. R. & Haldane, S. (2007).
 \emph{ACER ConQuest Version 2.0}. Mulgrave.
-\url{https://shop.acer.edu.au/acer-shop/group/CON3}
+https://shop.acer.edu.au/acer-shop/group/CON3.
 }
 
 

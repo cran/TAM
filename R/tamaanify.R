@@ -34,7 +34,7 @@ tamaanify <- function( tammodel , resp , tam.method=NULL , doparse=TRUE ){
     tam1a <- paste0( ifelse( tam1$section.label == 0 , "  " , "") , tam1$syn )	
 	res <- list( "tammodel" = paste0( tam1a , collapse="\n") )
 	res$tammodel.dfr <- tam1	
-
+    res$gammaslope.fixed <- NULL
 		
 	#***************************
 	# process analysis
@@ -86,7 +86,6 @@ tamaanify <- function( tammodel , resp , tam.method=NULL , doparse=TRUE ){
 	#*** fixed loadings in tam.mml.2pl (B.fixed)
 	res <- tamaanify.proc.loadings.B.fixed(res)	
 # cat("loadings B\n")
-
 	
 	#*** model constraints loadings
 	res <- tamaanify.modelconstraints.loadings(res)
@@ -110,9 +109,9 @@ tamaanify <- function( tammodel , resp , tam.method=NULL , doparse=TRUE ){
 
 	#*** define method
 	res <- tamaanify.define.method(res , tam.method )
- # cat("**  define method \n")
+#  cat("**  define method \n")
 
-	
+
 	#************************************************+
 	# OUTPUT:
 	

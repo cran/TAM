@@ -57,7 +57,7 @@ tam.mml.3pl <-
 	
 	
 	resp <- as.matrix(resp)
-	resp <- add.colnames.resp(resp)
+	resp0 <- resp <- add.colnames.resp(resp)
 	
 	#********************
 	# create E design matrix from different input matrices
@@ -125,7 +125,9 @@ tam.mml.3pl <-
       A <- .A.PCM2( resp ) 
     }  
 
-    
+  if ( ! is.null( variance.fixed ) ){
+			est.variance <- TRUE			
+				}    
 	
 	
 	# manage guessing parameters
@@ -707,6 +709,11 @@ a0 <- Sys.time()
       #---end 2PL---
       # stop("er")
 # cat("sufficient statistics 2PL") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
+
+	#******
+	# generate input for fixed parameters
+	xsi.fixed.estimated <- generate.xsi.fixed.estimated( xsi , A )
+	B.fixed.estimated <- generate.B.fixed.estimated(B)
       	  
       
 	  ######################################
@@ -1047,7 +1054,7 @@ a0 <- Sys.time()
                  "post" = hwt ,  "rprobs" = rprobs , "itemweight" = itemwt ,
                  "theta" = theta , 
                  "n.ik" = n.ik , "pi.k" = pi.k ,
-                 "Y" = Y , "resp" = resp , 
+                 "Y" = Y , "resp" = resp0 , 
                  "resp.ind" = resp.ind , "group" = group , 
                  "G" = if ( is.null(group)){1} else { length(unique( group ) )} , 
                  "groups" = if ( is.null(group)){1} else { groups } , 			   			   
@@ -1060,8 +1067,12 @@ a0 <- Sys.time()
                  "se.AXsi" = se.AXsi , 
                  "nstud" = nstud , "resp.ind.list" = resp.ind.list ,
                  "hwt" = hwt , "like"= res.like , "ndim" = ndim ,
-                 "xsi.fixed" = xsi.fixed , "beta.fixed" = beta.fixed , "Q" = Q, 
-                 "B.fixed" = B.fixed , "est.slopegroups" = est.slopegroups , "E" = E , "basispar" = basispar,
+                 "xsi.fixed" = xsi.fixed , 
+				 "xsi.fixed.estimated" = xsi.fixed.estimated , 				 
+				 "beta.fixed" = beta.fixed , "Q" = Q, 
+                 "B.fixed" = B.fixed , 
+				 "B.fixed.estimated" = B.fixed.estimated , 				 
+				 "est.slopegroups" = est.slopegroups , "E" = E , "basispar" = basispar,
                  "variance.fixed" = variance.fixed ,
                  "nnodes" = nnodes , "deviance" = deviance ,
                  "ic" = ic , 

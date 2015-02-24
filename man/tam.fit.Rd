@@ -216,7 +216,7 @@ dat <- sirt::sim.raschtype( rnorm(N) , b=b , fixed.a=a )
 mod1 <- tam.mml(resp=dat) 
 #*** assess item fit by infit and outfit statistic
 fit1 <- tam.fit( mod1 )$itemfit
-round( cbind( "b"=mod1$item$AXsi_.Cat1 , fit1 )[1:7,], 3 ) 
+round( cbind( "b"=mod1$item$AXsi_.Cat1 , fit1$itemfit[,-1] )[1:7,], 3 )  
 
 #*** compute item fit statistic in mirt package
 library(mirt)
