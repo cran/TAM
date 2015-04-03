@@ -124,6 +124,11 @@ function( object , file = NULL , ...){
 			  cat("\nSome item xsi parameters are not estimable ")
 			  cat(" which is indicated by values of 99\n\n")	
 							}
+			if ( object$PSF ){
+        cat("\nA pseudo facet 'psf' with zero effects with all zero effects\n")
+		cat("was created because of non-unique person-facet combinations.\n\n") 							}
+							
+							
 			for (vv in seq(3,ncol(obji) ) ){ obji[,vv] <- round( obji[,vv] , 3) }
 			print(obji)
 						}				

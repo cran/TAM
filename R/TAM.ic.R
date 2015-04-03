@@ -60,7 +60,7 @@
     	# AIC
         ic$AIC <- dev + 2*ic$np
 		# AIC3
-		ic$AIC <- dev + 3*ic$np
+		ic$AIC3 <- dev + 3*ic$np
         # BIC
         ic$BIC <- dev + ( log(ic$n) )*ic$np
 		# adjusted BIC 

@@ -41,7 +41,7 @@ lavaanify.sirt.v1 <- function( lavmodel ){
 	dfr2 <- dfr1[ dfr1$guess_slip == 0 , ]
 	lavmodel1 <- paste0( dfr2$syntax , collapse="")
 	
-	lavpartable1 <- lavaanify( as.character(lavmodel1 ) , warn = FALSE , debug=FALSE ,
+	lavpartable1 <- lavaan::lavaanify( as.character(lavmodel1 ) , warn = FALSE , debug=FALSE ,
 						fixed.x=FALSE)
 						
     # lavpartable1 <- lavaanify_in_sirt( as.character(lavmodel1 ) , warn = FALSE , debug=FALSE )	
@@ -53,7 +53,7 @@ lavaanify.sirt.v1 <- function( lavmodel ){
 	   syn0 <- lavpartable2lavsyntax( res1$lavpartable )	   
 	   
 # cat("**** lavpartable2lavsyntax") ; z1 <- Sys.time(); print(z1-z0) ; z0 <- z1			   
-	   lavpartable1 <- lavaanify( as.character( syn0 ) , warn = FALSE , debug=FALSE ,
+	   lavpartable1 <- lavaan::lavaanify( as.character( syn0 ) , warn = FALSE , debug=FALSE ,
 						    fixed.x = FALSE)
  
 #  cat("**** lavaanify changed sirt.v1") ; z1 <- Sys.time(); print(z1-z0) ; z0 <- z1		   

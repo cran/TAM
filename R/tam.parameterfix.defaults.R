@@ -10,7 +10,7 @@ generate.xsi.fixed.estimated <- function( xsi , A ){
 			}
 			
 ###################################################
-generate.B.fixed.estimated <- function( B){			
+generate.B.fixed.estimated <- function(B){			
 	dimB <- dim(B)
 	I <- dimB[1]
 	K <- dimB[2]

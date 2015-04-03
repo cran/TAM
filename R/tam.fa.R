@@ -46,6 +46,9 @@ function( resp , irtmodel , dims=NULL , nfactors=NULL ,
 		colnames(Q) <- c("g" , dim.names )
 		# variance constraints
 		variance.fixed <- NULL
+		if (irtmodel == "bifactor2"){
+				variance.fixed <- cbind( 1:(D+1) , 1:(D+1) , 1 )		
+					}
 		for (dd in 1:D){  
 			v1 <- cbind( dd , seq(dd+1, D+1) , 0 )
 			variance.fixed <- rbind( variance.fixed , v1 )
@@ -68,11 +71,12 @@ function( resp , irtmodel , dims=NULL , nfactors=NULL ,
 		rownames(Q) <- colnames(resp)
 		colnames(Q) <- paste0("Dim",1:D)
 		# variance constraints
-		variance.fixed <- NULL
+		variance.fixed <- cbind( 1:D , 1:D , 1 )
 		for (dd in 1:(D-1) ){  
 			v1 <- cbind( dd , seq(dd+1, D) , 0 )
 			variance.fixed <- rbind( variance.fixed , v1 )
-					}		
+					}
+		
 		}
 	#************************************
 

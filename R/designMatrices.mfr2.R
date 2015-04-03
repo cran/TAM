@@ -183,9 +183,13 @@ designMatrices.mfr2 <-
 
 #cat(" ---  after other facets" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    	
     colnames(gresp) <- rownames(X)
-    X$empty <- 1* (colSums( gresp, na.rm=TRUE ) == 0)
+#    X$empty <- 1* (colSums( gresp, na.rm=TRUE ) == 0)
+	X$empty <- .Call( "colsums_gresp" , gresp , PACKAGE="TAM")
+	
     colnames(gresp.noStep) <- rownames(X.noStep)
-    X.noStep$empty <- 1* (colSums( gresp.noStep, na.rm=TRUE ) == 0)
+#    X.noStep$empty <- 1* (colSums( gresp.noStep, na.rm=TRUE ) == 0)
+	X.noStep$empty <- .Call( "colsums_gresp" , gresp.noStep , PACKAGE="TAM")
+
     ### output
     ind <- X[,"empty"] == 1
     nStep <- maxK+1
@@ -211,16 +215,15 @@ designMatrices.mfr2 <-
                             dimnames2 ,
                             colnames(x) )
 		#@@@@@						
-      for (dd in seq(1 , ncol(x) ) ){
-	  for (ss in 0:(nStep-1)){
-          str.ss <- paste0("step",ss )
-          iss <- grep(  paste0(str.ss,"+(-|$)") , rownames(x))# , fixed=TRUE )
-          str.ss2 <- gsub( paste0("(^|-)+",str.ss) , "" , rownames(x)[iss] )
-          x2[ss+1,str.ss2,dd] <- as.vector(x[ iss , dd])
-          #			x2[ ss,,dd] <- matrix( x[,dd] , nrow=nStep , ncol= dim(x2)[2] , byrow=TRUE)
-        }
-      }
+	for (ss in 0:(nStep-1)){
+			  str.ss <- paste0("step",ss )
+			  iss <- grep(  paste0(str.ss,"+(-|$)") , rownames(x) )# , fixed=TRUE )
+			  str.ss2 <- gsub( paste0("(^|-)+",str.ss) , "" , rownames(x)[iss] )
+			  x2[ss+1,str.ss2,] <- x[ iss , ]
+			}	  
+	  
       x2 <- aperm( x2 , c(2,1,3) )
+	  	  	  
 	  #****
       # handle differing number of categories
 	  maxK <- max( maxKi )

@@ -174,14 +174,57 @@
 	rM <- rownames(matr)
 	cM <- colnames(matr)
 	I <- nrow(itemren)
+
+	vers <- FALSE
+	vers <- TRUE
+	
+	#-----------------------
+	# rows
+	if (vers){
+		rM0 <- rM
+		itemren2 <- paste0(itemren[,2] , "-")
+		nc2 <- nchar(itemren2)
+		N1 <- min(nc2)
+		N2 <- max(nc2)
+		for (nn in N1:N2){
+			i1 <- match( substring( rM0 , 1 , nn ) , itemren2 )
+			h1 <- paste0( itemren[ i1 ,1] , "-"  , substring( rM0 , nn+1 , nchar(rM0) ) )
+			i2 <- ! is.na(i1)
+			rM0[ i2 ] <- h1[ i2]
+						  }
+		rM <- rM0
+		if ( cols){
+			cM0 <- cM	
+			ind <- match(  cM0 , itemren[,2])
+			ind <- na.omit(ind)
+			cM0[ ind ] <- paste(itemren[,1])	
+			itemren2 <- paste0(itemren[,2] , ":")
+			nc2 <- nchar(itemren2)
+			N1 <- min(nc2)
+			N2 <- max(nc2)
+			for (nn in N1:N2){
+				i1 <- match( substring( cM0 , 1 , nn ) , itemren2 )
+				h1 <- paste0( itemren[ i1 ,1] , ":"  , substring( cM0 , nn+1 , nchar(cM0) ) )
+				i2 <- ! is.na(i1)
+				cM0[ i2 ] <- h1[ i2]
+							  }
+			cM <- cM0
+					}
+					
+				}
+
+if (!vers){	
 	for ( ii in 1:I){
 		rM <- gsub( paste0( itemren[ii,2] , "-") , paste0( itemren[ii,1] , "-") , rM )
 		if (cols){
 			cM <- gsub( paste0( itemren[ii,2] , ":") , paste0( itemren[ii,1] , ":") , cM )	
 			cM[ cM == itemren[ii,2] ] <- paste(itemren[ii,1])
 				}
-					}
-	rM -> rownames(matr) 
+					}					
+			}
+			
+	rM -> rownames(matr)
+
 	if ( cols){ cM -> colnames(matr) }
 	return(matr)
 		}
@@ -189,17 +232,41 @@
 .rename.items2 <- function( vec , itemren ){
 	cM <- vec
 	I <- nrow(itemren)
+
+vers <- TRUE	
+#vers <- FALSE
+if (vers){
+v0 <- Sys.time()
+	cM0 <- cM
+	# relabel items
+	ind <- match(  cM , itemren[,2])
+	ind <- na.omit(ind)
+	cM0[ ind ] <- paste(itemren[,1])
+	itemren2 <- paste0(itemren[,2] , ":")
+	nc2 <- nchar(itemren2)
+	N1 <- min(nc2)
+	N2 <- max(nc2)
+	for (nn in N1:N2){
+		i1 <- match( substring( cM0 , 1 , nn ) , itemren2 )
+		h1 <- paste0( itemren[ i1 ,1] , ":"  , substring( cM0 , nn+1 , nchar(cM0) ) )
+		i2 <- ! is.na(i1)
+		cM0[ i2 ] <- h1[ i2]
+					  }
+	cM <- cM0	
+	}
+if (!vers){	
 	for ( ii in 1:I){
 			cM <- gsub( paste0( itemren[ii,2] , ":") , paste0( itemren[ii,1] , ":") , cM )	
 			cM[ cM == itemren[ii,2] ] <- paste(itemren[ii,1])
 				}
+			}
 	return(cM)
 		}
 #############################################################
 .rename.items3 <- function( matr , facet.list , I , cols=TRUE  ){
 ### check for equalities in rM and cM in all entries!!!!
 	rM <- rownames(matr)
-	rMsplit <- strsplit( rM , split="-" )	
+	rMsplit <- strsplit( paste(rM) , split="-" )	
 	RR <- length(rMsplit)
 	FF <- length(facet.list)
 	for (rr in 1:RR){
@@ -221,7 +288,7 @@
 	#****************************************
 	if ( cols){
 		cM <- colnames(matr)
-		cMsplit <- strsplit( cM , split=":" )	
+		cMsplit <- strsplit( paste(cM) , split=":" )	
 		RR <- length(cMsplit)
 		FF <- length(facet.list)
 		for (rr in 1:RR){
@@ -248,26 +315,37 @@
 	cM <- vec
 	FF <- length(facet.list)
 	rM <- cM
+v0 <- Sys.time()	
     if ( ! is.null(rM) ){ 
-		rMsplit <- strsplit( rM , split=":" )	
+		rMsplit <- strsplit( paste(rM) , split="-" )	
 		RR <- length(rMsplit)
 		FF <- length(facet.list)
-		for (rr in 1:RR){
-			rr1 <- rMsplit[[rr]]
-			if (FF>0){
-			for (ff in 1:FF){
-				itemren <- facet.list[[ff]]
-				I <- nrow(itemren)
-					for (ii in 1:I ){ 
-						rr1[ rr1 == itemren[ii,2] ] <- paste(itemren[ii,1])
-						rMsplit[[rr]] <- rr1
-									}
-								}
-							}
-						}	
-		rM <- unlist( lapply( rMsplit , FUN = function(ll){ paste( ll , collapse=":") } )	)
-		cM <- rM
-			}
+		NRM <- max( unlist( lapply( rMsplit , FUN=function(ll){ length(ll) } ) ))
+		rMsplit0 <- rMsplit
+		rMsplit0 <-  matrix( unlist( rMsplit0 )  , ncol=NRM , byrow=TRUE )
+# cat(" *** ren2a split " ) ; v1 <- Sys.time() ; print(v1-v0) ; v0 <- v1 
+		if (FF>0){
+		  for (ff in 1:FF){
+			itemren <- facet.list[[ff]]
+			for (nn in 1:NRM){
+			# nn <- 3
+			rm_nn <- rMsplit0[,nn]
+			ind1 <- match( rm_nn , itemren[,2] )
+			ind1 <- na.omit(ind1)
+			h1 <- paste(itemren[ ind1 , 1] )
+			if ( length(h1) > 0 ){
+				rMsplit0[,nn] <- h1 
+						}
+				}
+					}
+# cat(" *** loop facets " ) ; v1 <- Sys.time() ; print(v1-v0) ; v0 <- v1 
+			cM0 <- apply( rMsplit0 , 1 , FUN = function(ll){ paste0( ll , collapse="-") } )
+			cM <- cM0
+# cat(" *** apply " ) ; v1 <- Sys.time() ; print(v1-v0) ; v0 <- v1 			
+				}
+		}
+			
+			
 	return(cM)
 		}
 #############################################################
@@ -276,66 +354,80 @@
 	cM <- vec
 	FF <- length(facet.list)
 	rM <- cM
+
     if ( ! is.null(rM) ){ 
-		rMsplit <- strsplit( rM , split="-" )	
+		rMsplit <- strsplit( paste(rM) , split="-" )	
 		RR <- length(rMsplit)
 		FF <- length(facet.list)
-		for (rr in 1:RR){
-			rr1 <- rMsplit[[rr]]
-			if (FF>0){
-			for (ff in 1:FF){
-				itemren <- facet.list[[ff]]
-    			I <- nrow(itemren)
-					for (ii in 1:I ){ 
-						rr1[ rr1 == itemren[ii,2] ] <- paste(itemren[ii,1])
-						rMsplit[[rr]] <- rr1
-									}
-								}
-							}
-						}	
-		rM <- unlist( lapply( rMsplit , FUN = function(ll){ paste( ll , collapse="-") } )	)
-		cM <- rM
-			}
+		NRM <- max( unlist( lapply( rMsplit , FUN=function(ll){ length(ll) } ) ))
+		rMsplit0 <- rMsplit
+		rMsplit0 <-  matrix( unlist( rMsplit0 )  , ncol=NRM , byrow=TRUE )
+
+		if (FF>0){
+		  for (ff in 1:FF){
+			itemren <- facet.list[[ff]]
+			for (nn in 1:NRM){
+			# nn <- 3
+			rm_nn <- rMsplit0[,nn]
+			ind1 <- match( rm_nn , itemren[,2] )
+			ind1 <- na.omit(ind1)
+			h1 <- paste(itemren[ ind1 , 1] )
+			if ( length(h1) > 0 ){
+				rMsplit0[,nn] <- h1 
+						}
+				}
+					}
+
+			cM0 <- apply( rMsplit0 , 1 , FUN = function(ll){ paste0( ll , collapse="-") } )
+			cM <- cM0
+				}
+		}
 	return(cM)
 		}
+##################################################################
+
 			
 		
 #############################################################		
 #############################################################
 .rename.items3a <- function( matr , facet.list , I , cols=TRUE ,
-			xsi.table ){
+			xsi.table ){		
 ### check for equalities in rM and cM in all entries!!!!
 	rM <- rownames(matr)
-	rMsplit <- strsplit( rM , split="-" )
+	rMsplit <- strsplit( paste(rM) , split="-" )
 	RR <- length(rMsplit)
 	rMM <- matrix( unlist(rMsplit) , nrow=RR , byrow=TRUE)
 	rMM.ncol <- ncol(rMM)
 	FF <- length(facet.list)	
-
-	if (FF>0){ 
-	for (ff in 1:FF){ # ff <- 1
+	
+	
+	rMM1 <- rMM	
+	NRM <- ncol(rMM1)
+	if (FF>0){
+	for (ff in 1:FF){
+		# ff <- 1  # facet ff
 		itemren <- facet.list[[ff]]
-		I <- nrow(itemren)		
-		for (ii in 1:I){ # ii <- 1
-		if (rMM.ncol>1){
-			for (kk in 2:rMM.ncol){# kk <- 3
-			rMM[ rMM[,kk] == itemren[ii,2] , kk ] <- paste(itemren[ii,1])
-							}
+		for (nn in 1:NRM){
+		   ind1 <- match( rMM1[,nn] , itemren[,2] )
+		   ind1 <- na.omit(ind1)
+		   h1 <- paste(itemren[ ind1 , 1] )
+		   if ( length(h1) > 0 ){
+				rMM1[,nn] <- h1 
 						}
-						}
-					}
-				}   # end if FF>0	
-	rM <- rMM[,1]
-    if (rMM.ncol>1){
-		for (rr in 2:rMM.ncol){ rM <- paste( rM , rMM[,rr] , sep="-" ) 	}
 				}
-	#****************************************
+				}		
+			}		
+	rMM1 <- apply( rMM1 , 1 , FUN = function(ll){ paste0( ll , collapse="-") } )
+	rM <- rMM1		
+		
+		
+	
 	if ( cols){
-		rM <- colnames(matr)
-		rMsplit <- unlist( strsplit( rM , split=":" ) )
+		rM <- colnames(matr)		
+		rMsplit <- unlist( strsplit( paste(rM) , split=":" ) )
 	    xsi.table <- xsi.table[xsi.table$constraint==0,]
 		XT <- nrow(xsi.table)
-		F0 <- max(xsi.table$facet.order)
+		F0 <- max(xsi.table$facet.order)				
 		index <- sapply( 1:XT , FUN = function(xx){
 				m1 <- cbind( xx , 1:xsi.table[xx,"facet.order"] )
 				matrix( t(m1) , ncol=1 , byrow=FALSE)

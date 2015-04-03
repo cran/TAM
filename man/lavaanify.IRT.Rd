@@ -28,7 +28,7 @@ of the \code{DO} statement, see \code{\link{doparse}} for specification.
 The operators \code{MEASERR1} and \code{MEASERR0} can be used for
 model specification for variables which contains known measurement
 error (see Example 6). While \code{MEASERR1} can be used for endogeneous
-variables, \code{MEASERR0} is the spcification for exogeneous variables.
+variables, \code{MEASERR0} provides the specification for exogeneous variables.
 
 }
 

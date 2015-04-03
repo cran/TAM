@@ -59,7 +59,7 @@ tamaanify.tam.mml.3pl.designMatrices.OLCA <- function( res ){
 			gammaslope.prior[ pospars , 3] <- 0	
 				}
 		res$gammaslope.prior <- gammaslope.prior
-								
+																						
 		# search for items which do not have the maximum number of categories
 		items1 <- which( itemtable$ncat - 1 < maxK )
         for ( ii in items1 ){

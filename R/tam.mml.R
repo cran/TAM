@@ -377,7 +377,7 @@ tam.mml <-
     } else {
       # sampled theta values
       if (QMC){						
-        r1 <- QUnif (n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)						
+        r1 <- sfsmisc::QUnif(n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)						
         theta0.samp <- qnorm( r1 )
       } else {
         theta0.samp <- matrix( mvrnorm( snodes , mu = rep(0,ndim) , 
@@ -636,6 +636,7 @@ tam.mml <-
       a02 <- abs( ( deviance - olddeviance )  )	
       
       if( deviance - olddeviance > 0 ){ 
+#      if( ( deviance - olddeviance < 0 ) | ( iter == 1)  ){ 
         xsi.min.deviance <- xsi.min.deviance 
         beta.min.deviance <- beta.min.deviance
         variance.min.deviance <- variance.min.deviance
@@ -696,6 +697,7 @@ tam.mml <-
       
     } # end of EM loop
     #******************************************************
+a0 <- Sys.time()	
     xsi.min.deviance -> xsi 
     beta.min.deviance -> beta
     variance.min.deviance -> variance	
@@ -761,7 +763,7 @@ tam.mml <-
     # collect item parameters
     item1 <- .TAM.itempartable( resp , maxK , AXsi , B , ndim ,
                                 resp.ind , rprobs,n.ik,pi.k)
-    # cat("tam itempartable") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1								 
+#     cat("tam itempartable") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1								 
     #####################################################
     # post ... posterior distribution	
     # create a data frame person	
@@ -807,7 +809,7 @@ tam.mml <-
       }
 #      person <- data.frame( "pid" = pid , person )
     }
-    #cat("person parameters") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1				  
+#    cat("person parameters") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1				  
     ############################################################
     s2 <- Sys.time()
     if ( is.null( dimnames(A)[[3]] ) ){  

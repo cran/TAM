@@ -17,17 +17,17 @@ or \code{tam.mml}.
 \method{plot}{tam}(x, items=1:x$nitems, type="expected", low=-3, high=3, ngroups=6, 
                    wle=NULL, export=TRUE, export.type="png", 
                    export.args=list(), observed=TRUE, overlay=FALSE , 
-                   ask=FALSE,  ...)
+                   ask=FALSE, package="lattice" , ...)
 	
 \method{plot}{tam.mml}(x, items=1:x$nitems, type="expected", low=-3, high=3, ngroups=6, 
                        wle=NULL, export=TRUE, export.type="png", 
                        export.args=list(), observed=TRUE, overlay=FALSE , 
-                       ask=FALSE,  ...)
+                       ask=FALSE,  package="lattice" , ...)
      
 \method{plot}{tam.jml}(x, items=1:x$nitems, type="expected", low=-3, high=3, ngroups=6, 
                        wle=NULL, export=TRUE, export.type="png", 
                        export.args=list(), observed=TRUE, overlay=FALSE , 
-                       ask=FALSE,   ...)
+                       ask=FALSE,  package="lattice" , ...)
 }
 %- maybe also 'usage' for other objects documented here.
 
@@ -79,13 +79,12 @@ of the working directory.
   A logical which asks for changing the graphic from item to item.
   The default is \code{FALSE}.
 }
+\item{package}{Used \R package for plot. Can be \code{"lattice"} or
+\code{"graphics"}.}
 \item{\dots}{
   Further arguments to be passed
 }
 }
-
-%\item{package}{Used \R package for plot. Can be \code{"lattice"} or
-%\code{"graphics"}.}
 
 \details{
 This plot method does not work for multidimensional item response
@@ -102,9 +101,10 @@ models.
 %\references{
 %% ~put references to the literature/web site here ~
 %}
-%\author{
-%%  ~~who you are~~
-%}
+\author{
+Margaret Wu, Thomas Kiefer, Alexander Robitzsch, Michal Modzelewski
+}
+
 %\note{
 %%  ~~further notes~~
 %}

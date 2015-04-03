@@ -60,7 +60,7 @@ rownames.design2 <- function(X){
           "facet.index" = paste0( colnames(facets)[ff] , seq(1,length(uff) ) ) )
       }
     }
-    #cat(" +++  v62" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						
+# cat(" +++  v62" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						
     ### Basic Information and Initializations
     constraint <- match.arg(constraint)
     if ( is.null(maxKi) ){
@@ -68,7 +68,7 @@ rownames.design2 <- function(X){
     }
     maxK <- max( maxKi )
     nI <- ncol( resp )
-    #cat(" +++  v70" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						
+# cat(" +++  v70" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						
     
     # stop processing if there are items with a maximum score of 0
     i11 <- names(maxKi)[ maxKi == 0 ]
@@ -82,7 +82,7 @@ rownames.design2 <- function(X){
     otherFacets <- setdiff( fvars, c("item", "step") )
     contr.list <- as.list( rep( "contr.sum", length(fvars) ) )
     names( contr.list ) <- fvars
-    #cat(" +++  v80" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     							
+# cat(" +++  v80" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <-z1
     #****
     # ARb: 2013-03-27
     # no contrasts for items
@@ -118,13 +118,13 @@ rownames.design2 <- function(X){
     
     names( expand.list ) <- fvars
     
-    #cat(" +++  v100" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     							  	  
+# cat(" +++  v100" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     							  	  
     #     expand.list <- expand.list[ !unlist( lapply(expand.list, is.null) ) ]
     
     for (vv in seq(1 , length(expand.list) ) ){
       expand.list[[vv]] <- paste( expand.list[[vv]] ) 
     }
-    # cat(" +++  v110" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     								  	
+# cat(" +++  v110" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     					
     X <- rownames.design2( expand.grid(expand.list) )
     ### constraints and formulaA
     if( constraint == "cases" ) formulaA <- update.formula(formulaA, ~0+.)
@@ -134,7 +134,7 @@ rownames.design2 <- function(X){
       if (uff==1){ cat(paste0("          - facet " ,
                               colnames(X)[ff] , " does only have one level!" ) , "\n") }
     }
-    # cat(" +++  v120" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     								  	 
+# cat(" +++  v120" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						
     mm <- - model.matrix(formulaA, X, contrasts = contr.list)
     #    mm <- - model.matrix(formulaA, X )
     if( constraint == "items" ) mm <- mm[,-1]
@@ -144,7 +144,7 @@ rownames.design2 <- function(X){
     ### generate all interactions	
     xsi.constr <- .generate.interactions(X , facets , formulaA , mm )									
     ###############################################################
-    #cat(" +++  v130" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						  	  		
+# cat(" +++  v130" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						  	  		
     ### Postprocessing
     # model.matrix _ case: step in fvars
     if( "step" %in% fvars ){
@@ -161,7 +161,7 @@ rownames.design2 <- function(X){
       
       stepgroups <- unique( gsub( "(^|-)+step([[:digit:]])*", "\\1step([[:digit:]])*", rownames(X) ) )
       X.out <- data.frame(as.matrix(X), stringsAsFactors = FALSE)
-      #cat(" +++  v150" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						  	  		
+# cat(" +++  v150" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						  	  		
       if (progress){
         cat("        o Create design matrix A\n")
         ip <- length(stepgroups)
@@ -175,32 +175,93 @@ rownames.design2 <- function(X){
           )
         }						
       }
+#cat(" +++  v155" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						  
       ii <- 0 ; vv <- 1
+##!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!	  
+##!!!! This loop is time consuming!	
+## changed ARb 2015-03-28 
+
+	NRX <- length( rownames(X) )
+	rownames_X_matr <- strsplit( rownames(X) , split="-")
+	rownames_X_matr <- matrix( unlist( rownames_X_matr ) , nrow=NRX , byrow=TRUE )
+	step_col <- 0
+	for (ff in 1:( ncol( rownames_X_matr ) ) ){
+		if ( length( grep( "step1" , rownames_X_matr[,ff] ) ) > 0 ){
+			step_col <- ff
+					} 
+				}
+	rownames_X_matr2 <- rownames_X_matr[ , - step_col , drop=FALSE ]
+	N2 <- ncol( rownames_X_matr2 )
+	rownames_X_matr2_collapse <- rownames_X_matr2[,1]
+	if (N2>1){
+		for (nn in 2:N2){ 
+		rownames_X_matr2_collapse <- paste0( rownames_X_matr2_collapse , "-" ,
+						rownames_X_matr2[,nn] )
+							}
+						}
+	stepgroups2 <- unique(rownames_X_matr2_collapse)
+	match_stepgroups <- match( rownames_X_matr2_collapse , stepgroups2 )
+
+
+	index_matr <- cbind( match_stepgroups , 1:NRX)
+	index_matr <- index_matr[ order( index_matr[ , 1] ) , ]
+
+	SG <- length(stepgroups2)	
+	res <- .Call( "a_matrix_cumsum" , as.matrix(index_matr)-1 , as.matrix(mm) , SG ,
+				PACKAGE="TAM")
+	mm.sg.temp <- res$cumsum_mm
+	rownames(mm.sg.temp) <- paste0("I", seq(1,nrow(mm.sg.temp) ) )
+	ind2 <- seq( 1 , NRX+SG , maxK+1 )
+	rownames(mm.sg.temp)[ind2] <- gsub("step([[:digit:]])*", "step0", stepgroups, fixed=T) 
+	rownames(mm.sg.temp)[setdiff( seq(1,NRX+SG) , ind2) ] <- rownames(mm)[ index_matr[,2] ]
+	colnames(mm.sg.temp) <- colnames(mm)
+	A1 <- rbind(A , mm.sg.temp)
+	
+# cat(" +++  v157" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						  
+
+	index_matr2 <- index_matr
+	index_matr2 <- index_matr2[ index_matr2[,1] != c(0 , index_matr2[ -NRX , 1] ) , ]
+	x.sg.temp <- X.out[ index_matr2[,2] , ]	
+	x.sg.temp[,"step"] <- 0
+	rownames(x.sg.temp) <- gsub("step([[:digit:]])*", "step0", stepgroups, fixed=T) 
+	X.out1 <- rbind( X.out , x.sg.temp )
+if (TRUE){
+	X.out <- X.out1
+	A <- A1
+		}
+if (FALSE){	
       for( sg in stepgroups ){
-        # sg <- stepgroups[1]
-        mm.sg.temp <- rbind( 0, apply( mm[ grep(sg, rownames(mm)) ,], 2, cumsum ) )
-        
+#        # sg <- stepgroups[1]
+		ind.mm <- grep(sg, rownames(mm))
+        mm.sg.temp <- rbind( 0, apply( mm[ ind.mm ,], 2, cumsum ) )        
+#		mm.sg.temp <- rbind( 0 , colCumsums.sirt( mm[ ind.mm ,] ) )				
         # substitute the following line later if the sirt function
         # colCumsums.sirt is available at CRAN
         #		mm.sg.temp <- rbind( 0 , colCumsums.sirt( mm[ grep(sg, rownames(mm)) ,] ) )
         rownames(mm.sg.temp)[1] <- gsub("step([[:digit:]])*", "step0", sg, fixed=T)
         A <- rbind(A, mm.sg.temp)
-        x.sg.temp <- X.out[grep(sg, rownames(X.out))[1], ]
+		isg <- grep(sg, rownames(X.out))[1]	
+        x.sg.temp <- X.out[ isg , ]
         x.sg.temp[,"step"] <- 0
         rownames(x.sg.temp) <- gsub("step([[:digit:]])*", "step0", sg, fixed = TRUE)
-        X.out <- rbind(X.out, x.sg.temp)
-        if ( progress ){
+        X.out <- rbind(X.out, x.sg.temp)		 	
+
+	if ( progress ){
           ii <- ii+1
           if (( ii == disp_progress[vv] ) & (vv<=10) ){
             cat("-") ; flush.console()
             vv <- vv+1			
           }
         }
-      }
+      }   # end for (sg in stepgroups) ...
+  }
+	  
+
+	  
       if ( progress ){
         cat("|\n") ; flush.console()
       }
-      # cat(" +++  v160" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     				  	  		      
+#cat(" +++  v160" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     				  	  		      
     } else {
       # model.matrix _ case: step not in fvars  
       rownames(mm) <- paste( rownames(X) , "-step1", sep = "")
@@ -211,20 +272,21 @@ rownames.design2 <- function(X){
         rownames(mm.k.temp) <- paste( rownames(X) , "-step", kk , sep ="")
         A <- rbind(A, mm.k.temp)
       }
-      #cat(" +++  v170" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     				  	  		      
+# cat(" +++  v170" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     				  	  		      
       X.out <- expand.grid( c( expand.list, list("step"=factor(0:maxK)) ) )
       X.out <- rownames.design2( data.frame(as.matrix(X.out), stringsAsFactors = FALSE) )
       
     }# end step in fvars
     
-    #cat(" +++  v180" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     								  	 
+#cat(" +++  v180" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     
+
     # facet design
     facet.design <- list( "facets" = facets , "facets.orig" = facets0 , 
                           "facet.list" = facet.list[otherFacets])
     A <- A[ ! duplicated( rownames(A) ) , ]
     A <- A[order(rownames(A)), ,drop = FALSE]      
     X.out <- X.out[order(rownames(X.out)), ,drop = FALSE]
-    #cat(" +++  out .A.matrix" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						
+#cat(" +++  out .A.matrix" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						
     return(list( "A"=A, "X"=X.out, "otherFacets"=otherFacets , "xsi.constr"=xsi.constr ,
                  "facet.design" = facet.design ) )
   }

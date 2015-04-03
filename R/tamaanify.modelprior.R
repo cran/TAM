@@ -104,8 +104,9 @@ tamaanify.modelprior <- function(res){
 							}
 			
 
-		
-		res$gammaslope.prior <- gammaslope.prior
+		if ( is.null( res$gammaslope.prior) ){
+			res$gammaslope.prior <- gammaslope.prior
+											}
 		res$xsi.prior <- xsi.prior
 		res$guess.prior <- guess.prior
 		return(res)

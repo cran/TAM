@@ -8,8 +8,10 @@ tamaan.3pl.trait <- function( res0 , anal.list , con , ... ){
 		notA <- res0$notA
 		if (is.null(notA) ){ notA <- FALSE }
 		delta.inits <- res0$delta.inits					
-
-
+		
+		A <- res0$A
+		xsi.fixed <- res0$xsi.fixed
+				
 		res <- tam.mml.3pl(resp= res0$resp , 
 						E=res0$E , 
 						skillspace= res0$skillspace , 
@@ -22,6 +24,8 @@ tamaan.3pl.trait <- function( res0 , anal.list , con , ... ){
 						est.guess=res0$est.guess , 		
 						guess.prior = res0$guess.prior , 
 						notA= notA , 
+						xsi.fixed=xsi.fixed , 
+						A = A , 
 						# est.variance = FALSE , 
 						delta.inits = delta.inits ,  
 						control=con , 

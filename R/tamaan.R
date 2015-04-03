@@ -8,10 +8,10 @@ tamaan <- function( tammodel , resp , tam.method=NULL,
 	cl <- match.call()
 	cl1 <- paste(cl)
 	# cl1con <- cl1["con"]
-	if ( length( grep("increment.factor" , cl1 ) ) > 1 ){
+    incr.fac <- FALSE	
+	if ( length( grep("increment.factor" , cl1 ) ) > 0 ){
 		incr.fac <- TRUE 
 			}	
-
 
 	s0 <- Sys.time()	
 	res0 <- tamaanify( tammodel=tammodel , resp=resp , tam.method=tam.method ,
@@ -29,17 +29,24 @@ tamaan <- function( tammodel , resp , tam.method=NULL,
                  min.variance = .001 , progress = TRUE , ridge=0 ,
                  seed = NULL , xsi.start0=FALSE , increment.factor=1 , fac.oldxsi=0)
 		if ( anal.list$type %in% c("LCA","OLCA") ){
-			con$increment.factor <- 1.05 
+			#con$increment.factor <- 1.05 
+			con$increment.factor <- 1.01
 						}
 		if ( anal.list$type %in% c("TRAIT") ){
-			con$increment.factor <- 1.02 
+			# con$increment.factor <- 1.02 
+			con$increment.factor <- 1.01
 						}
 		if ( anal.list$type %in% c("MIXTURE") ){
-			con$increment.factor <- 1.035
+#			con$increment.factor <- 1.035
+			con$increment.factor <- 1.01
 						}						
 		if ( anal.list$type %in% c("LOCLCA") ){
 			con$increment.factor <- 1.01
-						}	
+						}
+	if ( incr.fac ){
+		    con$increment.factor <- control$increment.factor 	
+					}
+					
 	#a0 <- Sys.time()			   
     con[ names(control) ] <- control  
     Lcon <- length(con)
@@ -57,9 +64,11 @@ tamaan <- function( tammodel , resp , tam.method=NULL,
 					control=con , ... )
 		res$tamaan.method <- "tam.mml"			
 						}
+						
 	#******************************
 	# tam.mml.2pl
     if ( res0$method == "tam.mml.2pl" ){	
+
 		res <- tam.mml.2pl( resp=res0$resp , A=res0$A , xsi.fixed=res0$xsi.fixed ,
 					Q=res0$Q , variance.fixed=res0$variance.fixed ,
 					B.fixed=res0$B.fixed , est.variance=res0$est.variance,

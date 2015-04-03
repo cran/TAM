@@ -401,7 +401,7 @@ tam.mml.3pl <-
     } else {
       # sampled theta values
       if (QMC){			
-        r1 <- QUnif(n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)						
+        r1 <- sfsmisc::QUnif(n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)		
         theta0.samp <- qnorm( r1 )
       } else {
         theta0.samp <- matrix( mvrnorm( snodes , mu = rep(0,ndim) , 
@@ -804,7 +804,7 @@ a0 <- Sys.time()
       a01 <- abs( ( deviance - olddeviance ) / deviance  )
       a02 <- abs( ( deviance - olddeviance )  )	
 	  
-      if( deviance - olddeviance < 0 ){ 
+      if( ( deviance - olddeviance < 0 ) | ( iter == 1)  ){ 
         xsi.min.deviance <- xsi 
         beta.min.deviance <- beta
         variance.min.deviance <- variance	

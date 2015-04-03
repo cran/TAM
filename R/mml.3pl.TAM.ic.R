@@ -60,9 +60,9 @@
 	ic$Nguess <- length( setdiff( unique(est.guess) , 0 ) )									 
 	if ( skillspace != "normal" ){								 
 		ic$Ndelta <- prod( dim(delta) )
-        if ( fulldesign ){ 
+#        if ( fulldesign ){ 
              ic$Ndelta <- ic$Ndelta - ncol(delta)
-							}
+#							}
              if ( ! is.null( delta.fixed ) ){							
 				ic$Ndelta <- ic$Ndelta - nrow(delta.fixed )
 									}			 							

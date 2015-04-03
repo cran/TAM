@@ -32,7 +32,8 @@ export(designMatrices, .A.matrix, designMatrices.mfr,
        msq.itemfit ,
        IRT.linearCFA ,
        IRT.threshold ,
-       IRT.WrightMap
+       IRT.WrightMap ,
+       IRT.drawPV
        )
 
 
@@ -170,3 +171,4 @@ importFrom(utils,packageDescription)
 importFrom(msm,dtnorm)
 importFrom(msm,rtnorm)
 importFrom(WrightMap,wrightMap)
+importFrom(plyr,ldply)

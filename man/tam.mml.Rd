@@ -46,8 +46,8 @@ tam.mml.2pl(resp, Y = NULL, group = NULL, irtmodel = "2PL", formulaY = NULL,
     control = list())
             
 tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
-    dataY = NULL, ndim = 1, pid = NULL, xsi.fixed = NULL, xsi.inits = NULL, 
-    beta.fixed = NULL, beta.inits = NULL, variance.fixed = NULL , 
+    dataY = NULL, ndim = 1, pid = NULL, xsi.fixed = NULL, xsi.setnull = NULL,
+    xsi.inits = NULL, beta.fixed = NULL, beta.inits = NULL, variance.fixed = NULL , 
     variance.inits = NULL , est.variance = FALSE , formulaA=~item+item:step, 
     constraint="cases", A=NULL , B=NULL ,  B.fixed = NULL , Q=NULL , 
     facets=NULL, est.slopegroups=NULL , E = NULL , pweights = NULL , 
@@ -126,6 +126,9 @@ tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
      A matrix with two columns for fixing \eqn{\xi} parameters. 
      1st column: index of \eqn{\xi} parameter, 2nd column: fixed value 
 }
+\item{xsi.setnull}{A vector of strings indicating which \eqn{\xi}
+	elements should be set to zero which do have entries in
+	\code{xsi.setnull} in their labels (see Example 10a).}
   \item{xsi.inits}{
      A matrix with two columns (in the same way defined as in
      \code{xsi.fixed} with initial value for \eqn{\xi}.
@@ -194,7 +197,8 @@ tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
      An optional vector of person weights
 }
 \item{formulaA}{Design formula (only applies to \code{tam.mml.mfr}). 
-    See Example 8.}
+    See Example 8. It is also to possible to set all effects
+  of a facet to zero, e.g. \code{item*step + 0*rater} (see Example 10a).}
     
 \item{facets}{A data frame with facet entries (only applies to 
 	\code{tam.mml.mfr})
@@ -209,7 +213,7 @@ if a \code{userfct.variance} is provided.}
     \code{        convD = .001 ,conv = .0001 , convM = .0001 , Msteps = 4 ,   }\cr
     \code{        maxiter = 1000 , max.increment = 1 , }\cr
     \code{        min.variance = .001 , progress = TRUE , ridge=0 ,    }\cr
-    \code{        seed = NULL , xsi.start0=FALSE, , increment.factor=1 ,  }\cr
+    \code{        seed = NULL , xsi.start0=0, , increment.factor=1 ,  }\cr
     \code{        fac.oldxsi=0 )  }\cr
     
 \code{nodes}: the discretized \eqn{\theta} nodes for numerical integration 
@@ -252,9 +256,12 @@ for the latent regression which is added to the covariance matrix
 \code{seed}: An optional integer defining the simulation seed 
 (important for reproducible results for stochastic integration) 
 
-\code{xsi.start0}: A logical indicating whether all \eqn{\xi} starting 
-values should be initially set to zero.
-   
+\code{xsi.start0}: A numeric value. The value of 0 indicates that for all
+parameters staring values are provided. A value of 1 means that all
+starting values are set to zero and a value of 2 means that only
+starting values of item parameters (but not facet parameters)
+are used.
+
 \code{increment.factor}: A value (larger than one) 
 	which defines the extent of the decrease of the maximum
 	increment of item parameters in every iteration. The maximum increment 
@@ -1263,8 +1270,35 @@ summary(mod10)
 # estimate person parameter with WLE 
 wmod10 <- tam.wle( mod10 )
 
+#--- Example 10a
+# compare model containing only item
+formulaA <- ~ item + rater      # pseudo formula for item
+xsi.setnull <- "rater"          # set all rater effects to zero
+mod10a <- tam.mml.mfr( resp=resp , facets=facets , formulaA = formulaA , 
+            xsi.setnull=xsi.setnull , pid=dat$pid , beta.fixed = cbind(1,1,0))
+summary(mod10a)
+
+# A shorter way for specifying this example is 
+formulaA <- ~ item + 0*rater        # set all rater effects to zero
+mod10a1 <- tam.mml.mfr( resp=resp, facets=facets, formulaA = formulaA, pid=dat$pid )
+summary(mod10a1)
+
+# tam.mml.mfr also appropriately extends the facets data frame with pseudo facets
+# if necessary
+formulaA <- ~ item 	# omitting the rater term
+mod10a2 <- tam.mml.mfr( resp=resp, facets=facets, formulaA = formulaA, pid=dat$pid )
+  ##   Item Parameters Xsi
+  ##              xsi se.xsi
+  ##   I0001   -1.931  0.111
+  ##   I0002   -1.023  0.095
+  ##   I0003   -0.089  0.089
+  ##   I0004    1.015  0.094
+  ##   I0005    1.918  0.110
+  ##   psfPF11  0.000  0.000
+  ##   psfPF12  0.000  0.000
+
 #***
-# Model 10 2: specification with long format response data
+# Model 10_2: specification with long format response data
 resp.long=c(unlist( dat[ , -c(1:2) ] ))
 
 pid <- rep( dat$pid, ncol(dat[ , -c(1:2) ]) )
@@ -1816,6 +1850,59 @@ Q <- matrix( 0 ,  nrow=8 , ncol=2 )
 Q[1:4,1] <- Q[5:8,2] <- 1
 # partial credit model with some constraint on item parameters
 mod1 <- tam.mml( dat , Q=Q , irtmodel="PCM2" , constraint="items")
+summary(mod1)
+
+#############################################################################
+# EXAMPLE 19: Partial credit scoring: 0.5 points for partial credit items
+#             and 1 point for dichotomous items   
+#############################################################################
+
+data(data.timssAusTwn.scored)
+dat <- data.timssAusTwn.scored
+# extrcat item response data
+dat <- dat[ , grep("M03" , colnames(dat) ) ]
+
+# select items with do have maximum score of 2 (polytomous items)
+ind <- which( apply( dat ,  2, max , na.rm=TRUE ) == 2 )
+I <- ncol(dat)
+# define Q-matrix with scoring variant
+Q <- matrix( 1 , nrow=I , ncol=1 )
+Q[ ind , 1 ] <- .5    # score of 0.5 for polyomous items 
+
+# estimate model
+mod1 <- tam.mml( dat , Q=Q , irtmodel="PCM2" , control=list( nodes=seq(-10,10,len=21) ) )
+summary(mod1)
+
+#############################################################################
+# EXAMPLE 20: Specification of loading matrix in multidimensional model   
+#############################################################################
+
+data(data.gpcm)
+psych::describe(data.gpcm)
+resp <- data.gpcm
+
+# define three dimensions and different loadings of item categories 
+# on these dimensions in B loading matrix
+I <- 3  # 3 items
+D <- 3  # 3 dimensions
+# define loading matrix B
+# 4 categories for each item (0,1,2,3)
+B <- array( 0 , dim=c(I,4,D) )
+for (ii in 1:I){
+    B[ ii , 1:4  , 1 ] <- 0:3
+    B[ ii , 1 ,2 ] <- 1    
+    B[ ii , 4 ,3 ] <- 1
+            }
+dimnames(B)[[1]] <- colnames(resp)            
+B[1,,]
+  ##   > B[1,,]
+  ##        [,1] [,2] [,3]
+  ##   [1,]    0    1    0
+  ##   [2,]    1    0    0
+  ##   [3,]    2    0    0
+  ##   [4,]    3    0    1
+#-- test run
+mod1 <- tam.mml( resp , B = B , control=list( snodes=1000 , maxiter=5)  )
 summary(mod1)
 }
 }

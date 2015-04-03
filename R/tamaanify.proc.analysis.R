@@ -23,6 +23,10 @@ tamaanify.proc.analysis <- function( res ){
 		if( length( grep("TYPE=LOCLCA",dfr) ) > 0 ){
 			ANALYSIS.list$type <- "LOCLCA"
 					}		
+		# trait		
+		if( length( grep("TYPE=TRAIT",dfr) ) > 0 ){
+			ANALYSIS.list$type <- "TRAIT"
+					}						
 		# ordered latent class analysis			
 		if( length( grep("TYPE=OLCA",dfr) ) > 0 ){
 			ANALYSIS.list$type <- "OLCA"

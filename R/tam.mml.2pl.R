@@ -366,7 +366,8 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   } else {
     # sampled theta values
 	if (QMC){			
-		r1 <- QUnif (n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)						
+		r1 <- sfsmisc::QUnif (n=snodes, min = 0, max = 1, 
+					n.min = 1, p=ndim, leap = 409)
 		theta0.samp <- qnorm( r1 )
 			} else {
 			theta0.samp <- matrix( mvrnorm( snodes , mu = rep(0,ndim) , 
@@ -650,6 +651,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
     a02 <- abs( ( deviance - olddeviance )  )	
 	
 	if( deviance - olddeviance > 0 ){ 
+#      if( ( deviance - olddeviance > 0 ) | ( iter == 1)  ){ 
 		xsi.min.deviance <- xsi.min.deviance 
 		beta.min.deviance <- beta.min.deviance
 		variance.min.deviance <- variance.min.deviance

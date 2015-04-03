@@ -5,7 +5,11 @@
 # create table of item parameters
 .TAM.itempartable <- function( resp , maxK , AXsi , B , ndim ,
 			resp.ind , rprobs,n.ik,pi.k){
-				
+	
+	if ( is.null(dimnames(B)[[1]] ) ){ 
+		dimnames(B)[[1]] <- colnames(resp)
+					}
+		
 	item1 <- data.frame( "item" = dimnames(B)[[1]] )
 	item1$N <- colSums(resp.ind )
 	item1$M <- colSums( resp.ind * resp , na.rm=TRUE) / colSums( resp.ind )
@@ -34,7 +38,7 @@
 		for (dd in 1:ndim){
 			item1[ , paste0("B.Cat" , kk,".Dim",dd) ] <- B[,kk+1,dd]
 							}
-					}				
+					}						
     item1 <- item1[ item1$N > 0 , ]	
 #	item1 <- item1[ order( paste( item1$item)) , ]		
 	rownames(item1) <- NULL

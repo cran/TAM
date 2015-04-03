@@ -2,7 +2,8 @@ tam.mml.mfr <-
   function( resp , Y=NULL , group = NULL ,  irtmodel ="1PL" ,
             formulaY = NULL , dataY = NULL , 
             ndim = 1 , pid = NULL ,
-            xsi.fixed=NULL ,  xsi.inits = NULL , 
+            xsi.fixed=NULL ,  xsi.setnull = NULL , 
+			xsi.inits = NULL , 			
             beta.fixed = NULL , beta.inits = NULL , 
             variance.fixed = NULL , variance.inits = NULL , 
             est.variance = FALSE , formulaA=~item+item:step, constraint="cases",
@@ -52,7 +53,7 @@ tam.mml.mfr <-
                  convD = .001 ,conv = .0001 , convM = .0001 , Msteps = 4 ,            
                  maxiter = 1000 , max.increment = 1 , 
                  min.variance = .001 , progress = TRUE , ridge=0,seed= NULL ,
-                 xsi.start0= FALSE , increment.factor=1 , fac.oldxsi=0)  	
+                 xsi.start0= 0 , increment.factor=1 , fac.oldxsi=0)  	
     con[ names(control) ] <- control  
     Lcon <- length(con)
     con1a <- con1 <- con ; 
@@ -83,7 +84,7 @@ tam.mml.mfr <-
     
     if ( ! is.null(facets) ){ facets <- as.data.frame(facets) }
     
-    # cat("read data" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
+# cat("read data" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
     # create design matrices
     if(ncol(resp)>1){
       maxKi <- apply( resp , 2 , max , na.rm=TRUE )
@@ -97,10 +98,23 @@ tam.mml.mfr <-
                             max, na.rm=TRUE )
         
       }
-    } 
+    }
+
+	#*****************
+	# handle formula and facets
+
+	res <- mfr.dataprep( formulaA , xsi.setnull , B , Q ,
+				resp, pid, facets , beta.fixed  )				
+	formulaA <- res$formula_update
+	xsi.setnull <- res$xsi.setnull	
+	beta.fixed <- res$beta.fixed
+	facets <- res$facets
+	PSF <- res$PSF
+	
 	diffKi <- FALSE
 	if ( var( maxKi ) > .001 ){ 
 	     diffKi <- TRUE
+# cat("heere1\n")		 
 		 design <- designMatrices.mfr2(resp, formulaA=formulaA, facets=facets,  
                                  constraint=constraint, ndim=ndim,
                                  Q=Q, A=A, B=B , progress=progress)
@@ -114,10 +128,10 @@ tam.mml.mfr <-
 				dimB <- dim(design$B$B.3d.0	)	
 			    beta.fixed <- cbind( 1 , 1:dimB[3] , 0)
 							}
-					} else {
+					} else {				
          design <- designMatrices.mfr(resp, formulaA=formulaA, facets=facets,  
                                  constraint=constraint, ndim=ndim,
-                                 Q=Q, A=A, B=B , progress=progress)
+                                 Q=Q, A=A, B=B , progress=progress)							 
 							}	 
 													
     A <- design$A$A.3d.0	
@@ -131,6 +145,9 @@ tam.mml.mfr <-
     xsi.constr <- design$xsi.constr
     if ( is.null( pid ) ){ pid <- 1:(nrow(gresp) ) }
     
+	
+#Revalpr(" head(gresp.noStep)")	
+	
     design <- NULL
     
     if (progress){ 
@@ -138,11 +155,12 @@ tam.mml.mfr <-
           paste(Sys.time()) , ")\n") ; flush.console()	  
     }    
     
-    # cat("design matrix ready" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
+#    cat(" --- design matrix ready" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
     
     #***
     # preprocess data if multiple person IDs do exist
     tp <- max( table( pid ))
+
     if ( tp > 1){
       persons <- sort( unique( pid ) )
       NP <- length( persons )
@@ -158,23 +176,36 @@ tam.mml.mfr <-
         #pos <- 1
         PP[,pos] <- unlist( lapply( person.ids , FUN = function( vv){ vv[pos] } ) )
       }
+
       #print(PP[1:5,])
-      #iii <- c(988 ,1888, 1895)
-      #print( gresp.noStep[  iii , ] )
-      #print( facets[ iii , ] )
-      #print( resp[ iii , ] )
-      
-      
-      #cat("*** multiple persons lapply function" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1				
+# iii <- c(206,207,208,212,213)
+# Revalpr("PP[iii,]")	  
+# Revalpr( "gresp.noStep[  iii , ] ")
+# Revalpr("facets[ iii , ]" )
+# Revalpr(" resp[ iii , ]" )
+     
+#     cat("*** multiple persons lapply function" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
       gresp0 <- matrix( NA , nrow=NP , ncol= ncol(gresp) )
       colnames(gresp0) <- colnames(gresp)
       gresp0.noStep <- matrix( NA , nrow=NP , ncol= ncol(gresp.noStep) )
       colnames(gresp0.noStep) <- colnames(gresp.noStep)
       grespNA <- ( ! is.na( gresp ) )
       grespnoStepNA <- ( ! is.na( gresp.noStep ) )		
-      #cat("*** multiple persons start pos" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1				
+      #cat("*** multiple persons start pos" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1			
+	  
+	  #***
+	  # check multiple rows
+	  m1 <- rowsum( 1-is.na(gresp.noStep) , pid )
+	  h1 <- sum(m1>1)
+	  if (h1>0){
+		cat("* Combinations of person identifiers and facets are not unique.\n")
+		cat("* Use an extended 'formulaA' to include all \n")
+		cat("  relevant facets and the argument 'xsi.setnull'.\n")
+		cat("  See the help page of 'tam.mml' (?tam.mml) Example 10a.\n") 
+		stop()			
+				}
+	  	  
       for (pos in 1:tp){
-        #			pos <- 3
         ind.pos <- which( ! is.na( PP[,pos]  ) )
         PP.pos <- PP[ind.pos,pos]
         g1 <- gresp[ PP.pos , ]
@@ -189,7 +220,9 @@ tam.mml.mfr <-
         #			ig1 <- ( ! is.na(g1) )
         ig1 <- grespnoStepNA[ PP.pos , ]
         g0[ ig1 ] <- g1[ ig1 ]
-        gresp0.noStep[ ind.pos , ] <- g0	
+        gresp0.noStep[ ind.pos , ] <- g0
+
+	
       }
       #cat("*** multiple persons loop over pos" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1				
       gresp0 -> gresp
@@ -202,9 +235,27 @@ tam.mml.mfr <-
     }
     ###################################################
     
-    # print(beta)
-    
-    # cat("process data in case of multiple persons" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
+	# set some xsi effects to null
+	if ( ! is.null(xsi.setnull) ){	
+		xsi.labels <- dimnames(A)[[3]]
+		xsi0 <- NULL	
+		N1 <- length(xsi.setnull)
+		for (nn in 1:N1){
+			ind.nn <- grep( xsi.setnull[nn] , xsi.labels )	
+			l1 <- cbind( ind.nn , 0 )
+			xsi0 <- rbind( xsi0 , l1 )	
+			colnames(xsi0) <- NULL
+						}
+		xsi.fixed <- rbind( xsi.fixed , xsi0 )
+		i2 <- duplicated(xsi.fixed[,1])
+		if ( sum(i2) > 0 ){
+			xsi.fixed <- xsi.fixed[ - i2  , ]
+								}							
+						}
+
+#cat("process data in case of multiple persons" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
+
+
     nitems <- nrow( X.red )
     nstud <- nrow(gresp)        # number of students
     if ( is.null( pweights) ){
@@ -298,8 +349,8 @@ tam.mml.mfr <-
       G <- 1 
       groups <- NULL
     } 
-    
-    
+
+   
     # beta inits
     # (Y'Y)
     if ( ! is.null( formulaY ) ){
@@ -480,7 +531,16 @@ tam.mml.mfr <-
     xsi[est.xsi.index] <- - log(abs(( ItemScore[est.xsi.index]+.5)/
                                       (ItemMax[est.xsi.index]-ItemScore[est.xsi.index]+.5) ) )							  
     # starting values of zero
-    if( xsi.start0 ){ xsi <- 0*xsi }
+    if( xsi.start0 == 1){ 
+			xsi <- 0*xsi 
+					}
+    if( xsi.start0 == 2){ 
+		ind1 <- which( dimnames(A)[[3]] %in% colnames(resp) )
+		ind2 <- which( dimnames(A)[[3]] %in% paste0( "step" ,1:9) )
+		ind3 <- setdiff( seq(1,length(xsi) ) , union(ind1,ind2) )
+		xsi[ind3] <- 0
+					}
+					
     
     
     #log of odds ratio of raw scores  
@@ -508,7 +568,7 @@ tam.mml.mfr <-
     } else {
       # sampled theta values
       if (QMC){			
-        r1 <- QUnif (n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)						
+        r1 <- sfsmisc::QUnif (n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)
         theta0.samp <- qnorm( r1 )
       } else {
         theta0.samp <- matrix( mvrnorm( snodes , mu = rep(0,ndim) , 
@@ -544,7 +604,7 @@ tam.mml.mfr <-
     YSD <- max( apply( Y , 2 , sd ) )
     if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }
     
-    
+    devch <- 0
     
     # display
     disp <- "....................................................\n"
@@ -582,20 +642,19 @@ tam.mml.mfr <-
 
       rprobs <- res[["rprobs"]]
       AXsi <- res[["AXsi"]]
-	  
       # calculate student's prior distribution
       gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
                            nnodes=nnodes , ndim=ndim,YSD=YSD)
       #print( head(gwt))						   
       
       # calculate student's likelihood
-      res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=gwt , resp=gresp.noStep , nitems=nitems , 
-                                   resp.ind.list= resp.ind.list , normalization=TRUE , 
-                                   thetasamp.density=thetasamp.density , snodes=snodes ,
-                                   resp.ind=resp.ind	, avoid.zerosum=TRUE)	
+      res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=gwt , resp=gresp.noStep , 
+					nitems=nitems , resp.ind.list= resp.ind.list , normalization=TRUE , 
+                    thetasamp.density=thetasamp.density , snodes=snodes ,
+                    resp.ind=resp.ind	, avoid.zerosum=TRUE)	
       hwt <- res.hwt[["hwt"]] 
-	  
-      # cat("calc posterior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		  
+
+# cat("calc posterior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		  
       if (progress){ cat("M Step Intercepts   |"); flush.console() }
       # collect old values for convergence indication
       oldxsi <- xsi
@@ -608,8 +667,11 @@ tam.mml.mfr <-
                                 ndim=ndim , nstud=nstud , beta.fixed=beta.fixed , variance=variance , 
                                 Variance.fixed=variance.fixed , group=group ,  G=G , snodes = snodes ,
                                 nomiss=nomiss)
-
-								
+														
+	if ( ( iter < 2 ) & is.na(resr$variance) ){
+		stop("Choose argument control=list( xsi.start0=TRUE, ...) ")
+						}												
+														
       beta <- resr$beta
       #cat("m step regression") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		        
       variance <- resr$variance	
@@ -633,7 +695,7 @@ tam.mml.mfr <-
       ######################################
       #M-step item parameters
       converge <- FALSE
-      Miter <- 1
+      Miter <- 1	  
       old_increment <- rep( max.increment , np )
       #	  if (TRUE & (iter>1) ){
       #	     old_increment <- xsi.change
@@ -669,18 +731,27 @@ tam.mml.mfr <-
         #!!!	  necessary to include statement to control increment?
         ci <- ceiling( abs(increment) / ( abs( old_increment) + 10^(-10) ) )
         a1 <- abs(old_increment)
-
+#		a1 <- max.increment
+#***
+choice1 <- TRUE
+#choice1 <- FALSE
+if (choice1){		
         increment <- ifelse( abs( increment) > a1  , 
                              increment/(2*ci) , increment )					 
-        #****
+        old_increment <- abs(increment)							 
+			}
+  	    #****
         # inclusion
-		
-#                increment <- ifelse( abs( increment) > old_increment  , 
-#                                     sign(increment)*old_increment / 1.5 , increment )
-#        		max.increment <- max( abs(increment) )
+if (!choice1){		
+                increment <- ifelse( abs( increment) > old_increment  , 
+                                     sign(increment)*old_increment / 1.5 , increment )
+        		max.increment <- max( abs(increment) )
+#				old_increment <- max( abs(increment) )				
+			}	
         #****
         
-        old_increment <- abs(increment)
+
+        
 #        w <- 1		
 #		old_increment <- w * abs(increment) + (1-w)*abs(old_increment)
 		
@@ -688,7 +759,8 @@ tam.mml.mfr <-
         
         # stabilizing the algorithm | ARb 2013-09-10
         if (fac.oldxsi > 0 ){
-          xsi <-  (1-fac.oldxsi) * xsi + fac.oldxsi *oldxsi
+		  fac.oldxsi1 <- (devch>0)*fac.oldxsi	  
+          xsi <-  (1-fac.oldxsi1) * xsi + fac.oldxsi1 *oldxsi
         }
         
         
@@ -716,7 +788,7 @@ tam.mml.mfr <-
       if( increment.factor > 1){max.increment <-  1 / increment.factor^iter }	  
       
       
-      # cat("m step item parameters") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		        
+# cat("m step item parameters") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		        
       # calculate deviance
       if ( snodes == 0 ){ 
         deviance <- - 2 * sum( pweights * log( res.hwt$rfx * thetawidth ) )
@@ -758,9 +830,9 @@ tam.mml.mfr <-
       
       a2 <- max( abs( beta - oldbeta ))	
       a3 <- max( abs( variance - oldvariance ))
+	  devch <- -( deviance - olddeviance )
       if (progress){ 
-        cat( paste( "\n  Deviance =" , round( deviance , 4 ) ))
-        devch <- -( deviance - olddeviance )
+        cat( paste( "\n  Deviance =" , round( deviance , 4 ) ))        
         cat( " | Deviance change:", round( devch  , 4 ) )
         if ( devch < 0 & iter > 1 ){ 
           cat ("\n!!! Deviance increases!                                        !!!!") 
@@ -779,7 +851,7 @@ tam.mml.mfr <-
         flush.console()
       }
       
-      
+
       
     } # end of EM loop
     #############################################################
@@ -1015,7 +1087,7 @@ tam.mml.mfr <-
                  "deviance.history" = deviance.history ,
                  "control" = con1a , "irtmodel" = irtmodel ,
                  "iter" = iter , "resp_orig" = resp_orig ,
-                 "printxsi"=TRUE , "YSD"=YSD 
+                 "printxsi"=TRUE , "YSD"=YSD , "PSF" = PSF
                  #			   "design"=design
                  #			   "xsi.min.deviance" = xsi.min.deviance ,
                  #			   "beta.min.deviance" = beta.min.deviance , 

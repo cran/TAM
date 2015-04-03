@@ -43,6 +43,46 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 
 -------------------------------------------------------
+Changes in Version 1.6   (2015-04-03)  --  CRAN 1.6-0
+-------------------------------------------------------
+
+Features:
+* included function 'IRT.drawPV' for drawing plausible values
+  based on individual posterior (output of 'IRT.posterior')
+
+Bug fixes:
+* fixed a bug for input of a B loading matrix with no item labels
+* fixed a bug in 'plot.tam' with missing data in item responses
+  (bug fix provided by Michal Modzelewski)
+* corrected an included bug in recent TAM versions in AIC
+  calculation (thanks to Simon Grund)
+* fixed a bug in variance fixing in 'tam.fa' which occured in a 
+  recent TAM version due to changes in defaults in 'tam.mml.2pl'
+* fixed a bug when constraining of item parameters was ignored
+  in 'tamaan' (thanks to Stefan Behrendt)
+
+Notes:
+* speeded data/design matrix preparation phase in 'tam.mml.mfr'
+* included internal function 'tamcat' for analyzing computation time
+* changed numerical behavior in 'tam.mml.mfr' in order to avoid a zero sum 
+  of all individual posterior probabilities (thanks to Roman Freunberger)
+* included argument 'xsi.setnull' in 'tam.mml.mfr' for convenient
+  fixing of xsi parameter groups. A warning is now given if the
+  combination of person and facet identifiers is not unique.     
+* allowed also explicit use of facets without effects in 'tam.mml.mfr'
+  on 'formulaA', e.g. 'item*step + 0*rater' sets all rater effects
+  to zero
+* included wranings in 'tam.wle' if the WLE is (possibly) not estimable
+  (suggested by Rainer Alexandrowicz)
+
+Datasets included or modified:
+* ---
+
+Examples included or modified:
+* tam.mml (19, 20, 10a), IRT.drawPV (1), tamaan (1.9)
+
+
+-------------------------------------------------------
 Changes in Version 1.5   (2015-02-24)  --  CRAN 1.5-2
 -------------------------------------------------------
 
@@ -77,7 +117,6 @@ Notes:
 * extended 'plotctt' and 'plot.tam' the using graphics package
   in addition to lattice (suggested by Michal Modzelewski)
 * included function for computing Thurstonian thresholds ('IRT.threshold')   
-
 
 Datasets included or modified:
 * ---

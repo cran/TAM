@@ -18,7 +18,6 @@ using namespace Rcpp;
 
 // user includes
 
-
 // declarations
 extern "C" {
 SEXP gresp_extend( SEXP gresp_, SEXP xstep_) ;
@@ -108,6 +107,103 @@ BEGIN_RCPP
      //    ) ;  
 END_RCPP
 }
+
+
+
+// declarations
+extern "C" {
+SEXP a_matrix_cumsum( SEXP index_matr_, SEXP mm_, SEXP SG_) ;
+}
+
+// definition
+
+SEXP a_matrix_cumsum( SEXP index_matr_, SEXP mm_, SEXP SG_ ){
+BEGIN_RCPP
+  
+       
+     Rcpp::NumericMatrix index_matr(index_matr_);  
+     Rcpp::NumericMatrix mm(mm_);          
+     int SG=as<int>(SG_);  
+       
+     int NR = mm.nrow();  
+     int NR1 = NR + SG;  
+     int NC = mm.ncol() ;  
+       
+     Rcpp::NumericMatrix cumsum_mm(NR1,NC);  
+       
+     double tmp=0;  
+     int ss =0;  
+     int rr=0;  
+       
+     for (int cc=0; cc<NC ; cc++){  
+     	ss = 2*SG;  
+     	rr=0;	  
+     	for( int zz=0; zz < NR ; zz++){   
+     		if ( index_matr(zz,0) != ss ){  
+     			rr ++ ;  
+     			tmp = 0 ;  
+     			      }  
+     		tmp = tmp + mm( index_matr(zz,1) , cc ) ;  
+     		cumsum_mm( rr , cc ) = tmp ;  
+     		ss = index_matr(zz,0) ;  
+     		rr ++ ;  
+     				}	  
+     		}  
+       
+     //*************************************************      
+     // OUTPUT              
+                   
+      return Rcpp::List::create(    
+         _["index_matr"] = index_matr ,  
+         _["SG"] = SG ,  
+         _["cumsum_mm"] = cumsum_mm  
+         ) ;  
+END_RCPP
+}
+
+
+
+// declarations
+extern "C" {
+SEXP colsums_gresp( SEXP gresp_) ;
+}
+
+// definition
+
+SEXP colsums_gresp( SEXP gresp_ ){
+BEGIN_RCPP  
+       
+     Rcpp::NumericMatrix gresp(gresp_);                
+              
+     int NR = gresp.nrow();  
+     int NC = gresp.ncol();  
+       
+     Rcpp::NumericVector sumnull(NC);  
+       
+     for (int cc=0;cc<NC;cc++){  
+     sumnull[cc]=1;  
+     	for (int nn=0;nn<NR;nn++){  
+     	if ( ! R_IsNA( gresp(nn,cc) ) ){  
+     	     if ( gresp(nn,cc) > 0 ){  
+     		     sumnull[cc] = 0 ;  
+     		     break;  
+     				}  
+     			}  
+     		}  
+     	}  
+       
+       
+     return( wrap(sumnull) );		  
+     		  
+     //*************************************************      
+     // OUTPUT              
+                   
+     // return Rcpp::List::create(    
+     //    _["gresp"] = gresp  
+     //    ) ;  
+END_RCPP
+}
+
 
 
 

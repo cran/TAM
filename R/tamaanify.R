@@ -45,7 +45,7 @@ tamaanify <- function( tammodel , resp , tam.method=NULL , doparse=TRUE ){
 	#***** extract lavaan model	
 	res <- tamaanify.proc.lavaanmodel(res , resp )	
 # cat("**  lavaanmodel\n")
-	
+ 
 	#*****************************
 	# item characteristics
 	res <- tamaanify.proc.items( res , resp)
@@ -60,7 +60,6 @@ tamaanify <- function( tammodel , resp , tam.method=NULL , doparse=TRUE ){
 	# include model constraints	
 	res <- tamaanify.proc.modelconstraint(  res )	
 #  cat("**  model constraint \n")
-
  
 	#******
 	# add response dataset
@@ -106,6 +105,7 @@ tamaanify <- function( tammodel , resp , tam.method=NULL , doparse=TRUE ){
 	#**** model prior
 	res <- tamaanify.modelprior( res )	
 # cat("**  model prior \n")
+
 
 	#*** define method
 	res <- tamaanify.define.method(res , tam.method )

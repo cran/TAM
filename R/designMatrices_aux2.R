@@ -184,8 +184,8 @@
 		for (kk in (maxKi[ii]+1):maxK){
 #			kk <- 2
 			# set rows in A matrix to zero
-			mm.sg.temp[ grep( paste0( "-step" , kk ) , rownames(mm.sg.temp) ) ,  ] <- NA							
-#			mm.sg.temp[ grep( paste0( "-step" , kk ) , rownames(mm.sg.temp) ) ,  ] <- 0							
+			mm.sg.temp[ grep( paste0( "-step" , kk ) , rownames(mm.sg.temp) ) ,  ] <- NA				
+#			mm.sg.temp[ grep( paste0( "-step" , kk ) , rownames(mm.sg.temp) ) ,  ] <- 0					
 			i1 <- grep( paste0(sg1[1] ,"\\:" ) , colnames(mm.sg.temp) , value=TRUE)
 			i2 <- grep( paste0(":step" , kk-1) ,  colnames(mm.sg.temp) , value=TRUE) 			
 			i3 <- intersect( i1 , i2 )			

@@ -183,7 +183,7 @@ mod5 <- tamaan( tammodel , resp=dat , control=list(maxiter=100)  )
 summary(mod5)
 
 #*********************************************************************
-#*** Model 6: Ordered latent class analysis with four classes  
+#*** Model 6: Ordered latent class analysis with three classes  
 
 tammodel <- "
 ANALYSIS:
@@ -237,6 +237,24 @@ MODEL PRIOR:
 mod8 <- tamaan( tammodel , resp=dat )
 summary(mod8)
 
+#*********************************************************************
+#*** Model 9: Two-dimensional model with constraints on parameters
+
+tammodel <- "
+LAVAAN MODEL:
+  FA =~ A1+b*A2+A3+d*A4
+  FB =~ B1+b*B2+B3+d*B4
+  FA ~~ 1*FA
+  FA ~~ FB
+  FB ~~ 1*FB
+  A1 | c*t1
+  B1 | c*t1
+  A2 | .7*t1
+    "
+# estimate model    
+mod9 <- tamaan( tammodel , resp=dat , control=list(maxiter=30) )
+summary(mod9)
+
 #############################################################################
 # EXAMPLE 2: Examples polytomous data | data.Students
 #############################################################################
@@ -261,8 +279,6 @@ LAVAAN MODEL:
 # estimate model    
 mod1 <- tamaan( tammodel , dat , control=list(maxiter=10)  )
 summary(mod1)
-# plot item response functions
-plot( mod1 , type="items" , ask=TRUE , export=FALSE )
 
 #*********************************************************************
 #*** Model 2: Two-dimensional model, some constraints

@@ -45,11 +45,13 @@ calc_posterior.v2 <-
 	
 	if (avoid.zerosum ){	
 		fxs <- rowSums( fx )
-		m1 <- min( fxs[ fxs > 0 ] ) / 1E3 / ncol(fx )
-		fx[ fxs == 0 , ] <- m1
+		#m1 <- min( fxs[ fxs > 0 ] ) / 1E3 / ncol(fx )
+		m1 <- max( min( fxs[ fxs > 0 ] , na.rm=TRUE) , 1E-200 ) / 1E3 / ncol(fx )	
+		fx[ (fxs == 0) , ] <- m1
+		fx[ is.na(fxs) , ] <- m1 
 		# fx <- fx + m1
 		}
-	
+		
 # cat("nach calcfx") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1			
     # numerical integration
     if ( snodes == 0 ){ 
