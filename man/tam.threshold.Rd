@@ -30,10 +30,12 @@ or between item multidimensional models.
 \value{
 A data frame with Thurstonian thresholds. Rows correspond to items and
 columns to item steps.
+}
+
 %%  \item{comp1 }{Description of 'comp1'}
 %%  \item{comp2 }{Description of 'comp2'}
 %% ...
-}
+
 %\references{
 %% ~put references to the literature/web site here ~
 %}

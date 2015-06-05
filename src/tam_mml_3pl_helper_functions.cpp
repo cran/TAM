@@ -351,4 +351,121 @@ END_RCPP
 
 
 
+// declarations
+extern "C" {
+SEXP mml_3pl_compute_B_rcpp( SEXP Edes_, SEXP gammaslope_, SEXP dimE_) ;
+}
+
+// definition
+
+SEXP mml_3pl_compute_B_rcpp( SEXP Edes_, SEXP gammaslope_, SEXP dimE_ ){
+BEGIN_RCPP
+  
+       
+     Rcpp::NumericMatrix Edes(Edes_);          
+     Rcpp::NumericVector gammaslope(gammaslope_);   
+     Rcpp::NumericVector dimE(dimE_);   
+       
+     int NE=Edes.nrow();  
+     int I=dimE[0];  
+     int K=dimE[1];  
+     int D=dimE[2];  
+     // int L=dimE[3];  
+       
+     Rcpp::NumericVector B(I*K*D);  
+       
+     int ii=0;  
+     int kk=0;  
+     int dd=0;  
+     int ll=0;  
+     int ind=0;  
+       
+     for (int lz=0;lz<NE;lz++){  
+     	ii = Edes(lz,0);  
+     	kk = Edes(lz,1);  
+     	dd = Edes(lz,2);  
+     	ll = Edes(lz,3);  
+     	// index Edes(,4) ; value Edes(,5);  
+     	ind = ii + I*kk + I*K*dd ;  
+     	B[ind] += Edes(lz,5)*gammaslope[ll];  
+     	// ind = ii + I*kk + I*K*dd + I*K*D*ll;  
+     		}  
+       
+       
+     //*************************************************      
+     // OUTPUT              
+                   
+      return Rcpp::List::create(    
+         _["E_design"] = Edes ,  
+         _["B"] = B  
+         ) ;  
+END_RCPP
+}
+
+
+
+// declarations
+extern "C" {
+SEXP mml_3pl_nonzero_entries( SEXP E_, SEXP dimE_) ;
+}
+
+// definition
+
+SEXP mml_3pl_nonzero_entries( SEXP E_, SEXP dimE_ ){
+BEGIN_RCPP
+  
+       
+     Rcpp::NumericVector E(E_);          
+     Rcpp::NumericVector dimE(dimE_);   
+       
+     int NE = E.size();   
+       
+     int I=dimE[0];  
+     int K=dimE[1];  
+     int D=dimE[2];  
+     int L=dimE[3];  
+       
+     Rcpp::NumericMatrix E_design(NE,6);  
+       
+     int lz=0;  
+       
+     int ind=0;  
+       
+       
+     for (int ll=0;ll<L;ll++){  
+     for (int dd=0;dd<D;dd++){  
+     for (int kk=0;kk<K;kk++){  
+     for (int ii=0;ii<I;ii++){  
+        ind = ii + I*kk + I*K*dd + I*K*D*ll;  
+        if ( E[ind] != 0 ){  
+     	E_design(lz,0) = ii ;  
+     	E_design(lz,1) = kk ;  
+     	E_design(lz,2) = dd ;  
+     	E_design(lz,3) = ll ;  
+     	E_design(lz,4) = ind ;  
+     	E_design(lz,5) = E[ind] ;  
+     	lz ++ ;  
+     		}	  
+     	}  // end ii  
+     }	// end kk  
+     } // end dd  
+     } // end ll  
+       
+     E_design = E_design( Rcpp::Range(0,lz-1) , Rcpp::Range(0,5) ) ;  
+       
+     //*************************************************      
+     // OUTPUT              
+                   
+      return Rcpp::List::create(    
+         _["E_design"] = E_design ,  
+         _["maxE"] = lz   
+         ) ;  
+END_RCPP
+}
+
+
+
+
+
+
 

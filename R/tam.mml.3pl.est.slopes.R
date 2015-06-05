@@ -5,7 +5,7 @@
 			Msteps , nitems , A , AXsi , B , xsi , guess , theta , nnodes , maxK ,
 			progress ,ItemScore , fac.oldxsi , rprobs , xsi.fixed , convM , rprobs0 ,
 			n.ik , N.ik , gammaslope , E , FdesM , dimFdes ,
-			gammaslope.fixed , gammaslope.prior , maxgamma = 9.99 ){
+			gammaslope.fixed , gammaslope.prior , maxgamma = 9.99 , Edes ){
 	  	  
 	  if (progress){ cat("\nM Step Slopes       |"); flush.console() }
 		eps <- 1e-10
@@ -20,12 +20,18 @@
 	  
 	while( ( iter <= msteps ) & ( parchange > convM)  ){		
 	    Xlambda0 <- gammaslope <- Xlambda		
-		B <- .mml.3pl.computeB( E , gammaslope )
+# a0 <- Sys.time()		
+#		B <- .mml.3pl.computeB( E , gammaslope )
+		B <- .mml.3pl.computeB.v2( Edes , gammaslope , E )
+# cat(" +++ compute B") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
+
+ 
 		# calculate probabilities
 		res <- .mml.3pl.calc_prob.v5(iIndex=1:nitems, A, AXsi, B, xsi, theta, 
 					nnodes, maxK, recalc=TRUE , guess=guess )
 		rprobs <- res$rprobs
 		rprobs0 <- res$rprobs0	
+# cat(" +++ calc prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1				
 		# init derivatives		
 		d2.b <- d1.b <- rep(eps,Nlam)			
 		res <- .Call("mml3_slca_deriv" ,FdesM , dimFdes , gammaslope , as.vector(rprobs) ,
@@ -33,6 +39,7 @@
 			PACKAGE="TAM")   
 		d1.b <- res$d1b
 		d2.b <- res$d2b	
+# cat(" +++ calc slca deriv") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1					
 		# prior distribution for gammaslope
 		  if ( ! is.null(gammaslope.prior) ){
 			  h <- .0001	
@@ -88,7 +95,7 @@
 		if (progress){ cat("-") ; flush.console() }		
 		iter <- iter + 1
 		parchange <- max( abs(Xlambda0-Xlambda))
-		
+# cat(" +++ calc rest") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							
 			}
 		#********* end algorithm
 		if (oldfac > 0 ){

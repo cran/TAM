@@ -1,11 +1,21 @@
 ###############################################################################
-plotDevianceTAM   <- function ( tam.obj , omitUntil = 1, reverse = TRUE ) {
+plotDevianceTAM   <- function ( tam.obj , omitUntil = 1, reverse = TRUE ,
+			change=TRUE) {
         stopifnot(class(tam.obj) %in% c("tam.mml","tam.mml.2pl","tam.mml.mfr","tam.mml.3pl","tamaan") )
+		
+		devhistory <- tam.obj$deviance.history
         if(omitUntil>0)  {
-				devChange <- diff(tam.obj$deviance.history[-c(1:omitUntil),2])
+				devChange <- devhistory[-c(1:omitUntil),2]
 						} else { 
-					devChange <- diff(tam.obj$deviance.history[,2]) 
+				devChange <- devhistory[,2]
 							}
+		if ( change ){ 	
+			devChange <- diff(devChange) 	
+				ylab1 <- "Deviance Change"
+					} else {
+				ylab1 <- "Deviance"
+						}
+		
         if(reverse)      {devChange <- -1 *  devChange }
         devChange <- data.frame ( nr = 1:length(devChange), devChange)
 		xm        <- ceiling( max(devChange[,1])/10 )*10      
@@ -16,7 +26,7 @@ plotDevianceTAM   <- function ( tam.obj , omitUntil = 1, reverse = TRUE ) {
 		plot ( devChange[,1] , devChange[,2] , type = "o" , 
 				main = "Deviance Change Plot", xlab = "Iteration" , 
 				xlim = c(min(devChange[,1]) ,max(devChange[,1])) ,  xaxp = c(0,xm,xt) , 
-				ylab = "Deviance Change" , pch = 20 , cex = cex , lwd = 0.75 )
+				ylab = ylab1 , pch = 20 , cex = cex , lwd = 0.75 )
 		abline ( a=0 , b=0 )                                   
 		dcr       <- devChange[devChange[,2]<0,]               
         points( dcr[,1] , dcr[,2] , pch=20, cex = cex , col="red") 

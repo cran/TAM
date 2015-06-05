@@ -18,9 +18,9 @@ tam.mml.3pl <-
 			guess.prior=NULL ,
             skillspace = "normal" , theta.k = NULL , 
             delta.designmatrix=NULL , delta.fixed=NULL , 
-			delta.inits = NULL ,  pweights = NULL , control = list() 
-            # control can be specified by the user 
-  ){
+			delta.inits = NULL ,  pweights = NULL , 
+			control = list() ,	Edes = NULL  
+				){
     
     #------------------------------------
     # INPUT:
@@ -45,6 +45,8 @@ tam.mml.3pl <-
 
 
     s1 <- Sys.time()
+	CALL <- match.call()
+	
     # display
     disp <- "....................................................\n"  
     increment.factor <- progress <- nodes <- snodes <- ridge <- xsi.start0 <- QMC <- NULL
@@ -80,10 +82,16 @@ tam.mml.3pl <-
 					} else { 
 			gammaslope <- rep(1,Ngam ) 
 					}
-				}	
-							
-	  B <-.mml.3pl.computeB( E , gammaslope )
-	  
+				}
+
+	if ( is.null(Edes) ){			
+		Edes <- .Call("mml_3pl_nonzero_entries", as.vector(E) , dim(E) ,
+				   PACKAGE="TAM")$E_design
+						}
+											
+	 # B <-.mml.3pl.computeB( E , gammaslope )
+	 B <- .mml.3pl.computeB.v2( Edes , gammaslope , E )
+	 
 	 #*********************** 	
     if ( is.null(A)){ printxsi <- FALSE  } else { printxsi <- TRUE }  
     # attach control elements
@@ -492,9 +500,7 @@ tam.mml.3pl <-
 		i1 <- which( gammaslope.prior[,2] < 10 )
 		gammaslope[ i1 ] <- gammaslope.prior[i1,1]	
 										}
-
-# Revalpr("gammaslope")										
-										
+			
 	#******
 	# prior distribution slope parameter
 	if ( ! is.null(xsi.prior) ){		
@@ -632,12 +638,8 @@ a0 <- Sys.time()
 	                               resp.ind.list=resp.ind.list , normalization=FALSE , 
                                    thetasamp.density=thetasamp.density , snodes=snodes ,
                                    resp.ind=resp.ind , logprobs=TRUE  )
-#	   hwt0 <- hwt <- res.hwt$hwt * gwt
-#       hwt <- hwt / rowSums( hwt )	   
-
-	   hwt0 <- hwt <- res.hwt[["hwt"]]  
-	   
-
+#	   hwt0 <- hwt <- res.hwt$hwt * gwt   
+	   hwt0 <- hwt <- res.hwt[["hwt"]]  	   
        hwt <- hwt / rowSums( hwt )	   	   
 	   
 # cat("posterior v2") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
@@ -697,7 +699,7 @@ a0 <- Sys.time()
 									}
       
 		if (skillspace == "normal"){
-			diag(variance) <- diag(variance)+10^(-14)	  
+		   if (G==1){  diag(variance) <- diag(variance)+10^(-14)	 }
 			if ( ! est.variance ){ 
 			  if ( G == 1 ){ variance <- cov2cor(variance)  } # fix variance at 1  
 			  if ( G > 1 ){ variance[ group == 1 ] <- 1 }     
@@ -745,7 +747,7 @@ a0 <- Sys.time()
 				Msteps , nitems , A , AXsi , B , xsi , guess , theta , nnodes , maxK ,
 				progress ,ItemScore , fac.oldxsi , rprobs , xsi.fixed , convM , rprobs0 ,
 				n.ik , N.ik , gammaslope , E , FdesM , dimFdes ,
-				gammaslope.fixed , gammaslope.prior , maxgamma = maxgamma )	
+				gammaslope.fixed , gammaslope.prior , maxgamma = maxgamma , Edes )	
 				
 		  gammaslope <- res$gammaslope	
 		  se.gammaslope <- res$se.gammaslope
@@ -765,7 +767,9 @@ a0 <- Sys.time()
 #				B <- .mml.3pl.computeB( E , gammaslope )		
 					}	  		  
 		  gammaslope <- fac.oldxsi	* oldgamma + ( 1 - fac.oldxsi)*gammaslope		
-		  B <- .mml.3pl.computeB( E , gammaslope )	  
+		  # B <- .mml.3pl.computeB( E , gammaslope )	  
+		  B <- .mml.3pl.computeB.v2( Edes , gammaslope , E )		  
+		  
 				}
 					
 	  #*********************
@@ -1083,7 +1087,7 @@ a0 <- Sys.time()
 				 "skillspace"= skillspace ,
 				 "delta" = delta , "delta.designmatrix" = delta.designmatrix , 
 				 "gammaslope" = gammaslope , "se.gammaslope" = se.gammaslope ,
-				 "E"= E 
+				 "E"= E , "Edes" = Edes , CALL = CALL 
                  #			   "design"=design				
                  #			   "xsi.min.deviance" = xsi.min.deviance ,
                  #			   "beta.min.deviance" = beta.min.deviance , 

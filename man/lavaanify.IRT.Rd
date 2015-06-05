@@ -8,7 +8,7 @@ Slight Extension of the \code{lavaan} Syntax, with Focus on Item Response Models
 \description{
 This functions slightly extends the \code{lavaan}
 syntax implemented in the \pkg{lavaan} package
-(see \code{\link[lavaan:lavaanify]{lavaanify}}).
+(see \code{\link[lavaan:lavaanify]{lavaan::lavaanify}}).
 
 Guessing and slipping parameters can be specified 
 by using the operators \code{?=g1} and \code{?=s1},
@@ -58,7 +58,7 @@ should be parsed for \code{DO} statements.}
 \value{
 A list with following entries	
 \item{lavpartable}{A \code{lavaan} parameter table}
-\item{lavaan.syntax}{Processed syntax for \code{lavaan} package}
+\item{lavaan.syntax}{Processed syntax for \pkg{lavaan} package}
 \item{nonlin_factors}{Data frame with renamed and original nonlinear
 factor specifications}
 \item{nonlin_syntable}{Data frame with original and modified 
@@ -79,14 +79,14 @@ syntax if nonlinear factors are used.}
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-\code{\link[lavaan:lavaanify]{lavaanify}} (\pkg{lavaan})
+\code{\link[lavaan:lavaanify]{lavaan::lavaanify}}
 
 
-See \code{\link[sirt:tam2mirt]{tam2mirt}} (\pkg{sirt}) for
+See \code{\link[sirt:tam2mirt]{sirt::tam2mirt}} for
 converting objects of class \code{tam} into \code{mirt}
 objects.
 
-See \code{\link[sirt:lavaan2mirt]{lavaan2mirt}} (\pkg{sirt}) 
+See \code{\link[sirt:lavaan2mirt]{sirt::lavaan2mirt}} 
 for estimating models in the \pkg{mirt} package using \code{lavaan} syntax.
 
 See \code{\link{doparse}} for the \code{DO} and \code{DO2} statements.

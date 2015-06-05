@@ -1,8 +1,8 @@
 Package: TAM
 Type: Package
 Title: Test Analysis Modules
-Version: 1.6-0
-Date: 2015-04-03
+Version: 1.7-1
+Date: 2015-06-05
 Author: Thomas Kiefer [aut], Alexander Robitzsch [aut, cre], Margaret Wu [aut]
 Maintainer: Alexander Robitzsch <a.robitzsch@bifie.at>
 Authors@R: c(person("Thomas", "Kiefer", role = c("aut"), email =
@@ -14,9 +14,9 @@ Description:
   estimation of uni- and multidimensional item response models 
   (Rasch, 2PL, 3PL, Generalized Partial Credit, Multi Facets,
   Nominal Item Response, Structured Latent Class Analysis,
-  Mixture Distribution IRT Models, Located Latent Class Models,
-  Cognitive Diagnostic Models). Latent regression models and
-  plausible value imputation are also supported.
+  Mixture Distribution IRT Models, Located Latent Class Models). 
+  Latent regression models and plausible value imputation are 
+  also supported.
 Depends: R (>= 2.15.1), CDM (>= 4.2), MASS
 Imports: Rcpp, mirt, lavaan, WrightMap, tensor, sfsmisc, GPArotation,
         psych, mvtnorm, msm, lattice, plyr
@@ -25,7 +25,7 @@ LinkingTo: Rcpp, RcppArmadillo
 License: GPL (>= 2)
 URL: http://www.edmeasurementsurveys.com/TAM/Tutorials/,
         https://sites.google.com/site/alexanderrobitzsch/software
-Packaged: 2015-04-03 09:05:00 UTC; robitzsch
+Packaged: 2015-06-05 16:49:10 UTC; robitzsch
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2015-04-03 13:34:53
+Date/Publication: 2015-06-05 22:30:38

@@ -12,8 +12,8 @@ Extracting Item Response Dataset
 
 \description{
 Extracts expected counts for models
-fitted in \pkg{TAM}. See \code{\link[CDM:IRT.data]{IRT.data}} 
-(\pkg{CDM}) for more details.
+fitted in \pkg{TAM}. See \code{\link[CDM:IRT.data]{CDM::IRT.data}} 
+ for more details.
 }
 
 
@@ -66,11 +66,11 @@ A dataset with item responses
 \examples{	
 \dontrun{
 #############################################################################
-# EXAMPLE 1: Dichotomous data sim.rasch
+# EXAMPLE 1: Dichotomous data data.sim.rasch
 #############################################################################	
 
-data(sim.rasch)
-dat <- sim.rasch
+data(data.sim.rasch)
+dat <- data.sim.rasch
 
 # estimate model
 mod1 <- tam.mml(dat)

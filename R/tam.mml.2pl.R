@@ -40,6 +40,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   #-------------------------------------
    
   s1 <- Sys.time()
+  CALL <- match.call()
   # display
   disp <- "....................................................\n"  
   increment.factor <- progress <- nodes <- snodes <- ridge <- xsi.start0 <- QMC <- NULL
@@ -900,7 +901,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
                "deviance.history" = deviance.history ,
                "control" = con1a , "irtmodel" = irtmodel ,
 			   "iter" = iter ,
-				"printxsi"=printxsi 	, "YSD"=YSD		
+				"printxsi"=printxsi 	, "YSD"=YSD		, CALL =CALL 
 #			   "design"=design				
 #			   "xsi.min.deviance" = xsi.min.deviance ,
 #			   "beta.min.deviance" = beta.min.deviance , 

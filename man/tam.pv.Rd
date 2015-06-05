@@ -121,8 +121,8 @@ from models which provides asn individual likelihood as an input.
 # EXAMPLE 1: Dichotomous unidimensional data sim.rasch
 #############################################################################
 
-data(sim.rasch)
-resp <- sim.rasch[ 1:500 , 1:15 ]  # select subsample of students and items
+data(data.sim.rasch)
+resp <- data.sim.rasch[ 1:500 , 1:15 ]  # select subsample of students and items
 
 # estimate Rasch model
 mod <- tam.mml(resp)

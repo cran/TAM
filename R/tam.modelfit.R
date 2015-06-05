@@ -25,7 +25,7 @@ tam.modelfit <- function( tamobj , progress=TRUE ){
   }
   RR <- I*(I-1) / 2 
   res0 <- .Call("tam_q3_calc_residM" , as.vector( rprobs ) , as.matrix(resp) , 
-                I , TP , maxK ,  maxKi , hwt , PACKAGE="TAM" )
+                I , TP , maxK ,  maxKi , hwt , PACKAGE="TAM" )								
   residM <- res0$residM
   resp[ resp.ind == 0 ] <- NA
   residM <- resp - residM
@@ -46,7 +46,11 @@ tam.modelfit <- function( tamobj , progress=TRUE ){
   dfr2$p <- 2 * pnorm( se1  )
   dfr <- dfr2
   dfr <- dfr[ order( dfr$aQ3 , decreasing=TRUE) , ]
-  dfr$p.holm <- p.adjust( dfr$p , method="holm")
+  dfr$p.holm <- p.adjust( dfr$p , method="holm")    
+   # include sample size of each item pair
+   resp_ind <- 1 - is.na(resp)
+   cp1 <- crossprod( resp_ind )
+   dfr$N_itempair <- cp1[ as.matrix(dfr[ , c("index1" , "index2" ) ]) ]         
   cn <- colnames(resp)
   # cat("p values") ; zz1 <- Sys.time(); print(zz1-zz0) ; zz0 <- zz1					
   #**** fit statistic
@@ -68,6 +72,7 @@ tam.modelfit <- function( tamobj , progress=TRUE ){
   obs_counts <- res1$obs_counts
   exp_counts <- res1$exp_counts
   pair_exists <- rowSums(obs_counts) > 0
+    
   # cat("calc counts V2") ; zz1 <- Sys.time(); print(zz1-zz0) ; zz0 <- zz1  					
   chi2.stat <- data.frame(res1$maxKiM)
   colnames(chi2.stat) <- c("index1","index2", "maxK1" , "maxK2" , "df")
@@ -135,6 +140,30 @@ tam.modelfit <- function( tamobj , progress=TRUE ){
   modelfit.stat <- as.data.frame(modelfit.stat)
   
   
+  #****************
+  # calculate summary of Q3 statistics
+  Q3_summary <- data.frame( "type" = c("Q3" , "aQ3" ) )
+  diag(cp1) <- NA
+  Q3_summary[1,"M"] <- sum( Q3.matr * cp1 , na.rm=TRUE ) / sum( cp1 , na.rm=TRUE ) 
+  Q3_summary[2,"M"] <- sum( aQ3.matr * cp1 , na.rm=TRUE ) / sum( cp1 , na.rm=TRUE ) 
+  Q3_summary[1,"SD"] <- sum( Q3.matr^2 * cp1 , na.rm=TRUE ) / sum( cp1 , na.rm=TRUE ) 
+  Q3_summary[2,"SD"] <- sum( aQ3.matr^2 * cp1 , na.rm=TRUE ) / sum( cp1 , na.rm=TRUE )   
+  Q3_summary$SD <- sqrt( Q3_summary$SD - Q3_summary$M^2 )
+  Q3_summary[1,"min"] <- min( Q3.matr , na.rm=TRUE ) 
+  Q3_summary[1,"max"] <- max( Q3.matr , na.rm=TRUE ) 
+  Q3_summary[2,"min"] <- min( aQ3.matr , na.rm=TRUE ) 
+  Q3_summary[2,"max"] <- max( aQ3.matr , na.rm=TRUE )
+  cp10 <- 1 - is.na(cp1)    
+  Q3_summary[1,"SGDDM"] <- sum( abs(Q3.matr) * cp10 , na.rm=TRUE ) / 
+				sum( cp10 , na.rm=TRUE )   
+  Q3_summary[2,"SGDDM"] <- sum( abs(aQ3.matr) * cp10 , na.rm=TRUE ) / 
+						sum( cp10 , na.rm=TRUE )   
+  Q3_summary[1,"wSGDDM"] <- sum( abs(Q3.matr) * cp1 , na.rm=TRUE ) / 
+				sum( cp1 , na.rm=TRUE )   
+  Q3_summary[2,"wSGDDM"] <- sum( abs(aQ3.matr) * cp1 , na.rm=TRUE ) / 
+						sum( cp1 , na.rm=TRUE ) 						
+
+  
   #******* OUTPUT *******
   res <- list( "stat.MADaQ3"=stat.MADaQ3 , "chi2.stat"=chi2.stat ,
                "fitstat" = fitstat , "modelfit.test"= modelfit.test , 
@@ -142,29 +171,10 @@ tam.modelfit <- function( tamobj , progress=TRUE ){
                "chisquare.itemfit"=chisquare.itemfit , 
                "residuals" = residM ,
                "Q3.matr"=Q3.matr  ,  "aQ3.matr"=aQ3.matr ,
+			   Q3_summary = Q3_summary , 
+			   N_itempair = cp1 , 
                "statlist" = modelfit.stat )
   class(res) <- "tam.modelfit"
   return(res)
 }
 ################################################
-
-summary.tam.modelfit <- function( object , ... ){
-  #*****
-  cat("Test of Global Model Fit (Maximum Chi Square)\n")
-  cat("p =" , round( object$modelfit.test$p.holm , 5 ) )
-  #******
-  cat("\n\nMADaQ3 Statistic and Test of Global Model Fit (Maximum aQ3)\n")
-  obji <- round( object$stat.MADaQ3 , 4)
-  print(obji)
-  #*****
-  cat("\nFit Statistics\n")
-  obji <- object$fitstat
-  print( round( obji,3))		
-  #*****
-  #	cat("\nItem-wise Fit Statistics\n")
-  #	obji <- object$chisquare.itemfit
-  #	for (vv in 2:(ncol(obji))){ obji[,vv] <- round( obji[,vv] , 3 ) }
-  #	print(  obji )	
-}
-
-

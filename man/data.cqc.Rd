@@ -96,17 +96,18 @@ variables of following format
 
 
 \seealso{
-See the \code{\link[sirt:R2conquest]{R2conquest}} (\pkg{sirt}) function
+See the \code{\link[sirt:R2conquest]{sirt::R2conquest}} function
 for running ConQuest software from within \R.
 
-See the \pkg{\link[WrightMap:WrightMap]{WrightMap}} for functions 
+See the \pkg{\link[WrightMap:WrightMap]{WrightMap}} package for functions 
 connected to reading ConQuest files and creating Wright maps.
 ConQuest output files can be read into \R with the help of
-the \code{\link[WrightMap:CQmodel]{CQmodel}} (\pkg{WrightMap}) function.
+the \code{\link[WrightMap:CQmodel]{WrightMap::CQmodel}} function.
 
-See also the \pkg{eat} package (\url{http://eat.r-forge.r-project.org/})
+See also the \pkg{eat} package (\url{https://r-forge.r-project.org/projects/eat/})
 for elaborate functionality for communication of ConQuest with \R.
 }	
+% https://r-forge.r-project.org/projects/eat/
 
 %\source{
 %%  ~~ reference to a publication or URL from which the data were obtained ~~
@@ -131,6 +132,7 @@ setwd( "p:\\my_files\\ConQuest_analyses" )  # working directory
 #############################################################################
 # EXAMPLE 01: Rasch model data.cqc01
 #############################################################################
+
 data(data.cqc01)
 dat <- data.cqc01
 
@@ -165,6 +167,7 @@ plot(res01a, label.items.srt = 90 )
 #############################################################################
 # EXAMPLE 02: Partial credit model and rating scale model data.cqc02
 #############################################################################
+
 data(data.cqc02)
 dat <- data.cqc02
 
@@ -197,6 +200,7 @@ summary( mod02b )
 #############################################################################
 # EXAMPLE 03: Faceted Rasch model for rating data data.cqc03
 #############################################################################
+
 data(data.cqc03)
 # select items
 resp <- data.cqc03[ , c("crit1","crit2") ]
@@ -256,6 +260,7 @@ summary( mod03c )
 #############################################################################
 # EXAMPLE 04: Faceted Rasch model for rating data data.cqc04
 #############################################################################
+
 data(data.cqc04)
 resp <- data.cqc04[,4:8]
 facets <- data.cqc04[ , c("rater" , "topic") ]

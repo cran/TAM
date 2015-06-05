@@ -93,7 +93,11 @@ A generalized form of the Rasch model. In M. von Davier & C. H. Carstensen (Eds.
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-Item fit and person fit based on estimated person parameters can be 
+Fit statistics can be also calculated by the function \code{\link{msq.itemfit}}
+which avoids simulations and rather directly evaluates individual
+posterior distributions.
+	
+Item fit and person fit based on estimated person parameters can also be 
 calculated using the \code{\link[sirt:pcm.fit]{pcm.fit}} function
 in the \pkg{sirt} package (see Example 1 and Example 2).
 }
@@ -101,12 +105,12 @@ in the \pkg{sirt} package (see Example 1 and Example 2).
 
 \examples{
 #############################################################################
-# EXAMPLE 1: Dichotomous data sim.rasch
+# EXAMPLE 1: Dichotomous data data.sim.rasch
 #############################################################################
 
-data(sim.rasch)
+data(data.sim.rasch)
 # estimate Rasch model
-mod1 <- tam.mml(resp=sim.rasch) 
+mod1 <- tam.mml(resp=data.sim.rasch) 
 # item fit
 fit1 <- tam.fit( mod1 )
 summary(fit1)
@@ -126,7 +130,7 @@ wle <- tam.wle(mod1)
 # extract item parameters
 b1 <- - mod1$AXsi[ , -1 ]
 # assess item fit and person fit
-fit1a <- sirt::pcm.fit(b=b1, theta=wle$theta , sim.rasch )
+fit1a <- sirt::pcm.fit(b=b1, theta=wle$theta , data.sim.rasch )
 fit1a$item       # item fit statistic
 fit1a$person     # person fit statistic
 

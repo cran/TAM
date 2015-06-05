@@ -81,12 +81,12 @@ Standard error estimation for loading parameters in case of
 
 \examples{
 #############################################################################
-# EXAMPLE 1: 1PL model, sim.rasch data
+# EXAMPLE 1: 1PL model, data.sim.rasch
 #############################################################################
 	
-data(sim.rasch)
+data(data.sim.rasch)
 # estimate Rasch model
-mod1 <- tam.mml(resp=sim.rasch[1:500,1:10]) 
+mod1 <- tam.mml(resp=data.sim.rasch[1:500,1:10]) 
 # standard error estimation
 se1 <- tam.se( mod1 ) 
 # proportion of standard errors estimated by 'tam.se' and 'tam.mml'

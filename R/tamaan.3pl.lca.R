@@ -15,6 +15,7 @@ tamaan.3pl.lca <- function( res0 , anal.list , con , ... ){
 		con0$maxiter <- NSTARTS[2]
 		con0$progress <- FALSE
 		devmin <- 1E100
+		Edes <- NULL
 		
 		if (NSTARTS[1] > 0 ){
 		for (nn in 1:(NSTARTS[1]) ){		
@@ -33,7 +34,8 @@ tamaan.3pl.lca <- function( res0 , anal.list , con , ... ){
 						theta.k= res0$theta.k , gammaslope=gammaslope ,  
 						notA= res0$notA , control=con0 , delta.inits=delta.inits , 
 						gammaslope.fixed = res0$gammaslope.fixed , 
-						... )
+						Edes = Edes , 	... )
+			Edes <- res$Edes
             if (con$progress){
 				cat( paste0( "*** Random Start " , nn  ,
 						" | Deviance = " , round( res$deviance , 2 ) , "\n") )
@@ -59,7 +61,7 @@ tamaan.3pl.lca <- function( res0 , anal.list , con , ... ){
 						theta.k= res0$theta.k , gammaslope=gammaslope ,  
 						gammaslope.fixed = res0$gammaslope.fixed ,
 						notA= res0$notA , delta.inits = delta.inits ,  control=con , 
-						... )
+						Edes = Edes , ... )
 		# LCA probabilities
         res$lcaprobs <- .extract.lcaprobs(res)
 		

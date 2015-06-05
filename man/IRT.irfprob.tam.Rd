@@ -13,8 +13,8 @@ Extracting Item Response Functions
 
 \description{
 Extracts item response functions for models
-fitted in \pkg{TAM}. See \code{\link[CDM:IRT.irfprob]{IRT.irfprob}} 
-(\pkg{CDM}) for more details.
+fitted in \pkg{TAM}. See \code{\link[CDM:IRT.irfprob]{CDM::IRT.irfprob}} 
+ for more details.
 }
 
 
@@ -45,7 +45,7 @@ Object of class \code{\link{tam}}, \code{\link{tam.mml}},
 
 
 \value{
-See \code{\link[CDM:IRT.irfprob]{IRT.irfprob}} (\pkg{CDM}).
+See \code{\link[CDM:IRT.irfprob]{CDM::IRT.irfprob}}.
 }
 
 
@@ -68,12 +68,12 @@ See \code{\link[CDM:IRT.irfprob]{IRT.irfprob}} (\pkg{CDM}).
 
 \examples{
 #############################################################################
-# EXAMPLE 1: Dichotomous data sim.rasch - item response functions
+# EXAMPLE 1: Dichotomous data data.sim.rasch - item response functions
 #############################################################################
 	
-data(sim.rasch)
+data(data.sim.rasch)
 # 1PL estimation
-mod1 <- tam.mml(resp=sim.rasch)
+mod1 <- tam.mml(resp=data.sim.rasch)
 IRT.irfprob(mod1)
 }
 

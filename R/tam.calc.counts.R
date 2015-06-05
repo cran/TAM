@@ -11,6 +11,7 @@
 	G <- length( unique( group ))
 	# n.ik [ 1:TP , 1:I , 1:(K+1) , 1:G ]
 	n.ik <- array( 0 , dim=c(TP,I,maxK , G ))
+		
 	for (gg in 1:G){	# gg <- 1
 	ind.gg <- which( group == gg ) 		
 		for (kk in 1:(maxK)){   #		kk <- 1	# category 0 ( -> 1 )

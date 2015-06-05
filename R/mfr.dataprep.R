@@ -11,6 +11,12 @@ mfr.dataprep <- function( formulaA , xsi.setnull , B , Q ,
 	ind <- which( stlab == 0 )
 	nullfacets <- names(stlab)[ind]
 
+	if ( is.null(pid) ){
+		pid <- seq( 1 , nrow(resp) )
+		cat("--- Created person identifiers.\n")
+					}
+		
+
 	#********************
 	# data restructuring for non-identifiable combinations
 	facets_labs <- setdiff( rownames(tlab) , c("item" , "step") )
@@ -23,25 +29,33 @@ mfr.dataprep <- function( formulaA , xsi.setnull , B , Q ,
 			combi <- paste0( combi , "-" , facets[ , facets_labs[ff] ] )
 						}
 					}
-	dups_combi <- any( duplicated( combi ) )
+
+	dups <- duplicated( combi )
+	dups1 <- combi[ dups ]
+	dups_combi <- any( dups )
     PSF <- FALSE	
-    if ( dups_combi ){	
+	#***** begin duplications of identifiers
+    if ( dups_combi ){		
+							
 		NC <- max( table( table( combi) ) )		
-		l1 <- sapply( unique(combi) , FUN = function(cc){
-				  N1 <- which( combi == cc ) 
-				  m1 <- t( cbind( N1 , seq(1,length(N1) ) ) )
-				  return(m1)
-							} )			
-		l1 <- matrix( unlist(l1) , ncol=2 , byrow=TRUE)
-#		facets$psf <- paste0("PF",10^(round(log(NC,10)+1 )) + l1[,2] )
-		N1 <- nchar( paste(max(table(combi))))	
-		facets$psf <- paste0("PF", 10^N1 + l1[,2] )			
+		N1 <- nchar( paste(max(table(combi))))
+		facets$psf <-  paste0("PF", 10^N1 + 1 )	
+		for (cc in dups1){
+			# cc <- dups1[1]
+			ind <- which( combi == cc )
+			N0 <- length(ind)
+			h1 <- paste0("PF", 10^N1 + seq(1,N0) )	
+			facets$psf[ind] <- h1
+						}
+
+		
 		nullfacets <- c( nullfacets , "psf" )
         PSF <- TRUE
         cat("   -- Created a pseudo facet 'psf' (with zero effects)\n")
 		cat("   -- because of non-unique person-facet combinations.\n") 		
 					}
-
+	#**** end duplications of identifiers
+				
 	# new formula
 	formula_update <- paste( c( attr( tA , "term.labels") , nullfacets ) , collapse=" + ")
 	formula_update <- as.formula( paste0( "~ " , formula_update ) )
@@ -67,7 +81,7 @@ mfr.dataprep <- function( formulaA , xsi.setnull , B , Q ,
 	res <- list( "formula_update" = formula_update , 
 				"xsi.setnull" = xsi.setnull ,
 				"beta.fixed" = beta.fixed ,
-				"facets"=facets , "PSF" = PSF )
+				"facets"=facets , "PSF" = PSF , "pid" = pid  )
 	return(res)
 		}
 ############################################################		

@@ -514,9 +514,9 @@ Use \code{\link{tam.se}} for improved standard errors.
 
 For model comparisons see \code{\link{anova.tam}}.
 
-See \code{\link[sirt:tam2mirt]{tam2mirt}} (\pkg{sirt}) for converting
+See \code{\link[sirt:tam2mirt]{sirt::tam2mirt}} for converting
 \code{tam} objects into objects of class 
-\code{\link[mirt:mirt]{mirt}} in the \pkg{mirt} package.
+\code{\link[mirt:mirt]{mirt::mirt}} in the \pkg{mirt} package.
 }
 
 %% \code{\link{logLik.tam}}, \code{\link{anova.tam}}
@@ -530,13 +530,13 @@ See \code{\link[sirt:tam2mirt]{tam2mirt}} (\pkg{sirt}) for converting
 \examples{
 #############################################################################
 # EXAMPLE 1: dichotomous data
-# sim.rasch: 2000 persons, 40 items
+# data.sim.rasch: 2000 persons, 40 items
 #############################################################################
-data(sim.rasch)
+data(data.sim.rasch)
 
 #************************************************************
 # Model 1: Rasch model (MML estimation)
-mod1 <- tam.mml(resp=sim.rasch) 
+mod1 <- tam.mml(resp=data.sim.rasch) 
 # extract item parameters
 mod1$item    # item difficulties
 
@@ -560,7 +560,7 @@ tammodel <- "
  ITEM TYPE:
    ALL(Rasch)
    "
-mod1t <- tamaan( tammodel , sim.rasch)   
+mod1t <- tamaan( tammodel , data.sim.rasch)   
 summary(mod1t)
 
 #************************************************************
@@ -568,19 +568,19 @@ summary(mod1t)
 xsi0 <- mod1$xsi$xsi
 xsi.fixed <- cbind( 1:(length(xsi0)) , xsi0 )   
         # define vector with fixed item difficulties
-mod1a <- tam.mml( resp=sim.rasch , xsi.fixed=xsi.fixed )
+mod1a <- tam.mml( resp=data.sim.rasch , xsi.fixed=xsi.fixed )
 summary(mod1a)
 
 # Usage of the output value mod1$xsi.fixed.estimated has the right format
 # as the input of xsi.fixed
-mod1aa <- tam.mml( resp=sim.rasch , xsi.fixed= mod1$xsi.fixed.estimated )
+mod1aa <- tam.mml( resp=data.sim.rasch , xsi.fixed= mod1$xsi.fixed.estimated )
 summary(mod1b)
 
 #************************************************************
 # Model 1b: Rasch model with initial xsi parameters for items 2 (item difficulty b=-1.8),
 # item 4 (b=-1.6) and item 40 (b=2)
 xsi.inits <- cbind( c(2,4,40) , c(-1.8,-1.6,2))
-mod1b <- tam.mml( resp=sim.rasch , xsi.inits=xsi.inits )
+mod1b <- tam.mml( resp=data.sim.rasch , xsi.inits=xsi.inits )
 
 #-- tamaan specification
 tammodel <- "
@@ -594,12 +594,12 @@ tammodel <- "
  ITEM TYPE:
    ALL(Rasch)
    "
-mod1bt <- tamaan( tammodel , sim.rasch)   
+mod1bt <- tamaan( tammodel , data.sim.rasch)   
 summary(mod1bt)
 
 #************************************************************
 # Model 1c: 1PL estimation with sum constraint on item difficulties
-dat <- sim.rasch
+dat <- data.sim.rasch
 # modify A design matrix to include the sum constraint
 des <- designMatrices(resp=dat)
 A1 <- des$A[ , , - ncol(dat) ]
@@ -620,7 +620,7 @@ summary(mod1d)
 #************************************************************
 # Model 1e: This sum constraint can also be obtained by using the argument 
 # constraint="items" in tam.mml
-mod1e <- tam.mml( resp=sim.rasch , constraint="items" )
+mod1e <- tam.mml( resp=data.sim.rasch , constraint="items" )
 summary(mod1e)
 
 #************************************************************
@@ -645,7 +645,7 @@ stopifnot( all(mod1d$xsi.facets$xsi == mod1d2$xsi.facets$xsi) )
 
 #************************************************************
 # Model 2: 2PL model
-mod2 <- tam.mml.2pl(resp=sim.rasch,irtmodel="2PL") 
+mod2 <- tam.mml.2pl(resp=data.sim.rasch,irtmodel="2PL") 
 
 # extract item parameters
 mod2$xsi    # item difficulties
@@ -659,7 +659,7 @@ tammodel <- "
    # item type of 2PL is the default for dichotomous data
    "   
 # estimate model
-mod2t <- tamaan( tammodel , sim.rasch)   
+mod2t <- tamaan( tammodel , data.sim.rasch)   
 summary(mod2t)
 
 \dontrun{
@@ -668,7 +668,7 @@ summary(mod2t)
 xsi0 <- mod2$xsi$xsi
 xsi.fixed <- cbind( 1:(length(xsi0)) , xsi0 )   
         # define vector with fixed item difficulties
-mod2a <- tam.mml( resp=sim.rasch , xsi.fixed=xsi.fixed ,
+mod2a <- tam.mml( resp=data.sim.rasch , xsi.fixed=xsi.fixed ,
         B = mod2$B # fix slopes
             )
 summary(mod2a)
@@ -682,7 +682,7 @@ mod2a$B     # inspect used slope matrix
 est.slope <- rep(1,40)
 est.slope[ 11:20 ] <- 2
 est.slope[ 31:40 ] <- 3
-mod3 <- tam.mml.2pl( resp=sim.rasch , irtmodel="2PL.groups" , 
+mod3 <- tam.mml.2pl( resp=data.sim.rasch , irtmodel="2PL.groups" , 
                est.slopegroups = est.slope )
 mod3$B
 summary(mod3)
@@ -694,7 +694,7 @@ tammodel <- "
    F ~~ 1*F
    "   
 # estimate model
-mod3tA <- tamaan( tammodel , sim.rasch)   
+mod3tA <- tamaan( tammodel , data.sim.rasch)   
 summary(mod3tA)
 
 #--- tamaan specification (alternative B)
@@ -708,7 +708,7 @@ tammodel <- "
    a21__a30 == lam1
    a31__a40 == lam3         
    "  
-mod3tB <- tamaan( tammodel , sim.rasch)   
+mod3tB <- tamaan( tammodel , data.sim.rasch)   
 summary(mod3tB)
 
 #--- tamaan specification (alternative C using DO operator)
@@ -729,7 +729,7 @@ tammodel <- "
    F ~~ 1*F
    "   
 # estimate model
-mod3tC <- tamaan( tammodel , sim.rasch)   
+mod3tC <- tamaan( tammodel , data.sim.rasch)   
 summary(mod3tC)
 
 #############################################################################
@@ -1231,17 +1231,17 @@ summary(mod8b)
 #############################################################################
 # EXAMPLE 9: Multifaceted Rasch Model
 #############################################################################
-data(sim.mfr) ; data(sim.facets)
+data(data.sim.mfr) ; data(data.sim.facets)
 
 # two way interaction item and rater
 formulaA <- ~item+item:step + item*rater
-mod9a <- tam.mml.mfr( resp=sim.mfr , facets=sim.facets , formulaA = formulaA )
+mod9a <- tam.mml.mfr( resp=data.sim.mfr , facets=data.sim.facets , formulaA = formulaA )
 mod9a$xsi.facets
 summary(mod9a)
 
 # three way interaction item, female and rater
 formulaA <- ~item+item:step + female*rater + female*item*step
-mod9b <- tam.mml.mfr( resp=sim.mfr , facets=sim.facets , formulaA = formulaA )
+mod9b <- tam.mml.mfr( resp=data.sim.mfr , facets=data.sim.facets , formulaA = formulaA )
 summary(mod9b)
 
 #############################################################################

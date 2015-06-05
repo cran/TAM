@@ -5,8 +5,10 @@ plot.tam <- function(x, items=1:x$nitems, type="expected" ,
                      low=-3, high=3, ngroups=6, 
                      wle=NULL, export=TRUE, export.type="png", 
                      export.args=list(), observed=TRUE, overlay=FALSE , 
-                     ask=FALSE, package="lattice" , ...) {
+                     ask=FALSE, package="lattice" , 
+					 fix.devices=FALSE , ...) {
 #  requireNamespace("plyr")
+if ( fix.devices ){
   old.opt.dev <- getOption("device")
   old.opt.err <- c(getOption("show.error.messages"))
   old.par.ask <- par("ask")
@@ -20,6 +22,7 @@ plot.tam <- function(x, items=1:x$nitems, type="expected" ,
   # restore new pars' values
   on.exit(par("xpd"=old.par.xpd), add=TRUE)
   on.exit(par("mar"=old.par.mar), add=TRUE)
+}  
   
   tamobj <- x
   ndim <- tamobj$ndim

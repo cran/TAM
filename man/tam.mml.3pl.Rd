@@ -24,7 +24,7 @@ tam.mml.3pl(resp, Y = NULL, group = NULL, formulaY = NULL, dataY = NULL, ndim = 
   gammaslope.prior = NULL, userfct.gammaslope = NULL , gammaslope.constr.Npars = 0 ,
   est.guess = NULL, guess = rep(0, ncol(resp)), 
   guess.prior = NULL, skillspace = "normal", theta.k = NULL, delta.designmatrix = NULL, 
-  delta.fixed = NULL, delta.inits=NULL, pweights = NULL, control = list() )
+  delta.fixed = NULL, delta.inits=NULL, pweights = NULL, control = list(), Edes=NULL )
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -193,6 +193,9 @@ Optional vector of person weights.
   \item{control}{
 See \code{\link{tam.mml}} for more details.
 }
+\item{Edes}{Compact form of design matrix. This argument is only
+	defined for convenience for models with random starting
+	values to avoid recalculations.}
 }
 
 \details{
@@ -231,6 +234,7 @@ The same output as in \code{\link{tam.mml}} and additional entries
  \item{delta}{Parameter vector \eqn{\delta}}
  \item{gammaslope}{Estimated \eqn{\gamma} item slope parameters}
  \item{E}{Used design matrix \eqn{E}}
+ \item{Edes}{Used design matrix \eqn{E} in compact form}
 }
 % \item{comp1 }{Description of 'comp1'}
 %%  \item{comp2 }{Description of 'comp2'}
@@ -265,7 +269,7 @@ See \url{http://www.antonformann.at/} for more information.
 \seealso{
 See also \code{\link{tam.mml}}.
 
-See the \code{\link[CDM:slca]{slca}} function in the \pkg{CDM} package
+See the \code{\link[CDM:slca]{CDM::slca}} function in the \pkg{CDM} package
 for a similar method.
 
 \code{\link{logLik.tam}}, \code{\link{anova.tam}}
@@ -275,11 +279,11 @@ for a similar method.
 \examples{
 \dontrun{
 #############################################################################
-# EXAMPLE 1: Dichotomous data | sim.rasch
+# EXAMPLE 1: Dichotomous data | data.sim.rasch
 #############################################################################
 
-data(sim.rasch)
-dat <- sim.rasch
+data(data.sim.rasch)
+dat <- data.sim.rasch
 # some control arguments
 ctl.list <- list(maxiter= 20 ) # increase the number of iterations in applications!
 

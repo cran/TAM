@@ -13,8 +13,8 @@ Extracting Factor Scores in \pkg{TAM}
 
 \description{
 Extracts factor scores for models
-fitted in \pkg{TAM}. See \code{\link[CDM:IRT.factor.scores]{IRT.factor.scores}} 
-(\pkg{CDM}) for more details.
+fitted in \pkg{TAM}. See \code{\link[CDM:IRT.factor.scores]{CDM::IRT.factor.scores}} 
+for more details.
 }
 
 
@@ -52,7 +52,7 @@ Object of class \code{\link{tam}}, \code{\link{tam.mml}},
 
 
 \value{
-See \code{\link[CDM:IRT.factor.scores]{IRT.factor.scores}} (\pkg{CDM}).
+See \code{\link[CDM:IRT.factor.scores]{CDM::IRT.factor.scores}}.
 }
 
 
@@ -76,12 +76,12 @@ See \code{\link[CDM:IRT.factor.scores]{IRT.factor.scores}} (\pkg{CDM}).
 \examples{
 \dontrun{	
 #############################################################################
-# EXAMPLE 1: sim.rasch - Different factor scores in Rasch model 
+# EXAMPLE 1: data.sim.rasch - Different factor scores in Rasch model 
 #############################################################################
 	
-data(sim.rasch)
+data(data.sim.rasch)
 # 1PL estimation
-mod1 <- tam.mml(resp=sim.rasch)
+mod1 <- tam.mml(resp=data.sim.rasch)
 # EAP
 pmod1 <- IRT.factor.scores( mod1 )
 # WLE

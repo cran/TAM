@@ -33,7 +33,10 @@ export(designMatrices, .A.matrix, designMatrices.mfr,
        IRT.linearCFA ,
        IRT.threshold ,
        IRT.WrightMap ,
-       IRT.drawPV
+       IRT.drawPV,
+       IRT.residuals ,
+       msq.itemfitWLE ,
+       tam.Q3
        )
 
 
@@ -78,6 +81,13 @@ S3method(predict, tamaan )
 #### print
 S3method(print, IRT.threshold)
 
+
+#### residuals
+S3method(residuals, tam.mml )
+S3method(residuals, tam.mml.2pl )
+S3method(residuals, tam.mml.mfr )
+
+
 #### summary
 S3method(summary, tam )
 S3method(summary, tam.mml )
@@ -91,6 +101,9 @@ S3method(summary, IRT.modelfit.tam.mml )
 S3method(summary, IRT.modelfit.tam.mml.3pl )
 S3method(summary, IRT.modelfit.tamaan )
 S3method(summary, IRT.linearCFA)
+S3method(summary, msq.itemfit)
+S3method(summary, msq.itemfitWLE)
+S3method(summary, tam.Q3)
 
 
 ########################################
@@ -145,6 +158,11 @@ S3method(IRT.posterior, tam.mml.3pl)
 S3method(IRT.posterior, tamaan)
 S3method(IRT.posterior, tam.latreg)
 
+
+#### IRT.residuals
+S3method(IRT.residuals, tam.mml )
+S3method(IRT.residuals, tam.mml.2pl )
+S3method(IRT.residuals, tam.mml.mfr )
 
 #### IRT.WrightMap
 S3method(IRT.WrightMap, tam.mml )

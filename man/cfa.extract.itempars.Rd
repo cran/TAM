@@ -3,12 +3,12 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 
 \title{
-Extracting Item Parameters from a Fitted \code{cfa} Object
+Extracting Item Parameters from a Fitted \code{cfa} Object in \pkg{lavaan}
 }
 
 \description{
 This function extract item parameters from a fitted
-\code{\link[lavaan:cfa]{cfa}} (\pkg{lavaan}) object. It
+\code{\link[lavaan:cfa]{lavaan::cfa}} object in \pkg{lavaan}. It
 extract item loadings, item intercepts and the mean
 and covariance matrix of latent variables in a
 confirmatory factor analysis model.
@@ -57,7 +57,7 @@ See \code{\link{IRTLikelihood.cfa}} for extracting the
 individual likelihood from fitted confirmatory
 factor analyses.
 
-\code{\link[lavaan:cfa]{cfa}} (\pkg{lavaan})
+\code{\link[lavaan:cfa]{lavaan::cfa}}
 }
 
 

@@ -50,9 +50,6 @@ ordered latent class models (\code{"OLCA"}; only works for
 dichotomous item responses; e.g. Hoijtink, 1997; Shojima, 2007) and 
 mixture distribution models (\code{"MIXTURE"}; e.g. von Davier, 2007). \cr
 
-\emph{TO BE IMPLEMENTED: (ordered) latent class models
-for multiple dimensions, cognitive diagnostic models} \cr
-
 \code{LAVAAN MODEL:} \cr
 For specification of the syntax, see \code{\link{lavaanify.IRT}}. \cr
 
@@ -78,11 +75,6 @@ Fourier functions with decreasing periods.
 See Example 2, Model 7 of the \code{\link{tamaan}}
 function. \cr
 
-\emph{TO BE IMPLEMENTED: beta item response model, nominal item response model,
-smoothed nominal item response model, nonparametric B-spline
-item response functions, cognitive diagnostic models,
-latent class approximation of factor models}
-
 
 
 \code{PRIOR:} \cr
@@ -94,6 +86,15 @@ by \code{~}.\cr
 
 
 }
+
+
+%% \emph{TO BE IMPLEMENTED: (ordered) latent class models
+%% for multiple dimensions, cognitive diagnostic models} \cr
+
+%\emph{TO BE IMPLEMENTED: ITEM TYPE beta item response model, nominal item response model,
+%smoothed nominal item response model, nonparametric B-spline
+%item response functions, cognitive diagnostic models,
+%latent class approximation of factor models}
 
 
 \value{
@@ -160,7 +161,7 @@ In M. L. Nering & Ostini, R. (Eds.).
 
 Shojima, K. (2007). \emph{Latent rank theory: Estimation of item reference 
 profile by marginal maximum likelihood method with EM algorithm}.
-DNC Research Note 07-12. \url{http://www.rd.dnc.ac.jp/~shojima/ntt/paper.htm}.
+DNC Research Note 07-12.
 
 von Davier, M. (2007). \emph{Mixture distribution diagnostic models}. 
 ETS Research Report ETS RR-07-32. Princeton, ETS.
@@ -298,7 +299,7 @@ out$Q    # loading matrix for items
 #*** Model 2: Linear constraints
 
 # In the following syntax, linear equations for multiple constraints
-# go over multiple lines.
+# are arranged over multiple lines.
 tammodel <- "
   LAVAAN MODEL:
     F =~ a1__a5*act1__act5

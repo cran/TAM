@@ -9,7 +9,7 @@ Function for Drawing Plausible Values
 \description{
 This function draws plausible values of a continuous latent variable
 based on a fitted object for which the 
-\code{\link[CDM:IRT.posterior]{IRT.posterior}} (\pkg{CDM}) method
+\code{\link[CDM:IRT.posterior]{CDM::IRT.posterior}} method
 is defined.
 }
 
@@ -19,7 +19,7 @@ IRT.drawPV(object,NPV=5)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{object}{
-Object for which the method \code{\link[CDM:IRT.posterior]{IRT.posterior}} (\pkg{CDM}) 
+Object for which the method \code{\link[CDM:IRT.posterior]{CDM::IRT.posterior}}
   does exist.}
 \item{NPV}{Number of plausible values to be drawn.}
 }

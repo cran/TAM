@@ -90,12 +90,12 @@ information criteria.
 # EXAMPLE 1: Dichotomous data sim.rasch - 1PL vs. 2PL model
 #############################################################################
 	
-data(sim.rasch)
+data(data.sim.rasch)
 # 1PL estimation
-mod1 <- tam.mml(resp=sim.rasch)
+mod1 <- tam.mml(resp=data.sim.rasch)
 logLik(mod1)
 # 2PL estimation
-mod2 <- tam.mml.2pl(resp=sim.rasch , irtmodel="2PL")
+mod2 <- tam.mml.2pl(resp=data.sim.rasch , irtmodel="2PL")
 logLik(mod2)
 # Model comparison
 anova( mod1 , mod2 )

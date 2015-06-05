@@ -3,9 +3,10 @@
 summary.tam.mml <- summary.tam.2pl <- 
 	summary.tam.mfr <- summary.tam <- summary.tam.latreg <- 
 function( object , file = NULL , ...){
-	if ( ! is.null( file ) ){
-		sink( paste0( file , "__SUMMARY.Rout") , split=TRUE )
-						}
+
+
+	osink( file = file , prefix = "__SUMMARY.Rout" )
+						
     # object      ... object from tam.mml                #
 #	object <- tamobject
    latreg <- FALSE
@@ -24,7 +25,10 @@ function( object , file = NULL , ...){
     cat("Multidimensional Item Response Model in TAM \n\n")
 	irtmodel <- object$irtmodel
 	
-	cat("IRT Model" , irtmodel , "\n")
+	cat("IRT Model" , irtmodel ) # , "\n")
+	
+	# print Call
+    print_CALL(object$CALL)	
 	
 	cat("------------------------------------------------------------\n")
 	cat( "Number of iterations =" , object$iter , "\n" )
@@ -173,8 +177,7 @@ function( object , file = NULL , ...){
 						}
 			}
 	#******
-	if ( ! is.null( file ) ){
-		sink(  )
-						}
+	csink(file)
+	
 			}
 #*******************************************************

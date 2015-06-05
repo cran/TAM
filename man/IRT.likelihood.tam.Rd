@@ -20,8 +20,8 @@ Extracting Individual Likelihood and Individual Posterior
 
 \description{
 Extracts individual likelihood and posterior for models
-fitted in \pkg{TAM}. See \code{\link[CDM:IRT.likelihood]{IRT.likelihood}} 
-(\pkg{CDM}) for more details.
+fitted in \pkg{TAM}. See \code{\link[CDM:IRT.likelihood]{CDM::IRT.likelihood}} 
+for more details.
 }
 
 
@@ -60,7 +60,7 @@ or \code{\link{tam.latreg}}.
 
 
 \value{
-See \code{\link[CDM:IRT.likelihood]{IRT.likelihood}} (\pkg{CDM}).
+See \code{\link[CDM:IRT.likelihood]{CDM::IRT.likelihood}}.
 }
 
 
@@ -83,12 +83,12 @@ See \code{\link[CDM:IRT.likelihood]{IRT.likelihood}} (\pkg{CDM}).
 
 \examples{
 #############################################################################
-# EXAMPLE 1: Dichotomous data sim.rasch - extracting likelihood/posterior
+# EXAMPLE 1: Dichotomous data data.sim.rasch - extracting likelihood/posterior
 #############################################################################
 	
-data(sim.rasch)
+data(data.sim.rasch)
 # 1PL estimation
-mod1 <- tam.mml(resp=sim.rasch)
+mod1 <- tam.mml(resp=data.sim.rasch)
 lmod1 <- IRT.likelihood(mod1)
 str(lmod1)
 pmod1 <- IRT.posterior(mod1)

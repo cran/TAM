@@ -40,6 +40,7 @@ tam.mml <-
     #-------------------------------------
     
     s1 <- Sys.time()
+	CALL <- match.call()
     # display
     disp <- "....................................................\n"
     
@@ -376,9 +377,11 @@ tam.mml <-
       thetasamp.density <- NULL
     } else {
       # sampled theta values
-      if (QMC){						
-        r1 <- sfsmisc::QUnif(n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)						
-        theta0.samp <- qnorm( r1 )
+      if (QMC){
+        fac <- 1
+        r1 <- sfsmisc::QUnif(n=snodes, min = 0, max = 1, 
+						n.min = 1, p=ndim, leap = 409)
+        theta0.samp <- fac * qnorm( r1 )
       } else {
         theta0.samp <- matrix( mvrnorm( snodes , mu = rep(0,ndim) , 
                                         Sigma = diag(1,ndim ) )	,
@@ -900,7 +903,7 @@ a0 <- Sys.time()
                  "control" = con1a , "irtmodel" = irtmodel ,
                  "iter" = iter ,
                  "printxsi" = printxsi ,
-                 "YSD"=YSD 
+                 "YSD"=YSD , CALL =CALL
                  #			   "design"=design
                  #			   "xsi.min.deviance" = xsi.min.deviance ,
                  #			   "beta.min.deviance" = beta.min.deviance , 

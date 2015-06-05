@@ -14,8 +14,8 @@ Expected Values and Predicted Probabilities for Fitted \pkg{TAM} Models
 Extracts predicted values from the posterior disribution for models
 fitted in \pkg{TAM}. 
 
-See \code{\link[CDM:predict]{predict}} 
-(\pkg{CDM}) for more details.
+See \code{\link[CDM:predict]{CDM::predict}} 
+for more details.
 }
 
 
@@ -73,11 +73,11 @@ See \code{\link[CDM:predict]{predict}} (\pkg{CDM}).
 # EXAMPLE 1: Dichotomous data sim.rasch - predict method
 #############################################################################
 	
-data(sim.rasch)
+data(data.sim.rasch)
 # 1PL estimation
-mod1 <- tam.mml(resp=sim.rasch)
+mod1 <- tam.mml(resp=data.sim.rasch)
 # predict method
-prmod1 <- IRT.predict(mod1, sim.rasch)
+prmod1 <- IRT.predict(mod1, data.sim.rasch)
 str(prmod1)
 }
 

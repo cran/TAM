@@ -10,15 +10,15 @@ Test Analysis Modules
   estimation of uni- and multidimensional item response models 
   (Rasch, 2PL, 3PL, Generalized Partial Credit, Multi Facets,
   Nominal Item Response, Structured Latent Class Analysis,
-  Mixture Distribution IRT Models, Located Latent Class Models,
-  Cognitive Diagnostic Models). Latent regression models and
-  plausible value imputation are also supported.
+  Mixture Distribution IRT Models, Located Latent Class Models). 
+  Latent regression models and plausible value imputation are 
+  also supported.
 }
 \details{
 \tabular{ll}{
 Package: \tab \pkg{TAM}\cr
 Type: \tab Package\cr
-Version: \tab 1.6\cr
+Version: \tab 1.7\cr
 Publication Year: \tab 2015\cr
 License: \tab GPL (>=2.0)\cr
 URL: \tab \url{http://www.edmeasurementsurveys.com/TAM/Tutorials/}\cr

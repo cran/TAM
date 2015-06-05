@@ -9,7 +9,7 @@ Plots the deviance change in every iteration.
 }
 
 \usage{
-plotDevianceTAM(tam.obj, omitUntil = 1, reverse = TRUE)
+plotDevianceTAM(tam.obj, omitUntil = 1, reverse = TRUE, change=TRUE)
 }
 
 %- maybe also 'usage' for other objects documented here.
@@ -25,6 +25,8 @@ plotting.
 A logical indicating whether the deviance change should be
 multiplied by minus 1. The default is \code{TRUE}.
 }
+\item{change}{An optional logical indicating whether deviance change
+or the deviance should be plotted.}
 }
 %\details{
 %%  ~~ If necessary, more details than the description above ~~
@@ -40,7 +42,7 @@ multiplied by minus 1. The default is \code{TRUE}.
 %% ~put references to the literature/web site here ~
 %}
 \author{
-Martin Hecht, Sebastian Weirich
+Martin Hecht, Sebastian Weirich, Alexander Robitzsch
 }
 %\note{
 %%  ~~further notes~~
@@ -55,12 +57,14 @@ Martin Hecht, Sebastian Weirich
 #############################################################################
 # EXAMPLE 1: deviance plot dichotomous data
 #############################################################################
-data(sim.rasch)
+data(data.sim.rasch)
 
 # 2PL model
-mod1 <- tam.mml.2pl(resp=sim.rasch ) 
+mod1 <- tam.mml.2pl(resp=data.sim.rasch ) 
 # plot deviance change
 plotDevianceTAM( mod1 )
+# plot deviance
+plotDevianceTAM( mod1 , change=FALSE)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

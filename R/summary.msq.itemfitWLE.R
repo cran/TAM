@@ -1,9 +1,7 @@
 
-
-
 ###################################################
-# summary for tam.fit
-summary.msq.itemfit <- function( object , ... ){
+# summary for objects of class msq.itemfitWLE
+summary.msq.itemfitWLE <- function( object , ... ){
 
 	cat("------------------------------------------------------------\n")
     d1 <- packageDescription("TAM")
@@ -13,25 +11,38 @@ summary.msq.itemfit <- function( object , ... ){
 	cat("Computation time:" , print(object$time[2] - object$time[1]), "\n\n")
 	# cat( Rsessinfo() , "\n\n")			
 
-	cat("MSQ item fit statitics (Function 'msq.itemfit')\n\n")
+	cat("MSQ item fit statitics (Function 'msq.itemfitWLE')\n\n")
 
 	cat("****************************************************\n")
 	cat("\nSummary outfit and infit statistic\n")
-    obji <- object$summary_itemfit
+	
+	if ( is.null(object$fitindices) ){
+		object1 <- object$fit_data_summary 
+				} else {
+		object1 <- object$fit_parm_summary 
+					}	
+	
+    obji <- object1
 	for ( vv in seq(2,ncol(obji) ) ){
 		obji[,vv] <- round( obji[,vv] , 3 )
 					}	
 	rownames(obji) <- NULL
 	print(obji)
+	
 	cat("\n****************************************************\n")
-	cat("\nOutfit and infit statistic\n")	
-    object <- object$itemfit
-	ind <- grep( "fitgroup" , colnames(object) )
+	cat("\nOutfit and infit statistic\n")		
+	
+	
+	if ( is.null(object$fitindices) ){
+		object <- object$fit_data 
+				} else {
+		object <- object$fit_parm 
+					}
 	obji <- object
-	for ( vv in seq(ind+1,ncol(obji) ) ){
+	for ( vv in seq(2,ncol(obji) ) ){
 		obji[,vv] <- round( obji[,vv] , 3 )
 					}
+    rownames(obji) <- NULL					
 	print(obji)
-	invisible(obji)
 		}
 ###################################################

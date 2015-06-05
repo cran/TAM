@@ -2,13 +2,13 @@
 #######################################
 # Item fit mean squares statistics
 msq.itemfit <- function( object , fitindices=NULL ){
-
+		s1 <- Sys.time()
 		#--- collect necessary input
 		resp <- IRT.data(object)
 # a0 <- Sys.time()		
 		res <- predict(object)
 		irf1 <- IRT.irfprob(object)
-		
+		irf1[ is.na(irf1) ] <- 0
 # cat("predict function\n"); a1 <- Sys.time() ; print(a1-a0); a0 <- a1		
 		post1 <- IRT.posterior(object)
 		NI <- dim(res$probs.categ)
@@ -31,7 +31,6 @@ msq.itemfit <- function( object , fitindices=NULL ){
 #		dfr <- msq.itemfit.R( dfr , FF , fitindices , fitgroups ,
 #					res , post1 , N , TP , I , K , resp )		
 # cat("msq in R\n"); a1 <- Sys.time() ; print(a1-a0); a0 <- a1				
-
 	
 		#---- include fit statistic in Rcpp
 		
@@ -74,8 +73,15 @@ msq.itemfit <- function( object , fitindices=NULL ){
 		cdfr <- colnames(dfr)
 		ind <- c( grep( "Outfit" , cdfr ) ,  grep( "Infit" , cdfr ) )
 		ind <- c( setdiff( seq(1,ncol(dfr) ) , ind ) , ind )
-		dfr <- dfr[,ind]		
-		res <- list( "itemfit" = dfr )
+		dfr <- dfr[,ind]	
+		# summary statistic
+		vars <- c("Outfit" , "Infit")
+		dfr2 <- data.frame( "fit" = vars , "M" = colMeans(dfr[,vars]) ,
+					"SD" = apply( dfr[,vars] , 2 , sd ) )
+		s2 <- Sys.time()
+		v1 <- c(s1 , s2 )
+		res <- list( "itemfit" = dfr , "summary_itemfit"=dfr2 ,
+					time=v1 )
 		class(res) <- "msq.itemfit"
 		return(res)			
 					}
@@ -123,7 +129,7 @@ msq.itemfit.R <- function( dfr , FF , fitindices , fitgroups ,
 			N1 <- sum( 1-is.na(resp[,ind.ff] ) )
 			qi <- sum( v1 / N1^2 ) - 1/N1
 	
-			# this seems to be a an adequate formula
+			# this seems to be the adequate formula
 			dfr[ff,"Outfit_t"] <- ( fit0^(1/3)-1 )* 3 / sqrt(qi) + sqrt(qi) / 3 
 
 			#***********

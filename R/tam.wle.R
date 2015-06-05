@@ -17,7 +17,8 @@ tam.wle <- function( tamobj, ... ){
 ################################################################
 tam.mml.wle <-
   function( tamobj, score.resp=NULL , WLE=TRUE , adj=.3 , Msteps=20 , 
-            convM = .0001 ){
+            convM = .0001 , progress=TRUE ,
+			output.prob=FALSE ){
     #########################################################
     # INPUT:
     # tamobj ... result from tam analysis
@@ -174,9 +175,11 @@ tam.mml.wle <-
         converge <- TRUE
       }
       Miter <- Miter + 1 
+	  if (progress){
       cat( paste( "Iteration in WLE/MLE estimation ", Miter, 
                   "  | Maximal change " , round( max(abs(increment)) , 4) , "\n" )  ) 
       flush.console()
+			}
     }  # end of Newton-Raphson
     
     #standard errors of theta estimates
@@ -230,7 +233,9 @@ tam.mml.wle <-
       # WLE_Rel = ( v1 - v2 ) / v1 = 1 - v2 / v1
       WLE.rel <- 1 - v2 / v1
 	  if (WLE){ w1 <- "WLE" } else { w1 <- "MLE" }
-      cat("----\n" , w1 ,"Reliability =" , round(WLE.rel,3) ,"\n" )
+	  if (progress){
+		cat("----\n" , w1 ,"Reliability =" , round(WLE.rel,3) ,"\n" )
+					}
       res$WLE.rel <- rep( WLE.rel , nrow(res) )
     }
     if ( ndim>1 ){
@@ -247,6 +252,14 @@ tam.mml.wle <-
       }
     }				
     #  res <- list( "PersonScores" = PersonScores, "PersonMax" = PersonMax, "theta" = theta , "error" =  error )
+					
+	if (output.prob){
+		 res <- as.list(res)
+	     res$probs <- rprobsWLE
+					}	
+	
+
+	
     return(res)
   }
 
@@ -255,7 +268,7 @@ tam.mml.wle <-
 ################################################################
 tam.mml.wle2 <-
   function( tamobj, score.resp=NULL , WLE=TRUE , adj=.3 , Msteps=20 , 
-            convM = .0001 ){
+            convM = .0001 , progress=TRUE , output.prob=FALSE ){
     #########################################################
     # INPUT:
     # tamobj ... result from tam analysis
@@ -413,11 +426,11 @@ tam.mml.wle2 <-
       
       Miter <- Miter + 1 
 
-      
-      cat( paste( "Iteration in WLE/MLE estimation ", Miter, 
-                  "  | Maximal change " , round( max(abs(increment)) , 4) , "\n" )  ) 
-      flush.console()
-
+      if (progress){
+		  cat( paste( "Iteration in WLE/MLE estimation ", Miter, 
+					  "  | Maximal change " , round( max(abs(increment)) , 4) , "\n" )  ) 
+		  flush.console()
+					}
     }  # end of Newton-Raphson
 
     #standard errors of theta estimates
@@ -472,7 +485,9 @@ tam.mml.wle2 <-
       WLE.rel <- 1 - v2 / v1
       WLE.rel <- 1 - v2 / v1
 	  if (WLE){ w1 <- "WLE" } else { w1 <- "MLE" }
-      cat("----\n" , w1 ,"Reliability =" , round(WLE.rel,3) ,"\n" )	  
+	  if (progress){
+		cat("----\n" , w1 ,"Reliability =" , round(WLE.rel,3) ,"\n" )	  
+					}
 #      cat("----\nWLE Reliability =" , round(WLE.rel,3) ,"\n" )
       res$WLE.rel <- rep( WLE.rel , nrow(res) )
     }
@@ -512,8 +527,11 @@ tam.mml.wle2 <-
 		cat(" * Maybe the WLE is not identified (i.e. estimable).\n")
 		cat(" * Please proceed with caution.\n")		
 						}
-		
-	
+					
+	if (output.prob){
+		 res <- as.list(res)
+	     res$probs <- rprobsWLE
+					}	
 	
 	
     #  res <- list( "PersonScores" = PersonScores, "PersonMax" = PersonMax, "theta" = theta , "error" =  error )

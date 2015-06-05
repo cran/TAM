@@ -19,9 +19,11 @@ respectively.
 \usage{
 tam.wle(tamobj, ...)
 
-tam.mml.wle(tamobj, score.resp=NULL, WLE=TRUE, adj=0.3, Msteps=20, convM=1e-04)
+tam.mml.wle(tamobj, score.resp=NULL, WLE=TRUE, adj=0.3, Msteps=20, convM=1e-04,
+        progress=TRUE , output.prob=FALSE )
 
-tam.mml.wle2(tamobj, score.resp=NULL, WLE=TRUE, adj=0.3, Msteps=20, convM=1e-04)
+tam.mml.wle2(tamobj, score.resp=NULL, WLE=TRUE, adj=0.3, Msteps=20, convM=1e-04,
+        progress=TRUE , output.prob=FALSE )
 
 tam.jml.WLE(tamobj, resp, resp.ind, A, B, nstud, nitems, maxK, convM, 
     PersonScores, theta, xsi, Msteps, WLE=FALSE, theta.fixed = NULL)
@@ -52,6 +54,9 @@ tam.jml.WLE(tamobj, resp, resp.ind, A, B, nstud, nitems, maxK, convM,
   \item{convM}{
      Convergence criterion
   }
+\item{progress}{Logical indicating whether progress should be displayed.}
+\item{output.prob}{Logical indicating whether evaluated probabilities should
+be included in the list of outputs.}
 \item{resp}{Data frame with item responses (only for \code{tam.jml.WLE})
 }
 \item{resp.ind}{Data frame with response indicators (only for \code{tam.jml.WLE})
@@ -120,7 +125,7 @@ response theory. \emph{Psychometrika}, \bold{54}, 427-450.
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-See the \code{\link[PP:PP_gpcm]{PP_gpcm}} (\pkg{PP}) function
+See the \code{\link[PP:PP_gpcm]{PP::PP_gpcm}} function
 in the \pkg{PP} package for more person
 parameter estimators for the partial credit model (Penfield & Bergeron, 2005).
 	
@@ -129,11 +134,11 @@ See the S3 method \code{\link{IRT.factor.scores.tam}}.
 
 \examples{
 #############################################################################
-# EXAMPLE 1: 1PL model, sim.rasch data
+# EXAMPLE 1: 1PL model, data.sim.rasch
 #############################################################################
-data(sim.rasch)
+data(data.sim.rasch)
 # estimate Rasch model
-mod1 <- tam.mml(resp=sim.rasch) 
+mod1 <- tam.mml(resp=data.sim.rasch) 
 # WLE estimation
 wle1 <- tam.wle( mod1 )
   ## ----
@@ -141,10 +146,10 @@ wle1 <- tam.wle( mod1 )
 
 # scoring for a different dataset containing same items (first 10 persons in 
 #  sim.rasch)
-wle2 <- tam.wle( mod1 , score.resp=sim.rasch[1:10,])
+wle2 <- tam.wle( mod1 , score.resp=data.sim.rasch[1:10,])
 
 \dontrun{
-# compare results to earlier wle-implementation
+# compare results to earlier WLE implementation
 wle3 <- tam.mml.wle( mod1 )
 stopifnot( all(wle3==wle1) )
 

@@ -17,17 +17,17 @@ or \code{tam.mml}.
 \method{plot}{tam}(x, items=1:x$nitems, type="expected", low=-3, high=3, ngroups=6, 
                    wle=NULL, export=TRUE, export.type="png", 
                    export.args=list(), observed=TRUE, overlay=FALSE , 
-                   ask=FALSE, package="lattice" , ...)
+                   ask=FALSE, package="lattice" , fix.devices=FALSE , ...)
 	
 \method{plot}{tam.mml}(x, items=1:x$nitems, type="expected", low=-3, high=3, ngroups=6, 
                        wle=NULL, export=TRUE, export.type="png", 
                        export.args=list(), observed=TRUE, overlay=FALSE , 
-                       ask=FALSE,  package="lattice" , ...)
+                       ask=FALSE,  package="lattice" ,  fix.devices=FALSE , ...)
      
 \method{plot}{tam.jml}(x, items=1:x$nitems, type="expected", low=-3, high=3, ngroups=6, 
                        wle=NULL, export=TRUE, export.type="png", 
                        export.args=list(), observed=TRUE, overlay=FALSE , 
-                       ask=FALSE,  package="lattice" , ...)
+                       ask=FALSE,  package="lattice" , fix.devices=FALSE , ...)
 }
 %- maybe also 'usage' for other objects documented here.
 
@@ -81,6 +81,8 @@ of the working directory.
 }
 \item{package}{Used \R package for plot. Can be \code{"lattice"} or
 \code{"graphics"}.}
+\item{fix.devices}{Optional logical indicating whether old graphics devices should
+	 be saved.}
 \item{\dots}{
   Further arguments to be passed
 }
@@ -112,17 +114,18 @@ Margaret Wu, Thomas Kiefer, Alexander Robitzsch, Michal Modzelewski
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-See \code{\link[CDM:IRT.irfprobPlot]{IRT.irfprobPlot}} (\pkg{CDM})
+See \code{\link[CDM:IRT.irfprobPlot]{CDM::IRT.irfprobPlot}}
 for a general plot method.
 }
 
 \examples{
+\dontrun{	
 #############################################################################
-# EXAMPLE 1: Dichotomous data
+# EXAMPLE 1: Dichotomous data data.sim.rasch
 #############################################################################
 
-data(sim.rasch)
-mod <- tam.mml(sim.rasch)
+data(data.sim.rasch)
+mod <- tam.mml(data.sim.rasch)
 # expected response curves
 plot(mod, items=1:5, export=FALSE)
 # item response curves
@@ -145,6 +148,7 @@ mod1 <- tam.mml( dat )
 # plot item response curves and expected response curves
 plot(mod1, type="items", export=FALSE)
 plot(mod1, type="expected", export=FALSE )
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

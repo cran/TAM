@@ -7,7 +7,6 @@
 calc_prob.v5 <-
   function(iIndex, A, AXsi, B, xsi, theta, 
            nnodes, maxK, recalc=TRUE){
-    
     if(recalc){
       AXsi.tmp <- array( tensor( A[iIndex,,, drop = FALSE], xsi, 3, 1 ) , 
                          dim = c( length(iIndex) , maxK , nnodes ) )
@@ -15,7 +14,6 @@ calc_prob.v5 <-
     } else {
       AXsi.tmp <- array( AXsi, dim = c( length(iIndex) , maxK , nnodes ) )
     }
-    
     Btheta <- array(0, dim = c(length(iIndex) , maxK , nnodes) )
     for( dd in 1:ncol(theta) ) 
       Btheta <- Btheta + array(B[iIndex,,dd ,drop = FALSE] %o% theta[,dd] , dim = dim(Btheta))

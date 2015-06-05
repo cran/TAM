@@ -131,7 +131,7 @@ items with differing number of response options.
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-See \code{\link{sim.mfr}} for some examples for creating design matrices.	
+See \code{\link{data.sim.mfr}} for some examples for creating design matrices.	
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 

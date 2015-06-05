@@ -1,8 +1,8 @@
-\name{sim.rasch}
+\name{data.sim.rasch}
 
-\alias{sim.rasch}
-\alias{sim.rasch.pweights}
-\alias{sim.rasch.missing}
+\alias{data.sim.rasch}
+\alias{data.sim.rasch.pweights}
+\alias{data.sim.rasch.missing}
 
 \docType{data}
 
@@ -12,15 +12,16 @@ Simulated Rasch data
 
 \description{
 Simulated Rasch data under unidimensional trait distribution
+}
+
 %% ## DON'T FORGET TO SET SEEDS BEFORE SIMULATING ACTUAL SIM-DATA
 %% ## (NOT DONE YET)
 %% ## Safe simulation script in "inst"-folder
-}
 
 \usage{
- data(sim.rasch) 
- data(sim.rasch.pweights)
- data(sim.rasch.missing)
+ data(data.sim.rasch) 
+ data(data.sim.rasch.pweights)
+ data(data.sim.rasch.missing)
 }
 
 \format{
@@ -53,17 +54,17 @@ Simulated Rasch data under unidimensional trait distribution
 
 \examples{
 \dontrun{      
-data(sim.rasch)
+data(data.sim.rasch)
 N <- 2000
 Y <- cbind( rnorm( N , sd = 1.5) , rnorm(N , sd = .3 ) )
 
 # Loading Matrix
 # B <- array( 0 , dim = c( I , 2 , 1 )  )
 # B[1:(nrow(B)), 2, 1] <- 1
-B <- designMatrices(resp = sim.rasch)[["B"]]
+B <- designMatrices(resp = data.sim.rasch)[["B"]]
   
 # estimate model
-mod1_1 <- tam(resp=sim.rasch , Y=Y)
+mod1_1 <- tam(resp=data.sim.rasch , Y=Y)
 
 # standard errors
 res1 <- tam.se(mod1_1)
@@ -80,17 +81,17 @@ pv1 <- tam.pv( mod1_1 , nplausible = 7 , # 7 plausible values
 # item parameter constraints
 xsi.fixed <- matrix( c( 1, -2,5, -.22,10, 2 ), nrow=3 , ncol=2 , byrow=TRUE)
 xsi.fixed
-mod1_4 <- tam( resp=sim.rasch , xsi.fixed=xsi.fixed )
+mod1_4 <- tam( resp=data.sim.rasch , xsi.fixed=xsi.fixed )
 
 # missing value handling
-data(sim.rasch.missing)
-mod1_2 <- tam(sim.rasch.missing , Y = Y)
+data(data.sim.rasch.missing)
+mod1_2 <- tam(data.sim.rasch.missing , Y = Y)
 
 # handling of sample (person) weights
-data(sim.rasch.pweights)
+data(data.sim.rasch.pweights)
 N <- 1000
 pweights <- c(  rep(3,N/2) , rep( 1, N/2 ) )
-mod1_3 <- tam( sim.rasch.pweights , control = list(conv = .001) , pweights = pweights )}
+mod1_3 <- tam( data.sim.rasch.pweights , control = list(conv = .001) , pweights = pweights )}
 }
 
 \keyword{datasets}

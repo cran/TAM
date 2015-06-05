@@ -39,6 +39,7 @@ tam.mml.mfr <-
     # progress ... if TRUE, then display progress
     #-------------------------------------
     
+	CALL <- match.call()
     a0 <- Sys.time()    
     s1 <- Sys.time()
     # display
@@ -110,6 +111,7 @@ tam.mml.mfr <-
 	beta.fixed <- res$beta.fixed
 	facets <- res$facets
 	PSF <- res$PSF
+	pid <- res$pid
 	
 	diffKi <- FALSE
 	if ( var( maxKi ) > .001 ){ 
@@ -196,6 +198,9 @@ tam.mml.mfr <-
 	  #***
 	  # check multiple rows
 	  m1 <- rowsum( 1-is.na(gresp.noStep) , pid )
+	  	  
+# Revalpr("table( rowsum( m1 > 1 )[,1] )")	  
+	  
 	  h1 <- sum(m1>1)
 	  if (h1>0){
 		cat("* Combinations of person identifiers and facets are not unique.\n")
@@ -908,8 +913,9 @@ if (!choice1){
     
     #***
     # calculate counts
-    res <- .tam.calc.counts( resp, theta , resp.ind , 
-                             group , maxK , pweights , hwt )
+    res <- .tam.calc.counts( resp = gresp.noStep, theta , 
+				resp.ind=gresp.noStep.ind , 
+                group , maxK , pweights , hwt )
     n.ik <- res$n.ik
     pi.k <- res$pi.k 
     
@@ -922,7 +928,7 @@ if (!choice1){
     item1 <- .TAM.itempartable( resp=gresp.noStep , maxK , AXsi , B , ndim ,
                                 resp.ind=gresp.noStep.ind , rprobs,n.ik,pi.k)
     
-    
+  
     #####################################################
     # post ... posterior distribution	
     # create a data frame person	
@@ -1087,7 +1093,8 @@ if (!choice1){
                  "deviance.history" = deviance.history ,
                  "control" = con1a , "irtmodel" = irtmodel ,
                  "iter" = iter , "resp_orig" = resp_orig ,
-                 "printxsi"=TRUE , "YSD"=YSD , "PSF" = PSF
+                 "printxsi"=TRUE , "YSD"=YSD , "PSF" = PSF ,
+				 CALL = CALL 
                  #			   "design"=design
                  #			   "xsi.min.deviance" = xsi.min.deviance ,
                  #			   "beta.min.deviance" = beta.min.deviance , 

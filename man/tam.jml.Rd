@@ -187,8 +187,8 @@ maximum likelihood estimation see \code{\link{tam.mml}}.
 #############################################################################
 # EXAMPLE 1: Dichotomous data
 #############################################################################
-data(sim.rasch)
-resp <- sim.rasch[1:700 , seq( 1 , 40 , len=10)  ]  # subsample
+data(data.sim.rasch)
+resp <- data.sim.rasch[1:700 , seq( 1 , 40 , len=10)  ]  # subsample
 # estimate the Rasch model with JML (function 'tam.jml')
 mod1a <- tam.jml(resp=resp) 
 summary(mod1a)
