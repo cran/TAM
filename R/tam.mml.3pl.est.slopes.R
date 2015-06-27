@@ -17,7 +17,8 @@
 	  oldfac <- fac.oldxsi
 	  iter <- 1
 	  	  
-	  
+
+		  
 	while( ( iter <= msteps ) & ( parchange > convM)  ){		
 	    Xlambda0 <- gammaslope <- Xlambda		
 # a0 <- Sys.time()		

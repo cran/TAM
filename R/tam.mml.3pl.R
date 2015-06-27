@@ -7,6 +7,7 @@ tam.mml.3pl <-
             variance.fixed = NULL , variance.inits = NULL , 
             est.variance = TRUE , 
             A=NULL , notA = FALSE , Q=NULL , 
+			Q.fixed = NULL , 
 			E = NULL , gammaslope.des = "2PL" , 
 			gammaslope=NULL , gammaslope.fixed=NULL ,
             est.some.slopes=TRUE ,    			
@@ -63,7 +64,12 @@ tam.mml.3pl <-
 	
 	#********************
 	# create E design matrix from different input matrices
-	E <- .mml.3pl.create.E( resp , E , Q , gammaslope.des )		
+	res0 <- .mml.3pl.create.E( resp , E , Q , gammaslope.des , Q.fixed )		
+	E <- res0$E
+	if ( is.null(gammaslope.fixed ) ){
+		gammaslope.fixed <- res0$gammaslope.fixed
+								}
+	
 	# calculation of not A if requested
 	if ( notA) {
 		res <- .mml.3pl.create.notA( E , notA )	
@@ -518,7 +524,13 @@ tam.mml.3pl <-
 	  res <- .Call("mml3_calc_Fdes" , as.vector(Fdes) , dimFdes=dimFdes ,
 				       PACKAGE="TAM" )	  
 	  FdesM <- res$FdesM[ 1:res$NFdesM , ]
-					
+	
+	#*****
+	#@@@@ 2015-06-26
+#	Avector <- as.vector(A)
+#	Avector[ is.na(Avector) ] <- 0
+	#@@@@
+	
     ##**SE
     se.xsi <- 0*xsi
     se.B <- 0*B 
@@ -871,7 +883,7 @@ a0 <- Sys.time()
     ############################################################################
     ############################################################################
 # stop("check here")  
-    
+
     xsi.min.deviance -> xsi 
     beta.min.deviance -> beta
     variance.min.deviance -> variance	

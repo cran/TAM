@@ -429,6 +429,12 @@ tam.mml <-
     YSD <- max( apply( Y , 2 , sd ) )
     if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }
     
+	#*****
+	#@@@@ 2015-06-26
+	Avector <- as.vector(A)
+	Avector[ is.na(Avector) ] <- 0
+	#@@@@
+	
     # define progress bar for M step
     mpr <- round( seq( 1 , np , len = 10 ) )
     
@@ -472,21 +478,22 @@ tam.mml <-
       #***	      
       # AXsi[ is.na(AXsi) ] <- 0
       
-      # cat("calc_prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
+#cat("calc_prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
       
       # calculate student's prior distribution
       gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
                            nnodes=nnodes , ndim=ndim,YSD=YSD)
 
 						   
-      # cat("stud_prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						 
+# cat("stud_prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						 
+
       # calculate student's likelihood
       res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=gwt , resp=resp , nitems=nitems , 
                                    resp.ind.list=resp.ind.list , normalization=TRUE , 
                                    thetasamp.density=thetasamp.density , snodes=snodes ,
                                    resp.ind=resp.ind	)	
       hwt <- res.hwt[["hwt"]]   
-      # cat("calc_posterior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						 
+# cat("calc_posterior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						 
       
       
       if (progress){ cat("M Step Intercepts   |"); flush.console() }
@@ -494,14 +501,16 @@ tam.mml <-
       oldxsi <- xsi
       oldbeta <- beta
       oldvariance <- variance 
-      # cat("before mstep regression") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						           
+# cat("before mstep regression") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						           
+
       # M step: estimation of beta and variance
       resr <- mstep.regression( resp=resp , hwt=hwt , resp.ind=resp.ind , pweights=pweights , 
                                 pweightsM=pweightsM , Y=Y , theta=theta , theta2=theta2 , YYinv=YYinv , 
                                 ndim=ndim , nstud=nstud , beta.fixed=beta.fixed , variance=variance , 
                                 Variance.fixed=variance.fixed , group=group ,  G=G , snodes = snodes ,
                                 nomiss=nomiss )
-      # cat("mstep regression") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						       
+# cat("mstep regression") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						       
+
       beta <- resr$beta
       
       variance <- resr$variance	
@@ -518,16 +527,6 @@ tam.mml <-
       
       if (G == 1){
         diag(variance) <- diag(variance) + 10^(-10)
-		# diag(variance) <- diag(variance) + 10^(-3)
-		
-#		 diag(variance) <- diag(variance) + .0035
-# Revalpr("round(cov2cor(variance),4)")
-
-        #		if( det(variance) < 10^(-20) ){
-        #		  stop("\n variance is close to singular or zero. Estimation cannot proceed")
-        #@@ARb: I would not prefer to stop the program but adding a small
-        #       constant in the diagonal.
-        #				} 
       }
       
 	    
@@ -536,21 +535,6 @@ tam.mml <-
 			variance <- do.call( userfct.variance , list(variance ) )			
 				}
 	  
-
-	  
-      #     #---2PL---
-      #     #compute sufficient statistics for 2PL slope parameters
-      #     if (irtmodel %in% c("2PL","GPCM","GPCM.design","2PL.groups")) {
-      #       thetabar <- hwt%*%theta
-      #       cB_obs <- t(cResp*pweights)%*%(thetabar)
-      #       B_obs <- aperm(array(cB_obs,dim=c(maxK, nitems,ndim)),c(2,1,3))
-      #       if ( ! est.variance ){ 
-      # 		if ( G == 1 ){ variance <- cov2cor(variance)  } # fix variance at 1  
-      # 		if ( G > 1 ){ variance[ group == 1 ] <- 1 }     
-      # 				# fix variance of first group to 1
-      # 							}
-      #     }
-      #     #---end 2PL---
       
       if (max(abs(variance-oldvariance)) < conv) varConv <- TRUE
       
@@ -563,15 +547,20 @@ tam.mml <-
       while (!converge & ( Miter <= Msteps ) ) {	
         # xbar2 <- xxf <- xbar <- rep(0,np)
         # Only compute probabilities for items contributing to param p
+# z0 <- Sys.time()
+
         
         if (Miter > 1){ 
           res.p <- calc_prob.v5( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , 
                                  xsi=xsi , theta=theta , nnodes=nnodes, maxK=maxK)					
           rprobs <- res.p[["rprobs"]]            
         }
-        
+# cat("calc prob") ; z1 <- Sys.time(); print(z1-z0) ; z0 <- z1		
+
+	
         res <- calc_exp_TK3( rprobs , A , np , est.xsi.index , itemwt ,
-                             indexIP.no , indexIP.list2 )
+                             indexIP.no , indexIP.list2 , Avector )
+# cat("calc_exp") ; z1 <- Sys.time(); print(z1-z0) ; z0 <- z1									 
         xbar <- res$xbar
         xbar2 <- res$xbar2
         xxf <- res$xxf	
@@ -587,12 +576,6 @@ tam.mml <-
         increment <- ifelse( abs( increment) > abs(old_increment)  , 
                              increment/(2*ci) , 
                              increment )						
-        # Code from Margaret
-        #    	for (p in est.xsi.index ) {
-        #			 while (abs(increment[p]) > abs(old_increment[p])){
-        #				increment[p] <- increment[p] / 2.0  #damping the increment
-        #						}
-        #						}
         
         old_increment <- increment
         
@@ -602,7 +585,10 @@ tam.mml <-
         ##**	
         
         xsi <- xsi+increment   # update parameter p
-        #	est.xsi.index <- which( abs(increment) > convM )			  
+        #	est.xsi.index <- which( abs(increment) > convM )
+		
+# ask for est.xsi.index
+		
         if ( max(abs(increment)) < convM ) { converge <- TRUE }
         Miter <- Miter + 1						
         
@@ -616,10 +602,13 @@ tam.mml <-
           #        cat( paste( rep("-" , sum( mpr == p ) ) , collapse="" ) )
           cat("-") ;    flush.console()
         }
+# cat("rest") ; z1 <- Sys.time(); print(z1-z0) ; z0 <- z1	
+		
       } # end of all parameters loop
+
       
-      # cat("mstep item parameters") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						 	
-      
+# cat("mstep item parameters") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						 	
+
      
       #***
       # decrease increments in every iteration
@@ -695,12 +684,16 @@ tam.mml <-
         flush.console()
       }
       
-      # cat("rest") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
+# cat("rest") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
       
       
     } # end of EM loop
     #******************************************************
-a0 <- Sys.time()	
+	
+	
+	
+# stop()	
+# a0 <- Sys.time()	
     xsi.min.deviance -> xsi 
     beta.min.deviance -> beta
     variance.min.deviance -> variance	

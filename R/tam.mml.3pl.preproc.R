@@ -1,6 +1,7 @@
 ####################################################
 # create E matrix
-.mml.3pl.create.E <- function( resp , E , Q , gammaslope.des ){  
+.mml.3pl.create.E <- function( resp , E , Q , gammaslope.des ,
+		Q.fixed = NULL ){  
   if ( is.null(E) ){
 	maxKi <- apply( resp , 2 , max , na.rm=TRUE )
 	I <- ncol(resp)
@@ -40,10 +41,34 @@
 							}							
 							}
 							}
-					   }
-				}
+					   }  # end dd   					   					   
+				}  # end ii
 	  Qdes <- as.data.frame( Qdes[ 1:(vv-1) , ] )
 	  Ngam <- max( Qdes$gammapar )
+	  gammaslope.fixed <- NULL
+	  # fixed gammaslope parameters
+	  Qdes$gamma.fixed <- NA	  	  	  
+	  if ( ! is.null(Q.fixed) ){
+	      for (dd in 1:D){
+			# dd <- 1
+			Q1 <- Q.fixed[ , dd ]
+			ind.dd <- which( ! is.na( Q1) )
+			if ( length(ind.dd) > 0 ){
+			    I1 <- length(ind.dd)
+				for (ii in 1:I1){
+						i2 <- which( ( Qdes$item == ind.dd[ii] ) & 
+								  (	Qdes$dim == dd )	)
+						Qdes[i2,"gamma.fixed"] <- Q1[ ind.dd[ii] ]	
+								  }	
+								}  # end if len(ind.dd) > 0	  
+					} # end dd
+		  gam1 <- aggregate( Qdes$gamma.fixed , list(Qdes$gammapar) , mean )
+		  gam1 <- na.omit(gam1)
+		  gammaslope.fixed <- gam1[ , c(1,2) ]
+		  colnames(gammaslope.fixed) <- NULL
+				}  # end ! is.null(Q.fixed)
+
+
 	#****  
 	# c("gammapar" , "item" , "dim" , "category" , "Qval")
 	E <- array( 0 , dim=c(I,maxK , D , Ngam ) )
@@ -54,7 +79,8 @@
 				Qdes.ii$gammapar ] <- Qdes.ii$Qval
 					}
 			}
-	return(E)
+	res <- list(E=E , Qdes=Qdes , gammaslope.fixed=gammaslope.fixed )
+	return(res)
 	}
 ####################################################################	
 

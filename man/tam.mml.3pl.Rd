@@ -17,8 +17,8 @@ allowed which can be log-linearly smoothed.
 tam.mml.3pl(resp, Y = NULL, group = NULL, formulaY = NULL, dataY = NULL, ndim = 1, 
   pid = NULL, xsi.fixed = NULL, xsi.inits = NULL, xsi.prior = NULL, 
   beta.fixed = NULL, beta.inits = NULL, variance.fixed = NULL, variance.inits = NULL, 
-  est.variance = TRUE, A = NULL, notA=FALSE , Q = NULL, E = NULL,gammaslope.des = "2PL", 
-  gammaslope = NULL, gammaslope.fixed = NULL, 
+  est.variance = TRUE, A = NULL, notA=FALSE , Q = NULL, Q.fixed=NULL, E = NULL, 
+  gammaslope.des = "2PL", gammaslope = NULL, gammaslope.fixed = NULL, 
   est.some.slopes = TRUE, gammaslope.constr.V = NULL, gammaslope.constr.c = NULL,
   gammaslope.center.index=NULL ,  gammaslope.center.value=NULL , 
   gammaslope.prior = NULL, userfct.gammaslope = NULL , gammaslope.constr.Npars = 0 ,
@@ -108,6 +108,9 @@ tam.mml.3pl(resp, Y = NULL, group = NULL, formulaY = NULL, dataY = NULL, ndim = 
   An optional \eqn{I \times D} matrix (the Q-matrix) which specifies the 
   loading structure of items on dimensions.  
 }
+\item{Q.fixed}{Optional \eqn{I \times D} matrix of the same dimensions
+	like \code{Q}. Non \code{NA} entries contain values at which
+item loadings should be fixed to.}
   \item{E}{
 Optional design array for item slopes \eqn{\gamma}. It is a four 
 dimensional array of size \eqn{I \times (K+1) \times D \times N_\gamma}
@@ -908,7 +911,6 @@ LAVAAN MODEL:
 mod1t <- tamaan( tammodel , resp=dat )
 summary(mod1t)
 
-
 #############################################################################
 # EXAMPLE 9: Toy example: Exact representation of an item by a factor
 #############################################################################
@@ -939,6 +941,31 @@ summary(mod1)
 # -> the latent distribution corresponds to the manifest distribution, because ...
 round( mod1$pi.k , 3 )
 round( t1 / sum(t1) , 3 )
+
+#############################################################################
+# EXAMPLE 10: Some fixed item loadings
+#############################################################################
+
+data(data.Students,package="CDM") 
+dat <- data.Students
+# select variables
+vars <- scan( nlines=1 , what="character")
+    act1 act2 act3 act4 act5 sc1 sc2 sc3 sc4 
+dat <- data.Students[ , vars  ]
+
+# define loading matrix: two-dimensional model
+Q <- matrix( 0 , nrow=9 , ncol=2 )
+Q[1:5,1] <- 1
+Q[6:9,2] <- 1 
+# define some fixed item loadings
+Q.fixed <- NA*Q
+Q.fixed[ c(1,4) , 1] <- .5
+Q.fixed[ 6:7 , 2 ] <- 1
+
+# estimate model
+mod3 <- tam.mml.3pl( resp=dat , gammaslope.des = "2PL" , Q=Q , Q.fixed = Q.fixed ,
+            control=list( maxiter=10 , nodes = seq(-4,4,len=10) )  )
+summary(mod3)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

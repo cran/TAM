@@ -14,7 +14,9 @@
 	  nij <- N.ik
 	  Miter <- 1
 	  converge <- FALSE
-	  guess_old <- guess
+	  guess_old <- guess	 
+	  h <- .0001	
+
 	  
 	  while ( !converge & ( Miter <= Msteps ) ){		  
 	      res.p <- .mml.3pl.calc_prob.v5( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , 
@@ -23,14 +25,20 @@
           rprobs <- res.p[["rprobs"]]
           rprobs0 <- res.p$rprobs0
 		  pij <- rprobs[ , 2 , ]
-	      pij0 <- rprobs0[ , 2 , ]		  	  
+		  pij <- pij + eps
+	      pij0 <- rprobs0[ , 2 , ]		 
+		  guess <- ifelse( ( guess < h ) & ( est.guess != 0 ) , 4*h , guess )
+		  guess.logit <- qlogis( guess + eps)	  
 		  #****
 		  # derivatives guessing priors
 		  if ( ! is.null(guess.prior) ){
-			  h <- .0001	
 			  d0  <- log(dbeta( plogis(guess.logit) , guess.prior[,1] , guess.prior[,2] ) + eps)
 			  d0p <- log(dbeta( plogis(guess.logit+h), guess.prior[,1] , guess.prior[,2] ) + eps)
 			  d0m <- log(dbeta( plogis(guess.logit-h), guess.prior[,1] , guess.prior[,2] ) + eps)
+#			  d0  <- log(dbeta( guess , guess.prior[,1] , guess.prior[,2] ) + eps)
+#			  d0p <- log(dbeta( guess + h , guess.prior[,1] , guess.prior[,2] ) + eps)
+#			  d0m <- log(dbeta( guess - h, guess.prior[,1] , guess.prior[,2] ) + eps)
+
 			  d1 <- ( d0p - d0 ) / h
 			  d2 <- ( ( d0p - d0 ) - ( d0 - d0m ) ) / h^2		  		  		  
 								}
@@ -38,11 +46,17 @@
 		  # first derivative
 		  der1 <- rowSums( ( n1ij - pij * nij ) * guess / pij )		  
 		  # second derivative
-		  der2 <- rowSums( guess*(1-guess) * ( ( guess + pij0 ) / pij^2 * n1ij - nij ) )
+		  der2 <- rowSums( guess*(1-guess) * 
+						( ( guess + pij0 ) / pij^2 * n1ij - nij ) )
+
+				
 		  if ( ! is.null( guess.prior) ){	  
 				der1 <- der1 + d1
 				der2 <- der2 + d2 
 									}
+									
+									
+									
 		  # aggregation over group of parameters
 		  der1 <- aggregate( der1 , list( est.guess ) , sum )
 		  der2 <- aggregate( der2 , list( est.guess ) , sum )	  	  		  
@@ -53,8 +67,10 @@
 		  increment <- ifelse( abs( increment) > abs(old_increment)  , 
 								 increment/(2*ci) , increment )	  								 						 
 		  increment <- increment[ est.guess ]
-		  guess.logit[ ind.guess ] <- guess.logit[ind.guess ] + increment
-		  guess <- plogis( guess.logit)
+		 #  guess.logit[ ind.guess ] <- guess.logit[ind.guess ] + increment
+		   guess[ ind.guess ] <- guess[ind.guess ] + increment
+		  guess <- ifelse( ( guess < h ) & ( est.guess != 0 ) , 4*h , guess )
+#		   guess <- plogis( guess.logit)
 		  old_increment <- max(abs(increment))
 		  if ( old_increment < convM){ converge <- TRUE }
 		  Miter <- Miter + 1

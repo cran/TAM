@@ -27,12 +27,12 @@
 					
 	# include guessing	
 	rprobs0 <- rprobs
-	ind <- which(guess > 0 )
+	ind <- which(guess > 1E-6 )
 	if ( length(ind) > 0 ){
 		rprobs[ ind , 2 , ] <- guess[ind] + ( 1-guess[ind] ) * rprobs0[ind,2,]	
 		# include guessing here
 		rprobs[ ind , 1 , ] <- 1 - rprobs[ ind , 2 , ]
-							}
+							}						
     return(list("rprobs" = rprobs, "AXsi" = AXsi , "rprobs0"=rprobs0 ))
   }
 ##############################################################################

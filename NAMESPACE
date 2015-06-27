@@ -36,7 +36,8 @@ export(designMatrices, .A.matrix, designMatrices.mfr,
        IRT.drawPV,
        IRT.residuals ,
        msq.itemfitWLE ,
-       tam.Q3
+       tam.Q3 ,
+       IRT.informationCurves
        )
 
 
@@ -72,6 +73,7 @@ S3method(logLik, tam.latreg )
 S3method( plot , tam )
 S3method( plot , tam.mml )
 S3method( plot , tam.jml )
+S3method( plot , IRT.informationCurves )
 
 #### predict
 S3method(predict, tam.mml )
@@ -129,6 +131,12 @@ S3method(IRT.factor.scores, tam.mml )
 S3method(IRT.factor.scores, tam )
 S3method(IRT.factor.scores, tam.mml.3pl)
 S3method(IRT.factor.scores, tamaan )
+
+#### IRT.informationCurves
+S3method(IRT.informationCurves, tam.mml )
+S3method(IRT.informationCurves, tam.mml.2pl )
+S3method(IRT.informationCurves, tam.mml.3pl )
+S3method(IRT.informationCurves, tam.mml.mfr )
 
 
 #### IRT.irfprob

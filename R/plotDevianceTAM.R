@@ -17,7 +17,7 @@ plotDevianceTAM   <- function ( tam.obj , omitUntil = 1, reverse = TRUE ,
 						}
 		
         if(reverse)      {devChange <- -1 *  devChange }
-        devChange <- data.frame ( nr = 1:length(devChange), devChange)
+        devChange <- data.frame ( nr = omitUntil + 1:length(devChange), devChange)
 		xm        <- ceiling( max(devChange[,1])/10 )*10      
 		xt        <- NULL;	for ( i in c( 1:30 ) ) xt <- c ( xt , (xm/10) %% i == 0 )
 		xt        <- max ( which ( xt ) )                         

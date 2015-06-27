@@ -21,6 +21,17 @@ tamaanify.proc.items <- function( res , resp){
 	# res$maxcat <- max(maxK)
 	res$maxcat <- max( maxK[ names(maxK) %in% items0 ] )
 	
+	
+	#********************************
+	# items with guessing parameters
+	
+	l2 <- lavpartable[ lavpartable$op == "?=" , ]
+	if ( nrow(l2) > 0 ){
+		items <- res$items
+		items[ items$item %in% l2$lhs , "itemtype" ] <- "3PL"
+		res$items <- items
+						}
+								
 	# add all thresholds in lavaan parameter table
 	lavpartable$fullsyn <- paste0( lavpartable$lhs , lavpartable$op , lavpartable$rhs )	
 	lavpartable2 <- lavpartable		
@@ -72,5 +83,6 @@ tamaanify.proc.items <- function( res , resp){
 								}
 							}				
 	res$lavpartable <- lavpartable2
+	
 	return(res)	
 		}

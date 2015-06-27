@@ -600,6 +600,12 @@ tam.mml.mfr <-
     deviance.min <- 0
     itemwt.min <- 0
     
+	#*****
+	#@@@@ 2015-06-26
+	Avector <- as.vector(A)
+	Avector[ is.na(Avector) ] <- 0
+	#@@@@	
+	
     ##**SE
     se.xsi <- 0*xsi
     se.B <- 0*B
@@ -721,7 +727,7 @@ tam.mml.mfr <-
         # ==> Vector with start and end indices for item parameter estimation
         
         res <- calc_exp_TK3( rprobs , A , np , est.xsi.index , itemwt ,
-                             indexIP.no , indexIP.list2 )
+                             indexIP.no , indexIP.list2 , Avector )
         xbar <- res$xbar
         xbar2 <- res$xbar2
         xxf <- res$xxf
@@ -759,12 +765,14 @@ if (!choice1){
         
 #        w <- 1		
 #		old_increment <- w * abs(increment) + (1-w)*abs(old_increment)
+
 		
         xsi <- xsi+increment   # update parameter p
         
         # stabilizing the algorithm | ARb 2013-09-10
         if (fac.oldxsi > 0 ){
 		  fac.oldxsi1 <- (devch>0)*fac.oldxsi	  
+		  # fac.oldxsi1 <- fac.oldxsi
           xsi <-  (1-fac.oldxsi1) * xsi + fac.oldxsi1 *oldxsi
         }
         

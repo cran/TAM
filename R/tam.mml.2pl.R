@@ -409,6 +409,12 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 						
   #---end 2PL---
  
+	#*****
+	#@@@@ 2015-06-26
+	Avector <- as.vector(A)
+	Avector[ is.na(Avector) ] <- 0
+	#@@@@ 
+ 
   ##**SE
 	se.xsi <- 0*xsi
 	se.B <- 0*B 
@@ -565,7 +571,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 
 
 		res <- calc_exp_TK3( rprobs , A , np , est.xsi.index , itemwt ,
-			indexIP.no , indexIP.list2 )
+			indexIP.no , indexIP.list2 , Avector )
         xbar <- res$xbar
 		xbar2 <- res$xbar2
 		xxf <- res$xxf	      

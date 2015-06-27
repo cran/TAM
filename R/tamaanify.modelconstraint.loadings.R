@@ -2,7 +2,7 @@
 ##########################################################
 # model constraint loadings
 tamaanify.modelconstraints.loadings <- function(res){
-	mdfr <- res$MODELCONSTRAINT.dfr
+	mdfr <- res$MODELCONSTRAINT.dfr	
 	lav1 <- res$lavpartable
 	Q <- res$Q
 	#*** create further model constraints if there are equalities

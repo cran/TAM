@@ -237,7 +237,8 @@ coefficients
 \code{convM}: Convergence criterion for item parameters within each
 M step
 
-\code{Msteps}: Number of M steps for item parameter estimation
+\code{Msteps}: Number of M steps for item parameter estimation. 
+A high value of M steps could be helpful in cases of non-convergence.
 
 \code{maxiter}: Maximum number of iterations
 
@@ -494,6 +495,14 @@ the number of quasi Monte Carlo or stochastic nodes \code{snodes}
 
 In faceted models (\code{tam.mml.mfr}), parameters which cannot be estimated
 are fixed to \code{99}.
+
+Several choices can be made if your model does not converge. First, the number
+of iterations within a M step can be increased (\code{Msteps=10}).
+Second, the absolute value of increments can be forced with increasing
+iterations (set a value higher than 1 to \code{max.increment}, maybe 1.05).
+Third, change in estimated parameters can be stabilized by \code{fac.oldxsi} for
+which a value of 0 (the default) and a value of 1 can be chosen. We recommend
+value between .5 and .8 if your model does not converge.
 }
 
 %\section{Warning}{
@@ -1609,6 +1618,12 @@ mod15a <- tam.mml.mfr(resp = data[,-c(1:2)],facets=data[,"group",drop=FALSE],
 mod15b <- tam.mml.mfr(resp = data[,-c(1:2)],facets=data[,"group",drop=FALSE], 
             formulaA = ~ group*item , pid = data$pid ,
             control=list(maxiter= 50 , increment.factor=1.03 , fac.oldxsi=.4 ) )
+           
+#***
+# Model 15c: Alternatively, just choose more iterations in M-step by "Msteps=10"
+mod15c <- tam.mml.mfr(resp = data[,-c(1:2)],facets=data[,"group",drop=FALSE], 
+    formulaA = ~ item + group*item, pid = data$pid , 
+    control=list(maxiter=250 , Msteps=10))                
             
 #############################################################################
 # EXAMPLE 16: Differential item function for polytomous items and

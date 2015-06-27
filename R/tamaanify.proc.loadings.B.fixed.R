@@ -36,8 +36,14 @@ tamaanify.proc.loadings.B.fixed <- function(res){
 		if ( nrow(lav1) > 0 ){ 
 				res$est.variance <- TRUE
 						}		
-			}
-	  res$B.fixed <- B.fixed		
+			
+#	  colnames(B.fixed) <- c("item_index" , "cat" , "dim" , "value") 					
+#	  rownames(B.fixed) <- items[ B.fixed[,"item_index"] ]
+	  
+				}
+	  res$B.fixed <- B.fixed	
+	  
+	  
 	  return(res)
 				}
 #############################################################

@@ -115,6 +115,8 @@ BEGIN_RCPP
        
      int RR = XdesM.nrow() ;  
        
+     double eps10 = 1E-7;
+     
      // int PP = I * maxK * TP ;  
        
      Rcpp::NumericVector d1b(Nlam);  
@@ -147,14 +149,17 @@ BEGIN_RCPP
      	ll = XdesM(rr,3);  // gamma parameter ll    
      	  
      	//*** no guessing parameter  
-     	if ( guess[ii] == 0 ){	  
+     	if ( guess[ii] <= eps10 ){	  
      	  d1b[ll] += XdesM(rr,4) * ( nik[ii+I*hh+I*maxK*tt] -  
      	      probs[ii+I*hh+I*maxK*tt] * Nik[ ii+I*tt ] ) ;  
      	  		  } // end if guess[ii] = 0  
      	//*** with guessing parameter	  		    
-     	if ( guess[ii] > 0 ){  
+     	if ( guess[ii] > eps10 ){
+     	// only allow for hh==1 ??
+	if (hh==1 ){	
      	   d1b[ll] += XdesM(rr,4) * probs0[ii+I*hh+I*maxK*tt] / probs[ii+I*hh+I*maxK*tt] *   
-     	      ( nik[ii+I*hh+I*maxK*tt] - probs[ii+I*hh+I*maxK*tt] * Nik[ ii+I*tt ] ) ;	  		    
+     	      ( nik[ii+I*hh+I*maxK*tt] - probs[ii+I*hh+I*maxK*tt] * Nik[ ii+I*tt ] ) ;
+     	      		}
      		}  // end guess[ii] > 0  
      		  
      		}  
@@ -196,15 +201,18 @@ BEGIN_RCPP
         vv = ii + I*tt + I*TP*ll ;  
      //  t2 <- sum( Xdes[ , hh , , ll] * N.ik * probs[,hh,] *  
      //   ( Xdes[, hh , , ll ] - tmp1 ) )     
-       if ( guess[ii] == 0 ){	  
+       if ( guess[ii] <= eps10 ){	  
             d2b[ll] += XdesM(rr,4) * Nik[ii + I*tt ] * probs[ ii + I*hh + I*maxK*tt ] *   
        	              ( XdesM(rr,4) - tmp1[vv] ) ;  
        		}  // end if guess[ii] = 0  
        		  
-       if ( guess[ii] > 0 ){	  
+       if ( guess[ii] >= eps10 ){
+       	  if (hh==1){
+       	    // only allow for hh==1?   
             d2b[ll] += pow(XdesM(rr,4),2.0) * probs0[ ii + I*hh + I*maxK*tt ] *  
                     probs0[ ii + I*0 + I*maxK*tt ] * ( guess[ii] * nik[ii+I*hh+I*maxK*tt] /  
-                    	     pow( probs[ ii + I*hh + I*maxK*tt ] , 2.0) - Nik[ii + I*tt ] );  
+                    	     pow( probs[ ii + I*hh + I*maxK*tt ] , 2.0) - Nik[ii + I*tt ] );
+                   }
        		}  // end if guess[ii] > 0  		  
        		  
        		  

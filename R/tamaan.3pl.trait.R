@@ -12,6 +12,8 @@ tamaan.3pl.trait <- function( res0 , anal.list , con , ... ){
 		A <- res0$A
 		xsi.fixed <- res0$xsi.fixed
 				
+				
+				
 		res <- tam.mml.3pl(resp= res0$resp , 
 						E=res0$E , 
 						skillspace= res0$skillspace , 
@@ -23,6 +25,7 @@ tamaan.3pl.trait <- function( res0 , anal.list , con , ... ){
 						guess=res0$guess , 
 						est.guess=res0$est.guess , 		
 						guess.prior = res0$guess.prior , 
+						Q = res0$Q , Q.fixed = res0$Q.fixed , 
 						notA= notA , 
 						xsi.fixed=xsi.fixed , 
 						A = A , 

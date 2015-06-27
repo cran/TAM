@@ -122,6 +122,7 @@ syntax in \code{LAVAAN MODEL}}
 \item{method}{Used \pkg{TAM} function}
 \item{A}{Design matrix A}
 \item{Q}{Design matrix for loadings}
+\item{Q.fixed}{Fixed values in \eqn{Q} matrix}
 \item{B.fixed}{Matrix with fixed item loadings 
       (used for \code{tam.mml.2pl})}
 \item{L}{Processed design matrix for loadings when there 

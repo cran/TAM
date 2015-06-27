@@ -40,22 +40,25 @@ tamaanify <- function( tammodel , resp , tam.method=NULL , doparse=TRUE ){
 	# process analysis
 	res <- tamaanify.proc.analysis( res )
 # cat("**  analysis\n")
-	
+
+ 
 	#***************************
 	#***** extract lavaan model	
 	res <- tamaanify.proc.lavaanmodel(res , resp )	
 # cat("**  lavaanmodel\n")
- 
+
 	#*****************************
 	# item characteristics
 	res <- tamaanify.proc.items( res , resp)
-#  cat("**  items\n")	
+# Revalpr("res$lavpartable")
+
 	
 	#****************************
 	# item type
 	res <- tamaanify.proc.itemtype(  res )	
 # cat("**  itemtype\n")
-	
+
+
 	#*******************************************
 	# include model constraints	
 	res <- tamaanify.proc.modelconstraint(  res )	
@@ -89,7 +92,8 @@ tamaanify <- function( tammodel , resp , tam.method=NULL , doparse=TRUE ){
 	#*** model constraints loadings
 	res <- tamaanify.modelconstraints.loadings(res)
 # cat("** model constraint loadings\n")
-  
+
+ 
 	#*** variance fixings
 	res <- tamaanify.variance.fixed( res)
 # cat("**  variance fixed\n")
@@ -97,6 +101,7 @@ tamaanify <- function( tammodel , resp , tam.method=NULL , doparse=TRUE ){
 	#*** define design matrices for tam.mml.3pl method
 	res <- tamaanify.tam.mml.3pl.designMatrices(res)
 # cat("**  design Matrices\n")
+
  
     #*** delta design matrix
 	res <- tamaanify.tam.mml.3pl.deltadesign(res)

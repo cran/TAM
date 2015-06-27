@@ -11,6 +11,7 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
   ){
        
     s1 <- Sys.time()
+	CALL <- match.call()
     # display
     disp <- "....................................................\n"    
     increment.factor <- progress <- nodes <- snodes <- ridge <- xsi.start0 <- QMC <- NULL
@@ -479,7 +480,7 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
                  "ic" = ic , 
                  "deviance.history" = deviance.history ,
                  "control" = con1a ,    "iter" = iter ,
-                 "YSD"=YSD 
+                 "YSD"=YSD , CALL = CALL 
 
     )
     class(res) <- "tam.latreg"

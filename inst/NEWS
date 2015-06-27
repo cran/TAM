@@ -42,8 +42,34 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 
 
+
 -------------------------------------------------------
-Changes in Version 1.7   (2015-06-05)  --  CRAN 1.7-1
+CHANGES IN VERSION 1.8   (2015-06-26)  --  CRAN 1.8-0
+-------------------------------------------------------
+
+Features:
+* added S3 method 'IRT.informationCurves' for computing
+  item and test information curves (suggested by Ray Opao) 
+
+Bug fixes:
+* fixed a crucial bug in 'tam.mml.3pl' for mixed dichotomous 
+  and polytomous data occur and guessing parameters
+  are estimated (thanks to Matthias Trendtel)
+
+Notes:
+* added the argument 'Q.fixed' in 'tam.mml.3pl' for usage
+  of fixed item loadings
+* small speedup in M-step for datasets with large number of items
+
+Datasets included or modified:
+* ---
+
+Examples included or modified:
+* tam.mml (15c), tam.mml.3pl (10), IRT.informationCurves (1,2)
+
+
+-------------------------------------------------------
+CHANGES IN VERSION 1.7   (2015-06-05)  --  CRAN 1.7-1
 -------------------------------------------------------
 
 Features:
@@ -87,7 +113,7 @@ Examples included or modified:
 * IRT.residuals (1), msq.itemfit (1,2,3), tam.modelfit (4)
 
 -------------------------------------------------------
-Changes in Version 1.6   (2015-04-03)  --  CRAN 1.6-0
+CHANGES IN VERSION 1.6   (2015-04-03)  --  CRAN 1.6-0
 -------------------------------------------------------
 
 Features:
@@ -125,9 +151,8 @@ Datasets included or modified:
 Examples included or modified:
 * tam.mml (19, 20, 10a), IRT.drawPV (1), tamaan (1.9)
 
-
 -------------------------------------------------------
-Changes in Version 1.5   (2015-02-24)  --  CRAN 1.5-2
+CHANGES IN VERSION 1.5   (2015-02-24)  --  CRAN 1.5-2
 -------------------------------------------------------
 
 Features:
@@ -171,7 +196,7 @@ Examples included or modified:
   IRT.threshold (1,2)
 
 -------------------------------------------------------
-Changes in Version 1.4   (2015-01-15)  --  CRAN 1.4-1
+CHANGES IN VERSION 1.4   (2015-01-15)  --  CRAN 1.4-1
 -------------------------------------------------------
 
 Features:
@@ -211,7 +236,7 @@ Examples included or modified:
   IRT.WrightMap (1,2,3,4), data.cqc (1,2,3), lavaanify.IRT (6)
 
 -------------------------------------------------------
-Changes in Version 1.3   (2015-01-06)  --  CRAN 1.3
+CHANGES IN VERSION 1.3   (2015-01-06)  --  CRAN 1.3
 -------------------------------------------------------
 
 Features:
@@ -275,7 +300,7 @@ Examples included or modified:
   tam.latreg (1)
 
 -------------------------------------------------------
-Changes in Version 1.2   (2014-11-22)  --  CRAN 1.2
+CHANGES IN VERSION 1.2   (2014-11-22)  --  CRAN 1.2
 -------------------------------------------------------
 
 Features:
@@ -334,7 +359,7 @@ Examples included or modified:
   IRT.irfprob (1)
 
 -------------------------------------------------------
-Changes in Version 1.1   (2014-10-19)  --  CRAN 1.1
+CHANGES IN VERSION 1.1   (2014-10-19)  --  CRAN 1.1
 -------------------------------------------------------
 
 Features:
@@ -366,7 +391,7 @@ Examples included or modified:
 * tam.fit (4), tam.mml (17), tam.ctt (1)
 
 -------------------------------------------------------
-Changes in Version 1.0-3.18 (2014-09-08)  --  CRAN 1.0-3.18-1
+CHANGES IN VERSION 1.0-3.18 (2014-09-08)  --  CRAN 1.0-3.18-1
 -------------------------------------------------------
 
 Bug fixes:
@@ -380,7 +405,7 @@ Notes:
   calculation of fit statistics
 
 -------------------------------------------------------
-Changes in Version 1.0-3 (2014-06-27)  --  CRAN 1.0-3
+CHANGES IN VERSION 1.0-3 (2014-06-27)  --  CRAN 1.0-3
 -------------------------------------------------------
 
 Features:
@@ -443,7 +468,7 @@ Notes:
   tam.mml.2pl is "GPCM.design", theta value in tam.jml is "MLE in final step").
 
 -------------------------------------------------------
-Changes in Version 1.0-2 (2014-03-26)  --  CRAN 1.0-2   --  CRAN 1.0-2.1
+CHANGES IN VERSION 1.0-2 (2014-03-26)  --  CRAN 1.0-2   --  CRAN 1.0-2.1
 -------------------------------------------------------
 
 * fixed a Bug in the optional specification of a B matrix
@@ -460,7 +485,7 @@ Changes in Version 1.0-2 (2014-03-26)  --  CRAN 1.0-2   --  CRAN 1.0-2.1
   vector, one-column matrix or data.frame)
 
 -------------------------------------------------------
-Changes in Versions 1.0 (2014-02-02)  --  CRAN 1.0-0  --  CRAN 1.0-1
+CHANGES IN VERSION 1.0 (2014-02-02)  --  CRAN 1.0-0  --  CRAN 1.0-1
 -------------------------------------------------------
 
 * updated DESCRIPTION and NAMESPACE due to changes in Rcpp
@@ -473,7 +498,7 @@ Changes in Versions 1.0 (2014-02-02)  --  CRAN 1.0-0  --  CRAN 1.0-1
 * fixed some examples in .Rd files
 
 -------------------------------------------------------
-Changes in Versions 0.91/0.99 (2013-11-02)  --  CRAN 0.99-7
+CHANGES IN VERSION 0.91/0.99 (2013-11-02)  --  CRAN 0.99-7
 -------------------------------------------------------
 
 * added 'AXsi_' as value in tam.mml, tam.mml.2pl and tam.mml.mfr
@@ -491,7 +516,7 @@ Changes in Versions 0.91/0.99 (2013-11-02)  --  CRAN 0.99-7
 * included an example for creation of user-defined fit statistics
 
 -------------------------------------------------------
-Changes in Versions 0.9 (2013-10-13)  --  CRAN 0.99-9
+CHANGES IN VERSION 0.9 (2013-10-13)  --  CRAN 0.99-9
 -------------------------------------------------------
 
 * removed blanks in item category labels in tam.ctt2 and 
@@ -502,7 +527,7 @@ Changes in Versions 0.9 (2013-10-13)  --  CRAN 0.99-9
   (thanks to Jonathan Williams)
 
 -------------------------------------------------------
-Changes in Versions 0.8 (2013-10-02)  --  CRAN 0.8-19
+CHANGES IN VERSION 0.8 (2013-10-02)  --  CRAN 0.8-19
 -------------------------------------------------------
 
 * changed rating scale parametrization for unequal
@@ -514,7 +539,7 @@ Changes in Versions 0.8 (2013-10-02)  --  CRAN 0.8-19
 * included tam.ctt3
 
 -------------------------------------------------------
-Changes in Versions 0.7 (2013-09-15)  --  CRAN 0.7-35
+CHANGES IN VERSION 0.7 (2013-09-15)  --  CRAN 0.7-35
 -------------------------------------------------------
 
 * include crossprod in some functions
@@ -554,7 +579,7 @@ Changes in Versions 0.7 (2013-09-15)  --  CRAN 0.7-35
   the ConQuest 2.0 manual (see data.cqc.Rd)
 
 -------------------------------------------------------
-Changes in Versions 0.6 (2013-08-28)  --  CRAN 0.6-26
+CHANGES IN VERSION 0.6 (2013-08-28)  --  CRAN 0.6-26
 -------------------------------------------------------
 
 * fixed a bug when in latent regression when providing a formula
@@ -582,7 +607,7 @@ Changes in Versions 0.6 (2013-08-28)  --  CRAN 0.6-26
 * added a longitudinal data example in 'tam.mml' manual
 
 -------------------------------------------------------
-Changes in Versions 0.5 (2013-07-28)  --  CRAN 0.5-21
+CHANGES IN VERSION 0.5 (2013-07-28)  --  CRAN 0.5-21
 -------------------------------------------------------
 
 * included data.ex11 example dataset
@@ -599,7 +624,7 @@ Changes in Versions 0.5 (2013-07-28)  --  CRAN 0.5-21
 * included data.numeracy and data.timssAusTwn datasets
 
 -------------------------------------------------------
-Changes in Versions 0.4 (2013-07-01)  --  CRAN 0.04-43 
+CHANGES IN VERSION 0.4 (2013-07-01)  --  CRAN 0.04-43 
     [*** First CRAN Release ***]
 -------------------------------------------------------
 
@@ -622,7 +647,7 @@ Changes in Versions 0.4 (2013-07-01)  --  CRAN 0.04-43
   with differering numbers of item categories
 
 -------------------------------------------------------
-Changes in Versions 0.3 (2013-03-23)
+CHANGES IN VERSION 0.3 (2013-03-23)
 -------------------------------------------------------
 
 * cleaned Rd manual files a bit
@@ -634,7 +659,7 @@ Changes in Versions 0.3 (2013-03-23)
 * fixed a bug in WLE estimation in the multdimensional case
 
 -------------------------------------------------------
-Changes in Versions 0.2 (2013-02-20)
+CHANGES IN VERSION 0.2 (2013-02-20)
 -------------------------------------------------------
 
 * removed bugs in tam.pv for sampling plausible values
@@ -651,7 +676,7 @@ Changes in Versions 0.2 (2013-02-20)
   (thanks to Ulrich Schroeders and Steffen Brandt)
 
 -------------------------------------------------------
-Changes in Version 0.1-03 (2012-11-21)
+CHANGES IN VERSION 0.1-03 (2012-11-21)
 -------------------------------------------------------
 
 * 2PL calibration outsourced
