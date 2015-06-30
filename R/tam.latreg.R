@@ -267,7 +267,7 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
       
       # calculate student's prior distribution
       gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
-                           nnodes=nnodes , ndim=ndim,YSD=YSD)
+                           nnodes=nnodes , ndim=ndim,YSD=YSD, unidim_simplify=FALSE)
 	  # compute posterior	  
 	  hwt <- like * gwt
 	  res.hwt$rfx <- rowSums(hwt)

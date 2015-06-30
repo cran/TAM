@@ -54,7 +54,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
                convD = .001 ,conv = .0001 , convM = .0001 , Msteps = 4 ,            
                maxiter = 1000 , max.increment = 1 , 
 			   min.variance = .001 , progress = TRUE , ridge=0,seed=NULL,
-			   xsi.start0=FALSE , increment.factor=1 , fac.oldxsi=0)  	
+			   xsi.start0=FALSE , increment.factor=1 , fac.oldxsi=0 , acceleration="none" )  	
   con[ names(control) ] <- control  
   Lcon <- length(con)
   con1a <- con1 <- con ; 
@@ -64,7 +64,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   }
   if ( !is.null(con$seed)){ set.seed( con$seed )	 }
   fac.oldxsi <- max( 0 , min( c( fac.oldxsi , .95 ) ) )
-	
+  acceleration <- con$acceleration	
     resp <- as.matrix(resp)	
 	resp0 <- resp <- add.colnames.resp(resp)
   
@@ -413,14 +413,48 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 	#@@@@ 2015-06-26
 	Avector <- as.vector(A)
 	Avector[ is.na(Avector) ] <- 0
+	unidim_simplify <- TRUE
+	if (G > 1){ unidim_simplify <- FALSE }
+	YSD <- max( apply( Y , 2 , sd ) )
+	if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }		
+	if (  YSD){ unidim_simplify <- FALSE }		
 	#@@@@ 
  
+	#@@@@AAAA@@@@@
+	# xsi acceleration
+	xsi_acceleration <- list( "acceleration" = acceleration , "w" = .35 ,
+							"w_max" = .95 , 
+							parm_history = cbind( xsi, xsi , xsi ) ,
+							"beta_new" = 0 ,
+							"beta_old" = 0 
+						)
+							
+	# add B acceleration here					
+	Bl <- as.vector(B)
+	B_acceleration <- list( "acceleration" = acceleration , "w" = .35 ,
+							"w_max" = .95 , 
+							parm_history = cbind( Bl, Bl , Bl ) ,
+							"beta_new" = 0 ,
+							"beta_old" = 0 
+						)						
+	if (irtmodel == "GPCM.design" ){
+				B_acceleration$acceleration <- "none"
+								}	
+
+	v1 <- as.vector(variance)					
+	variance_acceleration <- list( "acceleration" = acceleration , "w" = .35 ,
+							"w_max" = .95 , 
+							parm_history = cbind( v1, v1 , v1) ,
+							"beta_new" = 0 ,
+							"beta_old" = 0 
+						)
+	if (G>1){  variance_acceleration$acceleration <- "none" }						
+	#@@@@AAAA@@@@@	
+  
   ##**SE
 	se.xsi <- 0*xsi
 	se.B <- 0*B 
 
-	YSD <- max( apply( Y , 2 , sd ) )
-	if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }
 
   		hwt.min <- 0
 		rprobs.min <- 0
@@ -470,7 +504,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 	
     # calculate student's prior distribution
     gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
-                         nnodes=nnodes , ndim=ndim,YSD=YSD)
+                         nnodes=nnodes , ndim=ndim,YSD=YSD , unidim_simplify)
 # cat("stud prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
 						 
     # calculate student's likelihood
@@ -550,7 +584,16 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 	  if ( ! is.null( userfct.variance ) ){  
 			variance <- do.call( userfct.variance , list(variance ) )			
 				}
-	
+
+
+        #@@@@AAAA@@@@@
+		# variance acceleration
+		if ( variance_acceleration$acceleration != "none" ){		
+			variance_acceleration <- accelerate_parameters( xsi_acceleration=variance_acceleration , 
+							xsi=as.vector(variance) , iter=iter , itermin=3)
+			variance <- matrix( variance_acceleration$parm , nrow= nrow(variance) , ncol=ncol(variance) )
+								}
+	    #@@@@AAAA@@@@@					
 	
 	if (max(abs(variance-oldvariance)) < conv) varConv <- TRUE
     
@@ -618,7 +661,16 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
           cat("-") ; flush.console()
       }
     } # end of all parameters loop
-
+  #******
+        #@@@@AAAA@@@@@
+		# acceleration
+		if ( xsi_acceleration$acceleration != "none" ){		
+			xsi_acceleration <- accelerate_parameters( xsi_acceleration=xsi_acceleration , 
+							xsi=xsi , iter=iter , itermin=3)
+			xsi <- xsi_acceleration$parm
+								}
+	    #@@@@AAAA@@@@@  
+  
 	
 # cat("M steps intercepts") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
     
@@ -640,6 +692,16 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 	
     #---end 2PL---
 
+        #@@@@AAAA@@@@@
+		# acceleration
+		if ( B_acceleration$acceleration != "none" ){		
+			B_acceleration <- accelerate_parameters( xsi_acceleration=B_acceleration , 
+							xsi=as.vector(B) , iter=iter , itermin=3)							
+			B <- array( B_acceleration$parm , dim(B) ) 
+								}
+	    #@@@@AAAA@@@@@  	
+	
+	
 # cat("M steps slopes") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
 	
 	#***

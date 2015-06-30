@@ -115,12 +115,12 @@ function( resp , irtmodel , dims=NULL , nfactors=NULL ,
 	
 	# oblimin rotation in expploratory factor analysis
 	if (irtmodel=="efa"){
-		res$efa.oblimin <- oblimin(B.stand )
+		res$efa.oblimin <- GPArotation::oblimin(B.stand )
 			# needs GPArotation package
 		# Schmid Leiman solution
 		corrmatr <- tcrossprod( B.stand )
 		diag(corrmatr) <- 1
-		sl.sol <- schmid(model=corrmatr , nfactors = nfactors )
+		sl.sol <- psych::schmid(model=corrmatr , nfactors = nfactors )
 		res$B.SL <- B.stand <- sl.sol$sl[ , seq(1,nfactors+1) ]		
 				}
 	res$itemvariance <- itemvariance

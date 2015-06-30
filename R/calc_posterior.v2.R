@@ -32,9 +32,9 @@ calc_posterior.v2 <-
 #***
 	
 	
- #cat("vor calcfx") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
+# cat("vor calcfx") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
     fx <- .Call("calcfx", fx, rprobs, resp.ind.list, resp)
- #cat("nach calcfx") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
+# cat("nach calcfx") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
 #Revalpr("head(fx0)")	
 	# logprobs
 #	eps <- 1E-10
@@ -52,7 +52,7 @@ calc_posterior.v2 <-
 		# fx <- fx + m1
 		}
 		
-# cat("nach calcfx") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1			
+# cat("nach calcfx (2)") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1			
     # numerical integration
     if ( snodes == 0 ){ 
 #      rfx <- rowSums(fx)
@@ -68,8 +68,7 @@ calc_posterior.v2 <-
 		 hwt <- fx / rfx 	
 			} else { hwt <- fx }
     }
-# print( rowSums(hwt))	
-#print( cbind( rfx , rowSums(hwt ))[1:100,] )
+
     res <-  list("hwt" = hwt , "rfx" = rfx )
     if ( snodes > 0 ){ 
 		

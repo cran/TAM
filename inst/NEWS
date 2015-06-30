@@ -42,6 +42,30 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 
 
+-------------------------------------------------------
+CHANGES IN VERSION 1.9   (2015-06-30)  --  CRAN 1.9-0
+-------------------------------------------------------
+
+Features:
+* included accelerators of the EM algorithm according to
+  Ramsay (1975) and Yu (2012). In the recent TAM package
+  version, no acceleration is used as an default.
+
+Bug fixes:
+* Fixed recently broken 'tam.mml.3pl' function when the
+  design matrix E is used.
+
+Notes:
+* small speedup for large samples of students in
+  unidimensional models
+
+Datasets included or modified:
+* ---
+
+Examples included or modified:
+* tam.mml (21,22)
+
+
 
 -------------------------------------------------------
 CHANGES IN VERSION 1.8   (2015-06-26)  --  CRAN 1.8-0

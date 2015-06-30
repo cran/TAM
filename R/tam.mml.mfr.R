@@ -54,7 +54,7 @@ tam.mml.mfr <-
                  convD = .001 ,conv = .0001 , convM = .0001 , Msteps = 4 ,            
                  maxiter = 1000 , max.increment = 1 , 
                  min.variance = .001 , progress = TRUE , ridge=0,seed= NULL ,
-                 xsi.start0= 0 , increment.factor=1 , fac.oldxsi=0)  	
+                 xsi.start0= 0 , increment.factor=1 , fac.oldxsi=0 , acceleration="none")  	
     con[ names(control) ] <- control  
     Lcon <- length(con)
     con1a <- con1 <- con ; 
@@ -63,6 +63,8 @@ tam.mml.mfr <-
       assign( names(con)[cc] , con1[[cc]] , envir = e1 ) 
     }
     if ( !is.null(con$seed)){ set.seed( con$seed )	 }
+	acceleration <- con$acceleration
+	
     #***
     fac.oldxsi <- max( 0 , min( c( fac.oldxsi , .95 ) ) )
     
@@ -179,12 +181,6 @@ tam.mml.mfr <-
         PP[,pos] <- unlist( lapply( person.ids , FUN = function( vv){ vv[pos] } ) )
       }
 
-      #print(PP[1:5,])
-# iii <- c(206,207,208,212,213)
-# Revalpr("PP[iii,]")	  
-# Revalpr( "gresp.noStep[  iii , ] ")
-# Revalpr("facets[ iii , ]" )
-# Revalpr(" resp[ iii , ]" )
      
 #     cat("*** multiple persons lapply function" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
       gresp0 <- matrix( NA , nrow=NP , ncol= ncol(gresp) )
@@ -604,7 +600,31 @@ tam.mml.mfr <-
 	#@@@@ 2015-06-26
 	Avector <- as.vector(A)
 	Avector[ is.na(Avector) ] <- 0
+	unidim_simplify <- TRUE
+    YSD <- max( apply( Y , 2 , sd ) )
+    if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }		
+	if (G > 1){ unidim_simplify <- FALSE }
+	if ( YSD){ unidim_simplify <- FALSE }	
 	#@@@@	
+	
+	#@@@@AAAA@@@@@
+	# xsi acceleration
+	xsi_acceleration <- list( "acceleration" = acceleration , "w" = .35 ,
+							"w_max" = .95 , 
+							parm_history = cbind( xsi, xsi , xsi ) ,
+							"beta_new" = 0 ,
+							"beta_old" = 0 
+						)
+
+	v1 <- as.vector(variance)					
+	variance_acceleration <- list( "acceleration" = acceleration , "w" = .35 ,
+							"w_max" = .95 , 
+							parm_history = cbind( v1, v1 , v1) ,
+							"beta_new" = 0 ,
+							"beta_old" = 0 
+						)
+	if (G>1){  variance_acceleration$acceleration <- "none" }						
+	#@@@@AAAA@@@@@						
 	
     ##**SE
     se.xsi <- 0*xsi
@@ -612,8 +632,7 @@ tam.mml.mfr <-
     se.xsi.min <- se.xsi
     se.B.min <- se.B
     
-    YSD <- max( apply( Y , 2 , sd ) )
-    if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }
+
     
     devch <- 0
     
@@ -623,6 +642,8 @@ tam.mml.mfr <-
 # cat("rest  " ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1								 
 
    
+    ##############################################################   
+    ##############################################################   
     ##############################################################   
     #Start EM loop here
     while ( ( (!betaConv | !varConv)  | ((a1 > conv) | (a4 > conv) | (a02 > convD)) )  & 
@@ -655,7 +676,7 @@ tam.mml.mfr <-
       AXsi <- res[["AXsi"]]
       # calculate student's prior distribution
       gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
-                           nnodes=nnodes , ndim=ndim,YSD=YSD)
+                           nnodes=nnodes , ndim=ndim,YSD=YSD , unidim_simplify)
       #print( head(gwt))						   
       
       # calculate student's likelihood
@@ -702,6 +723,16 @@ tam.mml.mfr <-
         #       constant in the diagonal.
         #				} 
       }
+	  
+        #@@@@AAAA@@@@@
+		# variance acceleration
+		if ( variance_acceleration$acceleration != "none" ){		
+			variance_acceleration <- accelerate_parameters( xsi_acceleration=variance_acceleration , 
+							xsi=as.vector(variance) , iter=iter , itermin=3)
+			variance <- matrix( variance_acceleration$parm , nrow= nrow(variance) , ncol=ncol(variance) )
+								}
+	    #@@@@AAAA@@@@@		  	  
+	  
       if (max(abs(variance-oldvariance)) < conv){ varConv <- TRUE      }
       ######################################
       #M-step item parameters
@@ -760,9 +791,7 @@ if (!choice1){
 #				old_increment <- max( abs(increment) )				
 			}	
         #****
-        
-
-        
+               
 #        w <- 1		
 #		old_increment <- w * abs(increment) + (1-w)*abs(old_increment)
 
@@ -796,6 +825,15 @@ if (!choice1){
       } # end of all parameters loop
       
       
+        #@@@@AAAA@@@@@
+		# acceleration
+		if ( xsi_acceleration$acceleration != "none" ){		
+			xsi_acceleration <- accelerate_parameters( xsi_acceleration=xsi_acceleration , 
+							xsi=xsi , iter=iter , itermin=3)
+			xsi <- xsi_acceleration$parm
+								}
+	    #@@@@AAAA@@@@@	  
+	  
       #***
       # decrease increments in every iteration
       if( increment.factor > 1){max.increment <-  1 / increment.factor^iter }	  

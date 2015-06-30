@@ -214,7 +214,7 @@ if a \code{userfct.variance} is provided.}
     \code{        maxiter = 1000 , max.increment = 1 , }\cr
     \code{        min.variance = .001 , progress = TRUE , ridge=0 ,    }\cr
     \code{        seed = NULL , xsi.start0=0, , increment.factor=1 ,  }\cr
-    \code{        fac.oldxsi=0 )  }\cr
+    \code{        fac.oldxsi=0 , acceleration = "none")  }\cr
     
 \code{nodes}: the discretized \eqn{\theta} nodes for numerical integration 
 
@@ -239,6 +239,8 @@ M step
 
 \code{Msteps}: Number of M steps for item parameter estimation. 
 A high value of M steps could be helpful in cases of non-convergence.
+In \code{tam.mml}, \code{tam.mml.2pl} and \code{tam.mml.mfr}, the default is
+set to 4, in \code{tam.mml.3pl} it is set to 10.
 
 \code{maxiter}: Maximum number of iterations
 
@@ -278,8 +280,14 @@ parameter value of iteration \eqn{t-1}, then the modified parameter value
 is defined as \eqn{ \xi_t^* = (1-f) \cdot \xi_t + f \cdot \xi_{t-1}}.
 Especially in cases where the deviance increases, setting the parameter
 larger than 0 (maybe .4 or .5) is helpful in stabilizing the algorithm
-(see Example 15). \cr
+(see Example 15). 
+
+\code{acceleration}: String indicating whether convergence acceleration of
+the EM algorithm should be employed. Options are \code{"none"} (no acceleration,
+the default), the monoton overrelaxation method of \code{"Yu"} (Yu, 2012) and
+\code{"Ramsay"} for the Ramsay (1975) acceleration method. \cr
         
+
 }
 \item{delete.red.items}{An optional logical indicating whether redundant
 	generalized items (with no observations) should be eliminated.
@@ -476,6 +484,12 @@ Psychometric issues and models. \emph{Psychometrika}, \bold{64}, 407-433.
 Pan, J., & Thompson, R. (2007). Quasi-Monte Carlo estimation in
 generalized linear mixed models. \emph{Computational Statistics &
 Data Analysis}, \bold{51}, 5765-5775.
+
+Ramsay, J. O. (1975). Solving implicit equations in psychometric data analysis. 
+\emph{Psychometrika}, \bold{40(3)}, 337-360.
+
+Yu, Y. (2012). Monotonically overrelaxed EM algorithms. 
+\emph{Journal of Computational and Graphical Statistics}, \bold{21(2)}, 518-537.
 
 Wu, M. L., Adams, R. J., Wilson, M. R. & Haldane, S. (2007).
 \emph{ACER ConQuest Version 2.0}. Mulgrave.
@@ -1919,6 +1933,43 @@ B[1,,]
 #-- test run
 mod1 <- tam.mml( resp , B = B , control=list( snodes=1000 , maxiter=5)  )
 summary(mod1)
+
+#############################################################################
+# EXAMPLE 21: Acceleration of EM algorithm | dichotomous data   
+#############################################################################
+
+N <- 1000      # number of persons
+I <- 100       # number of items
+set.seed(987)
+# simulate data according to the Rasch model
+dat <- sirt::sim.raschtype( rnorm(N)  , b = seq(-2,2,len=I)  )
+# estimate models
+mod1n <- tam.mml( resp=dat , control=list( acceleration="none") )  # no acceler.
+mod1y <- tam.mml( resp=dat , control=list( acceleration="Yu") )  # Yu acceler.
+mod1r <- tam.mml( resp=dat , control=list( acceleration="Ramsay") )  # Ramsay acceler.
+# compare number of iterations
+mod1n$iter ; mod1y$iter ; mod1r$iter
+# log-likelihood values
+logLik(mod1n); logLik(mod1y) ; logLik(mod1r)
+
+#############################################################################
+# EXAMPLE 22: Acceleration of EM algorithm | polytomous data   
+#############################################################################
+
+data(data.gpcm)
+dat <- data.gpcm
+
+# no acceleration
+mod1n <- tam.mml.2pl( resp= dat , irtmodel="GPCM" , 
+                control=list( conv=1E-4 , acceleration="none") )
+# Yu acceleration
+mod1y <- tam.mml.2pl( resp= dat , irtmodel="GPCM" , 
+                control=list( conv=1E-4 , acceleration="Yu") )
+# Ramsay acceleration
+mod1r <- tam.mml.2pl( resp= dat , irtmodel="GPCM" , 
+                control=list( conv=1E-4 , acceleration="Ramsay") )
+# number of iterations
+mod1n$iter ; mod1y$iter ; mod1r$iter
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

@@ -64,7 +64,8 @@ tam.mml.se <-
     # compute likelihood
     # prior distribution for each student (normal density)
     res0a <- stud_prior.v2( theta=theta , Y=Y , beta=beta , variance=variance , 
-                            nstud=nstud , nnodes=nnodes , ndim=ndim , YSD=YSD )
+                            nstud=nstud , nnodes=nnodes , ndim=ndim , YSD=YSD ,
+							unidim_simplify=FALSE )
     
     ll <- matrix( 0 , nrow=nstud , ncol=3 )	
     vv <- 1
@@ -220,7 +221,8 @@ tam.mml.se <-
           # compute likelihood
           # prior distribution for each student (normal density)
           res0a <- stud_prior.v2( theta=theta , Y=Y , beta=beta0 , variance=variance , 
-                                  nstud=nstud , nnodes=nnodes , ndim=ndim, YSD=YSD )
+                                  nstud=nstud , nnodes=nnodes , ndim=ndim, YSD=YSD ,
+								  unidim_simplify=FALSE  )
           # calculate probabilities
           res0 <- calc_prob.v5( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , 
                                 xsi=xsi , theta=theta , nnodes=nnodes, maxK=maxK )

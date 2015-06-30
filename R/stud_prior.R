@@ -5,12 +5,20 @@
 #############################################################
 stud_prior.v2 <-
   function(theta , Y , beta , variance , nstud , 
-           nnodes , ndim , YSD ){
+           nnodes , ndim , YSD , unidim_simplify){	      
+# unidim_simplify <- FALSE		   
     if(ndim == 1) {
       ##################################
       # SINGLE DIMENSION
-      gwt <- matrix(dnorm(rep(theta, each = nstud), mean= Y%*%beta, sd = sqrt(variance)),
+	if ( ! unidim_simplify  ){	  
+		gwt <- matrix(dnorm(rep(theta, each = nstud), mean= Y%*%beta, sd = sqrt(variance)),
                     nrow = nstud)
+						} else {
+	  TP <- nrow(theta)				
+      gwt <- matrix(   dnorm(theta[,1] , mean= 0, sd = sqrt(variance[1,1])),  
+							nrow = nstud , ncol=TP , byrow=TRUE)					
+								}
+	  
     } else {
       ###################################
       # MULTIPLE DIMENSIONS
@@ -42,21 +50,7 @@ stud_prior.v2 <-
       gwt <- matrix( 0 , nrow=nstud , ncol=nnodes )  
 	  
 
-	  
-      ###*****
-	  ### ARb 2013-08-27
-	  ### different calculations depend if there are
-	  ### person-specific predictors or not  
-# a0 <- Sys.time()
-# manuell <- TRUE
-#if ( manuell ){
-#      for ( qq in 1:nnodes ) {
-#        x1 <- - mu + theta[rep(qq,nstud),]  #x has dimension nstud#
-#        x <- matrix( rowSums( (x1%*%varInverse) * x1 ) , ncol= 1)
-#        gwt[,qq] <- coeff*exp(-0.5*x) 		
-#					}
-# gwt0 <- gwt
-#						}						
+					
 						
 #  cat(" * prior Ysd") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
     if ( YSD ){

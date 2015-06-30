@@ -125,7 +125,7 @@ a0 <- Sys.time()
 
 		# calculate student's prior distribution    	
 		gwt <- stud_prior.v2( theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
-                          nnodes=nnodes , ndim=ndim , YSD=YSD)
+                          nnodes=nnodes , ndim=ndim , YSD=YSD , unidim_simplify=FALSE)
 # cat("stud prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							  
    
    

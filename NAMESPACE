@@ -1,4 +1,51 @@
+
 useDynLib(TAM)
+
+
+######################################################
+############### IMPORTS ##############################
+
+
+
+#***************************************************
+#*************** R Basics / Linking To *************
+
+import(graphics)
+importFrom(Rcpp, evalCpp)
+import(stats)
+importFrom(utils, flush.console)
+importFrom(utils, packageDescription)
+importFrom(utils, sessionInfo)
+
+
+
+#***************************************************
+#************** Depends ****************************
+
+import(CDM)
+import(MASS)
+
+
+
+#***************************************************
+#************** Imports ****************************
+
+importFrom(GPArotation, oblimin)
+import(lavaan)
+importFrom(lattice, xyplot)
+importFrom(msm, dtnorm)
+importFrom(msm, rtnorm)
+importFrom(mvtnorm, dmvnorm)
+importFrom(mvtnorm, pmvnorm)
+importFrom(mvtnorm, rmvnorm)
+importFrom(plyr, ldply)
+importFrom(psych, schmid)
+importFrom(sfsmisc, QUnif)
+import(tensor)
+importFrom(WrightMap, wrightMap)
+
+
+
 
 ########################################################
 ################  EXPORTS ##############################
@@ -75,10 +122,12 @@ S3method( plot , tam.mml )
 S3method( plot , tam.jml )
 S3method( plot , IRT.informationCurves )
 
+
 #### predict
 S3method(predict, tam.mml )
 S3method(predict, tam.mml.3pl )
 S3method(predict, tamaan )
+
 
 #### print
 S3method(print, IRT.threshold)
@@ -132,6 +181,7 @@ S3method(IRT.factor.scores, tam )
 S3method(IRT.factor.scores, tam.mml.3pl)
 S3method(IRT.factor.scores, tamaan )
 
+
 #### IRT.informationCurves
 S3method(IRT.informationCurves, tam.mml )
 S3method(IRT.informationCurves, tam.mml.2pl )
@@ -172,29 +222,10 @@ S3method(IRT.residuals, tam.mml )
 S3method(IRT.residuals, tam.mml.2pl )
 S3method(IRT.residuals, tam.mml.mfr )
 
+
 #### IRT.WrightMap
 S3method(IRT.WrightMap, tam.mml )
 S3method(IRT.WrightMap, tamaan)
 S3method(IRT.WrightMap, IRT.threshold)
 
 
-
-######################################################
-############### IMPORTS ##############################
-
-import(mvtnorm)
-import(tensor)
-import(MASS)
-import(GPArotation)
-importFrom( sfsmisc , QUnif  )
-importFrom( psych , schmid )
-importFrom( Rcpp , evalCpp )
-import(CDM)
-import(lattice)
-import(mirt)
-import(lavaan)
-importFrom(utils,packageDescription)
-importFrom(msm,dtnorm)
-importFrom(msm,rtnorm)
-importFrom(WrightMap,wrightMap)
-importFrom(plyr,ldply)

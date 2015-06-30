@@ -103,11 +103,11 @@ tam.mml.3pl <-
     # attach control elements
     e1 <- environment()
     con <- list( nodes = seq(-6,6,len=21) , snodes = 0 ,QMC=TRUE,
-                 convD = .001 ,conv = .0001 , convM = .0001 , Msteps = 4 ,            
+                 convD = .001 ,conv = .0001 , convM = .0001 , Msteps = 10 ,            
                  maxiter = 1000 , max.increment = 1 , 
                  min.variance = .001 , progress = TRUE , ridge=0,seed=NULL,
                  xsi.start0=FALSE , increment.factor=1 , fac.oldxsi=0 ,
-				 maxgamma = 9.99 )  	
+				 maxgamma = 9.99 , acceleration="none" )  	
     con[ names(control) ] <- control  
     Lcon <- length(con)
     con1a <- con1 <- con ; 
@@ -117,7 +117,7 @@ tam.mml.3pl <-
     }
     if ( !is.null(con$seed)){ set.seed( con$seed )	 }
     fac.oldxsi <- max( 0 , min( c( fac.oldxsi , .95 ) ) )
-    
+    acceleration <- con$acceleration
 	
     
     if (progress){ 
@@ -537,6 +537,58 @@ tam.mml.3pl <-
     
     YSD <- max( apply( Y , 2 , sd ) )
     if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }
+
+	#*****
+	#@@@@ speed gains, further auxiliary objects, 2015-06-26
+	Avector <- as.vector(A)
+	Avector[ is.na(Avector) ] <- 0
+	unidim_simplify <- TRUE
+	if (G > 1){ unidim_simplify <- FALSE }
+	if ( YSD){ unidim_simplify <- FALSE }	
+	#@@@@
+
+	#@@@@AAAA@@@@@
+	# acceleration
+	xsi_acceleration <- list( "acceleration" = acceleration , "w" = .35 ,
+							"w_max" = .95 , 
+							parm_history = cbind( xsi, xsi , xsi ) ,
+							"beta_new" = 0 ,
+							"beta_old" = 0 
+						)
+	v1 <- as.vector(variance)					
+	variance_acceleration <- list( "acceleration" = acceleration , "w" = .35 ,
+							"w_max" = .95 , 
+							parm_history = cbind( v1, v1 , v1) ,
+							"beta_new" = 0 ,
+							"beta_old" = 0 
+						)
+	if (G>1){  variance_acceleration$acceleration <- "none" }						
+	gammaslope_acceleration <- list( "acceleration" = acceleration , "w" = .35 ,
+							"w_max" = .95 , 
+							parm_history = cbind( gammaslope, gammaslope , gammaslope) ,
+							"beta_new" = 0 ,
+							"beta_old" = 0 
+						)
+	d1 <- as.vector(delta)	
+	delta_acceleration <- list( "acceleration" = acceleration , "w" = .35 ,
+							"w_max" = .95 , 
+							parm_history = cbind( d1, d1 , d1) ,
+							"beta_new" = 0 ,
+							"beta_old" = 0 
+						)
+    v1 <- qlogis( guess + 1E-4 )
+    ind.guess <- which( est.guess > 0 )	
+	guess_acceleration <- list( "acceleration" = acceleration , "w" = .35 ,
+							"w_max" = .95 , 
+							parm_history = cbind( v1, v1 , v1 ) ,
+							"beta_new" = 0 ,
+							"beta_old" = 0 ,
+							"ind_guess" = ind.guess
+						)							
+	#@@@@AAAA@@@@@		
+	
+	
+	
     
     hwt.min <- 0
     rprobs.min <- 0
@@ -567,7 +619,14 @@ tam.mml.3pl <-
 						}
 					}
 
-
+	#*****
+	#@@@@ speed gains, further auxiliary objects, 2015-06-26
+	# Avector <- as.vector(A)
+	# Avector[ is.na(Avector) ] <- 0
+	unidim_simplify <- TRUE
+	if (G > 1){ unidim_simplify <- FALSE }
+	if ( YSD){ unidim_simplify <- FALSE }
+	#@@@@
 								
 	##############################################################
 	##############################################################
@@ -615,7 +674,7 @@ a0 <- Sys.time()
 	  if (skillspace == "normal" ){	  	 	# normal distribution
 		  gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , 
 					variance=variance , nstud=nstud , 
-					nnodes=nnodes , ndim=ndim,YSD=YSD)
+					nnodes=nnodes , ndim=ndim,YSD=YSD , unidim_simplify)
 						   							   
 		 if ( snodes == 0 ){
 			gwt <- gwt / rowSums( gwt ) 
@@ -688,7 +747,9 @@ a0 <- Sys.time()
 		  }
 		  if (max(abs(variance-oldvariance)) < conv) varConv <- TRUE	  
 			}  # end skillspace == "normal"
-	
+		#******************************************
+		
+		
 		#******************************************
 		# skill space estimation non-normal distribution	
 		if ( skillspace != "normal" ){
@@ -706,6 +767,16 @@ a0 <- Sys.time()
 			pi.k <- res$pi.k
 			delta <- res$delta	
 			covdelta <- res$covdelta
+			
+        #@@@@AAAA@@@@@
+		# acceleration
+		if ( delta_acceleration$acceleration != "none" ){		
+			delta_acceleration <- accelerate_parameters( xsi_acceleration=delta_acceleration , 
+							xsi=delta , iter=iter , itermin=3)
+			delta <- matrix( delta_acceleration$parm , nrow=nrow(delta) , ncol=ncol(delta) )
+								}
+	    #@@@@AAAA@@@@@	  			
+			
 			varConv <- TRUE
 			betaConv <- TRUE			
 									}
@@ -749,6 +820,15 @@ a0 <- Sys.time()
 	  xsi <- res$xsi
 	  se.xsi <- res$se.xsi
       
+        #@@@@AAAA@@@@@
+		# acceleration
+		if ( xsi_acceleration$acceleration != "none" ){		
+			xsi_acceleration <- accelerate_parameters( xsi_acceleration=xsi_acceleration , 
+							xsi=xsi , iter=iter , itermin=3)
+			xsi <- xsi_acceleration$parm
+								}
+	    #@@@@AAAA@@@@@	  
+	  
 # cat("M steps intercepts") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
 
       ###############################################
@@ -779,6 +859,16 @@ a0 <- Sys.time()
 #				B <- .mml.3pl.computeB( E , gammaslope )		
 					}	  		  
 		  gammaslope <- fac.oldxsi	* oldgamma + ( 1 - fac.oldxsi)*gammaslope		
+
+        #@@@@AAAA@@@@@
+		# acceleration
+		if ( gammaslope_acceleration$acceleration != "none" ){		
+			gammaslope_acceleration <- accelerate_parameters( xsi_acceleration=gammaslope_acceleration , 
+							xsi=gammaslope , iter=iter , itermin=3)
+			gammaslope <- gammaslope_acceleration$parm
+								}
+	    #@@@@AAAA@@@@@			  
+		  
 		  # B <- .mml.3pl.computeB( E , gammaslope )	  
 		  B <- .mml.3pl.computeB.v2( Edes , gammaslope , E )		  
 		  
@@ -787,12 +877,26 @@ a0 <- Sys.time()
 	  #*********************
 	  # 3PL estimation
 	  if ( est.some.guess ){
+	      oldguess <- guess
 		  res <- .mml.3pl.est.guessing( guess , Msteps , convM , 
 						nitems , A , AXsi , B, xsi , theta , nnodes , maxK ,
 						n.ik , N.ik , est.guess ,  old.increment.guess ,
 						guess.prior  , progress	)	  
-		  guess <- res$guess
+		  guess <- res$guess		  		  		  
 		  guess.change <- res$guess.change
+		  
+        #@@@@AAAA@@@@@
+		# acceleration
+		if ( guess_acceleration$acceleration != "none" ){		
+			guess_acceleration <- accelerate_parameters( xsi_acceleration=guess_acceleration , 
+							xsi= qlogis(guess+1E-5) , iter=iter , itermin=3)
+			guess <- plogis( guess_acceleration$parm )
+			# guess[ guess < 0 ] <- 1E-5
+			guess.change <- max( abs(guess - oldguess))
+								}
+	    #@@@@AAAA@@@@@	
+		
+		  
 #		  old.increment.guess <- guess.change
 					}
 # cat("M steps slopes") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		

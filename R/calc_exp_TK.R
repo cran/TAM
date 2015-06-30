@@ -53,6 +53,7 @@ calc_exp_TK3 <- function( rprobs , A , np , est.xsi.index , itemwt ,
 # 	AL1 <- .Call("redefine_vector_na" , AL1 , 0 , package="TAM")
     AL1 <- Avector
 	rprobsL1 <- .Call("redefine_vector_na" , rprobsL1, 0 , package="TAM")
+
 # cat("  *** preproc (miss) Cpp vector ") ; z1 <- Sys.time(); print(z1-z0) ; z0 <- z1			
 	res <- .Call( "TAM_CALCEXP2" , np , rprobsL1 , AL1 ,	indexIP.no , 
 			indexIP.list2 , est.xsi.index , CC , itemwt , NI*CC , TP , PACKAGE="TAM" )

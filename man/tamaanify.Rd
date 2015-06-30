@@ -53,7 +53,7 @@ mixture distribution models (\code{"MIXTURE"}; e.g. von Davier, 2007). \cr
 \code{LAVAAN MODEL:} \cr
 For specification of the syntax, see \code{\link{lavaanify.IRT}}. \cr
 
-\code{MODEL CONSTRAINTS:} \cr
+\code{MODEL CONSTRAINT:} \cr
 Linear constraints can be specified by using conventional
 specification in \R syntax. All terms must be combined
 with the \code{+} operator. Equality constraints are

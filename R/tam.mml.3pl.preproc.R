@@ -2,6 +2,8 @@
 # create E matrix
 .mml.3pl.create.E <- function( resp , E , Q , gammaslope.des ,
 		Q.fixed = NULL ){  
+  Qdes <- NULL		
+  gammaslope.fixed <- NULL
   if ( is.null(E) ){
 	maxKi <- apply( resp , 2 , max , na.rm=TRUE )
 	I <- ncol(resp)
@@ -17,7 +19,7 @@
     ng <- 1
 	kk <- 1
     vv <- 1	
-	Qdes <- matrix( 0 , nrow=maxK*I*D , ncol=5 )
+	Qdes <- matrix( 0 , nrow=maxK*I*D , ncol=5 )	
 	colnames(Qdes) <- c("gammapar" , "item" , "dim" , "category" , "Qval")
 	for (ii in 1:I){
 		for (dd in 1:D){
