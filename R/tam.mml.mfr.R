@@ -54,7 +54,8 @@ tam.mml.mfr <-
                  convD = .001 ,conv = .0001 , convM = .0001 , Msteps = 4 ,            
                  maxiter = 1000 , max.increment = 1 , 
                  min.variance = .001 , progress = TRUE , ridge=0,seed= NULL ,
-                 xsi.start0= 0 , increment.factor=1 , fac.oldxsi=0 , acceleration="none")  	
+                 xsi.start0= 0 , increment.factor=1 , fac.oldxsi=0 , acceleration="none" ,
+				 dev_crit = "absolute"  )  	
     con[ names(control) ] <- control  
     Lcon <- length(con)
     con1a <- con1 <- con ; 
@@ -676,7 +677,8 @@ tam.mml.mfr <-
       AXsi <- res[["AXsi"]]
       # calculate student's prior distribution
       gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
-                           nnodes=nnodes , ndim=ndim,YSD=YSD , unidim_simplify)
+                           nnodes=nnodes , ndim=ndim,YSD=YSD , unidim_simplify=unidim_simplify ,
+							snodes = snodes )
       #print( head(gwt))						   
       
       # calculate student's likelihood
@@ -850,6 +852,8 @@ if (!choice1){
       deviance.history[iter,2] <- deviance
       a01 <- abs( ( deviance - olddeviance ) / deviance  )
       a02 <- abs( ( deviance - olddeviance )  )	
+
+	if (con$dev_crit == "relative" ){ a02 <- a01 }
       
       if( deviance - olddeviance > 0 ){ 
         xsi.min.deviance <- xsi.min.deviance 
@@ -884,7 +888,8 @@ if (!choice1){
 	  devch <- -( deviance - olddeviance )
       if (progress){ 
         cat( paste( "\n  Deviance =" , round( deviance , 4 ) ))        
-        cat( " | Deviance change:", round( devch  , 4 ) )
+        cat( " | Deviance change:", round( devch  , 4 ) )		
+	cat( " | Relative deviance change:", round( a01  , 8 ) )
         if ( devch < 0 & iter > 1 ){ 
           cat ("\n!!! Deviance increases!                                        !!!!") 
           cat ("\n!!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!") 			

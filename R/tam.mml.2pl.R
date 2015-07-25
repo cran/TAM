@@ -54,7 +54,8 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
                convD = .001 ,conv = .0001 , convM = .0001 , Msteps = 4 ,            
                maxiter = 1000 , max.increment = 1 , 
 			   min.variance = .001 , progress = TRUE , ridge=0,seed=NULL,
-			   xsi.start0=FALSE , increment.factor=1 , fac.oldxsi=0 , acceleration="none" )  	
+			   xsi.start0=FALSE , increment.factor=1 , fac.oldxsi=0 , acceleration="none" ,
+			   dev_crit = "absolute"  )  	
   con[ names(control) ] <- control  
   Lcon <- length(con)
   con1a <- con1 <- con ; 
@@ -504,7 +505,8 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 	
     # calculate student's prior distribution
     gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
-                         nnodes=nnodes , ndim=ndim,YSD=YSD , unidim_simplify)
+                         nnodes=nnodes , ndim=ndim,YSD=YSD , unidim_simplify=unidim_simplify,
+						 snodes = snodes )
 # cat("stud prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
 						 
     # calculate student's likelihood
@@ -718,6 +720,8 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
     deviance.history[iter,2] <- deviance
     a01 <- abs( ( deviance - olddeviance ) / deviance  )
     a02 <- abs( ( deviance - olddeviance )  )	
+    if (con$dev_crit == "relative" ){ a02 <- a01 }
+ 	
 	
 	if( deviance - olddeviance > 0 ){ 
 #      if( ( deviance - olddeviance > 0 ) | ( iter == 1)  ){ 
@@ -753,6 +757,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
       cat( paste( "\n  Deviance =" , round( deviance , 4 ) ))
       devch <- -( deviance - olddeviance )
 	  cat( " | Deviance change:", round( devch  , 4 ) )
+	  cat( " | Relative deviance change:", round( a01  , 8 ) )	  
 	  if ( devch < 0 & iter > 1 ){ 
 			cat ("\n!!! Deviance increases!                                        !!!!") 
 			cat ("\n!!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!") 			

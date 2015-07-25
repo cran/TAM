@@ -214,7 +214,7 @@ if a \code{userfct.variance} is provided.}
     \code{        maxiter = 1000 , max.increment = 1 , }\cr
     \code{        min.variance = .001 , progress = TRUE , ridge=0 ,    }\cr
     \code{        seed = NULL , xsi.start0=0, , increment.factor=1 ,  }\cr
-    \code{        fac.oldxsi=0 , acceleration = "none")  }\cr
+    \code{        fac.oldxsi=0 , acceleration = "none", dev_crit = "absolute" )  }\cr
     
 \code{nodes}: the discretized \eqn{\theta} nodes for numerical integration 
 
@@ -285,7 +285,11 @@ larger than 0 (maybe .4 or .5) is helpful in stabilizing the algorithm
 \code{acceleration}: String indicating whether convergence acceleration of
 the EM algorithm should be employed. Options are \code{"none"} (no acceleration,
 the default), the monoton overrelaxation method of \code{"Yu"} (Yu, 2012) and
-\code{"Ramsay"} for the Ramsay (1975) acceleration method. \cr
+\code{"Ramsay"} for the Ramsay (1975) acceleration method. 
+
+\code{dev_crit}: Criterion for convergence in deviance. \code{dev_crit="abolute"}
+refers to absolute differences in successive deviance values, while
+\code{dev_crit = "relative"} refers to relative differences. \cr
         
 
 }

@@ -62,7 +62,9 @@ of the working directory.
 }
 \item{export.type}{
   A string which indicates the type of the graphics export. For currently 
-  supported file types, see \code{\link{dev.new}}.  
+  supported file types, see     
+\code{\link[grDevices:dev.new]{grDevices::dev.new}}.
+
 }
 \item{export.args}{
   A list of arguments that are passed to the export method can be specified. 

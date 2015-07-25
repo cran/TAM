@@ -98,7 +98,7 @@ which avoids simulations and rather directly evaluates individual
 posterior distributions.
 	
 Item fit and person fit based on estimated person parameters can also be 
-calculated using the \code{\link[sirt:pcm.fit]{pcm.fit}} function
+calculated using the \code{\link[sirt:pcm.fit]{sirt::pcm.fit}} function
 in the \pkg{sirt} package (see Example 1 and Example 2).
 }
 %% ~~objects to See Also as \code{\link{help}}, ~~~

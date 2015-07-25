@@ -10,7 +10,16 @@ useDynLib(TAM)
 #***************************************************
 #*************** R Basics / Linking To *************
 
-import(graphics)
+importFrom(graphics, abline)
+importFrom(graphics, axis)
+importFrom(graphics, par)
+importFrom(graphics, plot)
+importFrom(graphics, points)
+importFrom(graphics, legend)
+importFrom(graphics, lines)
+importFrom(grDevices, dev.off)
+importFrom(grDevices, dev.cur)
+importFrom(methods, is)
 importFrom(Rcpp, evalCpp)
 import(stats)
 importFrom(utils, flush.console)
@@ -84,7 +93,9 @@ export(designMatrices, .A.matrix, designMatrices.mfr,
        IRT.residuals ,
        msq.itemfitWLE ,
        tam.Q3 ,
-       IRT.informationCurves
+       IRT.informationCurves ,
+       IRT.simulate ,
+       IRT.truescore
        )
 
 
@@ -196,6 +207,13 @@ S3method(IRT.irfprob, tam.mml.3pl)
 S3method(IRT.irfprob, tamaan )
 
 
+#### IRT.itemfit
+S3method(IRT.itemfit, tam.mml )
+S3method(IRT.itemfit, tam.mml.2pl )
+S3method(IRT.itemfit, tam.mml.3pl )
+S3method(IRT.itemfit, tam.mml.mfr )
+
+
 #### IRT.likelihood
 S3method(IRT.likelihood, tam.mml )
 S3method(IRT.likelihood, tam )
@@ -221,6 +239,13 @@ S3method(IRT.posterior, tam.latreg)
 S3method(IRT.residuals, tam.mml )
 S3method(IRT.residuals, tam.mml.2pl )
 S3method(IRT.residuals, tam.mml.mfr )
+
+
+#### IRT.simulate
+S3method(IRT.simulate, tam.mml )
+S3method(IRT.simulate, tam.mml.2pl )
+S3method(IRT.simulate, tam.mml.3pl )
+S3method(IRT.simulate, tam.mml.mfr )
 
 
 #### IRT.WrightMap

@@ -37,12 +37,15 @@ function( resp , hwt ,  resp.ind ,
 
 	if ( snodes > 0 ){
 # cat("- start monte carlo ") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1								
-	# maybe both if statements can be merged to one
 #		hwtS <- hwt / snodes
-	 # The division above is not necessary
 		hwtS <- hwt
+		
+#****		
 #		hwtS <- hwt / outer( rep(1,nrow(hwt) ) , thetasamp.density )
+
 		hwtS <- hwtS / rowSums( hwtS )   # maybe this can be fastened
+# Revalpr("rowSums(hwtS)")		
+		
 # cat("- pure matrix R ") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1				
 		#*** included		
 		# hwt ... N x q matrix
@@ -50,12 +53,14 @@ function( resp , hwt ,  resp.ind ,
 		itemwt <- crossprod( hwtS , resp.ind * pweightsM  )
 		# make this formula easier and make some speed checks!!
 # cat("- calc itemwt ") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1				
-		hwtS <- hwt		
+
+#		hwtS <- hwt			
+		
 		#  -- itemwt0 <- matrix(rep(colSums(hwt), nitems), nrow=nnodes, ncol=nitems)
 		# This formula is not faster!
-		thetabar <- hwtS%*%theta
+		thetabar <- hwtS %*% theta
 # cat("- thetabar ") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						
-		sumbeta <- Y%t*%( thetabar*pweights )
+		sumbeta <- Y %t*% ( thetabar*pweights )
 # cat("- tensor operation ") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1								
 		# -- sumsig2 <- sum( (pweights*hwt) %*% theta2 )
 		# sumsig2 <- colSums((pweights*hwtS) %*% theta2)      		
@@ -66,7 +71,7 @@ function( resp , hwt ,  resp.ind ,
     beta <- YYinv%*%sumbeta                     #new beta
     sumsig2 <- matrix(sumsig2,ndim,ndim)
     if (G==1){ 
-		variance <- (sumsig2-sumbeta%t*%beta)/nstud  #new variance
+		variance <- (sumsig2-sumbeta %t*% beta )/nstud  #new variance
 			}
 			
 	# fixed beta coefficients

@@ -56,7 +56,7 @@ tam.mml <-
                  maxiter = 1000 , max.increment = 1 , 
                  min.variance = .001 , progress = TRUE , ridge=0 ,
                  seed = NULL , xsi.start0=FALSE , increment.factor=1 , fac.oldxsi=0 ,
-				 acceleration="none")  
+				 acceleration="none" , dev_crit = "absolute" )  
 	#@@@@AAAA@@@@@				 
     #a0 <- Sys.time()			   
     con[ names(control) ] <- control  
@@ -381,6 +381,7 @@ tam.mml <-
       # sampled theta values
       if (QMC){
         fac <- 1
+		# fac <- 2
         r1 <- sfsmisc::QUnif(n=snodes, min = 0, max = 1, 
 						n.min = 1, p=ndim, leap = 409)
         theta0.samp <- fac * qnorm( r1 )
@@ -475,7 +476,7 @@ tam.mml <-
     ##############################################################   
     #Start EM loop here
     while ( ( (!betaConv | !varConv)  | ((a1 > conv) | (a4 > conv) | (a02 > convD)) )  & (iter < maxiter) ) { 
-      
+      	  	  
       iter <- iter + 1
       if (progress){ 
         cat(disp)	
@@ -485,9 +486,22 @@ tam.mml <-
       # calculate nodes for Monte Carlo integration	
       if ( snodes > 0){
         #      theta <- beta[ rep(1,snodes) , ] +  t ( t(chol(variance)) %*% t(theta0.samp) )
-        theta <- beta[ rep(1,snodes) , ] + theta0.samp %*% chol(variance) 
+		
+		# fac0 <- 1
+		
+		# theta <- beta[ rep(1,snodes) , ] + fac0* (theta0.samp %*% chol(variance) )
+		theta <- beta[ rep(1,snodes) , ] + theta0.samp %*% chol(variance) 
+#****
+# fac0 <- 1
+# theta <- fac0*theta0.samp		
+
+		
         # calculate density for all nodes
-        thetasamp.density <- dmvnorm( theta , mean = as.vector(beta[1,]) , sigma = variance )
+        thetasamp.density <- mvtnorm::dmvnorm( theta , mean = as.vector(beta[1,]) , sigma = variance )
+		#***
+# thetasamp.density <- thetasamp.density / sum(thetasamp.density)
+# thetasamp.density <- 1+0*thetasamp.density
+#****	
         # recalculate theta^2
         #      theta2 <- matrix( theta.sq(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
         theta2 <- matrix( theta.sq2(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
@@ -507,7 +521,8 @@ tam.mml <-
       
       # calculate student's prior distribution
       gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
-                           nnodes=nnodes , ndim=ndim,YSD=YSD , unidim_simplify=unidim_simplify )
+                           nnodes=nnodes , ndim=ndim,YSD=YSD , unidim_simplify=unidim_simplify ,
+						   snodes = snodes )
 
 						   
 # cat("stud_prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						 
@@ -533,7 +548,7 @@ tam.mml <-
                                 pweightsM=pweightsM , Y=Y , theta=theta , theta2=theta2 , YYinv=YYinv , 
                                 ndim=ndim , nstud=nstud , beta.fixed=beta.fixed , variance=variance , 
                                 Variance.fixed=variance.fixed , group=group ,  G=G , snodes = snodes ,
-                                nomiss=nomiss )
+                                nomiss=nomiss ,  thetasamp.density= thetasamp.density )
 # cat("mstep regression") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						       
 
       beta <- resr$beta
@@ -664,13 +679,18 @@ tam.mml <-
         deviance <- - 2 * sum( pweights * log( res.hwt$rfx * thetawidth ) )
       } else {
         #       deviance <- - 2 * sum( pweights * log( res.hwt$rfx ) )
-        deviance <- - 2 * sum( pweights * log( rowMeans( res.hwt$swt ) ) )
 
-		
-      }
+        # deviance <- - 2 * sum( pweights * log( rowMeans( res.hwt$swt ) ) )
+		#deviance <- - 2 * sum( pweights * log( rowSums( res.hwt$swt ) ) )
+#Revalpr("deviance")		
+		# deviance <- - 2 * sum( pweights * log( res.hwt$rfx  ) )
+		deviance <- - 2 * sum( pweights * log( res.hwt$rfx   ) )
+		      }
       deviance.history[iter,2] <- deviance
       a01 <- abs( ( deviance - olddeviance ) / deviance  )
       a02 <- abs( ( deviance - olddeviance )  )	
+	  	  
+	  if (con$dev_crit == "relative" ){ a02 <- a01 }
       
       if( deviance - olddeviance > 0 ){ 
 #      if( ( deviance - olddeviance < 0 ) | ( iter == 1)  ){ 
@@ -707,6 +727,7 @@ tam.mml <-
         cat( paste( "\n  Deviance =" , round( deviance , 4 ) ))
         devch <- -( deviance - olddeviance )
         cat( " | Deviance change:", round( devch  , 4 ) )
+		cat( " | Relative deviance change:", round( a01  , 8 ) )
         if ( devch < 0 & iter > 1 ){ 
           cat ("\n!!! Deviance increases!                                        !!!!") 
           cat ("\n!!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!") 			
@@ -736,7 +757,6 @@ tam.mml <-
       
     } # end of EM loop
     #******************************************************
-	
 	
 	
 # stop()	

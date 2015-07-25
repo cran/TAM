@@ -5,7 +5,7 @@
 #############################################################
 stud_prior.v2 <-
   function(theta , Y , beta , variance , nstud , 
-           nnodes , ndim , YSD , unidim_simplify){	      
+           nnodes , ndim , YSD , unidim_simplify , snodes ){	      
 # unidim_simplify <- FALSE		   
     if(ndim == 1) {
       ##################################
@@ -30,8 +30,9 @@ stud_prior.v2 <-
 	  
 	# @@@ ARb 2014-10-19: Stabilization of the covariance matrix
 		svd_var <- svd(variance)
-		d0 <- d <- svd_var$d
+		d0 <- d <- svd_var$d		
 		eps2 <- .05
+		# eps2 <- 1E-8
 		ind <- which( d < eps2)
 		if (length(ind)>0){
 			d[ ind ] <- eps2
@@ -43,7 +44,7 @@ stud_prior.v2 <-
       #	variance[ diag(variance) ] <- diag(variance) + eps
 #      diag(variance) <- diag(variance) + eps
       varInverse <- solve(variance)
-		detvar <- det(variance)
+	  detvar <- det(variance)
 
       coeff <- 1/sqrt( (2*pi)^ndim * detvar ) 
 	  # coeff <- 1 
@@ -54,18 +55,36 @@ stud_prior.v2 <-
 						
 #  cat(" * prior Ysd") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
     if ( YSD ){
+	  if (snodes >= 0 ){	
 		gwt <- prior.normal.density.R( theta_=theta , mu_=mu , 
 			     varInverse_=varInverse ,  coeff_=coeff) 
+						}
+						
+		if ( snodes < 0 ){ 		
+# Revalpr("cbind( theta[ rep(1:snodes , nstud ) , ] , mu[ rep(1:nstud , each=snodes)   , ])")		
+			gwt <- dmvnorm_TAM( x = theta[ rep(1:snodes , nstud ) , ] , 
+							mean = mu[ rep(1:nstud , each=snodes)   , ] , sigma = variance )	
+			gwt <- matrix( gwt , nrow=nstud , byrow=TRUE)
+# gwt <- matrix( gwt , nrow=nstud , ncol=nnodes , byrow=TRUE )			
+# gwt <- gwt / matrix( rowSums(gwt) , nrow=nstud , ncol=nnodes , byrow=TRUE )
+				}
+			 
 			   }	
 #  cat(" * prior nnodes2") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						
     if ( ! YSD){
+	  if (snodes >= 0 ){
 		gwt <- prior.normal.densityALL.R( theta_=theta , mu_=mu , 
-			     varInverse_=varInverse ,  coeff_=coeff) 
-# gwt <- mvtnorm::dmvnorm( theta , mean=mu[1,1:2] , sigma=variance )	  
+			           varInverse_=varInverse ,  coeff_=coeff) 			 
+					}				
+	  if (snodes < 0 ){
+#       gwt1 <- mvtnorm::dmvnorm( theta , mean=as.vector(mu[1,1:2]) , sigma=variance )	  
+		gwt <- dmvnorm_TAM( x=theta , mean= as.vector(mu[1,1:2]) , sigma=variance )
+						}	
 		# gtw <- gwt / sum(gwt) 
 		gwt <- matrix( gwt , nrow=nstud , ncol=nnodes , byrow=TRUE )
 				}
-#	 gwt <- gwt / matrix( rowSums(gwt) , nrow=nstud , ncol=nnodes , byrow=TRUE )			
+
+# gwt <- gwt / matrix( rowSums(gwt) , nrow=nstud , ncol=nnodes , byrow=TRUE )			
 				
 #  cat(" * prior nnodes3") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						
     }
@@ -83,7 +102,7 @@ function( theta_ , mu_ , varInverse_ , coeff_){
 } 
 
 prior.normal.densityALL.R <- 
-function( theta_ , mu_ , varInverse_ , coeff_){
-	.Call("prior_normal_densityALL_C",  theta_ , mu_ , 
+ function( theta_ , mu_ , varInverse_ , coeff_){
+ 	.Call("prior_normal_densityALL_C",  theta_ , mu_ , 
 		varInverse_  , coeff_ , PACKAGE = "TAM")
-} 
+ } 

@@ -25,7 +25,7 @@ IRTLikelihood.cfa(data, cfaobj = NULL, theta = NULL, L = NULL, nu = NULL,
 Dataset with item responses
 }
   \item{cfaobj}{
-Fitted \code{\link[lavaan:cfa]{cfa}} (\pkg{lavaan}) object
+Fitted \code{\link[lavaan:cfa]{lavaan::cfa}} (\pkg{lavaan}) object
 }
   \item{theta}{
 Optional matrix containing the \code{theta} values

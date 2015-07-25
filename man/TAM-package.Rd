@@ -18,7 +18,7 @@ Test Analysis Modules
 \tabular{ll}{
 Package: \tab \pkg{TAM}\cr
 Type: \tab Package\cr
-Version: \tab 1.9\cr
+Version: \tab 1.10\cr
 Publication Year: \tab 2015\cr
 License: \tab GPL (>=2.0)\cr
 URL: \tab \url{http://www.edmeasurementsurveys.com/TAM/Tutorials/}\cr

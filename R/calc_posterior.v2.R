@@ -15,9 +15,15 @@ calc_posterior.v2 <-
       fx <- gwt  
     } else {
       # calculate individual 'sampling weight'
-      swt <- fx <- gwt / outer( rep(1,nrow(gwt)) , thetasamp.density )
-	  # This is essentially equal to one.
-#    	swt <-fx <- gwt
+	  nstud <- nrow(gwt)
+	  tsd <- matrix( thetasamp.density , nrow=nstud , ncol= ncol(gwt) , byrow=TRUE)
+	  gwt <- gwt / tsd
+	  gwt <- gwt / ncol(gwt)
+			
+# gwt <- gwt / rowSums(gwt)
+      swt <- fx <- gwt
+	  # swt <- fx <- gwt	  
+# swt <-fx <- gwt
     } 
     nstud <- nrow(fx)
     # using c Code here
@@ -53,6 +59,8 @@ calc_posterior.v2 <-
 		}
 		
 # cat("nach calcfx (2)") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1			
+
+	#*********************************
     # numerical integration
     if ( snodes == 0 ){ 
 #      rfx <- rowSums(fx)
@@ -60,19 +68,26 @@ calc_posterior.v2 <-
       if (normalization ){
         hwt <- fx / rfx } else {   hwt <- fx }
     }
+	#*********************************
     # Monte Carlo integration
     if ( snodes > 0 ){ 
-#      rfx <- rowMeans(fx)
+
+# rfx <- rowMeans(fx)
+
 		rfx <- rowSums(fx)		
       if (normalization ){
 		 hwt <- fx / rfx 	
 			} else { hwt <- fx }
     }
 
-    res <-  list("hwt" = hwt , "rfx" = rfx )
-    if ( snodes > 0 ){ 
-		
+    res <-  list("hwt" = hwt , "rfx" = rfx  )
+	
+	
+	res$fx1 <- fx / gwt
+	
+    if ( snodes > 0 ){ 		
 		res[["swt" ]] <- fx
+		res$gwt <- gwt
 				}
 # cat(" in  posterior rest") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	    
     return(res)

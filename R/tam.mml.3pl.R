@@ -107,7 +107,7 @@ tam.mml.3pl <-
                  maxiter = 1000 , max.increment = 1 , 
                  min.variance = .001 , progress = TRUE , ridge=0,seed=NULL,
                  xsi.start0=FALSE , increment.factor=1 , fac.oldxsi=0 ,
-				 maxgamma = 9.99 , acceleration="none" )  	
+				 maxgamma = 9.99 , acceleration="none" , dev_crit = "absolute"  )  	
     con[ names(control) ] <- control  
     Lcon <- length(con)
     con1a <- con1 <- con ; 
@@ -570,13 +570,15 @@ tam.mml.3pl <-
 							"beta_old" = 0 
 						)
 	d1 <- as.vector(delta)	
+	#delta_acceleration <- list( "acceleration" = "none" , "w" = .35 ,
 	delta_acceleration <- list( "acceleration" = acceleration , "w" = .35 ,
 							"w_max" = .95 , 
 							parm_history = cbind( d1, d1 , d1) ,
 							"beta_new" = 0 ,
 							"beta_old" = 0 
 						)
-    v1 <- qlogis( guess + 1E-4 )
+    #v1 <- qlogis( guess + 1E-4 )
+	v1 <- guess
     ind.guess <- which( est.guess > 0 )	
 	guess_acceleration <- list( "acceleration" = acceleration , "w" = .35 ,
 							"w_max" = .95 , 
@@ -674,7 +676,8 @@ a0 <- Sys.time()
 	  if (skillspace == "normal" ){	  	 	# normal distribution
 		  gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , 
 					variance=variance , nstud=nstud , 
-					nnodes=nnodes , ndim=ndim,YSD=YSD , unidim_simplify)
+					nnodes=nnodes , ndim=ndim,YSD=YSD , unidim_simplify=unidim_simplify , 
+					snodes = snodes )
 						   							   
 		 if ( snodes == 0 ){
 			gwt <- gwt / rowSums( gwt ) 
@@ -888,10 +891,14 @@ a0 <- Sys.time()
         #@@@@AAAA@@@@@
 		# acceleration
 		if ( guess_acceleration$acceleration != "none" ){		
+			# g1 <- qlogis( guess + 1E-5 )
+			g1 <- guess
 			guess_acceleration <- accelerate_parameters( xsi_acceleration=guess_acceleration , 
-							xsi= qlogis(guess+1E-5) , iter=iter , itermin=3)
-			guess <- plogis( guess_acceleration$parm )
-			# guess[ guess < 0 ] <- 1E-5
+							xsi= g1 , iter=iter , itermin=3 , 
+							ind = guess_acceleration$ind_guess)
+			#guess <- plogis( guess_acceleration$parm )
+			guess <- guess_acceleration$parm
+			guess[ guess < 0 ] <- 1E-5
 			guess.change <- max( abs(guess - oldguess))
 								}
 	    #@@@@AAAA@@@@@	
@@ -923,7 +930,8 @@ a0 <- Sys.time()
       deviance.history[iter,2] <- deviance
       a01 <- abs( ( deviance - olddeviance ) / deviance  )
       a02 <- abs( ( deviance - olddeviance )  )	
-	  
+	  if (con$dev_crit == "relative" ){ a02 <- a01 }
+ 
       if( ( deviance - olddeviance < 0 ) | ( iter == 1)  ){ 
         xsi.min.deviance <- xsi 
         beta.min.deviance <- beta
@@ -948,6 +956,7 @@ a0 <- Sys.time()
         cat( paste( "\n  Deviance =" , round( deviance , 4 ) ))
         devch <- -( deviance - olddeviance )
         cat( " | Deviance change:", round( devch  , 4 ) )
+		cat( " | Relative deviance change:", round( a01  , 8 ) )		
         if ( devch < 0 & iter > 1 ){ 
           cat ("\n!!! Deviance increases!                                        !!!!") 
           cat ("\n!!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!") 			

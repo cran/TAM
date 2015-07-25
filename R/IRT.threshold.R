@@ -2,7 +2,7 @@
 ###################################################
 # general function for computing thresholds from a fitted
 # model for which IRT.irfprob exists
-IRT.threshold <- function( object , prob.lvl = .5){
+IRT.threshold <- function( object , prob.lvl = .5 , type="category"){
 	irfprob <- IRT.irfprob( object )
 	irfprob[ is.na(irfprob) ] <- 0
 	KI <- dim(irfprob)
@@ -19,7 +19,13 @@ IRT.threshold <- function( object , prob.lvl = .5){
 		irf.ii <- irfprob[ ii ,,]
 		# compute maximum number of categories
 		rs <- rowSums( irf.ii , 1 , na.rm=TRUE )
-		K <- sum( rs > 0 ) - 1
+		K <- sum( rs > 0 ) - 1		
+		if ( type=="item"){
+			N1 <- nrow(irf.ii)
+			irf1 <- irf.ii * 0:(N1-1)
+			irf.ii[2,] <- colSums( irf1 ) / K
+			K <- 1			
+						}	
 		vv <- 0
 		for (dd in 1:D){
 			# dd <- 1
@@ -35,7 +41,10 @@ IRT.threshold <- function( object , prob.lvl = .5){
 			thresh[ii,kk] <- CDM.find.root( x1 , y1 , prob.lvl , theta )
 						}
 			}
-
+	if (type=="item"){
+		thresh <- as.vector(thresh[,1])
+		names(thresh) <- as.vector(dimnames(irfprob)[[1]])
+					}			
 	class(thresh) <- "IRT.threshold"
 	attr(thresh , "theta") <- attr( irfprob , "theta")
 	attr(thresh , "prob.theta") <- attr( irfprob , "prob.theta")
