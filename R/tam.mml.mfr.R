@@ -606,6 +606,7 @@ tam.mml.mfr <-
     if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }		
 	if (G > 1){ unidim_simplify <- FALSE }
 	if ( YSD){ unidim_simplify <- FALSE }	
+	if (  is.null(beta.fixed) ){ unidim_simplify <- FALSE }
 	#@@@@	
 	
 	#@@@@AAAA@@@@@
@@ -847,7 +848,8 @@ if (!choice1){
         deviance <- - 2 * sum( pweights * log( res.hwt$rfx * thetawidth ) )
       } else {
         #        deviance <- - 2 * sum( pweights * log( res.hwt$rfx ) )
-        deviance <- - 2 * sum( pweights * log( rowMeans( res.hwt$swt ) ) )
+        # deviance <- - 2 * sum( pweights * log( rowMeans( res.hwt$swt ) ) )
+		deviance <- - 2 * sum( pweights * log( res.hwt$rfx   ) )
       }
       deviance.history[iter,2] <- deviance
       a01 <- abs( ( deviance - olddeviance ) / deviance  )

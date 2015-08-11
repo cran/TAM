@@ -36,7 +36,7 @@ models outside the \pkg{TAM} package by applying
 \code{tam.modelfit.IRT} or \code{tam.modelfit.args}.
 
 The function \code{tam.Q3} computes the \eqn{Q_3} statistic based on
-weighted likelihood estimates (see \code{\link{tam.wle}}.
+weighted likelihood estimates (see \code{\link{tam.wle}}).
 }
 
 

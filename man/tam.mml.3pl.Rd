@@ -236,8 +236,12 @@ can be defined in \code{theta.k}.
 The same output as in \code{\link{tam.mml}} and additional entries		
  \item{delta}{Parameter vector \eqn{\delta}}
  \item{gammaslope}{Estimated \eqn{\gamma} item slope parameters}
+ \item{se.gammaslope}{Standard errors \eqn{\gamma} item slope parameters}
  \item{E}{Used design matrix \eqn{E}}
  \item{Edes}{Used design matrix \eqn{E} in compact form}
+ \item{guess}{Estimated \eqn{c} guessing parameters}
+ \item{se.guess}{Standard errors \eqn{c} guessing parameters}
+ 
 }
 % \item{comp1 }{Description of 'comp1'}
 %%  \item{comp2 }{Description of 'comp2'}

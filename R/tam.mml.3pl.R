@@ -545,6 +545,7 @@ tam.mml.3pl <-
 	unidim_simplify <- TRUE
 	if (G > 1){ unidim_simplify <- FALSE }
 	if ( YSD){ unidim_simplify <- FALSE }	
+	if (  is.null(beta.fixed) ){ unidim_simplify <- FALSE }
 	#@@@@
 
 	#@@@@AAAA@@@@@
@@ -605,6 +606,9 @@ tam.mml.3pl <-
     a44 <- 1000
 	old.increment.guess <- .6
 	se.gammaslope <- NULL
+	
+	se.guess <- 0*guess
+	
 	
     # display
     disp <- "....................................................\n"
@@ -885,8 +889,9 @@ a0 <- Sys.time()
 						nitems , A , AXsi , B, xsi , theta , nnodes , maxK ,
 						n.ik , N.ik , est.guess ,  old.increment.guess ,
 						guess.prior  , progress	)	  
-		  guess <- res$guess		  		  		  
+		  guess <- res$guess		  			  
 		  guess.change <- res$guess.change
+		  se.guess <- res$se.guess
 		  
         #@@@@AAAA@@@@@
 		# acceleration
@@ -925,7 +930,9 @@ a0 <- Sys.time()
         #      deviance <- - 2 * sum( pweights * log( res.hwt$rfx ) )
 #        deviance <- - 2 * sum( pweights * log( rowMeans( res.hwt$swt ) ) )
 # Revalpr("sum(res.hwt$rfx)")		
-        deviance <- - 2 * sum( pweights * log( rowMeans( res.hwt$hwt ) ) )
+       #	   deviance <- - 2 * sum( pweights * log( rowMeans( res.hwt$hwt ) ) )
+        deviance <- - 2 * sum( pweights * log( res.hwt$rfx   ) )		
+		
       }
       deviance.history[iter,2] <- deviance
       a01 <- abs( ( deviance - olddeviance ) / deviance  )
@@ -1212,6 +1219,7 @@ a0 <- Sys.time()
 				 "skillspace"= skillspace ,
 				 "delta" = delta , "delta.designmatrix" = delta.designmatrix , 
 				 "gammaslope" = gammaslope , "se.gammaslope" = se.gammaslope ,
+				 "guess" = guess ,  "se.guess" = se.guess , 
 				 "E"= E , "Edes" = Edes , CALL = CALL 
                  #			   "design"=design				
                  #			   "xsi.min.deviance" = xsi.min.deviance ,

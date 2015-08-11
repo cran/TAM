@@ -42,6 +42,32 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 
 -------------------------------------------------------------
+CHANGES IN VERSION 1.11   (2015-08-11)  --  CRAN 1.11-0
+-------------------------------------------------------------
+
+Features:
+* ---
+
+Bug fixes:
+* fixed a recently included bug in TAM 1.10-0 in calculation 
+  of deviance in 'tam.mml.2pl', 'tam.mml.3pl' and 'tam.mml.3pl'
+  (thanks to Christopher Gess)
+* fixed a recently included bug in TAM 1.9-0 in estimation
+  of models with estimated means of latent trait
+  (thanks to Frank Musekamp)
+
+Notes:
+* included guessing parameters and its standard errors in
+  output of 'tam.mml.3pl' ('guess' and 'se.guess')
+
+Datasets included or modified:
+* ---
+
+Examples included or modified:
+* ---
+
+
+-------------------------------------------------------------
 CHANGES IN VERSION 1.10   (2015-07-25)  --  CRAN 1.10-0
 -------------------------------------------------------------
 

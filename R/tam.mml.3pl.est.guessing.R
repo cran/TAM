@@ -46,10 +46,8 @@
 		  # first derivative
 		  der1 <- rowSums( ( n1ij - pij * nij ) * guess / pij )		  
 		  # second derivative
-		  der2 <- rowSums( guess*(1-guess) * 
-						( ( guess + pij0 ) / pij^2 * n1ij - nij ) )
-
-				
+		  der2 <- rowSums( guess*(1-guess) * ( ( guess + pij0 ) / pij^2 * n1ij - nij ) )
+			
 		  if ( ! is.null( guess.prior) ){	  
 				der1 <- der1 + d1
 				der2 <- der2 + d2 
@@ -67,21 +65,30 @@
 		  increment <- ifelse( abs( increment) > abs(old_increment)  , 
 								 increment/(2*ci) , increment )	  								 						 
 		  increment <- increment[ est.guess ]
-		 #  guess.logit[ ind.guess ] <- guess.logit[ind.guess ] + increment
-		   guess[ ind.guess ] <- guess[ind.guess ] + increment
-		  guess <- ifelse( ( guess < h ) & ( est.guess != 0 ) , 4*h , guess )
-#		   guess <- plogis( guess.logit)
+		   guess.logit[ ind.guess ] <- guess.logit[ind.guess ] + increment
+#		   guess[ ind.guess ] <- guess[ind.guess ] + increment
+#		  guess <- ifelse( ( guess < h ) & ( est.guess != 0 ) , 4*h , guess )
+		   guess <- plogis( guess.logit)
 		  old_increment <- max(abs(increment))
 		  if ( old_increment < convM){ converge <- TRUE }
 		  Miter <- Miter + 1
 		  if (progress){ cat("-") ; flush.console() }			  
 					}
+	  #*********************************************************
 	  # standard error of logit guessing parameter				
 	  se.guess <- sqrt( 1 / abs(der2[ est.guess , 2] ) )
 	  
 	  guess.change <- max( abs( guess - guess_old ))
-	  
-	  res <- list( "guess" = guess , "guess.change" = guess.change )
+	  se.guess <-  sqrt( 1 / der2[ est.guess ,2] )
+	  se2 <- 0*guess
+	  se2[ ind.guess ] <- se.guess[ est.guess ]
+	  # transform standard errors according to delta formula
+	  # h = plogis = ( 1 + exp( -x ) )^(-1)
+	  # h' = -1 * exp(-x) * ( 1 + exp( -x ) )^(-2)	 = h * ( 1 - h )
+	 hast <- guess * ( 1 - guess )
+	 se2 <- sqrt( hast^2 ) * se2
+	  res <- list( "guess" = guess , "guess.change" = guess.change ,
+			se.guess = se2 )
 	  return(res)
 	  }
 ################################################################################	  

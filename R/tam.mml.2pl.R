@@ -418,7 +418,8 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 	if (G > 1){ unidim_simplify <- FALSE }
 	YSD <- max( apply( Y , 2 , sd ) )
 	if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }		
-	if (  YSD){ unidim_simplify <- FALSE }		
+	if (  YSD){ unidim_simplify <- FALSE }	
+    if (  is.null(beta.fixed) ){ unidim_simplify <- FALSE }	
 	#@@@@ 
  
 	#@@@@AAAA@@@@@
@@ -714,8 +715,8 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
     if ( snodes == 0 ){ 
       deviance <- - 2 * sum( pweights * log( res.hwt$rfx * thetawidth ) )
     } else {
-#      deviance <- - 2 * sum( pweights * log( res.hwt$rfx ) )
-      deviance <- - 2 * sum( pweights * log( rowMeans( res.hwt$swt ) ) )
+		deviance <- - 2 * sum( pweights * log( res.hwt$rfx   ) )
+    #	deviance <- - 2 * sum( pweights * log( rowMeans( res.hwt$swt ) ) )
     }
     deviance.history[iter,2] <- deviance
     a01 <- abs( ( deviance - olddeviance ) / deviance  )

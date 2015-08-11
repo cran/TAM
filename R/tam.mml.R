@@ -439,6 +439,9 @@ tam.mml <-
 	unidim_simplify <- TRUE
 	if (G > 1){ unidim_simplify <- FALSE }
 	if ( YSD){ unidim_simplify <- FALSE }	
+	if (  is.null(beta.fixed) ){ unidim_simplify <- FALSE }
+	
+	# unidim_simplify <- FALSE
 	#@@@@
 	
     # define progress bar for M step
@@ -487,21 +490,11 @@ tam.mml <-
       if ( snodes > 0){
         #      theta <- beta[ rep(1,snodes) , ] +  t ( t(chol(variance)) %*% t(theta0.samp) )
 		
-		# fac0 <- 1
-		
 		# theta <- beta[ rep(1,snodes) , ] + fac0* (theta0.samp %*% chol(variance) )
 		theta <- beta[ rep(1,snodes) , ] + theta0.samp %*% chol(variance) 
-#****
-# fac0 <- 1
-# theta <- fac0*theta0.samp		
-
 		
         # calculate density for all nodes
         thetasamp.density <- mvtnorm::dmvnorm( theta , mean = as.vector(beta[1,]) , sigma = variance )
-		#***
-# thetasamp.density <- thetasamp.density / sum(thetasamp.density)
-# thetasamp.density <- 1+0*thetasamp.density
-#****	
         # recalculate theta^2
         #      theta2 <- matrix( theta.sq(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
         theta2 <- matrix( theta.sq2(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
@@ -523,7 +516,6 @@ tam.mml <-
       gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
                            nnodes=nnodes , ndim=ndim,YSD=YSD , unidim_simplify=unidim_simplify ,
 						   snodes = snodes )
-
 						   
 # cat("stud_prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						 
 
@@ -552,6 +544,7 @@ tam.mml <-
 # cat("mstep regression") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						       
 
       beta <- resr$beta
+
       
       variance <- resr$variance	
       if( ndim == 1 ){  # prevent negative variance
