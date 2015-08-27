@@ -619,7 +619,10 @@ tam.mml <-
         increment <- ifelse( abs( increment) > abs(old_increment)  , 
                              increment/(2*ci) , 
                              increment )						
-        
+#        increment <- ifelse( abs( increment) > abs(old_increment)  , 
+#                             sign(increment) * max.increment , increment )	
+
+							 
         old_increment <- increment
         
         ##**SE

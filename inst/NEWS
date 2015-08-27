@@ -41,6 +41,29 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
+
+
+-------------------------------------------------------------
+CHANGES IN VERSION 1.12   (2015-08-27)  --  CRAN 1.12-0
+-------------------------------------------------------------
+
+Features:
+* ---
+
+Bug fixes:
+* fixed a recently included bug (in TAM 1.11-0) in 
+  'tam.mml.3pl' estimation when guessing parameters are
+  estimated (thanks to Rolf Strietholt and Laura Zieger)
+
+Notes:
+* ---
+
+Datasets included or modified:
+* ---
+
+Examples included or modified:
+* ---
+
 -------------------------------------------------------------
 CHANGES IN VERSION 1.11   (2015-08-11)  --  CRAN 1.11-0
 -------------------------------------------------------------
@@ -65,7 +88,6 @@ Datasets included or modified:
 
 Examples included or modified:
 * ---
-
 
 -------------------------------------------------------------
 CHANGES IN VERSION 1.10   (2015-07-25)  --  CRAN 1.10-0

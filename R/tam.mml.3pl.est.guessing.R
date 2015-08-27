@@ -7,6 +7,7 @@
 	  old_increment <- old.increment.guess	  
 	  if (progress){ cat("\nM Step Guessing     |"); flush.console() }
 	  eps <- 1e-10
+	  eps10 <- 1E-30
 #	  eps1 <- 1e-5
 	  guess.logit0 <- guess.logit <- qlogis( guess + eps)	  
 	  ind.guess <- which( est.guess != 0 )	  
@@ -46,8 +47,9 @@
 		  # first derivative
 		  der1 <- rowSums( ( n1ij - pij * nij ) * guess / pij )		  
 		  # second derivative
-		  der2 <- rowSums( guess*(1-guess) * ( ( guess + pij0 ) / pij^2 * n1ij - nij ) )
-			
+		  #der2 <- rowSums( guess*(1-guess) * ( ( guess + pij0 ) / pij^2 * n1ij - nij ) )
+		  der2 <- rowSums( guess*(1-guess) * ( ( guess + pij0 ) / ( pij^2 + eps ) * n1ij - nij ) )
+		  
 		  if ( ! is.null( guess.prior) ){	  
 				der1 <- der1 + d1
 				der2 <- der2 + d2 
@@ -65,10 +67,10 @@
 		  increment <- ifelse( abs( increment) > abs(old_increment)  , 
 								 increment/(2*ci) , increment )	  								 						 
 		  increment <- increment[ est.guess ]
-		   guess.logit[ ind.guess ] <- guess.logit[ind.guess ] + increment
-#		   guess[ ind.guess ] <- guess[ind.guess ] + increment
-#		  guess <- ifelse( ( guess < h ) & ( est.guess != 0 ) , 4*h , guess )
-		   guess <- plogis( guess.logit)
+#		   guess.logit[ ind.guess ] <- guess.logit[ind.guess ] + increment
+		   guess[ ind.guess ] <- guess[ind.guess ] + increment
+		  guess <- ifelse( ( guess < h ) & ( est.guess != 0 ) , 4*h , guess )
+#		   guess <- plogis( guess.logit)
 		  old_increment <- max(abs(increment))
 		  if ( old_increment < convM){ converge <- TRUE }
 		  Miter <- Miter + 1
@@ -76,10 +78,10 @@
 					}
 	  #*********************************************************
 	  # standard error of logit guessing parameter				
-	  se.guess <- sqrt( 1 / abs(der2[ est.guess , 2] ) )
+	  # se.guess <- sqrt( 1 / abs(der2[ est.guess , 2] ) )
 	  
 	  guess.change <- max( abs( guess - guess_old ))
-	  se.guess <-  sqrt( 1 / der2[ est.guess ,2] )
+	  se.guess <-  sqrt( 1 / ( abs( der2[ est.guess ,2] ) + eps10 ) )
 	  se2 <- 0*guess
 	  se2[ ind.guess ] <- se.guess[ est.guess ]
 	  # transform standard errors according to delta formula

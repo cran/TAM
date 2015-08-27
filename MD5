@@ -1,4 +1,4 @@
-8a33e0060bd15d45b97f563f18cdcdd2 *DESCRIPTION
+90fd848642498fe38ba95eba957ce371 *DESCRIPTION
 b5d2e05379b248cecf338aa316f4996f *NAMESPACE
 d6256b8566b9409d380ea220fbd4981b *R/IRT.WrightMap.R
 8753c145cf85680b8a111f5b0d6cb008 *R/IRT.data.tam.R
@@ -96,11 +96,11 @@ d4348145cef1b81e9ec35f0caaa05bb0 *R/tam.latreg.R
 b856619df68b5ba45e98fbdd26905ff3 *R/tam.mml.2pl.R
 0a62c2643a87488da689f2eef6a0aa7e *R/tam.mml.3pl.R
 7967c28ad517e8143494f4bef20714b1 *R/tam.mml.3pl.algorithm.R
-bd71472c48cc0956b64f73a0198626ed *R/tam.mml.3pl.est.guessing.R
+5103f101d097b9c0cc9b8309ec3716b7 *R/tam.mml.3pl.est.guessing.R
 78c18c46a5c420e5ee04993c0058f1ad *R/tam.mml.3pl.est.intercepts.R
 a31b8eb42f82bf6a210838d67b586c42 *R/tam.mml.3pl.est.slopes.R
 265c4473b07901a52d416d1900a28f2b *R/tam.mml.3pl.preproc.R
-318d5868537e9d146394999030ccd6ca *R/tam.mml.R
+4111467adcadf32b17a6baae5caa2129 *R/tam.mml.R
 86f342d8d25409a951d9e78383bda88e *R/tam.mml.mfr.R
 3a2f160d327f18fc6dc2a815e4f05e3f *R/tam.modelfit.R
 a7daf8bbcb0b4427283a8a73f63bbf4a *R/tam.modelfit.func.R
@@ -169,7 +169,7 @@ d6e7c2bd1ff975803067798e331b5940 *data/data.sim.mfr.rda
 9ef2796de2baa4881e0bb985e7fb1620 *data/data.sim.rasch.rda
 26c90eef8293b4fe9cc2b07df6f0e537 *data/data.timssAusTwn.rda
 de8d3972d2fe8e35a85813a384c36401 *data/data.timssAusTwn.scored.rda
-c30bee11450e36d3c5cf873d1ef41c78 *inst/NEWS
+f0ca6813fc81c1936d29473c14680ffa *inst/NEWS
 e9d5974829c3b296bcb4b5cb61103ca0 *man/IRT.WrightMap.Rd
 4e7c9773e55e4842b6523748def601e3 *man/IRT.data.tam.Rd
 daf0a20afdc001a109663b70ac15bb03 *man/IRT.drawPV.Rd
@@ -186,7 +186,7 @@ da3c08b54a9f39d6ebd668a9a201e6ca *man/IRT.simulate.Rd
 837f3f7621daf353674cfde8c228388d *man/IRT.truescore.Rd
 4f4c0a2c07fec519dbfae93d031c3351 *man/IRTLikelihood.cfa.Rd
 d0252a8829d571ea7cbff298893d5efd *man/TAM-internal.Rd
-c21bdc2ffd15e4eebdf65b2cf43786d5 *man/TAM-package.Rd
+63fe26dd07bd0856bf640d565696fa17 *man/TAM-package.Rd
 c1a5f27316b6a2043f4fe73eeb3aef58 *man/anova.tam.Rd
 29f8b7c4bc05a1af2fbf44c3c6081b4e *man/cfa.extract.itempars.Rd
 7288cdb6655c2a6bebbf983d6683af46 *man/data.cqc.Rd
