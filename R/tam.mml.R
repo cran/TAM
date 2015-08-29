@@ -821,7 +821,7 @@ tam.mml <-
     #****
     # collect item parameters
     item1 <- .TAM.itempartable( resp , maxK , AXsi , B , ndim ,
-                                resp.ind , rprobs,n.ik,pi.k)
+                                resp.ind , rprobs,n.ik,pi.k)											
 #     cat("tam itempartable") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1								 
     #####################################################
     # post ... posterior distribution	

@@ -1,4 +1,4 @@
-90fd848642498fe38ba95eba957ce371 *DESCRIPTION
+b4047e32d758f12744aa810c7e1b048c *DESCRIPTION
 b5d2e05379b248cecf338aa316f4996f *NAMESPACE
 d6256b8566b9409d380ea220fbd4981b *R/IRT.WrightMap.R
 8753c145cf85680b8a111f5b0d6cb008 *R/IRT.data.tam.R
@@ -19,7 +19,7 @@ f9e34de6504faf50b49a36d19000209a *R/IRT.residuals.R
 c4ee0d91d41cb254b52159dfd256c4c6 *R/Mstep_slope.v2.R
 6844b3a298d864ebbc5e52b63ca7a13b *R/TAM-internal_helper.R
 46cc9943007b2211eb7c757839198a8c *R/TAM.ic.R
-d9c2656d134424471ec45e4a4beafc62 *R/TAM.itempartable.R
+afca189d7c8e1118eed64d480767b781 *R/TAM.itempartable.R
 f59c02cf7f2c757bcfe93dbe14682925 *R/TAM_utils.R
 38dadeebe242e293b88df1ca7f09cc38 *R/acceleration_algorithm.R
 5c4c19c7d3cf3956f180ae58a5bb6084 *R/add.colnames.resp.R
@@ -100,7 +100,7 @@ b856619df68b5ba45e98fbdd26905ff3 *R/tam.mml.2pl.R
 78c18c46a5c420e5ee04993c0058f1ad *R/tam.mml.3pl.est.intercepts.R
 a31b8eb42f82bf6a210838d67b586c42 *R/tam.mml.3pl.est.slopes.R
 265c4473b07901a52d416d1900a28f2b *R/tam.mml.3pl.preproc.R
-4111467adcadf32b17a6baae5caa2129 *R/tam.mml.R
+3c358d8e1b8b37a181650af1446d68d0 *R/tam.mml.R
 86f342d8d25409a951d9e78383bda88e *R/tam.mml.mfr.R
 3a2f160d327f18fc6dc2a815e4f05e3f *R/tam.modelfit.R
 a7daf8bbcb0b4427283a8a73f63bbf4a *R/tam.modelfit.func.R
@@ -169,7 +169,7 @@ d6e7c2bd1ff975803067798e331b5940 *data/data.sim.mfr.rda
 9ef2796de2baa4881e0bb985e7fb1620 *data/data.sim.rasch.rda
 26c90eef8293b4fe9cc2b07df6f0e537 *data/data.timssAusTwn.rda
 de8d3972d2fe8e35a85813a384c36401 *data/data.timssAusTwn.scored.rda
-f0ca6813fc81c1936d29473c14680ffa *inst/NEWS
+87855fa48c357ca3e779ad5882f46836 *inst/NEWS
 e9d5974829c3b296bcb4b5cb61103ca0 *man/IRT.WrightMap.Rd
 4e7c9773e55e4842b6523748def601e3 *man/IRT.data.tam.Rd
 daf0a20afdc001a109663b70ac15bb03 *man/IRT.drawPV.Rd
@@ -186,7 +186,7 @@ da3c08b54a9f39d6ebd668a9a201e6ca *man/IRT.simulate.Rd
 837f3f7621daf353674cfde8c228388d *man/IRT.truescore.Rd
 4f4c0a2c07fec519dbfae93d031c3351 *man/IRTLikelihood.cfa.Rd
 d0252a8829d571ea7cbff298893d5efd *man/TAM-internal.Rd
-63fe26dd07bd0856bf640d565696fa17 *man/TAM-package.Rd
+a889eda500afd938127869197473224b *man/TAM-package.Rd
 c1a5f27316b6a2043f4fe73eeb3aef58 *man/anova.tam.Rd
 29f8b7c4bc05a1af2fbf44c3c6081b4e *man/cfa.extract.itempars.Rd
 7288cdb6655c2a6bebbf983d6683af46 *man/data.cqc.Rd
@@ -214,7 +214,7 @@ e73774c322cc36fa0a5a7e64c5ed3db7 *man/tam.ctt.Rd
 416f44f5b6f5f9b76b88b88e4e726f52 *man/tam.jml.Rd
 c0938da3d0d1c07439bdd27a37b46c1b *man/tam.latreg.Rd
 6b5dd0c9cacc2dd8fe0f8545601001e3 *man/tam.mml.3pl.Rd
-39399fc9d01784bc5a90c89450ef2dee *man/tam.mml.Rd
+f23c0c235203f5819b64a0a68738a9f4 *man/tam.mml.Rd
 3ff510230267ef0f619e21c1991e6c70 *man/tam.modelfit.Rd
 87c1218ff939baa41ec041a9e94c723f *man/tam.pv.Rd
 7deeacfa45f1561a2fd109deec59ba14 *man/tam.se.Rd

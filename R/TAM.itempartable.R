@@ -31,10 +31,19 @@
 	# Exploratory analyses show that item fit rmsea
 	# does not seem to be sensitive
 #	item1$rmsea <- res
-	for (kk in 1:(maxK-1)){ # kk <- 1
+
+	b0 <- sum( B[ , 1 , ] , na.rm=TRUE ) 
+	# a0 <- sum( A[ , 1 , ] , na.rm=TRUE ) 
+	a0 <- 0
+	if ( b0 + a0 > 0 ){
+		kvec <- 0:(maxK-1)		
+				} else {
+		kvec <- 1:(maxK-1)
+						}
+	for (kk in kvec){ # kk <- 1
 		item1[ , paste0("AXsi_.Cat" , kk) ] <- - AXsi[,kk+1]
 						}
-	for (kk in 1:(maxK-1)){ # kk <- 1
+	for (kk in kvec){ # kk <- 1
 		for (dd in 1:ndim){
 			item1[ , paste0("B.Cat" , kk,".Dim",dd) ] <- B[,kk+1,dd]
 							}

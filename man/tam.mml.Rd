@@ -1974,6 +1974,50 @@ mod1r <- tam.mml.2pl( resp= dat , irtmodel="GPCM" ,
                 control=list( conv=1E-4 , acceleration="Ramsay") )
 # number of iterations
 mod1n$iter ; mod1y$iter ; mod1r$iter
+
+#############################################################################
+# EXAMPLE 23: Multidimensional polytomous Rasch model in which
+#             dimensions are defined by categories 
+#############################################################################
+
+data(data.Students, package="CDM")
+dat <- data.Students[ , grep( "act" , colnames(data.Students) ) ]
+
+# define multidimensional model in which categories of item define dimensions
+
+# * Category 0 -> loading of one on Dimension 0
+# * Category 1 -> no loadings
+# * Category 2 -> loading of one on Dimension 2
+
+# extract default design matrices
+res <- designMatrices( resp=dat )
+A <- res$A
+B0 <- 0*res$B
+# create design matrix B 
+B <- array( 0 , dim = c( dim(B0)[c(1,2) ] , 2  ) )
+dimnames(B)[[1]] <- dimnames(B0)[[1]]
+dimnames(B)[[2]] <- dimnames(B0)[[2]]
+dimnames(B)[[3]] <- c( "Dim0" , "Dim2" )
+B[,1,1]  <- 1
+B[,3,2]  <- 1
+
+# estimate multdimensional Rasch model
+mod1 <- tam.mml( resp=dat , A=A , B=B , control= list( maxiter=100) )
+summary(mod1)
+
+# alternative definition of B
+# * Category 1: negative loading on Dimension 1 and Dimension 2
+B <- array( 0 , dim = c( dim(B0)[c(1,2) ] , 2  ) )
+dimnames(B)[[1]] <- dimnames(B0)[[1]]
+dimnames(B)[[2]] <- dimnames(B0)[[2]]
+dimnames(B)[[3]] <- c( "Dim0" , "Dim2" )
+B[ ,1 , 1]  <- 1
+B[ ,3 , 2]  <- 1
+B[ ,2 , c(1,2)]  <- -1
+
+# estimate model
+mod2 <- tam.mml( resp=dat , A=A , B=B , control= list( maxiter=100) )
+summary(mod2)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
