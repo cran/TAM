@@ -165,8 +165,10 @@
 	  
       for( sg in stepgroups ){
 #         sg <- stepgroups[2]
-		mm1 <- mm[ grep(sg, rownames(mm)) ,]
-	   ind2 <- grep(sg, rownames(mm))
+	#	mm1 <- mm[ grep(sg, rownames(mm)) ,]
+	   mm1 <- grep(paste0("(", sg, ")+$"), rownames(mm))		
+	   # ind2 <- grep(sg, rownames(mm))	   
+	   ind2 <- grep( paste0("(", sg, ")+$") , rownames(mm))
 #	   if (length(ind2)>0){
           mm.sg.temp <- rbind( 0, apply( mm[ ind2 ,,drop=FALSE], 2, cumsum ) )
 #						}	

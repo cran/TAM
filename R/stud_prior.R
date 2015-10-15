@@ -5,7 +5,7 @@
 #############################################################
 stud_prior.v2 <-
   function(theta , Y , beta , variance , nstud , 
-           nnodes , ndim , YSD , unidim_simplify , snodes ){	      
+           nnodes , ndim , YSD , unidim_simplify , snodes=0 ){	      
 # unidim_simplify <- FALSE		   
     if(ndim == 1) {
       ##################################

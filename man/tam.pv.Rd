@@ -269,7 +269,7 @@ Q[cbind(1:(2*I), c( rep(1,I) , rep(2,I) ))] <- 1
 mod <- tam.mml( resp=resp , Y=Y , Q=Q , control=list(maxiter=5) )
 
 # (4) draw plausible values with normal approximation using the orginal theta grid
-pv1 <- tam.pv( mod , normal.approx=TRUE , theta.mod = TRUE )
+pv1 <- tam.pv( mod , normal.approx=TRUE , theta.model = TRUE )
 
 # (5) convert plausible values to list of imputed datasets
 Y1 <- data.frame(Y)

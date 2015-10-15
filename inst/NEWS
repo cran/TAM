@@ -43,6 +43,30 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 
 -------------------------------------------------------------
+CHANGES IN VERSION 1.14   (2015-10-15)  --  CRAN 1.14-0
+-------------------------------------------------------------
+
+Features:
+* ---
+
+Bug fixes:
+* fixed a bug in creating design matrices with more than 9 levels
+  of a factor in a facet for facet models with items with
+  varying number of categories
+* fixed a recently introduced bug in 'tam.pv' which occured due
+  to a change in the list of arguments in auxiliary function 
+  'stud_prior.v2' (thanks to Florian Gigl)
+
+Notes:
+* ---
+
+Datasets included or modified:
+* ---
+
+Examples included or modified:
+* ---
+
+-------------------------------------------------------------
 CHANGES IN VERSION 1.13   (2015-08-29)  --  CRAN 1.13-0
 -------------------------------------------------------------
 
