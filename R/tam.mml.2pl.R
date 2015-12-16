@@ -8,8 +8,10 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 				 est.variance = FALSE , 
                  A=NULL , B=NULL , B.fixed = NULL , 
 				 Q=NULL , est.slopegroups=NULL , E = NULL , 
+				 gamma.init = NULL , 
                  pweights = NULL , 
-			     userfct.variance = NULL , variance.Npars = NULL , 				 
+			     userfct.variance = NULL , variance.Npars = NULL , 		
+				 item.elim=TRUE  , 		
 				 control = list() 
                  # control can be specified by the user 
                  ){
@@ -114,6 +116,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 
   
   # normalize person weights to sum up to nstud
+  pweights0 <- pweights
   pweights <- nstud * pweights / sum(pweights)
   # a matrix version of person weights
   pweightsM <- outer( pweights , rep(1,nitems) )
@@ -150,8 +153,16 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   # maximum no. of categories per item. Assuming dichotomous
   maxK <- max( resp , na.rm=TRUE ) + 1 
   
+	#****
+	# ARb 2015-12-08
+	maxKi <- NULL
+	if ( ! (item.elim ) ){
+		maxKi <- rep( maxK - 1 , ncol(resp) )		
+				}
+    #***   
+  
   # create design matrices
-  design <- designMatrices( modeltype="PCM" , maxKi=NULL , resp=resp , 
+  design <- designMatrices( modeltype="PCM" , maxKi=maxKi , resp=resp , 
                             A=A , B=B , Q=Q , R=R, ndim=ndim )
   A <- design$A
   B <- design$B  
@@ -397,10 +408,16 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 		ES <- ncol(E)
 		basispar <- matrix( 1 , ES , ndim )	
 		basispar1 <- solve( t(E) %*% E	, t(E) %*% rep(1,nitems))
+		if ( ! is.null(gamma.init) ){
+			basispar1 <- gamma.init
+						}
+		
 		for ( dd in 1:ndim){
 			basispar[,dd] <- basispar1
 						}
 			   }
+			   
+			   
    if ( irtmodel %in% c("2PL","GPCM" , "GPCM.design","2PL.groups") ){
 	if ( ! is.null(B.fixed) ){
 			B[ B.fixed[,1:3,drop=FALSE] ] <- B.fixed[,4]	
@@ -462,7 +479,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 		rprobs.min <- 0
 		AXsi.min <- 0
 		B.min <- 0
-		deviance.min <- 0
+		deviance.min <- 1E100
 		itemwt.min <- 0
 		se.xsi.min <- se.xsi
 		se.B.min <- se.B
@@ -514,9 +531,12 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
     res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=gwt , resp=resp , nitems=nitems , 
                                  resp.ind.list=resp.ind.list , normalization=TRUE , 
                                  thetasamp.density=thetasamp.density , snodes=snodes ,
-						resp.ind=resp.ind	)	
+						         resp.ind=resp.ind	, avoid.zerosum=TRUE )	
     hwt <- res.hwt[["hwt"]]   
 
+# Revalpr("sum(is.na(hwt))")	
+	
+	
 # cat("posterior v2") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
     
     if (progress){ cat("M Step Intercepts   |"); flush.console() }
@@ -533,10 +553,11 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 							  thetasamp.density=thetasamp.density,nomiss=nomiss)
       
     beta <- resr$beta
+# Revalpr("beta")	
+	
 # cat("m step regression") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
 	
     variance <- resr$variance	
-
 	
 	if( ndim == 1 ){  # prevent negative variance
 			variance[ variance < min.variance ] <- min.variance 
@@ -621,12 +642,13 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
         xbar <- res$xbar
 		xbar2 <- res$xbar2
 		xxf <- res$xxf	      
-     
+					
       # Compute the difference between sufficient statistic and expectation
       diff <- as.vector(ItemScore) - xbar
       #Compute the Newton-Raphson derivative for the equation to be solved
       deriv <- xbar2 - xxf 			
       increment <- diff*abs(1/( deriv + 10^(-20) ) )
+	  	  
       if ( !is.null( xsi.fixed) ){ increment[ xsi.fixed[,1] ] <- 0 } 
 	  #!!!	  necesessary to include statement to control increment?
 	  ci <- ceiling( abs(increment) / ( abs( old_increment) + 10^(-10) ) )
@@ -711,6 +733,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 	# decrease increments in every iteration
 	if( increment.factor > 1){max.increment <-  1 / increment.factor^iter }
     
+
     # calculate deviance
     if ( snodes == 0 ){ 
       deviance <- - 2 * sum( pweights * log( res.hwt$rfx * thetawidth ) )
@@ -724,7 +747,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
     if (con$dev_crit == "relative" ){ a02 <- a01 }
  	
 	
-	if( deviance - olddeviance > 0 ){ 
+	if( deviance > deviance.min ){ 	
 #      if( ( deviance - olddeviance > 0 ) | ( iter == 1)  ){ 
 		xsi.min.deviance <- xsi.min.deviance 
 		beta.min.deviance <- beta.min.deviance
@@ -780,8 +803,11 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
     }
   } # end of EM loop
   #******************************************************
-# stop("check here")  
-  
+
+
+
+
+ 
   		xsi.min.deviance -> xsi 
 		beta.min.deviance -> beta
 		variance.min.deviance -> variance	
@@ -954,7 +980,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 			   "G" = if ( is.null(group)){1} else { length(unique( group ) )} , 
 			   "groups" = if ( is.null(group)){1} else { groups } , 			   			   
                "formulaY" = formulaY , "dataY" = dataY , 
-               "pweights" = pweights , 
+               "pweights" = pweights0 , 
                "time" = c(s1,s2,s2-s1) , "A" = A , "B" = B  ,
 			   "se.B" = se.B , 
                "nitems" = nitems , "maxK" = maxK , "AXsi" = AXsi ,

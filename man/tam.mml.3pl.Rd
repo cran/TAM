@@ -24,7 +24,8 @@ tam.mml.3pl(resp, Y = NULL, group = NULL, formulaY = NULL, dataY = NULL, ndim = 
   gammaslope.prior = NULL, userfct.gammaslope = NULL , gammaslope.constr.Npars = 0 ,
   est.guess = NULL, guess = rep(0, ncol(resp)), 
   guess.prior = NULL, skillspace = "normal", theta.k = NULL, delta.designmatrix = NULL, 
-  delta.fixed = NULL, delta.inits=NULL, pweights = NULL, control = list(), Edes=NULL )
+  delta.fixed = NULL, delta.inits=NULL, pweights = NULL, item.elim = TRUE ,
+  control = list(), Edes=NULL )
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -193,6 +194,9 @@ parameters.}
   \item{pweights}{
 Optional vector of person weights.
 }
+\item{item.elim}{Optional logical indicating whether an item with has
+    only zero entries should be removed from the analysis. The default
+    is \code{TRUE}.}
   \item{control}{
 See \code{\link{tam.mml}} for more details.
 }

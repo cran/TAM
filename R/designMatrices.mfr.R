@@ -225,11 +225,20 @@ z0 <- tamcat( " ---  col sums (gresp noStep) in X (Rcpp)" , z0 , tamcat_active )
     #*************
     # rename items
     # TK 2014-03-12: consider "item" in facets or long vector response MX
+	
     if( "item" %in% colnames(facets) ){
-      itemren <- data.frame( "item" = unique(facet.design$facets.orig[,"item"]) , "itemren" = paste0( "item" , unique(facet.design$facets[,"item"]) ) )
+      itemren <- data.frame( 
+			"item" = unique(facet.design$facets.orig[,"item"]) , 
+			"itemren" = paste0( "item" , unique(facet.design$facets[,"item"]) ) )		
     } else {
-      itemren <- data.frame( "item" =  colnames(resp) , "itemren" = paste0( "item" , 1:nI ) )
+	#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ARb 2015-10-16		
+	  n1 <- nI
+		if ( xsi.constr$intercept_included ){ n1 <- nI - 1  }
+      itemren <- data.frame( "item" =  colnames(resp)[1:n1] , 
+			"itemren" = paste0( "item" , 1:n1 ) )
+	#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@			
     }
+
 # cat(" --- .....before rename A" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1	
     A <- .rename.items( matr=A , itemren )
 z0 <- tamcat( " --- .rename.items (A)" , z0 , tamcat_active )  				 

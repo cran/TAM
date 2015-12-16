@@ -47,7 +47,9 @@ tam.mml.mfr <-
     increment.factor <- progress <- nodes <- snodes <- ridge <- xsi.start0 <- QMC <- NULL
     maxiter <- conv <- convD <- min.variance <- max.increment <- Msteps <- convM <- NULL 
     resp_orig <- resp
-    
+    B00 <- B 
+	B <- NULL
+
     # attach control elements
     e1 <- environment()
     con <- list( nodes = seq(-6,6,len=21) , snodes = 0 , QMC=TRUE , 
@@ -60,12 +62,15 @@ tam.mml.mfr <-
     Lcon <- length(con)
     con1a <- con1 <- con ; 
     names(con1) <- NULL
+
     for (cc in 1:Lcon ){
       assign( names(con)[cc] , con1[[cc]] , envir = e1 ) 
     }
     if ( !is.null(con$seed)){ set.seed( con$seed )	 }
-	acceleration <- con$acceleration
 	
+	
+	acceleration <- con$acceleration
+
     #***
     fac.oldxsi <- max( 0 , min( c( fac.oldxsi , .95 ) ) )
     
@@ -83,7 +88,8 @@ tam.mml.mfr <-
     
 	resp <- as.matrix(resp)
 	resp <- add.colnames.resp(resp)		
-    
+    itemnames <- colnames(resp)
+	
     nullY <- is.null(Y)
     
     if ( ! is.null(facets) ){ facets <- as.data.frame(facets) }
@@ -92,20 +98,31 @@ tam.mml.mfr <-
     # create design matrices
     if(ncol(resp)>1){
       maxKi <- apply( resp , 2 , max , na.rm=TRUE )
-    } else if(ncol(resp)==1){
-      item.ind <- grep("Item", names(facets), ignore.case=TRUE)
-      if(!is.null(item.ind)){ 
-        maxKi <- aggregate( resp , facets[,item.ind,drop=FALSE] , 
-                            max, na.rm=TRUE )[,2]
-      }else{
-        maxKi <- aggregate( resp , facets[,1,drop=FALSE] , 
-                            max, na.rm=TRUE )
-        
-      }
-    }
-
+    } else {
+		if(ncol(resp)==1){
+		  item.ind <- grep("Item", names(facets), ignore.case=TRUE)
+		  if(!is.null(item.ind)){
+				if ( length(item.ind) == 0 ){
+					item.ind <- NULL 
+								}
+							}		   
+		  if(!is.null(item.ind)){ 
+			maxKi <- aggregate( resp , facets[,item.ind,drop=FALSE] , 
+								max, na.rm=TRUE )[,2]
+		  }else{
+			maxKi <- aggregate( resp , facets[,1,drop=FALSE] , 
+								max, na.rm=TRUE )[,2]
+			
+		  }
+		}		
+	}
+# cat("w200\n")
+# Revalpr("maxKi")
+# Revalpr("head(resp)")
+	
 	#*****************
 	# handle formula and facets
+    resp00 <- resp
 
 	res <- mfr.dataprep( formulaA , xsi.setnull , B , Q ,
 				resp, pid, facets , beta.fixed  )				
@@ -115,19 +132,37 @@ tam.mml.mfr <-
 	facets <- res$facets
 	PSF <- res$PSF
 	pid <- res$pid
+
+# Revalpr("head(resp00)")
+# cat("s100\n")
+
+# maxKi <- 10
+
+
 	
 	diffKi <- FALSE
-	if ( var( maxKi ) > .001 ){ 
+# Revalpr("maxKi")	
+
+
+
+	var_ki <- var( maxKi )
+	if ( is.na( var_ki) ){ var_ki <- 0 }
+
+# Revalpr("var_ki")	
+	
+	if ( var_ki > .001 ){ 
 	     diffKi <- TRUE
 # cat("heere1\n")		 
 		 design <- designMatrices.mfr2(resp, formulaA=formulaA, facets=facets,  
                                  constraint=constraint, ndim=ndim,
                                  Q=Q, A=A, B=B , progress=progress)
 		 xsi.elim <- design$xsi.elim
-		 if ( nrow(xsi.elim) > 0 ){
-			 xsi.elim2 <- cbind( xsi.elim[,2] , 99 )		 
-			 xsi.fixed <- rbind( xsi.fixed , xsi.elim2 )
-									}								
+		if ( ! is.null(xsi.elim) ){	
+			 if ( nrow(xsi.elim) > 0 ){
+				 xsi.elim2 <- cbind( xsi.elim[,2] , 99 )		 
+				 xsi.fixed <- rbind( xsi.fixed , xsi.elim2 )
+										}
+									}
 			# set first beta coefficient to zero
 			if ( is.null( beta.fixed ) ){
 				dimB <- dim(design$B$B.3d.0	)	
@@ -136,8 +171,10 @@ tam.mml.mfr <-
 					} else {				
          design <- designMatrices.mfr(resp, formulaA=formulaA, facets=facets,  
                                  constraint=constraint, ndim=ndim,
-                                 Q=Q, A=A, B=B , progress=progress)							 
+                                 Q=Q, A=A, B=B , progress=progress)	
+								 
 							}	 
+																										
 													
     A <- design$A$A.3d.0	
     cA <- design$A$A.flat.0	
@@ -148,6 +185,27 @@ tam.mml.mfr <-
     gresp <- design$gresp$gresp
     gresp.noStep <- design$gresp$gresp.noStep
     xsi.constr <- design$xsi.constr
+	
+	#****************************
+	items00 <- colnames(resp00)
+	I00 <- length(items00)
+	D <- dim(B00)[3]
+	if ( ! is.null(B00) ){		
+			rownames_A <- dimnames(A)[[1]]
+			for (ii in 1:I00){
+				#		ii <- 1
+				ind <- grep( paste0( items00[ii] , "-" ) , rownames_A )
+				if ( length(ind) > 0 ){
+					I2 <- length(ind)
+					for (vv in 1:I2){
+						B[ ind[vv] , , 1:D] <- B00[ii , , 1:D ,drop=FALSE] * ( B[ ind[vv] , , 1:D] != 0  )
+								}						
+							}		
+						}									
+					}   # end is.null()
+			#*****************
+
+	
     if ( is.null( pid ) ){ pid <- 1:(nrow(gresp) ) }
     
 	
@@ -594,7 +652,7 @@ tam.mml.mfr <-
     rprobs.min <- 0
     AXsi.min <- 0
     B.min <- 0
-    deviance.min <- 0
+    deviance.min <- 1E100
     itemwt.min <- 0
     
 	#*****
@@ -641,7 +699,7 @@ tam.mml.mfr <-
     # display
     disp <- "....................................................\n"
     # define progress bar for M step        
-# cat("rest  " ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1								 
+ # cat("rest  " ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1								 
 
    
     ##############################################################   
@@ -839,8 +897,9 @@ if (!choice1){
 	  
       #***
       # decrease increments in every iteration
-      if( increment.factor > 1){max.increment <-  1 / increment.factor^iter }	  
+      if( increment.factor > 1){   max.increment <-  max.increment / increment.factor }	  
       
+
       
 # cat("m step item parameters") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		        
       # calculate deviance
@@ -857,7 +916,7 @@ if (!choice1){
 
 	if (con$dev_crit == "relative" ){ a02 <- a01 }
       
-      if( deviance - olddeviance > 0 ){ 
+      if( deviance > deviance.min ){ 
         xsi.min.deviance <- xsi.min.deviance 
         beta.min.deviance <- beta.min.deviance
         variance.min.deviance <- variance.min.deviance
@@ -1081,24 +1140,55 @@ if (!choice1){
     
     ####################################
     # collect xsi parameters
-    
     xsiFacet <- as.data.frame( (xsi.constr$xsi.table)[,1:2]	)
     obji <- data.frame( "parameter" = dimnames(A)[[3]] , 
                         "xsi"=xsi , "se.xsi"=se.xsi ) 		
     rownames(obji) <- paste(obji$parameter)
     rownames(xsiFacet) <- paste( xsi.constr$xsi.table[,1] )
+
     xsi1 <- merge( x = xsiFacet , y= obji , by="parameter" , all=TRUE )
     A1 <- xsi.constr$xsi.constraint %*% xsi
-    xsi1[ match( rownames(xsi.constr$xsi.constraint) , xsi1$parameter) , 
-          "xsi" ] <- A1
+	
+    xsi1[ match( rownames(xsi.constr$xsi.constraint) , xsi1$parameter) , "xsi" ] <- A1
+
     xsi1 <- xsi1[ match( xsiFacet$parameter , xsi1$parameter) , ]
     xsi.facets <- xsi1
     rownames(xsi.facets) <- NULL
     i1 <- grep( "Intercept" , xsi.facets$parameter)
+
     if ( length(i1) > 0 ){
       xsi.facets <-  xsi.facets[ - i1 , ] 
     }
-    
+
+	#@@@@@@@@@@@@@@@@@@@@@@@@ control xsi.facets
+	if( xsi.constr$intercept_included ){	
+		ind <- which( paste(xsi.facets$facet) == "item" )
+		n1 <- length(ind)
+			if ( n1 > 0 ){
+				itemc <- itemnames[n1]
+				itemo <- paste0("item" , n1 )		
+				g1 <- which( paste(xsi.facets$parameter) == itemo )
+				if ( length(g1) > 0 ){
+					xsi.facets$parameter[g1] <- itemc
+									}
+
+				g1 <- grep( paste0(itemo , ":") , paste(xsi.facets$parameter)  )
+				if ( length(g1) > 0 ){
+					xsi.facets$parameter <- gsub( paste0(itemo , ":") , paste0(itemc , ":")  ,
+										paste(xsi.facets$parameter) )
+									}
+
+				g1 <- grep( paste0(itemo , "-") , dimnames(A)[[1]]  )
+				if ( length(g1) > 0 ){
+					dimnames(A)[[1]] <- gsub( paste0(itemo , "-") , paste0(itemc , "-")  ,
+										dimnames(A)[[1]] )
+									}
+
+									
+						}
+				}	
+	#@@@@@@@@@@@@@@@@@@@@@@@@@
+	
     xsi <- obji[,-1]
     rownames(xsi) <- dimnames(A)[[3]]
     
@@ -1110,7 +1200,7 @@ if (!choice1){
                                    thetasamp.density=thetasamp.density , snodes=snodes ,
                                    resp.ind=resp.ind	)	
       res.like <- res.hwt[["hwt"]] 		
-	
+
 	
     # Output list
     deviance.history <- deviance.history[ 1:iter , ]

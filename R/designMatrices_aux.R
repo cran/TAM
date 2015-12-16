@@ -286,6 +286,25 @@ if (FALSE){
     A <- A[ ! duplicated( rownames(A) ) , ]
     A <- A[order(rownames(A)), ,drop = FALSE]      
     X.out <- X.out[order(rownames(X.out)), ,drop = FALSE]
+
+	#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ARb 2015-10-16	
+	#@@@@ clean xsi.constr	
+	xsi1 <- xsi.constr$xsi.constraints	
+	xsi.constr$intercept_included <- FALSE
+	ind <- grep("(Intercept" , rownames(xsi1) , fixed=TRUE)
+	if ( length(ind) > 0 ){
+		xsi1 <- xsi1[ - ind , ]
+		xsi.constr$xsi.constraints <- xsi1
+		xsi.constr$intercept_included <- TRUE	
+							}
+	xsi1 <- xsi.constr$xsi.table	
+	ind <- grep("(Intercept" , paste(xsi1$parameter) , fixed=TRUE)
+	if ( length(ind) > 0 ){
+		xsi1 <- xsi1[ - ind , ]
+		xsi.constr$xsi.table <- xsi1	
+							}													
+	#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	
 #cat(" +++  out .A.matrix" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						
     return(list( "A"=A, "X"=X.out, "otherFacets"=otherFacets , "xsi.constr"=xsi.constr ,
                  "facet.design" = facet.design ) )

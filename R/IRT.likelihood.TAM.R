@@ -8,6 +8,8 @@ IRT.likelihood.tam <- function( object , ... ){
     attr(ll,"theta") <- object$theta
 	attr(ll,"prob.theta") <- object$pi.k
 	attr(ll,"G") <- object$G
+	attr(ll,"pid") <- object$pid
+	attr(ll,"pweights") <- object$pweights	
     return(ll)
         }
 IRT.likelihood.tam.mml <- IRT.likelihood.tam 		
@@ -37,6 +39,8 @@ IRT.posterior.tam <- function( object , ... ){
     attr(ll,"theta") <- object$theta
 	attr(ll,"prob.theta") <- object$pi.k
 	attr(ll,"G") <- object$G
+	attr(ll,"pid") <- object$pid
+	attr(ll,"pweights") <- object$pweights		
     return(ll)
         }
 IRT.posterior.tam.mml <- IRT.posterior.tam 		

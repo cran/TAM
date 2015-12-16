@@ -10,6 +10,7 @@ tam.mml <-
             Q=NULL , est.slopegroups=NULL , E = NULL , 
             pweights = NULL , 
 			userfct.variance = NULL , variance.Npars = NULL , 
+			item.elim = TRUE , 
 			control = list() 
             # control can be specified by the user 
   ){
@@ -123,6 +124,7 @@ tam.mml <-
     # print( colSums( is.na(resp)) )
     
     # normalize person weights to sum up to nstud
+	pweights0 <- pweights
     pweights <- nstud * pweights / sum(pweights)
     # a matrix version of person weights
     pweightsM <- outer( pweights , rep(1,nitems) )
@@ -162,7 +164,14 @@ tam.mml <-
     # create design matrices
     modeltype <- "PCM"
     if (irtmodel=="RSM"){  modeltype <- "RSM" }
-    design <- designMatrices( modeltype= modeltype , maxKi=NULL , resp=resp , 
+	#****
+	# ARb 2015-12-08
+	maxKi <- NULL
+	if ( ! (item.elim ) ){
+		maxKi <- rep( maxK - 1 , ncol(resp) )		
+				}
+    #*** 
+    design <- designMatrices( modeltype= modeltype , maxKi=maxKi , resp=resp , 
                               A=A , B=B , Q=Q , R=R, ndim=ndim  , constraint=constraint )
     A <- design$A
     B <- design$B
@@ -174,7 +183,7 @@ tam.mml <-
     }    
     
     design <- NULL				
-    
+   
     #   #---2PL---
     #   B_orig <- B  #keep a record of generated B before estimating it in 2PL model 
     #   #---end 2PL---
@@ -365,7 +374,7 @@ tam.mml <-
     beta.min.deviance <- beta
     variance.min.deviance <- variance
     
-    # cat("b200"); a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1  									  
+# cat("b200"); a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1  									  
     
     # nodes
     if ( snodes == 0 ){ 
@@ -451,7 +460,7 @@ tam.mml <-
     rprobs.min <- 0
     AXsi.min <- 0
     B.min <- 0
-    deviance.min <- 0
+    deviance.min <- 1E100
     itemwt.min <- 0
     se.xsi.min <- se.xsi
     se.B.min <- se.B
@@ -523,7 +532,7 @@ tam.mml <-
       res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=gwt , resp=resp , nitems=nitems , 
                                    resp.ind.list=resp.ind.list , normalization=TRUE , 
                                    thetasamp.density=thetasamp.density , snodes=snodes ,
-                                   resp.ind=resp.ind	)	
+                                   resp.ind=resp.ind  ,  avoid.zerosum=TRUE	)	
       hwt <- res.hwt[["hwt"]]   
 # cat("calc_posterior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						 
       
@@ -688,7 +697,7 @@ tam.mml <-
 	  	  
 	  if (con$dev_crit == "relative" ){ a02 <- a01 }
       
-      if( deviance - olddeviance > 0 ){ 
+      if( deviance > deviance.min ){ 	
 #      if( ( deviance - olddeviance < 0 ) | ( iter == 1)  ){ 
         xsi.min.deviance <- xsi.min.deviance 
         beta.min.deviance <- beta.min.deviance
@@ -939,7 +948,7 @@ tam.mml <-
                  "G" = if ( is.null(group)){1} else { length(unique( group ) )} , 
                  "groups" = if ( is.null(group)){1} else { groups } , 			   
                  "formulaY" = formulaY , "dataY" = dataY , 
-                 "pweights" = pweights , 
+                 "pweights" = pweights0 , 
                  "time" = c(s1,s2,s2-s1) , "A" = A , "B" = B  ,
                  "se.B" = se.B , 
                  "nitems" = nitems , "maxK" = maxK , "AXsi" = AXsi ,

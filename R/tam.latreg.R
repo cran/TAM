@@ -228,7 +228,7 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
 #    mpr <- round( seq( 1 , np , len = 10 ) )
     
     hwt.min <- 0
-    deviance.min <- 0
+    deviance.min <- 1E100
     itemwt.min <- 0
 
 	nomiss <- TRUE
@@ -326,7 +326,7 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
       a01 <- abs( ( deviance - olddeviance ) / deviance  )
       a02 <- abs( ( deviance - olddeviance )  )	
       
-      if( deviance - olddeviance > 0 ){ 
+      if( deviance > deviance.min ){ 	 
         beta.min.deviance <- beta.min.deviance
         variance.min.deviance <- variance.min.deviance
         hwt.min <- hwt.min

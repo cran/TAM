@@ -272,7 +272,14 @@ designMatrices.mfr2 <-
     if( "item" %in% colnames(facets) ){
       itemren <- data.frame( "item" = unique(facet.design$facets.orig[,"item"]) , "itemren" = paste0( "item" , unique(facet.design$facets[,"item"]) ) )
     } else {
-      itemren <- data.frame( "item" =  colnames(resp) , "itemren" = paste0( "item" , 1:nI ) )
+#      itemren <- data.frame( "item" =  colnames(resp) , "itemren" = paste0( "item" , 1:nI ) )
+	#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ARb 2015-10-16		
+	  n1 <- nI
+		if ( xsi.constr$intercept_included ){ n1 <- nI - 1  }
+      itemren <- data.frame( "item" =  colnames(resp)[1:n1] , 
+			"itemren" = paste0( "item" , 1:n1 ) )
+	#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@		
+
     }
 # cat(".....\nbefore rename A" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1	
     # print("g100")	

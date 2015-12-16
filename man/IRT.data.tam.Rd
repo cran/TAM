@@ -11,7 +11,7 @@ Extracting Item Response Dataset
 
 
 \description{
-Extracts expected counts for models
+Extracts the used data set for models
 fitted in \pkg{TAM}. See \code{\link[CDM:IRT.data]{CDM::IRT.data}} 
  for more details.
 }

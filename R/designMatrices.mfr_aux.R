@@ -177,7 +177,7 @@
 
 	vers <- FALSE
 	vers <- TRUE
-	
+
 	#-----------------------
 	# rows
 	if (vers){
@@ -195,7 +195,7 @@
 		rM <- rM0
 		if ( cols){
 			cM0 <- cM	
-			ind <- match(  cM0 , itemren[,2])
+			ind <- match(  cM0 , itemren[,2])		
 			ind <- na.omit(ind)
 			cM0[ ind ] <- paste(itemren[,1])	
 			itemren2 <- paste0(itemren[,2] , ":")

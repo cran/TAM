@@ -41,7 +41,9 @@ calc_posterior.v2 <-
 # cat("vor calcfx") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
     fx <- .Call("calcfx", fx, rprobs, resp.ind.list, resp)
 # cat("nach calcfx") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
-#Revalpr("head(fx0)")	
+
+
+
 	# logprobs
 #	eps <- 1E-10
 #	rprobs <- log(rprobs + eps )
@@ -53,7 +55,10 @@ calc_posterior.v2 <-
 		fxs <- rowSums( fx )
 		#m1 <- min( fxs[ fxs > 0 ] ) / 1E3 / ncol(fx )
 		m1 <- max( min( fxs[ fxs > 0 ] , na.rm=TRUE) , 1E-200 ) / 1E3 / ncol(fx )	
-		fx[ (fxs == 0) , ] <- m1
+        ind <- which( fxs == 0 )
+		if ( length(ind) > 0 ){
+			fx[ (fxs == 0) , ] <- m1
+								}
 		fx[ is.na(fxs) , ] <- m1 
 		# fx <- fx + m1
 		}

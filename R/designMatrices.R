@@ -12,6 +12,7 @@ designMatrices <-
 					}
 	
     A.draft <- A	# if ! is.null(A), it is necessary
+	
     if( is.null(maxKi) ){
       if( !is.null(resp) ){
         resp[is.na(resp)] <- 0

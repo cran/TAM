@@ -35,15 +35,15 @@ tam.mml(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
     variance.inits = NULL, est.variance = FALSE, constraint="cases" , A = NULL, 
     B = NULL, B.fixed = NULL,  Q = NULL,  est.slopegroups = NULL, E = NULL, 
     pweights = NULL, userfct.variance = NULL , variance.Npars = NULL , 
-    control = list())
+    item.elim = TRUE , control = list() )
 
 tam.mml.2pl(resp, Y = NULL, group = NULL, irtmodel = "2PL", formulaY = NULL, 
     dataY = NULL, ndim = 1, pid = NULL, xsi.fixed = NULL, xsi.inits = NULL,
     beta.fixed = NULL, beta.inits = NULL, variance.fixed = NULL, 
     variance.inits = NULL, est.variance = FALSE, A = NULL, B = NULL, 
-    B.fixed = NULL, Q = NULL, est.slopegroups = NULL, E = NULL, 
+    B.fixed = NULL, Q = NULL, est.slopegroups = NULL, E = NULL, gamma.init = NULL , 
     pweights = NULL, userfct.variance = NULL , variance.Npars = NULL , 
-    control = list())
+    item.elim = TRUE , control = list() )
             
 tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
     dataY = NULL, ndim = 1, pid = NULL, xsi.fixed = NULL, xsi.setnull = NULL,
@@ -193,6 +193,9 @@ tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
   An optional design matrix for estimating item slopes
   in the generalized partial credit model (\code{irtmodel="GPCM.design"})
 }
+\item{gamma.init}{Optional initial \eqn{gamma} parameter vector
+(\code{irtmodel="GPCM.design"}).
+}
 \item{pweights}{
      An optional vector of person weights
 }
@@ -207,6 +210,9 @@ tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
 (See Simulated Example 17).}
 \item{variance.Npars}{Number of estimated parameters of variance matrix
 if a \code{userfct.variance} is provided.} 		
+\item{item.elim}{Optional logical indicating whether an item with has
+    only zero entries should be removed from the analysis. The default
+    is \code{TRUE}.}
 \item{control}{
   A list of control arguments for the algorithm: \cr\cr
   \code{ list( nodes = seq(-6,6,len=21) , snodes = 0 , QMC=TRUE,}\cr
@@ -260,7 +266,7 @@ for the latent regression which is added to the covariance matrix
 (important for reproducible results for stochastic integration) 
 
 \code{xsi.start0}: A numeric value. The value of 0 indicates that for all
-parameters staring values are provided. A value of 1 means that all
+parameters starting values are provided. A value of 1 means that all
 starting values are set to zero and a value of 2 means that only
 starting values of item parameters (but not facet parameters)
 are used.

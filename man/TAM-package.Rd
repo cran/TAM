@@ -18,7 +18,7 @@ Test Analysis Modules
 \tabular{ll}{
 Package: \tab \pkg{TAM}\cr
 Type: \tab Package\cr
-Version: \tab 1.14\cr
+Version: \tab 1.15\cr
 Publication Year: \tab 2015\cr
 License: \tab GPL (>=2.0)\cr
 URL: \tab \url{http://www.edmeasurementsurveys.com/TAM/Tutorials/}\cr
@@ -32,7 +32,7 @@ tutorials of the \pkg{TAM} package.
 \author{
 Thomas Kiefer [aut], Alexander Robitzsch [aut, cre], Margaret Wu [aut]
 
-Maintainer: Alexander Robitzsch <a.robitzsch@bifie.at>
+Maintainer: Alexander Robitzsch <robitzsch@ipn.uni-kiel.de>
 }
 \references{
 Adams, R. J., Wilson, M., & Wu, M. (1997).

@@ -24,7 +24,7 @@ T. Kiefer, A. Robitzsch, & M. Wu
 mailto:
 -------
 Alexander Robitzsch
-a.robitzsch@bifie.at
+robitzsch@ipn.uni-kiel.de
 
 For reporting a bug, please always provide a reproducible R script 
 and (if necessary) a corresponding dataset.
@@ -41,6 +41,42 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
+
+
+-------------------------------------------------------------
+CHANGES IN VERSION 1.15   (2015-12-15)  --  CRAN 1.15-0
+-------------------------------------------------------------
+
+Features:
+* ---
+
+Bug fixes:
+* fixed a bug in postprocessing of parameter names in 'tam.mml.mfr'
+  with the option "constraint='items'"
+* avoided NA entries in posterior calculation in 'tam.mml' and
+  'tam.mml.2pl' 
+
+Notes:
+* corrected output of likelihood when minimum value was not
+  obtained in last iteration
+* changed behavior of parameters 'max.increment' and 'increment.factor'
+  in 'tam.mml.mfr' which should result in more stable deviance
+  behavior
+* included attributes 'pid' and 'pweights' in 'IRT.likelihood' and
+  'IRT.posterior'
+* included optional argument 'gamma.init' for 'tam.mml.2pl' and 
+  irtmodel='GPCM.design'
+* included argument 'item.elim' in 'tam.mml', 'tam.mml.2pl' and 
+  'tam.mml.3pl' which prevents the omission of items with a 
+  maximum score of zero (suggested by Anja Mikolajetz)
+* changed output of 'pweights' to original provided person weights,
+  not the transformed person weights
+
+Datasets included or modified:
+* ---
+
+Examples included or modified:
+* ---
 
 -------------------------------------------------------------
 CHANGES IN VERSION 1.14   (2015-10-15)  --  CRAN 1.14-0

@@ -20,6 +20,7 @@ tam.mml.3pl <-
             skillspace = "normal" , theta.k = NULL , 
             delta.designmatrix=NULL , delta.fixed=NULL , 
 			delta.inits = NULL ,  pweights = NULL , 
+			item.elim = TRUE , 
 			control = list() ,	Edes = NULL  
 				){
     
@@ -179,6 +180,7 @@ tam.mml.3pl <-
     if ( is.null(pid) ){ pid <- seq(1,nstud) }
         
     # normalize person weights to sum up to nstud
+	pweights0 <- pweights
     pweights <- nstud * pweights / sum(pweights)
     # a matrix version of person weights
     pweightsM <- outer( pweights , rep(1,nitems) )
@@ -215,6 +217,16 @@ tam.mml.3pl <-
     
     # maximum no. of categories per item. Assuming dichotomous
     maxK <- max( resp , na.rm=TRUE ) + 1 
+	
+  
+	#****
+	# ARb 2015-12-15
+	maxKi <- NULL
+	if ( ! (item.elim ) ){
+		maxKi <- rep( maxK - 1 , ncol(resp) )		
+				}
+    #***     	
+	
     # create design matrices
     design <- designMatrices( modeltype="PCM" , maxKi=NULL , resp=resp , 
                               A=A , B=B , Q=Q , R=R, ndim=ndim )
@@ -597,7 +609,7 @@ tam.mml.3pl <-
     rprobs.min <- 0
     AXsi.min <- 0
     B.min <- 0
-    deviance.min <- 0
+    deviance.min <- 1E100
     itemwt.min <- 0
     se.xsi.min <- se.xsi
     se.B.min <- se.B
@@ -939,7 +951,7 @@ a0 <- Sys.time()
       a02 <- abs( ( deviance - olddeviance )  )	
 	  if (con$dev_crit == "relative" ){ a02 <- a01 }
  
-      if( ( deviance - olddeviance < 0 ) | ( iter == 1)  ){ 
+      if( ( deviance < deviance.min ) | ( iter == 1)  ){ 
         xsi.min.deviance <- xsi 
         beta.min.deviance <- beta
         variance.min.deviance <- variance	
@@ -1195,7 +1207,7 @@ a0 <- Sys.time()
                  "G" = if ( is.null(group)){1} else { length(unique( group ) )} , 
                  "groups" = if ( is.null(group)){1} else { groups } , 			   			   
                  "formulaY" = formulaY , "dataY" = dataY , 
-                 "pweights" = pweights , 
+                 "pweights" = pweights0 , 
                  "time" = c(s1,s2,s2-s1) , "A" = A , "B" = B  ,
                  "se.B" = se.B , 
                  "nitems" = nitems , "maxK" = maxK , "AXsi" = AXsi ,

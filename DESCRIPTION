@@ -1,31 +1,29 @@
 Package: TAM
 Type: Package
 Title: Test Analysis Modules
-Version: 1.14-0
-Date: 2015-10-15
-Author: Thomas Kiefer [aut], Alexander Robitzsch [aut, cre], Margaret Wu [aut]
-Maintainer: Alexander Robitzsch <a.robitzsch@bifie.at>
-Authors@R: c(person("Thomas", "Kiefer", role = c("aut"), email =
-        "t.kiefer@bifie.at"), person("Alexander", "Robitzsch", role =
-        c("aut","cre"), email = "a.robitzsch@bifie.at"),
-        person("Margaret", "Wu", role = "aut"))
+Version: 1.15-0
+Date: 2015-12-15
+Author: 
+    Thomas Kiefer [aut], Alexander Robitzsch [aut, cre], Margaret Wu [aut]
+Maintainer: 
+ Alexander Robitzsch <robitzsch@ipn.uni-kiel.de>
 Description: 
-  Includes marginal and joint maximum likelihood
-  estimation of uni- and multidimensional item response models 
-  (Rasch, 2PL, 3PL, Generalized Partial Credit, Multi Facets,
-  Nominal Item Response, Structured Latent Class Analysis,
-  Mixture Distribution IRT Models, Located Latent Class Models). 
-  Latent regression models and plausible value imputation are 
-  also supported.
+    Includes marginal and joint maximum likelihood
+    estimation of uni- and multidimensional item response models 
+    (Rasch, 2PL, 3PL, Generalized Partial Credit, Multi Facets,
+    Nominal Item Response, Structured Latent Class Analysis,
+    Mixture Distribution IRT Models, Located Latent Class Models). 
+    Latent regression models and plausible value imputation are 
+    also supported.
 Depends: R (>= 2.15.1), CDM, MASS
-Imports: stats, graphics, utils, grDevices, methods, Rcpp, lavaan,
-        WrightMap, tensor, sfsmisc, GPArotation, psych, mvtnorm, msm,
-        lattice, plyr
-Suggests: sirt, PP, semTools, miceadds
+Imports: GPArotation, graphics, grDevices, lavaan, lattice, methods,
+        mvtnorm, msm, plyr, psych, Rcpp, sfsmisc, stats, utils, tensor,
+        WrightMap
+Suggests: miceadds, PP, semTools, sirt
 LinkingTo: Rcpp, RcppArmadillo
 License: GPL (>= 2)
 URL: http://www.edmeasurementsurveys.com/TAM/Tutorials/
-Packaged: 2015-10-15 12:54:13 UTC; robitzsch
 NeedsCompilation: yes
+Packaged: 2015-12-15 20:14:03 UTC; sunpn563
 Repository: CRAN
-Date/Publication: 2015-10-15 15:45:22
+Date/Publication: 2015-12-16 12:23:41
