@@ -11,10 +11,12 @@ Simulated Multifaceted Data
 
 \description{
 Simulated data from multiple facets. 
+}
+
 %% ## DON'T FORGET TO SET SEEDS BEFORE SIMULATING ACTUAL SIM-DATA
 %% ## (NOT DONE YET)
 %% ## Safe simulation script in "inst"-folder
-}
+
 
 \usage{
  data(data.sim.mfr)

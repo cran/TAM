@@ -114,17 +114,17 @@ mod.sim.dat <- tam.mml.2pl(resp = sim.dat, irtmodel = "2PL")
 # Multi-Group ----
 set.seed(6778)
 N <- 3000
-theta <- c( rnorm(N/2,mean=0,sd = 1.5) , rnorm(N/2,mean=.5,sd = 1)  )
+theta <- c( stats::rnorm(N/2,mean=0,sd = 1.5) , stats::rnorm(N/2,mean=.5,sd = 1)  )
 I <- 20
-p1 <- plogis( outer( theta , seq( -2 , 2 , len=I ) , "-" ) )
-resp <- 1 * ( p1 > matrix( runif( N*I ) , nrow=N , ncol=I ) )
+p1 <- stats::plogis( outer( theta , seq( -2 , 2 , len=I ) , "-" ) )
+resp <- 1 * ( p1 > matrix( stats::runif( N*I ) , nrow=N , ncol=I ) )
 colnames(resp) <- paste("I" , 1:I, sep="")
 group <- rep(1:2 , each=N/2 )
 mod3 <- tam.mml(resp, group = group)
 
 # simulate data
-sim.dat.g1 <- IRT.simulate(mod3, theta = matrix( rnorm(N/2, mean = 0, sd = 1.5) , ncol=1) )
-sim.dat.g2 <- IRT.simulate(mod3, theta = matrix( rnorm(N/2, mean = .5, sd = 1) , ncol=1) )
+sim.dat.g1 <- IRT.simulate(mod3, theta = matrix( stats::rnorm(N/2, mean = 0, sd = 1.5) , ncol=1) )
+sim.dat.g2 <- IRT.simulate(mod3, theta = matrix( stats::rnorm(N/2, mean = .5, sd = 1) , ncol=1) )
 sim.dat <- rbind( sim.dat.g1 , sim.dat.g2)
 # estimate model
 mod3s <- tam.mml( sim.dat , group = group)
@@ -135,15 +135,15 @@ mod3s <- tam.mml( sim.dat , group = group)
 
 set.seed(6778)
 N <- 2000      
-Y <- cbind(rnorm(N), rnorm(N))
-theta <- rmvnorm(N, mean = c(0,0), sigma = matrix(c(1,.5,.5,1), 2, 2))
+Y <- cbind( stats::rnorm(N), stats::rnorm(N))
+theta <- mvtnorm::rmvnorm(N, mean = c(0,0), sigma = matrix(c(1,.5,.5,1), 2, 2))
 theta[,1] <- theta[,1] + .4 * Y[,1] + .2 * Y[,2]  # latent regression model
 theta[,2] <- theta[,2] + .8 * Y[,1] + .5 * Y[,2]  # latent regression model
 I <- 20
-p1 <- plogis(outer(theta[, 1], seq(-2, 2, len = I), "-"))
-resp1 <- 1 * (p1 > matrix(runif(N * I), nrow = N, ncol = I))
-p1 <- plogis(outer(theta[, 2], seq(-2 , 2 , len=I ) , "-" ))
-resp2 <- 1 * (p1 > matrix(runif(N * I), nrow = N, ncol = I))
+p1 <- stats::plogis(outer(theta[, 1], seq(-2, 2, len = I), "-"))
+resp1 <- 1 * (p1 > matrix(stats::runif(N * I), nrow = N, ncol = I))
+p1 <- stats::plogis(outer(theta[, 2], seq(-2 , 2 , len=I ) , "-" ))
+resp2 <- 1 * (p1 > matrix(stats::runif(N * I), nrow = N, ncol = I))
 resp <- cbind(resp1, resp2)
 colnames(resp) <- paste("I", 1 : (2 * I), sep = "")
 

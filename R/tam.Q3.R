@@ -7,7 +7,7 @@ tam.Q3 <- function( tamobj , ... ){
 	resp_ind <-  1 - is.na( res1$residuals )
 	cp20 <- cp1 <- crossprod( resp_ind )
 	# calculate Q3
-	Q3.matr <- cor( res1$residuals , use="pairwise.complete.obs" )
+	Q3.matr <- stats::cor( res1$residuals , use="pairwise.complete.obs" )
 	diag(Q3.matr) <- NA
 	aQ3.matr <- Q3.matr - mean( Q3.matr , na.rm=TRUE )	
 	Q3_summary <- data.frame( "type" = c("Q3" , "aQ3" ) )

@@ -95,11 +95,10 @@ tam.mml.fit <-
     }
 
 	N <- nrow(hwt)
-    rn1M <- matrix( runif(N*Nsimul) , nrow=N , ncol= Nsimul )        
+    rn1M <- matrix( stats::runif(N*Nsimul) , nrow=N , ncol= Nsimul )        
 
     
     for (p in 1:np) {
-#      if (progress){ cat("-") ; flush.console() }
       ip <- indexIP.list[[p]]
       xbari <- sapply( ip, function(i) colSums(FitMatrix[i,,p] * rprobs[i,,] , na.rm = TRUE ))
       #... TK: multiple category option -> na.rm = TRUE
@@ -212,25 +211,25 @@ tam.mml.fit <-
 	  
 	if (progress){
 		if ( p %in% prbar ){
-		       cat("-") ; flush.console()
+		       cat("-") ; utils::flush.console()
 							}
 						}
 	  
     }
-    if (progress){ cat("|\n") ; flush.console() }
+    if (progress){ cat("|\n") ; utils::flush.console() }
     res <- data.frame(
 	    "parameter" = dimnames(FitMatrix)[[3]] ,
 					  "Outfit" = Outfit , 
                       "Outfit_t" = Outfit_t, 
-					  "Outfit_p" = pnorm(-abs(Outfit_t)) /2 ,
+					  "Outfit_p" = stats::pnorm(-abs(Outfit_t)) /2 ,
 					  "Outfit_pholm" =NA , 
 					  "Infit" = Infit , 
                       "Infit_t" = Infit_t,  
-					  "Infit_p" = pnorm(-abs(Infit_t)) /2 ,
+					  "Infit_p" = stats::pnorm(-abs(Infit_t)) /2 ,
 					  "Infit_pholm" =NA 
 							)
-	res$Outfit_pholm <- p.adjust( res$Outfit_p , method="holm")
-	res$Infit_pholm <- p.adjust( res$Infit_p , method="holm")
+	res$Outfit_pholm <- stats::p.adjust( res$Outfit_p , method="holm")
+	res$Infit_pholm <- stats::p.adjust( res$Infit_p , method="holm")
     #data.frame( "Outfit" = round(Outfit,2) , "Outfit_t" = round(Outfit_t,1), "Infit" = round(Infit,2), Infit_t = round(Infit_t,1) )    
     res <- list( "itemfit" = res )
     class(res) <- "tam.fit"	

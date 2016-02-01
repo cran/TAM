@@ -146,10 +146,10 @@ BEGIN_RCPP
      // OUTPUT              
                    
       return Rcpp::List::create(    
-         _["Outfit_SIM"] = Outfit_SIM ,  
-         _["Infit_SIM"] = Infit_SIM ,  
-         _["Infit_t_SIM"] = Infit_t_SIM ,  
-         _["Outfit_t_SIM"] = Outfit_t_SIM  
+         Rcpp::_["Outfit_SIM"] = Outfit_SIM ,  
+         Rcpp::_["Infit_SIM"] = Infit_SIM ,  
+         Rcpp::_["Infit_t_SIM"] = Infit_t_SIM ,  
+         Rcpp::_["Outfit_t_SIM"] = Outfit_t_SIM  
          ) ;  
 END_RCPP
 }

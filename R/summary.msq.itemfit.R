@@ -6,7 +6,7 @@
 summary.msq.itemfit <- function( object , ... ){
 
 	cat("------------------------------------------------------------\n")
-    d1 <- packageDescription("TAM")
+    d1 <- utils::packageDescription("TAM")
 	cat( paste( d1$Package , " " , d1$Version , " (" , d1$Date , ")" , 
 			sep="") , "\n\n" )	
 	cat( "Date of Analysis:" , paste( object$time[2] ) , "\n" )

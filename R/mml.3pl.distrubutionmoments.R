@@ -44,7 +44,7 @@
 									}
 						}
 		rownames(Sigma.gg) <- colnames(Sigma.gg) <- rownames(mean.trait)
-		correlation.trait[[gg]] <- cov2cor(Sigma.gg + diag(10^(-5),D) )
+		correlation.trait[[gg]] <- stats::cov2cor(Sigma.gg + diag(10^(-5),D) )
 					}	
 	res <- list( "mean.trait"=mean.trait , "sd.trait" = sd.trait , 
 				"skewness.trait" = skewness.trait , "correlation.trait"=correlation.trait)

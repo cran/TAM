@@ -20,7 +20,7 @@ tam.modelfit <- function( tamobj , progress=TRUE ){
   # calculate Q3 and residuals
   #*** Rcpp call
   if (progress){
-    cat("**** Calculate Residuals \n") ; flush.console()
+    cat("**** Calculate Residuals \n") ; utils::flush.console()
     #		cat(paste0("     |",paste0(rep("*", 10),collapse="") , "|\n     |"))
   }
   RR <- I*(I-1) / 2 
@@ -43,10 +43,10 @@ tam.modelfit <- function( tamobj , progress=TRUE ){
   # compute p value
   N <- nrow(resp)
   se1 <- - abs( dfr2$aQ3 * sqrt( N -3 ) )
-  dfr2$p <- 2 * pnorm( se1  )
+  dfr2$p <- 2 * stats::pnorm( se1  )
   dfr <- dfr2
   dfr <- dfr[ order( dfr$aQ3 , decreasing=TRUE) , ]
-  dfr$p.holm <- p.adjust( dfr$p , method="holm")    
+  dfr$p.holm <- stats::p.adjust( dfr$p , method="holm")    
    # include sample size of each item pair
    resp_ind <- 1 - is.na(resp)
    cp1 <- crossprod( resp_ind )
@@ -64,7 +64,7 @@ tam.modelfit <- function( tamobj , progress=TRUE ){
   # cat("before calc counts") ; zz1 <- Sys.time(); print(zz1-zz0) ; zz0 <- zz1							
   #***** calculate observed and expected counts
   if (progress){
-    cat("**** Calculate Counts \n") ; flush.console()
+    cat("**** Calculate Counts \n") ; utils::flush.console()
   }
   res1 <- .Call("tam_q3_calc_V2counts" , as.matrix(resp0) , as.matrix(resp.ind) , 
                 as.vector(rprobs) , as.matrix(hwt) , maxKi , maxK ,
@@ -78,15 +78,15 @@ tam.modelfit <- function( tamobj , progress=TRUE ){
   colnames(chi2.stat) <- c("index1","index2", "maxK1" , "maxK2" , "df")
   eps <- 1e-10
   chi2.stat$chi2[pair_exists] <- rowSums( ( obs_counts - exp_counts )^2 / ( exp_counts + eps ) )[pair_exists]
-  chi2.stat$p[pair_exists] <- 1- pchisq( chi2.stat$chi2[pair_exists] , df=chi2.stat$df[pair_exists]  )
-  chi2.stat$p.holm[pair_exists] <- p.adjust( chi2.stat$p[pair_exists] , method="holm")
+  chi2.stat$p[pair_exists] <- 1- stats::pchisq( chi2.stat$chi2[pair_exists] , df=chi2.stat$df[pair_exists]  )
+  chi2.stat$p.holm[pair_exists] <- stats::p.adjust( chi2.stat$p[pair_exists] , method="holm")
   #*****
   # calculate covariance and correlation
   scorematrix <- cbind( rep( 0:(maxK-1) , maxK ) ,
                         rep(0:(maxK-1) , each=maxK) )
   # observation covariances and correlations
   if (progress){
-    cat("**** Calculate Covariances \n") ; flush.console()
+    cat("**** Calculate Covariances \n") ; utils::flush.console()
   }
   res2 <- .Call("tam_calccov" , obs_counts , scorematrix , adjust_= 1 , PACKAGE="TAM")
   res2e <- .Call("tam_calccov" , exp_counts , scorematrix , adjust_= 0 , PACKAGE="TAM" )
@@ -125,9 +125,9 @@ tam.modelfit <- function( tamobj , progress=TRUE ){
     # ii <- 1
     h1 <- dfr[ dfr$index1 == ii | dfr$index2 == ii , ]
     h1 <- h1[!is.nan(h1$p),]
-    chisquare.itemfit$p[ii] <- min( p.adjust( h1$p , method="holm") )
+    chisquare.itemfit$p[ii] <- min( stats::p.adjust( h1$p , method="holm") )
   }		
-  chisquare.itemfit$p.holm <- p.adjust( chisquare.itemfit$p , method="holm") 
+  chisquare.itemfit$p.holm <- stats::p.adjust( chisquare.itemfit$p , method="holm") 
   
   # maximum chi square
   modelfit.test <- data.frame("p.holm" = min( chi2.stat$p.holm[pair_exists] ) )

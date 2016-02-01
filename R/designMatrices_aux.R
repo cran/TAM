@@ -135,7 +135,7 @@ rownames.design2 <- function(X){
                               colnames(X)[ff] , " does only have one level!" ) , "\n") }
     }
 # cat(" +++  v120" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						
-    mm <- - model.matrix(formulaA, X, contrasts = contr.list)
+    mm <- - stats::model.matrix(formulaA, X, contrasts = contr.list)
     #    mm <- - model.matrix(formulaA, X )
     if( constraint == "items" ) mm <- mm[,-1]
     

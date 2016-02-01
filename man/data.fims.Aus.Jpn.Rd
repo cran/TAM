@@ -66,7 +66,7 @@ items <- grep("M1" , colnames(data.fims.Aus.Jpn.scored) , value=TRUE)
 ##    [8] "M1PTI14" "M1PTI17" "M1PTI18" "M1PTI19" "M1PTI21" "M1PTI22" "M1PTI23"
 
 # Run partial credit model
-mod1 <- tam(scored[,items])
+mod1 <- tam.mml(scored[,items])
 
 # extract values of the gender variable into a variable called "gender".
 gender <- scored[,"SEX"]
@@ -75,7 +75,7 @@ gender <- scored[,"SEX"]
 raw_score <- rowSums(scored[,items] )
 
 # compute the mean test score for each gender group: 1=male, and 2=female
-aggregate(raw_score,by=list(gender),FUN=mean)
+stats::aggregate(raw_score,by=list(gender),FUN=mean)
 # The mean test score is 6.12 for group 1 (males) and 6.27 for group 2 (females). 
 # That is, the two groups performed similarly, with girls having a slightly 
 # higher mean test score. The step of computing raw test scores is not necessary 

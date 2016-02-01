@@ -23,12 +23,12 @@ plotDevianceTAM   <- function ( tam.obj , omitUntil = 1, reverse = TRUE ,
 		xt        <- max ( which ( xt ) )                         
 		cex       <- 0.85 - ( length(devChange[,1]) / 1000 )       
 		if ( cex < 0.40 ) cex <- 0.40                             
-		plot ( devChange[,1] , devChange[,2] , type = "o" , 
+		graphics::plot ( devChange[,1] , devChange[,2] , type = "o" , 
 				main = "Deviance Change Plot", xlab = "Iteration" , 
 				xlim = c(min(devChange[,1]) ,max(devChange[,1])) ,  xaxp = c(0,xm,xt) , 
 				ylab = ylab1 , pch = 20 , cex = cex , lwd = 0.75 )
-		abline ( a=0 , b=0 )                                   
+		graphics::abline( a=0 , b=0 )                                   
 		dcr       <- devChange[devChange[,2]<0,]               
-        points( dcr[,1] , dcr[,2] , pch=20, cex = cex , col="red") 
+        graphics::points( dcr[,1] , dcr[,2] , pch=20, cex = cex , col="red") 
 			}
 ###############################################################################

@@ -85,7 +85,7 @@ tam.mml.3pl <-
 	  if ( is.null( gammaslope ) ){
 		   Ngam <- dim(E)[4]
 		   if ( est.some.slopes){
-			gammaslope <- runif( Ngam , .9 , 1.1 )
+			gammaslope <- stats::runif( Ngam , .9 , 1.1 )
 					} else { 
 			gammaslope <- rep(1,Ngam ) 
 					}
@@ -288,8 +288,8 @@ tam.mml.3pl <-
     # beta inits
     # (Y'Y)
     if ( ! is.null( formulaY ) ){
-      formulaY <- as.formula( formulaY )
-      Y <- model.matrix( formulaY , dataY )[,-1]   # remove intercept
+      formulaY <- stats::as.formula( formulaY )
+      Y <- stats::model.matrix( formulaY , dataY )[,-1]   # remove intercept
       nullY <- FALSE	
     }  
     #  if ( ! is.null(Y) ){ 
@@ -367,7 +367,7 @@ tam.mml.3pl <-
     cResp <- cResp[ , col.index  ]
     cResp <- 1 * ( cResp == matrix( rep(1:(maxK), nitems) , nrow(cResp) , 
                                     ncol(cResp) , byrow=TRUE ) )  
-    if ( sd(pweights) > 0 ){ 
+    if ( stats::sd(pweights) > 0 ){ 
       ItemScore <- as.vector( t( colSums( cResp * pweights ) ) %*% cA )
     } else { 
       ItemScore <- as.vector( t( colSums( cResp) ) %*% cA )			
@@ -383,11 +383,14 @@ tam.mml.3pl <-
     # starting values for xsi
     maxAi <-  - (apply(-(A) , 3 , rowMaxs , na.rm=TRUE))  
     personMaxA <- resp.ind %*% maxAi
-    ItemMax <- personMaxA %t*% pweights  
+    # ItemMax <- personMaxA %t*% pweights  
+	ItemMax <- crossprod( personMaxA , pweights )
+	
+	
     # maximum score in resp, equal categories?  
     maxscore.resp <- apply( resp , 2 , max , na.rm=TRUE)
     if ( ncol(resp)>1){ 
-      sd.maxscore.resp <- sd(maxscore.resp)
+      sd.maxscore.resp <- stats::sd(maxscore.resp)
     } else { sd.maxscore.resp <- 0 }
 
     
@@ -428,11 +431,11 @@ tam.mml.3pl <-
       # sampled theta values
       if (QMC){			
         r1 <- sfsmisc::QUnif(n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)		
-        theta0.samp <- qnorm( r1 )
+        theta0.samp <- stats::qnorm( r1 )
       } else {
-        theta0.samp <- matrix( mvrnorm( snodes , mu = rep(0,ndim) , 
+        theta0.samp <- matrix( MASS::mvrnorm( snodes , mu = rep(0,ndim) , 
                                         Sigma = diag(1,ndim ) )	,
-                               nrow= snodes , ncol=ndim )			
+                                         nrow= snodes , ncol=ndim )			
       }
       thetawidth <- NULL
 	  theta <- theta0.samp
@@ -547,7 +550,7 @@ tam.mml.3pl <-
     se.xsi <- 0*xsi
     se.B <- 0*B 
     
-    YSD <- max( apply( Y , 2 , sd ) )
+    YSD <- max( apply( Y , 2 , stats::sd ) )
     if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }
 
 	#*****
@@ -667,7 +670,7 @@ a0 <- Sys.time()
         theta <- beta[ rep(1,snodes) , ] + theta0.samp %*% chol(variance) 
         
         # calculate density for all nodes
-        thetasamp.density <- dmvnorm( theta , mean = as.vector(beta[1,]) , sigma = variance )
+        thetasamp.density <- mvtnorm::dmvnorm( theta , mean = as.vector(beta[1,]) , sigma = variance )
         # recalculate theta^2
         #      theta2 <- matrix( theta.sq(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
         theta2 <- matrix( theta.sq2(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
@@ -727,7 +730,7 @@ a0 <- Sys.time()
 	   res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=gwt1 , resp=resp , nitems=nitems , 
 	                               resp.ind.list=resp.ind.list , normalization=FALSE , 
                                    thetasamp.density=thetasamp.density , snodes=snodes ,
-                                   resp.ind=resp.ind , logprobs=TRUE  )
+                                   resp.ind=resp.ind , logprobs=TRUE , avoid.zerosum=TRUE )
 #	   hwt0 <- hwt <- res.hwt$hwt * gwt   
 	   hwt0 <- hwt <- res.hwt[["hwt"]]  	   
        hwt <- hwt / rowSums( hwt )	   	   

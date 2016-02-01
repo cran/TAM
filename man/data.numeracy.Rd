@@ -54,7 +54,7 @@ data(data.numeracy)
 dat <- data.numeracy$scored
 
 #Run IRT analysis: Rasch model
-mod1 <- tam(dat)
+mod1 <- tam.mml(dat)
 
 #Item difficulties
 mod1$xsi
@@ -72,14 +72,14 @@ hist(ItemDiff)
 hist(PersonAbility)
 mean(ItemDiff)
 mean(PersonAbility)
-sd(ItemDiff)
-sd(PersonAbility)
+stats::sd(ItemDiff)
+stats::sd(PersonAbility)
 
 \dontrun{
 #Extension
 #plot histograms of ability and item parameters in the same graph
 oldpar <- par(no.readonly = TRUE)	      # save writable default graphic settings
-windows (width=4.45, height=4.45, pointsize=12)
+windows(width=4.45, height=4.45, pointsize=12)
 layout(matrix(c(1,1,2),3,byrow=TRUE))
 layout.show(2)
 hist(PersonAbility,xlim=c(-3,3),breaks=20)
@@ -100,7 +100,7 @@ scored <- sapply( seq(1,length(key)) ,
             FUN = function(ii){ 1*(raw_resp[,ii] == key[ii]) } )
 
 #run IRT analysis
-mod1 <- tam(scored)
+mod1 <- tam.mml(scored)
 
 #Ability estimate - Weighted Likelihood Estimate
 Abil <- tam.wle(mod1)

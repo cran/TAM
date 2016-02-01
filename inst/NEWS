@@ -42,6 +42,34 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 
 
+-------------------------------------------------------------
+CHANGES IN VERSION 1.16   (2016-01-31)  --  CRAN 1.16-0
+-------------------------------------------------------------
+
+Features:
+* ---
+
+Bug fixes:
+* fixed a crucial bug in estimation of 'tam.mml.2pl', 
+  irtmodel='GPCM.design'
+
+Notes:
+* included a warning message in 'IRT.truescore' when
+  not all values in the theta grid can be computed
+* cleaned namespace file and defined imported functions
+  in a more explicit way
+* included argument 'Q' in 'IRT.truescore' function which
+  allows for computation of weighted true scores
+  (thanks to David Sichau)
+* fixed a bug in 'tam.mml.2pl' with irtmodel='GPCM.design'
+  in case of blank categories
+
+Datasets included or modified:
+* ---
+
+Examples included or modified:
+* IRT.truescore (2)
+
 
 -------------------------------------------------------------
 CHANGES IN VERSION 1.15   (2015-12-15)  --  CRAN 1.15-0

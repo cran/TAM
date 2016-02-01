@@ -91,7 +91,7 @@ tam.jml.xsi2 <-
 		  
 		  errorP <- sqrt(err_inv)
 		  convergeP[ abs(increment) < convM ] <- TRUE
-		  flush.console()
+		  utils::flush.console()
 		  iterP <- iterP + 1 
 		  p_loop <- est.xsi.index[convergeP[est.xsi.index]==FALSE]
 		  convergeAllP <- (sum(convergeP[est.xsi.index]) == length(est.xsi.index))  	  

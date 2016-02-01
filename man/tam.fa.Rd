@@ -182,9 +182,9 @@ resp <- data.read
 mod1a <- tam.fa( resp=resp , irtmodel="efa" , nfactors= 2  )
 summary(mod1a)
 # varimax rotation
-varimax(mod1a$B.stand)
+stats::varimax(mod1a$B.stand)
 # promax rotation
-promax(mod1a$B.stand)
+stats::promax(mod1a$B.stand)
 # more rotations are included in the GPArotation package
 library(GPArotation)
 # geomin rotation oblique

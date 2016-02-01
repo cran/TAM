@@ -182,7 +182,7 @@ summary(fit02a)
 # estimate model
 maxK <- max( dat , na.rm=TRUE )
 cmod02a <- sirt::R2conquest( dat , itemcodes= 0:maxK, model= "item+item*step" , 
-            name = "mod02a" , path.conquest=path.conquest)
+               name = "mod02a" , path.conquest=path.conquest)
 summary(cmod02a)   # summary output
 
 # read ConQuest model
@@ -300,7 +300,7 @@ xsi.fixed[,2] <- 0
   ##   topicScho   12    0
   ##   topicSpor   13    0
 mod04c1 <- tam.mml.mfr( resp , facets= facets ,
-            formulaA = formulaA , pid = data.cqc04$pid , xsi.fixed=xsi.fixed )
+             formulaA = formulaA , pid = data.cqc04$pid , xsi.fixed=xsi.fixed )
 summary( mod04c1 )
 
 #############################################################################

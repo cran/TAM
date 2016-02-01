@@ -1,8 +1,8 @@
 Package: TAM
 Type: Package
 Title: Test Analysis Modules
-Version: 1.15-0
-Date: 2015-12-15
+Version: 1.16-0
+Date: 2016-01-31
 Author: 
     Thomas Kiefer [aut], Alexander Robitzsch [aut, cre], Margaret Wu [aut]
 Maintainer: 
@@ -15,15 +15,15 @@ Description:
     Mixture Distribution IRT Models, Located Latent Class Models). 
     Latent regression models and plausible value imputation are 
     also supported.
-Depends: R (>= 2.15.1), CDM, MASS
-Imports: GPArotation, graphics, grDevices, lavaan, lattice, methods,
-        mvtnorm, msm, plyr, psych, Rcpp, sfsmisc, stats, utils, tensor,
-        WrightMap
+Depends: R (>= 2.15.1), CDM
+Imports: GPArotation, graphics, grDevices, lavaan, lattice, MASS,
+        methods, msm, mvtnorm, plyr, psych, Rcpp, sfsmisc, stats,
+        utils, tensor, WrightMap
 Suggests: miceadds, PP, semTools, sirt
 LinkingTo: Rcpp, RcppArmadillo
 License: GPL (>= 2)
 URL: http://www.edmeasurementsurveys.com/TAM/Tutorials/
 NeedsCompilation: yes
-Packaged: 2015-12-15 20:14:03 UTC; sunpn563
+Packaged: 2016-01-31 19:43:49 UTC; sunpn563
 Repository: CRAN
-Date/Publication: 2015-12-16 12:23:41
+Date/Publication: 2016-02-01 10:39:07

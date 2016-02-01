@@ -300,7 +300,7 @@ ctl.list <- list(maxiter= 20 ) # increase the number of iterations in applicatio
 
 #*** Model 1: Rasch model, normal trait distribution
 mod1 <- tam.mml.3pl(resp=dat , skillspace= "normal" , est.some.slopes=FALSE , 
-        control=ctl.list)
+              control=ctl.list)
 summary(mod1)
 
 #*** Model 2: Rasch model, discrete trait distribution
@@ -485,7 +485,7 @@ guess <- rep(0 , I )
 guess.items <- c(6,11,16)
 guess[ guess.items ] <- .33
 library(sirt)
-dat <- sirt::sim.raschtype( rnorm(N) , b=b , fixed.c=guess )
+dat <- sirt::sim.raschtype( stats::rnorm(N) , b=b , fixed.c=guess )
 
 #*******************************************************
 #*** Model 1: Difficulty + guessing model, i.e. fix slopes to 1
@@ -520,14 +520,14 @@ summary(mod2)
 set.seed(9876)
 I <- 7  # number of items
 # simulate response probabilities
-a1 <- round(runif(I,0 , .4 ),4)
-a2 <- round(runif(I , .6 , 1 ),4)
+a1 <- round( stats::runif(I,0 , .4 ),4)
+a2 <- round( stats::runif(I , .6 , 1 ),4)
 N <- 1000   # sample size
 # simulate data in two classes of proportions .3 and .7
 N1 <- round(.3*N)
-dat1 <- 1 * ( matrix(a1,N1,I,byrow=TRUE) > matrix( runif( N1 * I) , N1 , I ) )
+dat1 <- 1 * ( matrix(a1,N1,I,byrow=TRUE) > matrix( stats::runif( N1 * I) , N1 , I ) )
 N2 <- round(.7*N)
-dat2 <- 1 * ( matrix(a2,N2,I,byrow=TRUE) > matrix( runif( N2 * I) , N2 , I ) )
+dat2 <- 1 * ( matrix(a2,N2,I,byrow=TRUE) > matrix( stats::runif( N2 * I) , N2 , I ) )
 dat <- rbind( dat1 , dat2 )
 colnames(dat) <- paste0("I" , 1:I)
 
@@ -654,8 +654,8 @@ alpha0 <- matrix( c(0,0,1,0,0,1,1,1) , nrow=4,ncol=2,byrow=TRUE)
 prob0 <- c( .2 , .4 , .1 , .3 )
 alpha <- alpha0[ rep( 1:TP , prob0*N) ,]
 # define guessing and slipping parameters
-guess <- round( runif(I, 0 , .4 ) , 2 )
-slip <- round( runif(I , 0 , .3 ) , 2 )
+guess <- round( stats::runif(I, 0 , .4 ) , 2 )
+slip <- round( stats::runif(I , 0 , .3 ) , 2 )
 # simulate data according to the DINA model
 dat <- CDM::sim.din( q.matrix=Q , alpha=alpha , slip=slip , guess=guess )$dat
 
@@ -707,9 +707,9 @@ b2 <- b2 - mean(b2)
 N <- 3000    # number of persons
 wgt <- .25       # class probability for class 1
 # class 1
-dat1 <- sirt::sim.raschtype( rnorm( wgt*N ) , - b1 )
+dat1 <- sirt::sim.raschtype( stats::rnorm( wgt*N ) , - b1 )
 # class 2
-dat2 <- sirt::sim.raschtype( rnorm( (1-wgt)*N , mean= 1 , sd=1.7) , - b2 )
+dat2 <- sirt::sim.raschtype( stats::rnorm( (1-wgt)*N , mean= 1 , sd=1.7) , - b2 )
 dat <- rbind( dat1 , dat2 )
 
 # The idea is that each grid point class x theta is defined as new
@@ -735,7 +735,7 @@ for (ii in 1:I){
     E[ ii , 2 , 1:TT , I+1] <- theta.k1  # '1*theta' in '1*theta - b'    
                 }                               
 # initial gammaslope parameters
-par1 <- qlogis( colMeans( dat ) )
+par1 <- stats::qlogis( colMeans( dat ) )
 gammaslope <- c( par1 , 1 )
 # sum constraint of zero on item difficulties
 gammaslope.constr.V <- matrix( 0 , I+1 , 1 )
@@ -783,7 +783,7 @@ for (ii in 1:I){
                 }
 # initial gammaslope parameters
 par1 <- qlogis( colMeans( dat ) )
-gammaslope <- c( par1 , par1 + runif(I, -2  ,2 ) , 1 )
+gammaslope <- c( par1 , par1 + stats::runif(I, -2  ,2 ) , 1 )
 # sum constraint of zero on item difficulties within a class
 gammaslope.center.index <- c( rep( 1, I ) , rep(2,I) , 0 )
 gammaslope.center.value <- c(0,0)
@@ -796,7 +796,7 @@ mod1 <- tam.mml.3pl(resp= dat , E=E , control= list(maxiter=30) , skillspace="di
       notA=TRUE)          
 summary(mod1)
 # latent class proportions
-aggregate( mod1$pi.k , list( rep(1:2, each=TT)) , sum )
+stats::aggregate( mod1$pi.k , list( rep(1:2, each=TT)) , sum )
 # compare simulated and estimated item parameters
 cbind( b1 , b2 , - mod1$gammaslope[1:I] , - mod1$gammaslope[I + 1:I ] ) 
 
@@ -835,9 +835,9 @@ a1 <- rep( 1 , I )  # first class
 a2 <- rep( c(.5,1.5) , I/2 )
 
 # class 1
-dat1 <- sirt::sim.raschtype( rnorm( wgt*N ) , - b1 , fixed.a=a1)
+dat1 <- sirt::sim.raschtype( stats::rnorm( wgt*N ) , - b1 , fixed.a=a1)
 # class 2
-dat2 <- sirt::sim.raschtype( rnorm( (1-wgt)*N , mean= 1 , sd=1.4) , - b2 , fixed.a=a2)
+dat2 <- sirt::sim.raschtype( stats::rnorm( (1-wgt)*N , mean= 1 , sd=1.4) , - b2 , fixed.a=a2)
 dat <- rbind( dat1 , dat2 )
 
 #*** Model 1: Mixed 2PL model with two latent classes
@@ -873,9 +873,9 @@ for (ii in 1:I){
                 }
                                                
 # initial gammaslope parameters
-par1 <- scale( - qlogis( colMeans( dat ) ) , scale =FALSE )
+par1 <- scale( - stats::qlogis( colMeans( dat ) ) , scale =FALSE )
 gammaslope <- c( par1 , rep(1,I) ,  scale( par1 + runif(I, - 1.4  , 1.4 ), 
-        scale=FALSE)  , runif( I,.6,1.4) )
+        scale=FALSE)  , stats::runif( I,.6,1.4) )
 
 # constraint matrix
 gammaslope.constr.V <- matrix( 0 , 4*I , 4 )
@@ -899,7 +899,7 @@ mod1$gammaslope
 # summary
 summary(mod1)
 # latent class proportions
-round( aggregate( mod1$pi.k , list( rep(1:2, each=TT)) , sum ) , 3 )
+round( stats::aggregate( mod1$pi.k , list( rep(1:2, each=TT)) , sum ) , 3 )
 # compare simulated and estimated item intercepts
 int <- cbind( b1*a1 , b2 * a2 , - mod1$gammaslope[1:I] , - mod1$gammaslope[2*I + 1:I ] ) 
 round( int , 3 )

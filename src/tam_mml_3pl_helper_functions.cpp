@@ -75,8 +75,8 @@ BEGIN_RCPP
      // OUTPUT              
                    
      return Rcpp::List::create(    
-         _["NFdesM"] = ind  ,  
-         _["FdesM" ] = XdesM  
+         Rcpp::_["NFdesM"] = ind  ,  
+         Rcpp::_["FdesM" ] = XdesM  
          ) ;  
 END_RCPP
 }
@@ -223,8 +223,8 @@ BEGIN_RCPP
      // OUTPUT              
                    
       return Rcpp::List::create(    
-         _["d1b" ] = d1b ,  
-         _["d2b" ] = d2b   
+         Rcpp::_["d1b" ] = d1b ,  
+         Rcpp::_["d2b" ] = d2b   
          ) ;  
 END_RCPP
 }
@@ -345,9 +345,11 @@ BEGIN_RCPP
           ///////////////////////////////////////////////////////    
           ///////////// O U T P U T   ///////////////////////////    
               
-          return List::create(  
-          	     	_["xbar"]=XBAR , _["xbar2"]=XBAR2 , _["xxf"]=XXF ,  
-          	     	_["iscore"] = iscore  
+          return Rcpp::List::create(  
+          	     	Rcpp::_["xbar"]=XBAR , 
+                        Rcpp::_["xbar2"]=XBAR2 , 
+                        Rcpp::_["xxf"]=XXF ,  
+          	     	Rcpp::_["iscore"] = iscore  
           	     	);   
        
        
@@ -404,8 +406,8 @@ BEGIN_RCPP
      // OUTPUT              
                    
       return Rcpp::List::create(    
-         _["E_design"] = Edes ,  
-         _["B"] = B  
+         Rcpp::_["E_design"] = Edes ,  
+         Rcpp::_["B"] = B  
          ) ;  
 END_RCPP
 }
@@ -465,8 +467,8 @@ BEGIN_RCPP
      // OUTPUT              
                    
       return Rcpp::List::create(    
-         _["E_design"] = E_design ,  
-         _["maxE"] = lz   
+         Rcpp::_["E_design"] = E_design ,  
+         Rcpp::_["maxE"] = lz   
          ) ;  
 END_RCPP
 }

@@ -114,7 +114,7 @@ data(data.read,package="sirt")
 mod1 <- tam.mml.2pl(resp= data.read ) 
 # 2-dimensional model
 mod2 <- tam.fa(resp= data.read , irtmodel="efa" , nfactors=2 ,
-        control=list(maxiter=150) ) 
+             control=list(maxiter=150) ) 
 # Model comparison
 anova( mod1 , mod2 )
   ##       Model   loglike Deviance Npars      AIC      BIC    Chisq df  p

@@ -238,8 +238,8 @@ library(miceadds)
 # convert datalist into a mids object
 mids1 <- miceadds::datalist2mids( datlist1 )
 # fit linear regression
-mod1c <- with( mids1 , lm( PVREAD ~ migra + hisei ) )
-summary( pool(mod1c) )
+mod1c <- with( mids1 , stats::lm( PVREAD ~ migra + hisei ) )
+summary( mice::pool(mod1c) )
 
 #############################################################################
 # SIMULATED EXAMPLE 3: Multidimensional plausible value imputation
@@ -249,15 +249,15 @@ summary( pool(mod1c) )
 set.seed(6778)
 library(mvtnorm)
 N <- 1000      
-Y <- cbind( rnorm( N ) , rnorm(N) )
-theta <- rmvnorm( N,mean=c(0,0), sigma=matrix( c(1,.5,.5,1) , 2 , 2 ))
+Y <- cbind( stats::rnorm( N ) , stats::rnorm(N) )
+theta <- mvtnorm::rmvnorm( N,mean=c(0,0), sigma=matrix( c(1,.5,.5,1) , 2 , 2 ))
 theta[,1] <- theta[,1] + .4 * Y[,1] + .2 * Y[,2]  # latent regression model
 theta[,2] <- theta[,2] + .8 * Y[,1] + .5 * Y[,2]  # latent regression model
 I <- 20
-p1 <- plogis( outer( theta[,1] , seq( -2 , 2 , len=I ) , "-" ) )
-resp1 <- 1 * ( p1 > matrix( runif( N*I ) , nrow=N , ncol=I ) )
-p1 <- plogis( outer( theta[,2] , seq( -2 , 2 , len=I ) , "-" ) )
-resp2 <- 1 * ( p1 > matrix( runif( N*I ) , nrow=N , ncol=I ) )
+p1 <- stats::plogis( outer( theta[,1] , seq( -2 , 2 , len=I ) , "-" ) )
+resp1 <- 1 * ( p1 > matrix( stats::runif( N*I ) , nrow=N , ncol=I ) )
+p1 <- stats::plogis( outer( theta[,2] , seq( -2 , 2 , len=I ) , "-" ) )
+resp2 <- 1 * ( p1 > matrix( stats::runif( N*I ) , nrow=N , ncol=I ) )
 resp <- cbind(resp1,resp2)
 colnames(resp) <- paste("I" , 1:(2*I), sep="")
   
@@ -315,7 +315,7 @@ dat <- sirt::sim.raschtype( theta , b = itemdiff )
 
 #***********************
 #*** Model 0: Regression model with true variables
-mod0 <- lm( theta ~ X )
+mod0 <- stats::lm( theta ~ X )
 summary(mod0)
 
 #***********************
@@ -447,8 +447,8 @@ imp1 <- mice::mice( as.matrix(data) , predictorMatrix = predictorMatrix , m = 4,
 summary(imp1)
 
 # compute linear regression
-mod4a <- with( imp1 , lm( PVA ~ X1 + X2 ) )
-summary( pool(mod4a) )
+mod4a <- with( imp1 , stats::lm( PVA ~ X1 + X2 ) )
+summary( mice::pool(mod4a) )
 }
 }
 

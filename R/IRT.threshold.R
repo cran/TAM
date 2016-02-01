@@ -29,8 +29,8 @@ IRT.threshold <- function( object , prob.lvl = .5 , type="category"){
 		vv <- 0
 		for (dd in 1:D){
 			# dd <- 1
-			a1 <- aggregate( irf.ii[2,] , list(theta[,dd]) , mean )
-			if ( sd(a1[,2])> 1E-7 ){
+			a1 <- stats::aggregate( irf.ii[2,] , list(theta[,dd]) , mean )
+			if ( stats::sd(a1[,2])> 1E-7 ){
 				vv <- dd
 						}		
 						}

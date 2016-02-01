@@ -114,12 +114,12 @@ WrightMap.sim.PV <- function( object , ndim ){
      person <- object$person
 	 N <- nrow(person)
 	 if (ndim==1){
-	     pers.est <- rnorm( N , mean=person$EAP , sd=person$SD.EAP )
+	     pers.est <- stats::rnorm( N , mean=person$EAP , sd=person$SD.EAP )
 				  }
 	 if (ndim>1){
         pers.est <- matrix( 0 , nrow=N , ncol=ndim)
 		for (dd in 1:ndim){
-			pers.est[,dd] <- rnorm( N , mean= person[,paste0("EAP.Dim",dd)] , 
+			pers.est[,dd] <- stats::rnorm( N , mean= person[,paste0("EAP.Dim",dd)] , 
 							sd= person[,paste0("SD.EAP.Dim",dd)] )
 						}
 				}

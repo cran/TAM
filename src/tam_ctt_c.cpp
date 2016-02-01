@@ -142,8 +142,9 @@ BEGIN_RCPP
      ///////////////////////////////////////////  
      // OUTPUT:  
      return Rcpp::List::create(  
-            _["des"] = des ,  _["desV"] = desV   ,
-            _["LP"] = LP
+              Rcpp::_["des"] = des ,  
+              Rcpp::_["desV"] = desV   ,
+              Rcpp::_["LP"] = LP
             		) ;  
        
        
@@ -308,8 +309,9 @@ BEGIN_RCPP
           ///////////////////////////////////////////    
           // OUTPUT:    
           return Rcpp::List::create(    
-                 _["des"] = des ,  _["desV"] = desV   ,  
-                 _["LP"] = LP   
+                    Rcpp::_["des"] = des ,  
+                    Rcpp::_["desV"] = desV   ,  
+                    Rcpp::_["LP"] = LP   
                  		) ;    
               
               

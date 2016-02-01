@@ -26,7 +26,7 @@ IRTLikelihood.cfa <- function( data , cfaobj=NULL ,
 						}
 		if (D>2){				
 			r1 <- sfsmisc::QUnif (n=snodes, min = 0, max = 1, n.min = 1, p=D, leap = 409)						
-			theta <- qnorm( r1 )
+			theta <- stats::qnorm( r1 )
 			for ( dd in 1:D){
 				theta[,dd] <- snodes.adj*theta[,dd]
 							}
@@ -54,7 +54,7 @@ IRTLikelihood.cfa <- function( data , cfaobj=NULL ,
 			#    dd <- 1
 				term <- term + matrix( L[ii,dd] * theta[,dd] , nrow=N , ncol=TP , byrow=TRUE )
 						}					
-			h1 <- dnorm( data[,ii] , mean = term , sd = sqrt( psi[ii,ii] ) )
+			h1 <- stats::dnorm( data[,ii] , mean = term , sd = sqrt( psi[ii,ii] ) )
 			ind <- which( ! is.na( data[,ii] ) )
 			hwt[ind,] <- hwt[ind,] * h1[ind,]
 			    	}

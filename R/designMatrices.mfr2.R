@@ -21,19 +21,20 @@ designMatrices.mfr2 <-
     ### Basic Information and Initializations
     constraint <- match.arg(constraint)
     ## restructure formulaA
-    t1 <- attr( terms( formulaA ) , "term.labels" )
+    t1 <- attr( stats::terms( formulaA ) , "term.labels" )
     t2 <- intersect( c("item" , "step" , "item:step") , t1 )
         
 # cat(" ---  z20" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     	
     formulaA <- paste(  paste( c(t2 , setdiff(t1 , t2 ) ) , collapse= " + " ) )
-    formulaA <- as.formula( paste( " ~ " , formulaA ) )	
+    formulaA <- stats::as.formula( paste( " ~ " , formulaA ) )	
     
     #********************************
     # change formate in facets
     FF <- ncol(facets)
     NFF <- nrow(facets)
     if (progress){ 
-      cat( "        o Check facets (" , paste(Sys.time()) , ")\n") ; flush.console();
+      cat( "        o Check facets (" , paste(Sys.time()) , ")\n") ; 
+	  utils::flush.console();
     }
     if ( is.null(FF) ){ FF <- 0 }
     if (FF>0){	
@@ -105,7 +106,8 @@ designMatrices.mfr2 <-
 			rep(1,nrow(X.noStep)) else as.numeric(X.noStep[,"item"])
     
     if (progress){ 
-      cat( "        o Created A Matrix (" , paste(Sys.time()) , ")\n") ; flush.console();
+      cat( "        o Created A Matrix (" , paste(Sys.time()) , ")\n") ; 
+	  utils::flush.console();
     }
 # Revalpr("X.noStep.ind")
 
@@ -135,7 +137,8 @@ designMatrices.mfr2 <-
       B <- Q * as.numeric(X$step)
     }
     if (progress){ 
-      cat( "        o Created B Matrix (" , paste(Sys.time()) , ")\n") ; flush.console();
+      cat( "        o Created B Matrix (" , paste(Sys.time()) , ")\n") ; 
+	  utils::flush.console();
     }	
 
 # cat(" ---  created B matrix " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     						
@@ -340,7 +343,8 @@ designMatrices.mfr2 <-
 #cat("rename items" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1
 	    
     if (progress){ 
-      cat( "        o Relabeled Variable Names (" , paste(Sys.time()) , ")\n") ; flush.console();
+      cat( "        o Relabeled Variable Names (" , paste(Sys.time()) , ")\n") ; 
+	  utils::flush.console();
     }
     
 # cat(" ---  after all item renames" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    			

@@ -5,7 +5,7 @@ plotctt <- function( resp , theta , Ncuts = NULL , ask =FALSE ,
 		col.list = NULL , package="lattice" , ... ){
 	if ( ! is.null(Ncuts) ){
 		stepw <- 1/Ncuts
-		cuts <- quantile( theta , seq( stepw , 1-stepw , length=Ncuts-1 ) , na.rm=TRUE)
+		cuts <- stats::quantile( theta , seq( stepw , 1-stepw , length=Ncuts-1 ) , na.rm=TRUE)
 		eps <- .001
 		cuts <- round( c( min(theta, na.rm=TRUE) - eps  , cuts , max( theta , na.rm=TRUE ) + eps ) , 2 )	
 		resp <- resp[ ! is.na( theta) , , drop=FALSE ]
@@ -19,7 +19,7 @@ plotctt <- function( resp , theta , Ncuts = NULL , ask =FALSE ,
 					}
 		
 	
-	par( mfrow=c(1,1))
+	graphics::par( mfrow=c(1,1))
 	for (ii in 1:I){
 		# ii <- 25		
 		y <- resp[,ii]
@@ -30,7 +30,7 @@ plotctt <- function( resp , theta , Ncuts = NULL , ask =FALSE ,
 		dfr <- NULL
 		for (ll in 1:L1){
 			# ll <- 1
-			dfr.ll <- aggregate( 1 * ( y == unique.y[ll] ) , list( theta.cuts ) , mean , na.rm=TRUE )
+			dfr.ll <- stats::aggregate( 1 * ( y == unique.y[ll] ) , list( theta.cuts ) , mean , na.rm=TRUE )
 			dfr.ll <- data.frame("cat" = unique.y[ll] , dfr.ll )
 			colnames(dfr.ll)[-1] <- c("theta.cut" , "prob")
 			dfr <- rbind( dfr , dfr.ll )
@@ -55,24 +55,24 @@ plotctt <- function( resp , theta , Ncuts = NULL , ask =FALSE ,
 		       kk <- 1
 		       dfr1a <- dfr[ dfr$cat == unique.y[1] , ] 
 			   	K <- L1		   
-				plot( 1:Ncuts , dfr1a$prob , ylim=c(-.1,1.1) , 	
+				graphics::plot( 1:Ncuts , dfr1a$prob , ylim=c(-.1,1.1) , 	
 						ylab = expression(P(theta)), xlab = expression(theta) ,
 						col=col.list[kk] , pch = kk , type="o" , main=main , axes=FALSE , ...
 									)
-				axis(2)
-				axis(1,at=1:Ncuts,labels=paste( dfr1a$theta.cut) )										
+				graphics::axis(2)
+				graphics::axis(1,at=1:Ncuts,labels=paste( dfr1a$theta.cut) )										
 		      for (kk in seq(2,K) ){
 				dfr1a <- dfr[ dfr$cat == unique.y[kk] , ]		
-				lines( 1:Ncuts , dfr1a$prob , pch=kk , col=col.list[kk] )					
-				points( 1:Ncuts , dfr1a$prob , pch=kk , col= col.list[kk] )										
+				graphics::lines( 1:Ncuts , dfr1a$prob , pch=kk , col=col.list[kk] )					
+				graphics::points( 1:Ncuts , dfr1a$prob , pch=kk , col= col.list[kk] )										
 									}
-			legend( 1 , 1.1 , vkey , pch = 1:K , col= col.list[1:K] ,
+			graphics::legend( 1 , 1.1 , vkey , pch = 1:K , col= col.list[1:K] ,
 						horiz =TRUE , lty= 1)
 
 					}
 		#************* end			
 					
-		par( ask=ask )
+		graphics::par( ask=ask )
 # stop()		
 			}
 		}

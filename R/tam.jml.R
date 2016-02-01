@@ -125,12 +125,14 @@ function( resp , group = NULL , adj=.3 , disattenuate = FALSE ,
   cB[is.na(cB)] <- 0
   
   # Item sufficient statistics
-  ItemScore <- (cResp %*% cA) %t*% pweights
+  # ItemScore <- (cResp %*% cA) %t*% pweights
+  ItemScore <- crossprod(cResp %*% cA , pweights )
   
   # Computer possible maximum parameter score for each person
   maxAi <-  - (apply(-(A) , 3 , rowMaxs , na.rm=TRUE))  
   personMaxA <- resp.ind %*% maxAi
-  ItemMax <- personMaxA %t*% pweights
+  # ItemMax <- personMaxA %t*% pweights
+  ItemMax <- crossprod( personMaxA , pweights )
   
   #Adjust perfect and zero scores for the parameters
   ItemScore[ItemScore==ItemMax] <- ItemScore[ItemScore==ItemMax] + adj #..."+" sign, because ItemScore is -ve)
@@ -249,7 +251,7 @@ function( resp , group = NULL , adj=.3 , disattenuate = FALSE ,
   errorWLE <- jmlWLE$errorWLE
   
   #WLE person separation reliability
-  varWLE <- var(thetaWLE)
+  varWLE <- stats::var(thetaWLE)
   WLEreliability <- (varWLE - mean(errorWLE^2)) / varWLE
   
 

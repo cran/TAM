@@ -19,7 +19,7 @@ tamaan.3pl.lca <- function( res0 , anal.list , con , ... ){
 		
 		if (NSTARTS[1] > 0 ){
 		for (nn in 1:(NSTARTS[1]) ){		
-			gammaslope <- c( qlogis( runif( dim(res0$E)[4] - 1 ) ) , 1 )
+			gammaslope <- c( stats::qlogis( stats::runif( dim(res0$E)[4] - 1 ) ) , 1 )
 			TP <- dim(res0$E)[3]
 			
 			# delta.inits
@@ -39,7 +39,7 @@ tamaan.3pl.lca <- function( res0 , anal.list , con , ... ){
             if (con$progress){
 				cat( paste0( "*** Random Start " , nn  ,
 						" | Deviance = " , round( res$deviance , 2 ) , "\n") )
-				flush.console()
+				utils::flush.console()
 						}
 			if ( res$deviance < devmin ){
 				devmin <- res$deviance
@@ -53,7 +53,7 @@ tamaan.3pl.lca <- function( res0 , anal.list , con , ... ){
 			gammaslope <- gammaslope.min
 			delta.inits <- delta.min
 					} else {
-			gammaslope <- c( qlogis( runif( dim(res0$E)[4] - 1 ) ) , 1 )				
+			gammaslope <- c( stats::qlogis( stats::runif( dim(res0$E)[4] - 1 ) ) , 1 )				
 			delta.inits <- NULL
 							}
 			
@@ -97,7 +97,7 @@ tamaan.3pl.lca <- function( res0 , anal.list , con , ... ){
 # inits delta parameters
 inits.delta.lca <- function( G , TP , nn  ){
 		delta.inits <- matrix( 1/TP , nrow=TP , ncol=G )
-		delta.inits <- delta.inits + nn/8 * runif(TP*G)
+		delta.inits <- delta.inits + nn/8 * stats::runif(TP*G)
 		delta.inits <- delta.inits / colSums(delta.inits)
 		delta.inits <- log(delta.inits)
 		return(delta.inits)

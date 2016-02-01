@@ -78,7 +78,7 @@ lavaanify.sirt.v1 <- function( lavmodel ){
 		syn.temp[ syn.temp == "\\*" ] <- "*"
 		syn.temp[ syn.temp == "\\\n" ] <- "\n"
         syn.temp <- paste0( syn.temp , collapse="")
-		h1 <- lavaanify( syn.temp)	
+		h1 <- lavaan::lavaanify( syn.temp)	
 		h1 <- h1[ h1$op == "|" , ]
         h1$op <- "?="
 	

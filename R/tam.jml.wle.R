@@ -98,7 +98,7 @@ tam.jml.WLE <-
       }
       iterWLE <- iterWLE + 1 
       cat( "-"  ) 
-      flush.console()
+      utils::flush.console()
     }  # end of Newton-Raphson   
     cat("\n")
     meanChangeWLE <- mean(theta - thetaOld)

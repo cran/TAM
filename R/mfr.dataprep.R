@@ -3,7 +3,7 @@
 mfr.dataprep <- function( formulaA , xsi.setnull , B , Q ,
 		resp, pid, facets , beta.fixed ){
 	
-	tA <- terms( formulaA )
+	tA <- stats::terms( formulaA )
 	tlab <- attr(tA , "factors")
 	
 	# redefine formula
@@ -30,7 +30,7 @@ mfr.dataprep <- function( formulaA , xsi.setnull , B , Q ,
 						}
 					}
 
-	dups <- duplicated( combi )
+	dups <- base::duplicated( combi )
 	dups1 <- combi[ dups ]
 	dups_combi <- any( dups )
     PSF <- FALSE	
@@ -58,7 +58,7 @@ mfr.dataprep <- function( formulaA , xsi.setnull , B , Q ,
 				
 	# new formula
 	formula_update <- paste( c( attr( tA , "term.labels") , nullfacets ) , collapse=" + ")
-	formula_update <- as.formula( paste0( "~ " , formula_update ) )
+	formula_update <- stats::as.formula( paste0( "~ " , formula_update ) )
 	xsi.setnull <- unique( c( xsi.setnull , nullfacets ) )
 	
 	if ( length(xsi.setnull)==0 ){

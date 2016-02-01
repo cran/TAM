@@ -41,7 +41,7 @@ tamaan.3pl.olca <- function( res0 , anal.list , con , ... ){
             if (con$progress){
 				cat( paste0( "*** Random Start " , nn  ,
 						" | Deviance = " , round( res$deviance , 2 ) , "\n") )
-				flush.console()
+				utils::flush.console()
 						}
 			if ( res$deviance < devmin ){
 				devmin <- res$deviance
@@ -80,9 +80,9 @@ tamaan.3pl.olca <- function( res0 , anal.list , con , ... ){
 ###########################################
 # initial values 1dim OLCA
 .inits.olca.1dim <- function(res0 , anal.list ){
-			qm <- - qlogis( colMeans( res0$resp , na.rm=TRUE) )
+			qm <- - stats::qlogis( colMeans( res0$resp , na.rm=TRUE) )
 			TP <- anal.list$NCLASSES
-			theta1 <- qnorm( ( 1:TP - .5 ) / TP  )
+			theta1 <- stats::qnorm( ( 1:TP - .5 ) / TP  )
 			pr1 <- outer( theta1 , qm , "-" )
 			Nparm <- dim(res0$E)[4]
 			gammaslope <- rep(1,Nparm)
@@ -91,7 +91,7 @@ tamaan.3pl.olca <- function( res0 , anal.list , con , ... ){
 			for (tt in 2:TP){
 			    v1 <- pr1[tt,] - pr1[tt-1,]
 				L1 <- length(v1)
-				gammaslope[ 1:N1+(tt-1)*N1 ] <- runif(L1,0.7,1.3)*v1
+				gammaslope[ 1:N1+(tt-1)*N1 ] <- stats::runif(L1,0.7,1.3)*v1
 					}
 			return(gammaslope)
 			}

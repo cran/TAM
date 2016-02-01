@@ -7,7 +7,7 @@ summary.tam.jml <- function( object , file = NULL , ...){
     # object      ... object from tam.mml                #
 #	object <- tamobject
 	cat("------------------------------------------------------------\n")
-    d1 <- packageDescription("TAM")
+    d1 <- utils::packageDescription("TAM")
 	cat( paste( d1$Package , " " , d1$Version , " (" , d1$Date , ")" , 
 			sep="") , "\n\n" )	
 	cat( "Start of Analysis:" , paste( object$time[1] ) , "\n" )

@@ -13,13 +13,13 @@ z0 <- Sys.time()
     ### Basic Information and Initializations
     constraint <- match.arg(constraint)
     ## restructure formulaA
-    t1 <- attr( terms( formulaA ) , "term.labels" )
+    t1 <- attr( stats::terms( formulaA ) , "term.labels" )
     t2 <- intersect( c("item" , "step" , "item:step") , t1 )
    
 z0 <- tamcat( " ---  z20" , z0 , tamcat_active )    
 
     formulaA <- paste(  paste( c(t2 , setdiff(t1 , t2 ) ) , collapse= " + " ) )
-    formulaA <- as.formula( paste( " ~ " , formulaA ) )	
+    formulaA <- stats::as.formula( paste( " ~ " , formulaA ) )	
     
     #********************************
     # change formate in facets

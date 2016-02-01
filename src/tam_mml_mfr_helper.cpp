@@ -154,9 +154,9 @@ BEGIN_RCPP
      // OUTPUT              
                    
       return Rcpp::List::create(    
-         _["index_matr"] = index_matr ,  
-         _["SG"] = SG ,  
-         _["cumsum_mm"] = cumsum_mm  
+         Rcpp::_["index_matr"] = index_matr ,  
+         Rcpp::_["SG"] = SG ,  
+         Rcpp::_["cumsum_mm"] = cumsum_mm  
          ) ;  
 END_RCPP
 }

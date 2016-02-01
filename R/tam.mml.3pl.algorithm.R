@@ -39,9 +39,9 @@
 # Revalpr("round(ntheta1,5)")		
 		lntheta <- log(ntheta1+eps)
 # Revalpr("lntheta")
-		mod <- lm( lntheta ~ 0 + Z , weights = ntheta1 )
-		covbeta <- vcov(mod)		
-		beta <- coef(mod)
+		mod <- stats::lm( lntheta ~ 0 + Z , weights = ntheta1 )
+		covbeta <- stats::vcov(mod)		
+		beta <- stats::coef(mod)
 		if ( ! is.null( delta.fixed ) ){
 		# delta.fixed: 1st column: parameter index
 		#              2nd column: group index

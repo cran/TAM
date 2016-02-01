@@ -27,7 +27,7 @@ IRT.drawPV <- function( object , NPV = 5 ){
 			m1 <- rowSums( hwt * theta )
 		    sd1 <- sqrt( rowSums( hwt * theta^2 ) - m1^2 )
 			for (pp in 1:NPV){
-				pvmatr[,pp] <- rnorm( N , mean = m1 , sd = sd1 )
+				pvmatr[,pp] <- stats::rnorm( N , mean = m1 , sd = sd1 )
 							}    
 				}
 		#*************************************************

@@ -73,7 +73,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   
   if (progress){ 
       cat(disp)	
-      cat("Processing Data     ", paste(Sys.time()) , "\n") ; flush.console()
+      cat("Processing Data     ", paste(Sys.time()) , "\n") ; utils::flush.console()
 				}     
   if ( ! is.null(group) ){ 
     con1a$QMC <- QMC <- FALSE
@@ -108,7 +108,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 	if (progress){ 
 	  cat("    * Response Data:" , nstud , "Persons and " , 
 			nitems , "Items \n" )  ;
-	  flush.console()	  
+	  utils::flush.console()	  
 					}  	  
 					
   #!! check dim of person ID pid
@@ -170,7 +170,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   cA[is.na(cA)] <- 0
   if (progress){ 
       cat("    * Created Design Matrices   (", 
-			paste(Sys.time()) , ")\n") ; flush.console()	  
+			paste(Sys.time()) , ")\n") ; utils::flush.console()	  
 				}    
   design <- NULL
   
@@ -223,8 +223,8 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   # beta inits
   # (Y'Y)
   if ( ! is.null( formulaY ) ){
-    formulaY <- as.formula( formulaY )
-    Y <- model.matrix( formulaY , dataY )[,-1]   # remove intercept
+    formulaY <- stats::as.formula( formulaY )
+    Y <- stats::model.matrix( formulaY , dataY )[,-1]   # remove intercept
 	nullY <- FALSE	
   }
   
@@ -326,7 +326,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   cResp <- cResp[ , col.index  ]
   cResp <- 1 * ( cResp == matrix( rep(1:(maxK), nitems) , nrow(cResp) , 
 		    		ncol(cResp) , byrow=TRUE ) )  
-  if ( sd(pweights) > 0 ){ 
+  if ( stats::sd(pweights) > 0 ){ 
 	ItemScore <- as.vector( t( colSums( cResp * pweights ) ) %*% cA )
 			} else { 
 	ItemScore <- as.vector( t( colSums( cResp) ) %*% cA )			
@@ -335,18 +335,19 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 
   if (progress){ 
       cat("    * Calculated Sufficient Statistics   (", 
-			paste(Sys.time()) , ")\n") ; flush.console()	  
+			paste(Sys.time()) , ")\n") ; utils::flush.console()	  
 				}  
 				
   # starting values for xsi
   maxAi <-  - (apply(-(A) , 3 , rowMaxs , na.rm=TRUE))  
   personMaxA <- resp.ind %*% maxAi
-  ItemMax <- personMaxA %t*% pweights  
+  #ItemMax <- personMaxA %t*% pweights  
+  ItemMax <- crossprod( personMaxA , pweights )
   
   # maximum score in resp, equal categories?  
   maxscore.resp <- apply( resp , 2 , max )
   if ( ncol(resp)>1){ 
-	sd.maxscore.resp <- sd(maxscore.resp)
+	sd.maxscore.resp <- stats::sd(maxscore.resp)
 			} else { sd.maxscore.resp <- 0 }
   
   equal.categ <- if( sd.maxscore.resp > .00001 ){ FALSE } else { TRUE  }
@@ -379,11 +380,11 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   } else {
     # sampled theta values
 	if (QMC){			
-		r1 <- sfsmisc::QUnif (n=snodes, min = 0, max = 1, 
+		r1 <- sfsmisc::QUnif(n=snodes, min = 0, max = 1, 
 					n.min = 1, p=ndim, leap = 409)
-		theta0.samp <- qnorm( r1 )
+		theta0.samp <- stats::qnorm( r1 )
 			} else {
-			theta0.samp <- matrix( mvrnorm( snodes , mu = rep(0,ndim) , 
+			theta0.samp <- matrix( MASS::mvrnorm( snodes , mu = rep(0,ndim) , 
 						Sigma = diag(1,ndim ) )	,
                         nrow= snodes , ncol=ndim )			
 				}
@@ -416,7 +417,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 			basispar[,dd] <- basispar1
 						}
 			   }
-			   
+
 			   
    if ( irtmodel %in% c("2PL","GPCM" , "GPCM.design","2PL.groups") ){
 	if ( ! is.null(B.fixed) ){
@@ -424,6 +425,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 			B_orig[ B.fixed[,1:3,drop=FALSE] ] <- 0
 						}
 						}
+
 						
   #---end 2PL---
  
@@ -433,7 +435,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 	Avector[ is.na(Avector) ] <- 0
 	unidim_simplify <- TRUE
 	if (G > 1){ unidim_simplify <- FALSE }
-	YSD <- max( apply( Y , 2 , sd ) )
+	YSD <- max( apply( Y , 2 , stats::sd ) )
 	if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }		
 	if (  YSD){ unidim_simplify <- FALSE }	
     if (  is.null(beta.fixed) ){ unidim_simplify <- FALSE }	
@@ -499,7 +501,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
     if (progress){ 
       cat(disp)	
       cat("Iteration" , iter , "   " , paste( Sys.time() ) )
-      cat("\nE Step\n") ; flush.console()
+      cat("\nE Step\n") ; utils::flush.console()
     }
     # calculate nodes for Monte Carlo integration	
     if ( snodes > 0){
@@ -508,7 +510,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
       theta <- beta[ rep(1,snodes) , ] + theta0.samp %*% chol(variance) 
 
       # calculate density for all nodes
-      thetasamp.density <- dmvnorm( theta , mean = as.vector(beta[1,]) , sigma = variance )
+      thetasamp.density <- mvtnorm::dmvnorm( theta , mean = as.vector(beta[1,]) , sigma = variance )
       # recalculate theta^2
 #      theta2 <- matrix( theta.sq(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
       theta2 <- matrix( theta.sq2(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
@@ -539,7 +541,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 	
 # cat("posterior v2") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
     
-    if (progress){ cat("M Step Intercepts   |"); flush.console() }
+    if (progress){ cat("M Step Intercepts   |"); utils::flush.console() }
     # collect old values for convergence indication
 	oldxsi <- xsi
     oldbeta <- beta
@@ -581,10 +583,11 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
     #---2PL---
     #compute sufficient statistics for 2PL slope parameters
     if (irtmodel %in% c("2PL","GPCM","GPCM.design","2PL.groups")) {
-      thetabar <- hwt%*%theta
+      thetabar <- hwt %*% theta
 #      cB_obs <- t(cResp*pweights)%*%(thetabar)
       cB_obs <- crossprod( cResp*pweights , thetabar)
       B_obs <- aperm(array(cB_obs,dim=c(maxK, nitems,ndim)),c(2,1,3))
+ 
       if ( ( is.matrix(variance) )  ){
 	    if (  ncol(variance) > 1 ){
 		diag(variance) <- diag(variance)+10^(-14)	  
@@ -592,7 +595,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 						}					
       if ( ! est.variance ){ 
 		if ( G == 1 ){ 
-				variance <- cov2cor(variance)  
+				variance <- stats::cov2cor(variance)  
 						} # fix variance at 1  
 		if ( G > 1 ){ 
 				variance[ group == 1 ] <- 1 
@@ -602,7 +605,8 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
     }
     #---end 2PL---
 # cat("sufficient statistics 2PL") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
-    
+
+ 
 	
 	  # function for reducing the variance	  
 	  if ( ! is.null( userfct.variance ) ){  
@@ -683,7 +687,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
       # progress bar
       if (progress){ 
 #        cat( paste( rep("-" , sum( mpr == p ) ) , collapse="" ) )
-          cat("-") ; flush.console()
+          cat("-") ; utils::flush.console()
       }
     } # end of all parameters loop
   #******
@@ -698,21 +702,22 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   
 	
 # cat("M steps intercepts") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
-    
+   
     #---2PL---
     if (irtmodel %in% c("2PL","GPCM","GPCM.design","2PL.groups") ) {
-     if (progress){ cat("\nM Step Slopes       |"); flush.console() }
-      oldB <- B
+     if (progress){ cat("\nM Step Slopes       |"); utils::flush.console() }
+      oldB <- B  
       res <- Mstep_slope.v2(B_orig, B, B_obs, B.fixed , max.increment, nitems, A, 
                      AXsi, xsi, theta, nnodes, maxK, itemwt, Msteps, ndim, convM,
 					 irtmodel ,  progress , est.slopegroups,E,basispar , se.B ,
 					 equal.categ )
-	  B <- res$B
+	  B <- res$B	  
 	  #**SE (standard error estimate)
 	  se.B <- res$se.B
  #	  max.increment <- max( abs( B - oldB ) )	  
 	  basispar <- res$basispar
       a4 <- max( abs( B - oldB ))  
+  
     }
 	
     #---end 2PL---
@@ -799,15 +804,11 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
       }					
       cat( "\n  beta ",round(beta,4)  )
       cat( "\n" )
-      flush.console()
+      utils::flush.console()
     }
   } # end of EM loop
   #******************************************************
 
-
-
-
- 
   		xsi.min.deviance -> xsi 
 		beta.min.deviance -> beta
 		variance.min.deviance -> variance	
@@ -890,8 +891,8 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
     #***
     # calculate EAP reliability
     # EAP variance
-    EAP.variance <- weighted.mean( person$EAP^2 , pweights ) - ( weighted.mean( person$EAP , pweights ) )^2
-    EAP.error <- weighted.mean( person$SD.EAP^2 , pweights )
+    EAP.variance <- stats::weighted.mean( person$EAP^2 , pweights ) - ( stats::weighted.mean( person$EAP , pweights ) )^2
+    EAP.error <- stats::weighted.mean( person$SD.EAP^2 , pweights )
     EAP.rel <- EAP.variance / ( EAP.variance + EAP.error )	
   } else { 
     EAP.rel <- rep(0,ndim)
@@ -903,8 +904,8 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
       #***
       # calculate EAP reliability
       # EAP variance
-      EAP.variance <- weighted.mean( person$EAP^2 , pweights ) - ( weighted.mean( person$EAP , pweights ) )^2
-      EAP.error <- weighted.mean( person$SD.EAP^2 , pweights )
+      EAP.variance <- stats::weighted.mean( person$EAP^2 , pweights ) - ( stats::weighted.mean( person$EAP , pweights ) )^2
+      EAP.error <- stats::weighted.mean( person$SD.EAP^2 , pweights )
       EAP.rel[dd] <- EAP.variance / ( EAP.variance + EAP.error )	
       colnames(person)[ which( colnames(person) == "EAP" ) ] <- paste("EAP.Dim" , dd , sep="")
       colnames(person)[ which( colnames(person) == "SD.EAP" ) ] <- paste("SD.EAP.Dim" , dd , sep="")				
@@ -937,7 +938,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
       print( variance[ var.indices] , 4 )	}
     if ( ndim > 1){ 
       cat("\nCorrelation Matrix:\n" ) # , round( varianceM , 4 ))	
-      print( cov2cor(varianceM) , 4 )	
+      print( stats::cov2cor(varianceM) , 4 )	
     }
     cat("\n\nEAP Reliability:\n")
     print( round (EAP.rel,3) )

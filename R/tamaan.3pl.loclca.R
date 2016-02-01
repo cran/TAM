@@ -38,7 +38,7 @@ tamaan.3pl.loclca <- function( res0 , anal.list , con , ... ){
 			N2 <- nrow(res0$loclca_ITEMS)
 			# trait locations
 			K <- TP 
-			locs <- qnorm( seq( 1/(2*K) , 1 - 1/(2*K) , 1/K ) )
+			locs <- stats::qnorm( seq( 1/(2*K) , 1 - 1/(2*K) , 1/K ) )
 			locs <- rep( locs , each= D )
 			names(locs) <- paste(res0$loclca_LOC$parm)
 			if (nn==1){ locs0 <- locs }
@@ -46,15 +46,15 @@ tamaan.3pl.loclca <- function( res0 , anal.list , con , ... ){
 			# inits for item parameters
 			dfr <- res0$loclca_ITEMS
 			G <- 1
-			startprobs <- rep( 1/TP , each=TP ) + (nn-1)/5 * runif( TP )
+			startprobs <- rep( 1/TP , each=TP ) + (nn-1)/5 * stats::runif( TP )
 			startprobs <- startprobs / sum( startprobs )
 			delta.inits <- matrix( startprobs , ncol=G )		
 			# delta.inits
 			if (nn>1){
 				if (nn==2){ gammaslope0 <- res$gammaslope }
-				gammaslope[ 1:N1 ] <- gammaslope0[1:N1] + rnorm(N1, sd = nn/8 )					
-				if ( nn %% 2 == 0 ){  gammaslope0[ 1:N1 ] <- rnorm(N1 , sd =2 ) }
-				locs <- locs0 + rnorm( TP*D , sd = sqrt(nn/5) )
+				gammaslope[ 1:N1 ] <- gammaslope0[1:N1] + stats::rnorm(N1, sd = nn/8 )					
+				if ( nn %% 2 == 0 ){  gammaslope0[ 1:N1 ] <- stats::rnorm(N1 , sd =2 ) }
+				locs <- locs0 + stats::rnorm( TP*D , sd = sqrt(nn/5) )
 				gammaslope[ names(locs) ] <- locs
 					}				
 			res <- tam.mml.3pl(resp= res0$resp , E=res0$E , skillspace="discrete" , 
@@ -67,7 +67,7 @@ tamaan.3pl.loclca <- function( res0 , anal.list , con , ... ){
             if (con$progress){
 				cat( paste0( "*** Random Start " , nn  ,
 						" | Deviance = " , round( res$deviance , 2 ) , "\n") )
-				flush.console()
+				utils::flush.console()
 						}
 			if ( res$deviance < devmin ){
 				devmin <- res$deviance

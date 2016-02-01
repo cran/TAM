@@ -60,7 +60,7 @@ a0 <- Sys.time()
 	#--- dim = 1
 	if ( ndim == 1 ){
 		MEAP <- mean( tamobj$person$EAP )
-		SDEAP <- sqrt( var( tamobj$person$EAP ) + mean( tamobj$person$SD.EAP^2 ) )
+		SDEAP <- sqrt( stats::var( tamobj$person$EAP ) + mean( tamobj$person$SD.EAP^2 ) )
 				}
 	#--- dim > 1
 	if ( ndim > 1 ){
@@ -69,8 +69,8 @@ a0 <- Sys.time()
 		ind <- ind[ seq( 1 , length(ind) , 2 ) ]
 		dat1 <- tp1[ ,  ind ]
 		mu1 <- as.vector( colMeans( dat1 ) )
-		var1 <- apply( dat1 , 2 , var ) / tamobj$EAP.rel
-		Sigma1 <- cov2cor(variance)
+		var1 <- apply( dat1 , 2 , stats::var ) / tamobj$EAP.rel
+		Sigma1 <- stats::cov2cor(variance)
 		Sigma1 <- np.adj * diag( sqrt( var1) ) %*% Sigma1 %*% diag( sqrt( var1 ))
 					}
 										
@@ -80,7 +80,7 @@ a0 <- Sys.time()
     pp <- 1
 	cat("|")
 	cat( paste( rep("*" , nplausible ) , collapse="") )
-	cat("|\n|") ; flush.console()
+	cat("|\n|") ; utils::flush.console()
 	
 
 	###################################################
@@ -96,7 +96,7 @@ a0 <- Sys.time()
 	   if (ndim == 1){
 			# unidimensional theta simulation
 			if ( ! normal.approx){			
-				theta <- matrix( rnorm( ntheta , mean = MEAP , sd = np.adj*SDEAP )  , ncol= 1)	
+				theta <- matrix( stats::rnorm( ntheta , mean = MEAP , sd = np.adj*SDEAP )  , ncol= 1)	
 				theta <- theta[ order( theta[,1] ) , , drop=FALSE]
 								} else {
 				theta <- matrix( SDEAP * seq( - 5 , 5 , len=ntheta ) + MEAP , ncol=1 )		 
@@ -105,7 +105,7 @@ a0 <- Sys.time()
 	   #*****************************
        # multidimensional PV imputation									
 	   if( ndim > 1 ){
-	      theta <- mvrnorm( ntheta , mu = mu1 , Sigma = Sigma1 )
+	      theta <- MASS::mvrnorm( ntheta , mu = mu1 , Sigma = Sigma1 )
 					}
 				}
 	 if ( theta.model ){
@@ -154,7 +154,7 @@ a0 <- Sys.time()
 			#*****
 			# no normal approximation
 			if ( ! normal.approx){	
-				rn1 <- runif( nstud )
+				rn1 <- stats::runif( nstud )
 				ind <- rowSums( hwt1 < outer( rn1 , nthetal ) ) +1				
 				if (ndim==1){
 					pv[,pp] <- theta1 <- theta[ind]	
@@ -168,7 +168,7 @@ a0 <- Sys.time()
 				thetaM <- matrix( theta[,1] , nstud , ntheta , byrow=TRUE )
 				EAP <- rowSums( thetaM * hwt )
 				SDPost <- sqrt( rowSums( thetaM^2 * hwt ) - EAP^2 )
-				pv[,pp] <- theta1 <- rnorm( nstud , mean = EAP , sd = SDPost )		
+				pv[,pp] <- theta1 <- stats::rnorm( nstud , mean = EAP , sd = SDPost )		
 					           }
 
 			 #------
@@ -180,9 +180,10 @@ a0 <- Sys.time()
 				nstudl <- rep(1,N)	
 				for ( dd in 1:ndim ){
 					MEAP[,dd] <- rowSums( hwt * outer( nstudl , theta[,dd] ) )
-					SDEAP[,dd] <- sqrt(rowSums( hwt * outer( nstudl , theta[,dd]^2 ) ) - MEAP[,dd]^2)					
+					SDEAP[,dd] <- sqrt(rowSums( hwt * outer( nstudl , theta[,dd]^2 ) ) -
+											MEAP[,dd]^2)					
 								}												 				
-				thetaPV <- matrix( rnorm( N * ndim ) , nrow=N , ncol=ndim )
+				thetaPV <- matrix( stats::rnorm( N * ndim ) , nrow=N , ncol=ndim )
 				thetaPV <- SDEAP * thetaPV + MEAP
 				theta1 <- pv[ , (pp-1)*(ndim) + 1:ndim ] <- thetaPV			 
 									}
@@ -192,17 +193,17 @@ a0 <- Sys.time()
 			# bootstrap sample of persons to get sampled beta coefficients
 			if ( ndim > 1 ){
 				N <- nrow(theta1)			
-				ind <- sample( 1:N , N , replace=TRUE)
+				ind <- base::sample( 1:N , N , replace=TRUE)
 				theta1 <- theta1[ ind , ]				
 				Y1 <- Y[ ind , , drop=FALSE ]
 						} else {
 				N <- length(theta1)
-				ind <- sample( 1:N , N , replace=TRUE)
+				ind <- base::sample( 1:N , N , replace=TRUE)
 				theta1 <- theta1[ ind ]				
 				Y1 <- Y[ ind , , drop=FALSE ]				
 								}
 			
-			modlm <- lm( theta1  ~  -1 + as.matrix(Y1) , weights = pweights)
+			modlm <- stats::lm( theta1  ~  -1 + as.matrix(Y1) , weights = pweights)
 			beta <- modlm$coef			# sampled regression coefficients
 			if ( ndim == 1 ){
 				beta <- matrix( beta , ncol=1 )
@@ -217,7 +218,7 @@ a0 <- Sys.time()
 			 #------
 			 # no normal approximation
 			 if (  ! normal.approx  ){
-				rn1 <- runif( nstud )
+				rn1 <- stats::runif( nstud )
 				ind <- interval_index( hwt1 , rn1 )	
                 pv[ , (pp-1)*(ndim) + 1:ndim ] <- theta[ind , ]			
 									}
@@ -233,7 +234,7 @@ a0 <- Sys.time()
 					MEAP[,dd] <- rowSums( hwt * outer( nstudl , theta[,dd] ) )
 					SDEAP[,dd] <- sqrt(rowSums( hwt * outer( nstudl , theta[,dd]^2 ) ) - MEAP[,dd]^2)					
 								}												 				
-				thetaPV <- matrix( rnorm( N * ndim ) , nrow=N , ncol=ndim )
+				thetaPV <- matrix( stats::rnorm( N * ndim ) , nrow=N , ncol=ndim )
 				thetaPV <- SDEAP * thetaPV + MEAP
 				pv[ , (pp-1)*(ndim) + 1:ndim ] <- thetaPV			 
 									}
@@ -245,17 +246,17 @@ a0 <- Sys.time()
 				thetaM <- matrix( theta[,1] , nstud , ntheta , byrow=TRUE )
 				EAP <- rowSums( thetaM * hwt )
 				SDPost <- sqrt( rowSums( thetaM^2 * hwt ) - EAP^2 )
-				pv[,pp] <- rnorm( nstud , mean = EAP , sd = SDPost )					  
+				pv[,pp] <- stats::rnorm( nstud , mean = EAP , sd = SDPost )					  
 									}
 																		
             if (pp != nplausible){ 
-					cat("-") ; flush.console() 
+					cat("-") ; utils::flush.console() 
 									}
 								}
 			NPV <- nplausible / 2
 						}   # end no plausible
 		#--------------------------		
-		cat("-" ) ; flush.console()
+		cat("-" ) ; utils::flush.console()
 					}  # end while
 	##################################################	
 			cat("|\n")

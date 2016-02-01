@@ -97,7 +97,11 @@ BEGIN_RCPP
      ///////////////////////////////////////////////////////  
      ///////////// O U T P U T   ///////////////////////////  
        
-     return List::create(_["xbar"]=XBAR , _["xbar2"]=XBAR2 , _["xxf"]=XXF  ); 
+     return Rcpp::List::create(
+           Rcpp::_["xbar"]=XBAR , 
+           Rcpp::_["xbar2"]=XBAR2 , 
+           Rcpp::_["xxf"]=XXF  
+                ); 
 END_RCPP
 }
 
@@ -187,7 +191,11 @@ BEGIN_RCPP
      ///////////////////////////////////////////////////////  
      ///////////// O U T P U T   ///////////////////////////  
        
-     return List::create(_["xbar"]=XBAR , _["xbar2"]=XBAR2 , _["xxf"]=XXF  ); 
+     return Rcpp::List::create(
+                Rcpp::_["xbar"]=XBAR , 
+                Rcpp::_["xbar2"]=XBAR2 , 
+                Rcpp::_["xxf"]=XXF  
+                    ); 
 END_RCPP
 }
 
@@ -203,9 +211,6 @@ SEXP redefine_vector_na( SEXP A_, SEXP val_) ;
 SEXP redefine_vector_na( SEXP A_, SEXP val_ ){
 BEGIN_RCPP
   
-       
-     // probs_gpcm <- function( x , theta , b , a , K , x_ind = NULL )  
-       
      Rcpp::NumericVector A(A_);          
      double val = as<double>(val_);  
        

@@ -75,7 +75,7 @@ Scored[,c(1,2)] <- (resp[,c(1,2)]==2)*1  #Key for items 1 and 2 is B.
 Scored[,c(10,11)] <- (resp[,c(10,11)]==3)*1  #Key for items 10 and 11 is C.
 
 #Run IRT analysis for partial credit model (MML estimation)
-mod1 <- tam(Scored)
+mod1 <- tam.mml(Scored)
 
 #Item parameters
 mod1$xsi
@@ -106,7 +106,7 @@ xsi <- mod1$xsi$xsi
 anchor <- matrix(c(seq(1,nparam),xsi), ncol=2)
 
 #Run IRT with item parameters anchored on mod1 values
-mod2 <- tam(Scored2, xsi.fixed=anchor)
+mod2 <- tam.mml(Scored2, xsi.fixed=anchor)
 
 #WLE ability estimates
 ability <- tam.wle(mod2)
@@ -129,7 +129,7 @@ dummy <- matrix(0,nrow=16,ncol=11)
 dummy[lower.tri(dummy)] <- 1
 dummy[12:16,c(3,4,7,8)][lower.tri(dummy[12:16,c(3,4,7,8)])]<-2
 
-mod3 <- tam(dummy, xsi.fixed=anchor)
+mod3 <- tam.mml(dummy, xsi.fixed=anchor)
 wle3 <- tam.wle(mod3) 
 }
 }

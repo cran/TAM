@@ -9,8 +9,8 @@
 				length(grep( vv , paste(formulaA) )) } )
 	h1 <- colnames(d1)[ h1 == 0 ]
 	d0 <- d0[ , ! ( colnames(d1) %in% h1 ) , drop=FALSE]
-	M2 <- model.matrix( #object= 
-    formulaA , data= d1 , 
+	M2 <- stats::model.matrix( #object= 
+			formulaA , data= d1 , 
 			contrasts.arg = lapply( d0 , contrasts, contrasts=FALSE) )
 	h2 <- colnames(M2)
 	h1 <- colnames(mm)
@@ -146,7 +146,7 @@
    							    varsc <- setdiff( varsc , paste(bb) )	
 						        h1 <- colSums( xsi.constraints[ varsc , , drop=FALSE]	)					
 								varsc <- names(h1)[  h1 != 0 ]
-								varsc <- na.omit( varsc)
+								varsc <- stats::na.omit( varsc)
 								mult <- -1					
 													}
 						}
@@ -196,7 +196,7 @@
 		if ( cols){
 			cM0 <- cM	
 			ind <- match(  cM0 , itemren[,2])		
-			ind <- na.omit(ind)
+			ind <- stats::na.omit(ind)
 			cM0[ ind ] <- paste(itemren[,1])	
 			itemren2 <- paste0(itemren[,2] , ":")
 			nc2 <- nchar(itemren2)
@@ -331,7 +331,7 @@ v0 <- Sys.time()
 			# nn <- 3
 			rm_nn <- rMsplit0[,nn]
 			ind1 <- match( rm_nn , itemren[,2] )
-			ind1 <- na.omit(ind1)
+			ind1 <- stats::na.omit(ind1)
 			h1 <- paste(itemren[ ind1 , 1] )
 			if ( length(h1) > 0 ){
 				rMsplit0[,nn] <- h1 
@@ -370,7 +370,7 @@ v0 <- Sys.time()
 			# nn <- 3
 			rm_nn <- rMsplit0[,nn]
 			ind1 <- match( rm_nn , itemren[,2] )
-			ind1 <- na.omit(ind1)
+			ind1 <- stats::na.omit(ind1)
 			h1 <- paste(itemren[ ind1 , 1] )
 			if ( length(h1) > 0 ){
 				rMsplit0[,nn] <- h1 
@@ -409,7 +409,7 @@ v0 <- Sys.time()
 		itemren <- facet.list[[ff]]
 		for (nn in 1:NRM){
 		   ind1 <- match( rMM1[,nn] , itemren[,2] )
-		   ind1 <- na.omit(ind1)
+		   ind1 <- stats::na.omit(ind1)
 		   h1 <- paste(itemren[ ind1 , 1] )
 		   if ( length(h1) > 0 ){
 				rMM1[,nn] <- h1 

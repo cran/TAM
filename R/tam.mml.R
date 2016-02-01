@@ -236,8 +236,8 @@ tam.mml <-
     # beta inits
     # (Y'Y)
     if ( ! is.null( formulaY ) ){
-      formulaY <- as.formula( formulaY )
-      Y <- model.matrix( formulaY , dataY )[,-1]   # remove intercept
+      formulaY <- stats::as.formula( formulaY )
+      Y <- stats::model.matrix( formulaY , dataY )[,-1]   # remove intercept
       nullY <- FALSE
     }
     
@@ -357,7 +357,8 @@ tam.mml <-
     # starting values for xsi
     maxAi <-  - (apply(-(A) , 3 , rowMaxs , na.rm=TRUE))  
     personMaxA <- resp.ind %*% maxAi
-    ItemMax <- personMaxA %t*% pweights  
+    #ItemMax <- personMaxA %t*% pweights  
+	ItemMax <- crossprod( personMaxA , pweights ) 
     xsi[est.xsi.index] <- - log(abs(( ItemScore[est.xsi.index]+.5)/
                                       (ItemMax[est.xsi.index]-ItemScore[est.xsi.index]+.5) ) )
     # starting values of zero
@@ -393,9 +394,9 @@ tam.mml <-
 		# fac <- 2
         r1 <- sfsmisc::QUnif(n=snodes, min = 0, max = 1, 
 						n.min = 1, p=ndim, leap = 409)
-        theta0.samp <- fac * qnorm( r1 )
+        theta0.samp <- fac * stats::qnorm( r1 )
       } else {
-        theta0.samp <- matrix( mvrnorm( snodes , mu = rep(0,ndim) , 
+        theta0.samp <- matrix( MASS::mvrnorm( snodes , mu = rep(0,ndim) , 
                                         Sigma = diag(1,ndim ) )	,
                                nrow= snodes , ncol=ndim )			
       }

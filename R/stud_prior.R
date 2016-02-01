@@ -11,11 +11,11 @@ stud_prior.v2 <-
       ##################################
       # SINGLE DIMENSION
 	if ( ! unidim_simplify  ){	  
-		gwt <- matrix(dnorm(rep(theta, each = nstud), mean= Y%*%beta, sd = sqrt(variance)),
+		gwt <- matrix( stats::dnorm(rep(theta, each = nstud), mean= Y%*%beta, sd = sqrt(variance)),
                     nrow = nstud)
 						} else {
 	  TP <- nrow(theta)				
-      gwt <- matrix(   dnorm(theta[,1] , mean= 0, sd = sqrt(variance[1,1])),  
+      gwt <- matrix(   stats::dnorm(theta[,1] , mean= 0, sd = sqrt(variance[1,1])),  
 							nrow = nstud , ncol=TP , byrow=TRUE)					
 								}
 	  

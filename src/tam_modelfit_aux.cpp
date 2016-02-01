@@ -117,7 +117,7 @@ BEGIN_RCPP
      // OUTPUT              
                    
      return Rcpp::List::create(   
-         _["dfr"] = dfr   
+           Rcpp::_["dfr"] = dfr   
          ) ;    
        
      // Rcpp::Rcout << "tmp1 " <<  tmp1 <<  std::flush << std::endl ;
@@ -222,12 +222,12 @@ BEGIN_RCPP
      // OUTPUT              
                    
      return Rcpp::List::create(   
-         _["obs_counts"] = obs_counts ,  
-         _["exp_counts"] = exp_counts ,  
-         _["maxKiM"] = maxKiM ,  
-         _["RR"] = RR ,  
-         _["maxK"] = maxK ,  
-         _["maxK2"] = maxK2  
+         Rcpp::_["obs_counts"] = obs_counts ,  
+         Rcpp::_["exp_counts"] = exp_counts ,  
+         Rcpp::_["maxKiM"] = maxKiM ,  
+         Rcpp::_["RR"] = RR ,  
+         Rcpp::_["maxK"] = maxK ,  
+         Rcpp::_["maxK2"] = maxK2  
          ) ;    
        
      // Rcpp::Rcout << "tmp1 " <<  tmp1 <<  std::flush << std::endl ;
@@ -297,11 +297,11 @@ BEGIN_RCPP
      // OUTPUT              
                    
      return Rcpp::List::create(   
-         _["cov_ij"] = cov_ij ,  
-         _["cor_ij"] = cor_ij ,  
-         _["N_ij"] = n_ij ,  
-         _["M_ij"] = mean_ij ,  
-         _["SD_ij"] = sd_ij  
+         Rcpp::_["cov_ij"] = cov_ij ,  
+         Rcpp::_["cor_ij"] = cor_ij ,  
+         Rcpp::_["N_ij"] = n_ij ,  
+         Rcpp::_["M_ij"] = mean_ij ,  
+         Rcpp::_["SD_ij"] = sd_ij  
          ) ;    
        
      // Rcpp::Rcout << "tmp1 " <<  tmp1 <<  std::flush << std::endl ;
@@ -357,7 +357,7 @@ BEGIN_RCPP
      // OUTPUT              
                    
      return Rcpp::List::create(   
-         _["residM"] = residM        
+         Rcpp::_["residM"] = residM        
          ) ;    
        
      // Rcpp::Rcout << "tmp1 " <<  tmp1 <<  std::flush << std::endl ;

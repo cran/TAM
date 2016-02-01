@@ -5,11 +5,11 @@
 	  n.ik , N.ik , est.guess , old.increment.guess , guess.prior ,
 	  progress	  ){
 	  old_increment <- old.increment.guess	  
-	  if (progress){ cat("\nM Step Guessing     |"); flush.console() }
+	  if (progress){ cat("\nM Step Guessing     |"); utils::flush.console() }
 	  eps <- 1e-10
 	  eps10 <- 1E-30
 #	  eps1 <- 1e-5
-	  guess.logit0 <- guess.logit <- qlogis( guess + eps)	  
+	  guess.logit0 <- guess.logit <- stats::qlogis( guess + eps)	  
 	  ind.guess <- which( est.guess != 0 )	  
 	  n1ij <- n.ik[,2,]
 	  nij <- N.ik
@@ -29,13 +29,13 @@
 		  pij <- pij + eps
 	      pij0 <- rprobs0[ , 2 , ]		 
 		  guess <- ifelse( ( guess < h ) & ( est.guess != 0 ) , 4*h , guess )
-		  guess.logit <- qlogis( guess + eps)	  
+		  guess.logit <- stats::qlogis( guess + eps)	  
 		  #****
 		  # derivatives guessing priors
 		  if ( ! is.null(guess.prior) ){
-			  d0  <- log(dbeta( plogis(guess.logit) , guess.prior[,1] , guess.prior[,2] ) + eps)
-			  d0p <- log(dbeta( plogis(guess.logit+h), guess.prior[,1] , guess.prior[,2] ) + eps)
-			  d0m <- log(dbeta( plogis(guess.logit-h), guess.prior[,1] , guess.prior[,2] ) + eps)
+			  d0  <- log( stats::dbeta( stats::plogis(guess.logit) , guess.prior[,1] , guess.prior[,2] ) + eps)
+			  d0p <- log( stats::dbeta( stats::plogis(guess.logit+h), guess.prior[,1] , guess.prior[,2] ) + eps)
+			  d0m <- log( stats::dbeta( stats::plogis(guess.logit-h), guess.prior[,1] , guess.prior[,2] ) + eps)
 #			  d0  <- log(dbeta( guess , guess.prior[,1] , guess.prior[,2] ) + eps)
 #			  d0p <- log(dbeta( guess + h , guess.prior[,1] , guess.prior[,2] ) + eps)
 #			  d0m <- log(dbeta( guess - h, guess.prior[,1] , guess.prior[,2] ) + eps)
@@ -58,8 +58,8 @@
 									
 									
 		  # aggregation over group of parameters
-		  der1 <- aggregate( der1 , list( est.guess ) , sum )
-		  der2 <- aggregate( der2 , list( est.guess ) , sum )	  	  		  
+		  der1 <- stats::aggregate( der1 , list( est.guess ) , sum )
+		  der2 <- stats::aggregate( der2 , list( est.guess ) , sum )	  	  		  
 		  der1 <- der1[ der1[,1] != 0  , ]
 		  der2 <- der2[ der2[,1] != 0  , ]
 		  increment <- der1[,2] / ( abs(der2[,2]) + eps )
@@ -70,11 +70,11 @@
 #		   guess.logit[ ind.guess ] <- guess.logit[ind.guess ] + increment
 		   guess[ ind.guess ] <- guess[ind.guess ] + increment
 		  guess <- ifelse( ( guess < h ) & ( est.guess != 0 ) , 4*h , guess )
-#		   guess <- plogis( guess.logit)
+#		   guess <- stats::plogis( guess.logit)
 		  old_increment <- max(abs(increment))
 		  if ( old_increment < convM){ converge <- TRUE }
 		  Miter <- Miter + 1
-		  if (progress){ cat("-") ; flush.console() }			  
+		  if (progress){ cat("-") ; utils::flush.console() }			  
 					}
 	  #*********************************************************
 	  # standard error of logit guessing parameter				

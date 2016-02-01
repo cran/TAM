@@ -41,11 +41,11 @@
 		# xsi prior
 		  if ( ! is.null(xsi.prior) ){
 			  h <- .0001	
-			  d0  <- log(dnorm( xsi , mean=xsi.prior[,1] , 
+			  d0  <- log( stats::dnorm( xsi , mean=xsi.prior[,1] , 
 						       sd=xsi.prior[,2] ) + eps)
-			  d0p  <- log(dnorm( xsi + h , mean=xsi.prior[,1] , 
+			  d0p  <- log( stats::dnorm( xsi + h , mean=xsi.prior[,1] , 
 						       sd=xsi.prior[,2] ) + eps)
-			  d0m  <- log(dnorm( xsi - h , mean=xsi.prior[,1] , 
+			  d0m  <- log( stats::dnorm( xsi - h , mean=xsi.prior[,1] , 
 						       sd=xsi.prior[,2] ) + eps)
 			  d1 <- ( d0p - d0 ) / h
 			  d2 <- ( ( d0p - d0 ) - ( d0 - d0m ) ) / h^2		
@@ -83,7 +83,7 @@
         # progress bar
         if (progress){ 
           #        cat( paste( rep("-" , sum( mpr == p ) ) , collapse="" ) )
-          cat("-") ; flush.console()
+          cat("-") ; utils::flush.console()
         }
       } # end of all parameters loop
 	  

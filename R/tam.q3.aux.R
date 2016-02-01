@@ -2,7 +2,7 @@
 ############################################################
 # computation of Q3 statistic from residuals
 .tam.q3.q3sub <- function( residM ){
-    corM <- cor(residM  , use="pairwise.complete.obs")
+    corM <- stats::cor(residM  , use="pairwise.complete.obs")
     I <- ncol(residM)
     dfr <- matrix( corM , ncol=1 )
     dfr <- data.frame( "index1" = rep(1:I,each=I) , "index2"= rep(1:I,I)  , "Q3" = dfr )

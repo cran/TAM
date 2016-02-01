@@ -43,7 +43,8 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
 	
     if (progress){ 
       cat(disp)	
-      cat("Processing Data     ", paste(Sys.time()) , "\n") ; flush.console()
+      cat("Processing Data     ", paste(Sys.time()) , "\n") ; 
+	  utils::flush.console()
     }  
     
     if ( ! is.null(group) ){ 
@@ -62,7 +63,7 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
     }
     if (progress){ 
       cat("    * Response Data:" , nstud , "Persons \n" )  ;
-      flush.console()	  
+      utils::flush.console()	  
     }  	  
     
     #!! check dim of person ID pid
@@ -128,8 +129,8 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
     # beta inits
     # (Y'Y)
     if ( ! is.null( formulaY ) ){
-      formulaY <- as.formula( formulaY )
-      Y <- model.matrix( formulaY , dataY )[,-1]   # remove intercept
+      formulaY <- stats::as.formula( formulaY )
+      Y <- stats::model.matrix( formulaY , dataY )[,-1]   # remove intercept
       nullY <- FALSE
     }
     
@@ -158,7 +159,8 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
       nreg <- G - 1
     }
     
-    W <- t(Y * pweights) %*% Y
+    # W <- t(Y * pweights) %*% Y
+	W <- crossprod(Y * pweights ,  Y )
     if (ridge > 0){ diag(W) <- diag(W) + ridge }
     YYinv <- solve( W )
     
@@ -201,10 +203,10 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
     } else {
       # sampled theta values
       if (QMC){						
-        r1 <- QUnif (n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)						
-        theta0.samp <- qnorm( r1 )
+        r1 <- sfsmisc::QUnif(n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)						
+        theta0.samp <- stats::qnorm( r1 )
       } else {
-        theta0.samp <- matrix( mvrnorm( snodes , mu = rep(0,ndim) , 
+        theta0.samp <- matrix( MASS::mvrnorm( snodes , mu = rep(0,ndim) , 
                                         Sigma = diag(1,ndim ) )	,
                                nrow= snodes , ncol=ndim )			
       }
@@ -221,7 +223,7 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
     a02 <- a1 <- 999	# item parameter change
     a4 <- 0
     
-    YSD <- max( apply( Y , 2 , sd ) )
+    YSD <- max( apply( Y , 2 , stats::sd ) )
     if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }
     
     # define progress bar for M step
@@ -243,14 +245,15 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
       if (progress){ 
         cat(disp)	
         cat("Iteration" , iter , "   " , paste( Sys.time() ) )
-        cat("\nE Step\n") ; flush.console()
+        cat("\nE Step\n") ; 
+		utils::flush.console()
       }
       # calculate nodes for Monte Carlo integration	
       if ( snodes > 0){
         #      theta <- beta[ rep(1,snodes) , ] +  t ( t(chol(variance)) %*% t(theta0.samp) )
         theta <- beta[ rep(1,snodes) , ] + theta0.samp %*% chol(variance) 
         # calculate density for all nodes
-        thetasamp.density <- dmvnorm( theta , mean = as.vector(beta[1,]) , sigma = variance )
+        thetasamp.density <- mvtnorm::dmvnorm( theta , mean = as.vector(beta[1,]) , sigma = variance )
         # recalculate theta^2
         #      theta2 <- matrix( theta.sq(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
         theta2 <- matrix( theta.sq2(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
@@ -275,7 +278,10 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
       # cat("calc_posterior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						 
       
      
-      if (progress){ cat("M Step Intercepts   |"); flush.console() }
+      if (progress){ 
+	       cat("M Step Intercepts   |")
+		   utils::flush.console() 
+			   }
       oldbeta <- beta
       oldvariance <- variance 
   
@@ -360,7 +366,7 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
         }					
         cat( "\n  beta ",round(beta,4)  )
         cat( "\n" )
-        flush.console()
+        utils::flush.console()
       }
       
       # cat("rest") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
@@ -403,8 +409,8 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
       #***
       # calculate EAP reliability
       # EAP variance
-      EAP.variance <- weighted.mean( person$EAP^2 , pweights ) - ( weighted.mean( person$EAP , pweights ) )^2
-      EAP.error <- weighted.mean( person$SD.EAP^2 , pweights )
+      EAP.variance <- stats::weighted.mean( person$EAP^2 , pweights ) - ( stats::weighted.mean( person$EAP , pweights ) )^2
+      EAP.error <- stats::weighted.mean( person$SD.EAP^2 , pweights )
       EAP.rel <- EAP.variance / ( EAP.variance + EAP.error )	
     } else { 
       EAP.rel <- rep(0,ndim)
@@ -416,8 +422,8 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
         #***
         # calculate EAP reliability
         # EAP variance
-        EAP.variance <- weighted.mean( person$EAP^2 , pweights ) - ( weighted.mean( person$EAP , pweights ) )^2
-        EAP.error <- weighted.mean( person$SD.EAP^2 , pweights )
+        EAP.variance <- stats::weighted.mean( person$EAP^2 , pweights ) - ( stats::weighted.mean( person$EAP , pweights ) )^2
+        EAP.error <- stats::weighted.mean( person$SD.EAP^2 , pweights )
         EAP.rel[dd] <- EAP.variance / ( EAP.variance + EAP.error )	
         colnames(person)[ which( colnames(person) == "EAP" ) ] <- paste("EAP.Dim" , dd , sep="")
         colnames(person)[ which( colnames(person) == "SD.EAP" ) ] <- paste("SD.EAP.Dim" , dd , sep="")				

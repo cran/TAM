@@ -67,8 +67,8 @@ msq.itemfit <- function( object , fitindices=NULL ){
 		dfr <- cbind( dfr , res0)
 		
 		#---   compute p values
-		dfr$Outfit_p <- 2 * pnorm( -abs( dfr$Outfit_t )	)			
-		dfr$Infit_p <- 2 * pnorm( -abs( dfr$Infit_t ))	
+		dfr$Outfit_p <- 2 * stats::pnorm( -abs( dfr$Outfit_t )	)			
+		dfr$Infit_p <- 2 * stats::pnorm( -abs( dfr$Infit_t ))	
 		# arrange columns in data frame
 		cdfr <- colnames(dfr)
 		ind <- c( grep( "Outfit" , cdfr ) ,  grep( "Infit" , cdfr ) )
@@ -77,7 +77,7 @@ msq.itemfit <- function( object , fitindices=NULL ){
 		# summary statistic
 		vars <- c("Outfit" , "Infit")
 		dfr2 <- data.frame( "fit" = vars , "M" = colMeans(dfr[,vars]) ,
-					"SD" = apply( dfr[,vars] , 2 , sd ) )
+					"SD" = apply( dfr[,vars] , 2 , stats::sd ) )
 		s2 <- Sys.time()
 		v1 <- c(s1 , s2 )
 		res <- list( "itemfit" = dfr , "summary_itemfit"=dfr2 ,

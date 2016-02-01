@@ -39,7 +39,7 @@
       stop( cat( "Items with maximum score of 0:" , paste(i11 , collapse=" " ) ) )
     }
     
-    tf <- terms( formulaA )	
+    tf <- stats::terms( formulaA )	
     fvars <- as.vector( attr(tf,"variables"), mode = "character" )[-1]
     #cat("fvars 212") ; print(fvars)	
     otherFacets <- setdiff( fvars, c("item", "step") )
@@ -72,7 +72,7 @@
 	
     # cat(" +++  v110" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     								  	
 	g2 <- g1 <- expand.grid(expand.list)
-	diffK <- ( sd( maxKi) > 0 )
+	diffK <- ( stats::sd( maxKi) > 0 )
 	# diffK <- FALSE
 	diffK <- TRUE
 	# reduced combinations of items
@@ -100,7 +100,7 @@
 #	X$par.exist <- 1 * ( as.numeric(paste(X$step)) <= X$maxKi )	
 	#****
     ### constraints and formulaA
-    if( constraint == "cases" ) formulaA <- update.formula(formulaA, ~0+.)
+    if( constraint == "cases" ) formulaA <- stats::update.formula(formulaA, ~0+.)
     NX <- ncol(X)
     for (ff in 1:NX){
       uff <- length( unique(X[,ff] ) )
@@ -108,10 +108,10 @@
                               colnames(X)[ff] , " does only have one level!" ) , "\n") }
     }
     # cat(" +++  v120" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     								  	 
-    mm <- - model.matrix(formulaA, X, contrasts = contr.list)
+    mm <- - stats::model.matrix(formulaA, X, contrasts = contr.list)
 	
 	if (diffK){
-		mm2 <- - model.matrix(formulaA, X2, contrasts = contr.list)
+		mm2 <- - stats::model.matrix(formulaA, X2, contrasts = contr.list)
 				}
 
 
@@ -149,7 +149,7 @@
         ip <- length(stepgroups)
         VP <- min( ip , 10 )
         cat(paste0("          |",paste0( rep("*" , VP) , collapse="") , "|\n"))
-        cat("          |") ; flush.console()
+        cat("          |") ; utils::flush.console()
         if (VP<10){ disp_progress <- 1:ip } else {
           disp_progress <- 100* ( 1:ip ) / (ip+1)
           disp_progress <- sapply( seq(5,95,10) , FUN = function(pp){ # pp <- 5
@@ -221,14 +221,14 @@
         if ( progress ){
           ii <- ii+1
           if (( ii == disp_progress[vv] ) & (vv<=10) ){
-            cat("-") ; flush.console()
+            cat("-") ; utils::flush.console()
             vv <- vv+1			
               }
             }   # end progress
 	
       }  # end stepgroups
       if ( progress ){
-        cat("|\n") ; flush.console()
+        cat("|\n") ; utils::flush.console()
       }
       # cat(" +++  v160" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     				  	  		      
     } else {

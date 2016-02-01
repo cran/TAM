@@ -5,22 +5,19 @@ cfa.extract.itempars <- function( object ){
 
 	if ( object@Options$model.type != "cfa" ){
 			stop("Function can only be applied \n if cfa (in lavaan) is used.")
-											}
-											
-	ParTable <- as.data.frame( object@ParTable )
+											}								
+	# ParTable <- as.data.frame( object@ParTable )
+	ParTable <- as.data.frame( lavaan::parameterTable(object) )
 	ParTable$parname <- paste0( ParTable$lhs , ParTable$op , ParTable$rhs )	
 	labels1 <- paste(ParTable$label)
 	ParTable$parname <- ifelse ( labels1 != "" , labels1 , ParTable$parname )	
-	
 	ParTable$est <- ParTable$ustart
-	cobj <- coef( object )
-	
-	vars1 <- intersect( names(cobj) , ParTable$parname )
-	NV <- length(vars1)
-	for ( vv in vars1){
-		ParTable[ ParTable$parname %in% vv , "est" ] <- cobj[ vv ]
-					}
-
+#	cobj <- coef( object )
+#	vars1 <- intersect( names(cobj) , ParTable$parname )
+#	NV <- length(vars1)
+#	for ( vv in vars1){
+#		ParTable[ ParTable$parname %in% vv , "est" ] <- cobj[ vv ]
+#					}
 	# extract sample statistics
 	means <- object@SampleStats@mean[[1]]
 	obs.vars <- object@Data@ov.names[[1]]
@@ -81,7 +78,6 @@ cfa.extract.itempars <- function( object ){
 	   psi[ paste(part1[ll,"rhs"]) , paste(part1[ll,"lhs"]) ] <- 
 	      psi[ paste(part1[ll,"lhs"]) , paste(part1[ll,"rhs"]) ] <- part1[ll,"est"]
 					}
-	
 					
 	#**** output				
 	res <- list( "L"=L , "nu"= nu , "psi"= psi ,

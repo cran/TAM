@@ -35,8 +35,8 @@ Simulated Rasch data under unidimensional trait distribution
 \details{
 \code{N <- 2000     } \cr
 \code{ # simulate predictors} \cr
-\code{ Y <- cbind( rnorm( N , sd = 1.5) , rnorm(N , sd = .3 ) )} \cr
-\code{ theta <- rnorm( N ) + .4 * Y[,1] + .2 * Y[,2]  # latent regression model} \cr
+\code{ Y <- cbind( stats::rnorm( N , sd = 1.5) , stats::rnorm(N , sd = .3 ) )} \cr
+\code{ theta <- stats::rnorm( N ) + .4 * Y[,1] + .2 * Y[,2]  # latent regression model} \cr
 \code{ # simulate item responses with missing data} \cr
 \code{ I <- 40} \cr
 \code{ resp[ theta < 0 , c(1,seq(I/2+1 , I)) ] <- NA} \cr
@@ -56,15 +56,15 @@ Simulated Rasch data under unidimensional trait distribution
 \dontrun{      
 data(data.sim.rasch)
 N <- 2000
-Y <- cbind( rnorm( N , sd = 1.5) , rnorm(N , sd = .3 ) )
+Y <- cbind( stats::rnorm( N , sd = 1.5) , stats::rnorm(N , sd = .3 ) )
 
 # Loading Matrix
 # B <- array( 0 , dim = c( I , 2 , 1 )  )
 # B[1:(nrow(B)), 2, 1] <- 1
 B <- designMatrices(resp = data.sim.rasch)[["B"]]
   
-# estimate model
-mod1_1 <- tam(resp=data.sim.rasch , Y=Y)
+# estimate Rasch model
+mod1_1 <- tam.mml(resp=data.sim.rasch , Y=Y)
 
 # standard errors
 res1 <- tam.se(mod1_1)
@@ -81,17 +81,19 @@ pv1 <- tam.pv( mod1_1 , nplausible = 7 , # 7 plausible values
 # item parameter constraints
 xsi.fixed <- matrix( c( 1, -2,5, -.22,10, 2 ), nrow=3 , ncol=2 , byrow=TRUE)
 xsi.fixed
-mod1_4 <- tam( resp=data.sim.rasch , xsi.fixed=xsi.fixed )
+mod1_4 <- tam.mml( resp=data.sim.rasch , xsi.fixed=xsi.fixed )
 
 # missing value handling
 data(data.sim.rasch.missing)
-mod1_2 <- tam(data.sim.rasch.missing , Y = Y)
+mod1_2 <- tam.mml(data.sim.rasch.missing , Y = Y)
 
 # handling of sample (person) weights
 data(data.sim.rasch.pweights)
 N <- 1000
 pweights <- c(  rep(3,N/2) , rep( 1, N/2 ) )
-mod1_3 <- tam( data.sim.rasch.pweights , control = list(conv = .001) , pweights = pweights )}
+mod1_3 <- tam.mml( data.sim.rasch.pweights , control = list(conv = .001) , 
+               pweights = pweights )
+  }
 }
 
 \keyword{datasets}

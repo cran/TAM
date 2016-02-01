@@ -9,7 +9,7 @@
            nnodes, maxK, recalc=TRUE , guess){
 		   
     if(recalc){
-      AXsi.tmp <- array( tensor( A[iIndex,,, drop = FALSE], xsi, 3, 1 ) , 
+      AXsi.tmp <- array( tensor::tensor( A[iIndex,,, drop = FALSE], xsi, 3, 1 ) , 
                          dim = c( length(iIndex) , maxK , nnodes ) )
       AXsi[iIndex,] = AXsi.tmp[,,1]
     } else {

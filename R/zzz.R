@@ -12,13 +12,13 @@
 #}
 version <- function(pkg="TAM"){
   lib <- dirname(system.file(package = pkg))
-  d <- packageDescription(pkg)
+  d <- utils::packageDescription(pkg)
   return(paste(d$Package,d$Version,d$Date,lib))
 }
 # on attach TAM
 .onAttach <- function(libname,pkgname){
-  d <- packageDescription("TAM")
-  packageStartupMessage("::...........................::\n",
+  d <- utils::packageDescription("TAM")
+  base::packageStartupMessage("::...........................::\n",
 		paste(":: " , d$Package," " , d$Version," (",d$Date,")", 
           paste0(rep(" ", max(8-nchar(d$Version),0)), collapse=""), " ::",sep="") ,
 		paste("\n:: Test Analysis Modules     ::") ,
@@ -29,7 +29,7 @@ version <- function(pkg="TAM"){
 # R session info
 Rsessinfo <- function(){
     si <- Sys.info()
-    si2 <- sessionInfo()
+    si2 <- utils::sessionInfo()
     paste0( si2$R.version$version.string , " " , si2$R.version$system 
              , " | nodename = " , si["nodename"] , " | login = " , si["login"] )
             }

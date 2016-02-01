@@ -32,12 +32,12 @@ msq.itemfitWLE <- function( tamobj , fitindices = NULL , ...  ){
 			parms <- sort( unique(parmlabel) )
 			ind <- match( parmlabel , parms )
 			dfr_parm <- data.frame( "parm" = parms )
-			dfr_parm$N <- aggregate( dfr_data$N , list(ind) , sum )[,2]
-			dfr_parm$sum_var <- aggregate( dfr_data$sum_var , list(ind) , sum )[,2]
+			dfr_parm$N <- stats::aggregate( dfr_data$N , list(ind) , sum )[,2]
+			dfr_parm$sum_var <- stats::aggregate( dfr_data$sum_var , list(ind) , sum )[,2]
 			
-			out1 <- aggregate( dfr_data$N * dfr_data$Outfit , list(ind) , sum )[,2]
+			out1 <- stats::aggregate( dfr_data$N * dfr_data$Outfit , list(ind) , sum )[,2]
 			dfr_parm$Outfit <- out1 / dfr_parm$N
-			out1 <- aggregate( dfr_data$sum_var * dfr_data$Infit , list(ind) , sum )[,2]
+			out1 <- stats::aggregate( dfr_data$sum_var * dfr_data$Infit , list(ind) , sum )[,2]
 			dfr_parm$Infit <- out1 / dfr_parm$sum_var			
 			dfr_parm$sum_var <- NULL
 						}
@@ -45,13 +45,13 @@ msq.itemfitWLE <- function( tamobj , fitindices = NULL , ...  ){
 		# summary statistics
 		vars <- c("Outfit" , "Infit")
 		dfr2a <- data.frame( "fit" = vars , "M" = colMeans(dfr_data[,vars]) ,
-					"SD" = apply( dfr_data[,vars] , 2 , sd ) )
+					"SD" = apply( dfr_data[,vars] , 2 , stats::sd ) )
 		dfr2b <- NULL
 
 		if ( ! is.null(dfr_parm) ){			
 			vars <- c("Outfit" , "Infit")
 			dfr2b <- data.frame( "fit" = vars , "M" = colMeans(dfr_parm[,vars]) ,
-						"SD" = apply( dfr_parm[,vars] , 2 , sd ) )
+						"SD" = apply( dfr_parm[,vars] , 2 , stats::sd ) )
 								}
 		s2 <- Sys.time()
 		v1 <- c(s1 , s2 )					

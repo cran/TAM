@@ -178,7 +178,7 @@ tam.mml.wle <-
 	  if (progress){
       cat( paste( "Iteration in WLE/MLE estimation ", Miter, 
                   "  | Maximal change " , round( max(abs(increment)) , 4) , "\n" )  ) 
-      flush.console()
+      utils::flush.console()
 			}
     }  # end of Newton-Raphson
     
@@ -228,7 +228,7 @@ tam.mml.wle <-
     # WLE reliability
     if ( ndim==1 ){
       ind <- which( res$N.items > 0 )
-      v1 <- var( theta[ind] , na.rm=TRUE )	
+      v1 <- stats::var( theta[ind] , na.rm=TRUE )	
       v2 <- mean( error[ind]^2 , na.rm=TRUE)
       # WLE_Rel = ( v1 - v2 ) / v1 = 1 - v2 / v1
       WLE.rel <- 1 - v2 / v1
@@ -242,7 +242,7 @@ tam.mml.wle <-
       cat("\n-------\n")
       for (dd in 1:ndim){
         #	dd <- 1
-        v1 <- var( res[,paste0("theta.Dim" , substring( 100+1:ndim , 2))[dd] ] , na.rm=TRUE)
+        v1 <- stats::var( res[,paste0("theta.Dim" , substring( 100+1:ndim , 2))[dd] ] , na.rm=TRUE)
         v2 <- mean( res[,paste0("error.Dim" , substring( 100+1:ndim , 2))[dd] ]^2 , na.rm=TRUE)
         #		v2 <- mean( error^2 )
         res[ ,paste0("WLE.rel.Dim" , substring( 100+ dd , 2)) ]	<- h1 <- 1 - v2 / v1
@@ -429,7 +429,7 @@ tam.mml.wle2 <-
       if (progress){
 		  cat( paste( "Iteration in WLE/MLE estimation ", Miter, 
 					  "  | Maximal change " , round( max(abs(increment)) , 4) , "\n" )  ) 
-		  flush.console()
+		  utils::flush.console()
 					}
     }  # end of Newton-Raphson
 
@@ -479,7 +479,7 @@ tam.mml.wle2 <-
     # WLE reliability
     if ( ndim==1 ){
       ind <- which( res$N.items > 0 )
-      v1 <- var( theta[ind] , na.rm=TRUE )	
+      v1 <- stats::var( theta[ind] , na.rm=TRUE )	
       v2 <- mean( error[ind]^2 , na.rm=TRUE)
       # WLE_Rel = ( v1 - v2 ) / v1 = 1 - v2 / v1
       WLE.rel <- 1 - v2 / v1
@@ -495,7 +495,7 @@ tam.mml.wle2 <-
       cat("\n-------\n")
       for (dd in 1:ndim){
         #	dd <- 1
-        v1 <- var( res[,paste0("theta.Dim" , substring( 100+1:ndim , 2))[dd] ] , na.rm=TRUE)
+        v1 <- stats::var( res[,paste0("theta.Dim" , substring( 100+1:ndim , 2))[dd] ] , na.rm=TRUE)
         v2 <- mean( res[,paste0("error.Dim" , substring( 100+1:ndim , 2))[dd] ]^2 , na.rm=TRUE)
         #		v2 <- mean( error^2 )
         res[ ,paste0("WLE.rel.Dim" , substring( 100+ dd , 2)) ]	<- h1 <- 1 - v2 / v1

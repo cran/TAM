@@ -89,8 +89,13 @@ BEGIN_RCPP
 	    ///////////////////////////////////////////////////////
 	    ///////////// O U T P U T   ///////////////////////////
 	    
-	    return List::create(_["B_bari"]=B_bari, _["BB_bari"]=BB_bari, _["BBB_bari"]=BBB_bari,
-	    					_["B_Sq"]=B_Sq, _["B2_B"]=B2_B, _["B_Cube"]=B_Cube );
+	    return Rcpp::List::create(
+                    Rcpp::_["B_bari"]=B_bari, 
+                    Rcpp::_["BB_bari"]=BB_bari, 
+                    Rcpp::_["BBB_bari"]=BBB_bari,
+                    Rcpp::_["B_Sq"]=B_Sq, 
+                    Rcpp::_["B2_B"]=B2_B, 
+                    Rcpp::_["B_Cube"]=B_Cube );
 END_RCPP
 }
 

@@ -60,7 +60,7 @@ Mstep_slope.v2 <-
 #		  rpr.it <- t( rprobs[,k,] ) * itemwt[,items.temp,drop=FALSE]
 		  rprobs.k <- matrix( rprobs[,k,] , nrow=length(items.temp) , ncol=nrow(theta) )
 #		  rpr.it <- t( rprobs[,k,] ) * itemwt[,items.temp]
-		  rpr.it <- t( rprobs.k ) * itemwt[,items.temp]
+ 		  rpr.it <- t( rprobs.k ) * itemwt[,items.temp]
 		  ttheta.dd2 <- t( theta[,dd,drop=FALSE]^2)
 		  ttheta.dd <- t( theta[,dd,drop=FALSE] )
 #		  xbar[items.temp,k] <- t( theta[,dd] ) %*% rpr.it
@@ -90,6 +90,7 @@ Mstep_slope.v2 <-
 			#           nrow(theta),byrow=TRUE) * rprobs[,k,]
             xbar2[items.temp,k] <- 
               t( theta[,dd]^2 ) %*% t( rprobs[,k,]^2*t(itemwt[,items.temp]) )
+			  # t(A) %*% t( B * t(C) ) -> simplify this formula!!!
           }
           
           if ( ! is.null( items.conv) ){
@@ -143,19 +144,34 @@ Mstep_slope.v2 <-
           basispar[,dd] <- basispar[,dd] + increment.temp
           increment.temp <- ( E %*% increment.temp	)[,1]
           increment <- outer( increment.temp , mK - 1) 
-		  d1 <- outer(  1 / abs( deriv.temp ) , mK-1 ) 		  
+		  d1 <- outer(  1 / abs( deriv.temp ) , mK-1 ) 
+
           LL <- ncol(d1)		
 		  for (ll in 1:LL){
 	#		  ll <- 2
 			  m1 <- sqrt( diag( E %*% d1[,ll] %*% t( d1[,ll] ) %*% t(E) ) )
 			  if (Biter==1){ se.B[,ll,dd]  <- m1 }	  
 				}
+		#**** Bug fix ARb 2015-12-16
+		nB <- dim(B)	
+		# B_ind <- 1 * ( B_obs != 0 )
+		B_ind <- 1 * ( B_orig != 0 )
+		for (dd in 1:nB[3]){
+			# dd <- 1
+			EB <- E %*% basispar[,dd] 
+			for (cc in 1:(nB[2]-1)){ 
+			#	cc <- 1
+				B[,cc+1,dd] <- cc * EB * B_ind[,cc,dd]
+								}
+						}
+		B00 <- B
+
         } # end GPCM.design																			
         
         #**********
         if (irtmodel == "2PL.groups"){  # begin 2PL slopegroups
-          a1 <- aggregate( B_obs[,,dd] - xbar  , list(est.slopegroups) , sum )		
-          a2 <- aggregate( xbar2 - xxf  , list(est.slopegroups) , sum )				
+          a1 <- stats::aggregate( B_obs[,,dd] - xbar  , list(est.slopegroups) , sum )		
+          a2 <- stats::aggregate( xbar2 - xxf  , list(est.slopegroups) , sum )				
           deriv.temp <- as.matrix(a2[,-1])
           diff.temp <- as.matrix(a1[,-1])
           increment.temp <- diff.temp*abs(1/( deriv.temp + 10^(-20) ) )  
@@ -188,9 +204,12 @@ Mstep_slope.v2 <-
         }   # end 2PL
         ###########################################
         increment[B_orig[,,dd]==0] <- 0  # B[i,k,] could be zero for some dimensions
-        old_increment[,,dd] <- increment        
+        old_increment[,,dd] <- increment        	
         B[,,dd] <- B[,,dd] + increment   # update B parameter
-					
+		
+if (irtmodel=="GPCM.design"){
+     B <- B00
+				}		
 		
       }  # end dimensions
       ###############################################
@@ -202,7 +221,7 @@ Mstep_slope.v2 <-
       #          if ( max(abs(increment)) < convM ) { converge <- TRUE }
       if ( max(abs(old_increment)) < convM ) { converge <- TRUE }
       Biter <- Biter + 1
-      if (progress){ cat( "-" ) ; flush.console()	}		  
+      if (progress){ cat( "-" ) ; utils::flush.console()	}		  
     }		# end while loop
 	se.B[ B_orig == 0 ] <- 0
     res <- list( "B" = B , "basispar" = basispar , "se.B" = se.B )

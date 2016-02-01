@@ -79,7 +79,7 @@ tam.mml.mfr <-
     pid0 <- pid <- unname(c(unlist(pid)))
     if (progress){ 
       cat(disp)	
-      cat("Processing Data     ", paste(Sys.time()) , "\n") ; flush.console()
+      cat("Processing Data     ", paste(Sys.time()) , "\n") ; utils::flush.console()
     }    
     if ( ! is.null(group) ){ 
       con1a$QMC <- QMC <- FALSE
@@ -107,10 +107,10 @@ tam.mml.mfr <-
 								}
 							}		   
 		  if(!is.null(item.ind)){ 
-			maxKi <- aggregate( resp , facets[,item.ind,drop=FALSE] , 
+			maxKi <- stats::aggregate( resp , facets[,item.ind,drop=FALSE] , 
 								max, na.rm=TRUE )[,2]
 		  }else{
-			maxKi <- aggregate( resp , facets[,1,drop=FALSE] , 
+			maxKi <- stats::aggregate( resp , facets[,1,drop=FALSE] , 
 								max, na.rm=TRUE )[,2]
 			
 		  }
@@ -215,7 +215,7 @@ tam.mml.mfr <-
     
     if (progress){ 
       cat("    * Created Design Matrices   (", 
-          paste(Sys.time()) , ")\n") ; flush.console()	  
+          paste(Sys.time()) , ")\n") ; utils::flush.console()	  
     }    
     
 #    cat(" --- design matrix ready" ) ; a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1
@@ -290,7 +290,7 @@ tam.mml.mfr <-
       pid <- persons	
       if (progress){ 
         cat("    * Arranged Response Data with Multiple Person Rows   (", 
-            paste(Sys.time()) , ")\n") ; flush.console()	  
+            paste(Sys.time()) , ")\n") ; utils::flush.console()	  
       }  		
     }
     ###################################################
@@ -325,7 +325,7 @@ tam.mml.mfr <-
     if (progress){ 
       cat("    * Response Data:" , nstud , "Persons and " , 
           ncol(gresp.noStep) , "Generalized Items (" , paste(Sys.time()) ,")\n" )  ;
-      flush.console()	  
+      utils::flush.console()	  
     }  	
     #!! check dim of person ID pid
     if ( is.null(pid) ){ pid <- seq(1,nstud) }
@@ -414,8 +414,8 @@ tam.mml.mfr <-
     # beta inits
     # (Y'Y)
     if ( ! is.null( formulaY ) ){
-      formulaY <- as.formula( formulaY )
-      Y <- model.matrix( formulaY , dataY )[,-1]   # remove intercept
+      formulaY <- stats::as.formula( formulaY )
+      Y <- stats::model.matrix( formulaY , dataY )[,-1]   # remove intercept
       nullY <- FALSE	  
     }
     
@@ -528,7 +528,7 @@ tam.mml.mfr <-
       if (progress){ 
         cat("    * Reduced Response Data:" , nstud , "Persons and " , 
             ncol(gresp.noStep) , "Generalized Items (" , paste(Sys.time()) ,")\n" )  ;
-        flush.console()	  
+        utils::flush.console()	  
       } 		
       
     }
@@ -564,7 +564,7 @@ tam.mml.mfr <-
 									
     cA <- t( matrix( aperm( A , c(2,1,3) ) , nrow = dim(A)[3] , byrow = TRUE ) )
     cA[is.na(cA)] <- 0		
-    if ( sd(pweights) > 0 ){ 
+    if ( stats::sd(pweights) > 0 ){ 
       ItemScore <- as.vector( t( colSums( cResp * pweights ) ) %*% cA )
     } else { 
       ItemScore <- as.vector( t( colSums( cResp) ) %*% cA )			
@@ -574,12 +574,13 @@ tam.mml.mfr <-
        
     if (progress){ 
       cat("    * Calculated Sufficient Statistics   (", 
-          paste(Sys.time()) , ")\n") ; flush.console()	  
+          paste(Sys.time()) , ")\n") ; utils::flush.console()	  
     }   			
     # starting values for xsi
     gresp.ind.tmp <- gresp.noStep.ind[ , col.index  ]
     #    gresp.ind.tmp[,- grep(paste0("-step",(maxK-1)),colnames(gresp))] <- 0
-    ItemMax <- (gresp.ind.tmp %*% cA) %t*% pweights
+    # ItemMax <- (gresp.ind.tmp %*% cA) %t*% pweights
+	ItemMax <- crossprod(gresp.ind.tmp %*% cA , pweights )
     ItemMax <- as.vector( t( colSums( gresp.ind.tmp * pweights ) ) %*% cA )    
     
     
@@ -629,9 +630,9 @@ tam.mml.mfr <-
       # sampled theta values
       if (QMC){			
         r1 <- sfsmisc::QUnif (n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)
-        theta0.samp <- qnorm( r1 )
+        theta0.samp <- stats::qnorm( r1 )
       } else {
-        theta0.samp <- matrix( mvrnorm( snodes , mu = rep(0,ndim) , 
+        theta0.samp <- matrix( MASS::mvrnorm( snodes , mu = rep(0,ndim) , 
                                         Sigma = diag(1,ndim ) )	,
                                nrow= snodes , ncol=ndim )			
       }
@@ -660,7 +661,7 @@ tam.mml.mfr <-
 	Avector <- as.vector(A)
 	Avector[ is.na(Avector) ] <- 0
 	unidim_simplify <- TRUE
-    YSD <- max( apply( Y , 2 , sd ) )
+    YSD <- max( apply( Y , 2 , stats::sd ) )
     if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }		
 	if (G > 1){ unidim_simplify <- FALSE }
 	if ( YSD){ unidim_simplify <- FALSE }	
@@ -714,14 +715,14 @@ tam.mml.mfr <-
       if (progress){ 
         cat(disp)	
         cat("Iteration" , iter , "   " , paste( Sys.time() ) )
-        cat("\nE Step\n") ; flush.console()
+        cat("\nE Step\n") ; utils::flush.console()
       }
       # calculate nodes for Monte Carlo integration	
       if ( snodes > 0){
         #        theta <- beta[ rep(1,snodes) , ] +  t ( t(chol(variance)) %*% t(theta0.samp) )
         theta <- beta[ rep(1,snodes) , ] + theta0.samp %*% chol(variance) 
         # calculate density for all nodes
-        thetasamp.density <- dmvnorm( theta , mean = as.vector(beta[1,]) , sigma = variance )
+        thetasamp.density <- mvtnorm::dmvnorm( theta , mean = as.vector(beta[1,]) , sigma = variance )
         # recalculate theta^2
         #        theta2 <- matrix( theta.sq(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
         theta2 <- matrix( theta.sq2(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
@@ -748,7 +749,7 @@ tam.mml.mfr <-
       hwt <- res.hwt[["hwt"]] 
 
 # cat("calc posterior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		  
-      if (progress){ cat("M Step Intercepts   |"); flush.console() }
+      if (progress){ cat("M Step Intercepts   |"); utils::flush.console() }
       # collect old values for convergence indication
       oldxsi <- xsi
       oldbeta <- beta
@@ -881,7 +882,7 @@ if (!choice1){
         if (progress){ 
           #    cat( paste( rep("-" , sum( mpr == p ) ) , collapse="" ) )
           cat("-")
-          flush.console()
+          utils::flush.console()
         }
       } # end of all parameters loop
       
@@ -965,7 +966,7 @@ if (!choice1){
         }					
         cat( "\n  beta ",round(beta,4)  )
         cat( "\n" )
-        flush.console()
+        utils::flush.console()
       }
       
 
@@ -1074,9 +1075,9 @@ if (!choice1){
       #***
       # calculate EAP reliability
       # EAP variance
-      EAP.variance <- weighted.mean( person$EAP^2 , pweights ) - 
-        ( weighted.mean( person$EAP , pweights ) )^2
-      EAP.error <- weighted.mean( person$SD.EAP^2 , pweights )
+      EAP.variance <- stats::weighted.mean( person$EAP^2 , pweights ) - 
+				( stats::weighted.mean( person$EAP , pweights ) )^2
+      EAP.error <- stats::weighted.mean( person$SD.EAP^2 , pweights )
       EAP.rel <- EAP.variance / ( EAP.variance + EAP.error )	
     } else { 
       EAP.rel <- rep(0,ndim)
@@ -1088,8 +1089,9 @@ if (!choice1){
         #***
         # calculate EAP reliability
         # EAP variance
-        EAP.variance <- weighted.mean( person$EAP^2 , pweights ) - ( weighted.mean( person$EAP , pweights ) )^2
-        EAP.error <- weighted.mean( person$SD.EAP^2 , pweights )
+        EAP.variance <- stats::weighted.mean( person$EAP^2 , pweights ) - 
+					( stats::weighted.mean( person$EAP , pweights ) )^2
+        EAP.error <- stats::weighted.mean( person$SD.EAP^2 , pweights )
         EAP.rel[dd] <- EAP.variance / ( EAP.variance + EAP.error )	
         colnames(person)[ which( colnames(person) == "EAP" ) ] <- paste("EAP.Dim" , dd , sep="")
         colnames(person)[ which( colnames(person) == "SD.EAP" ) ] <- paste("SD.EAP.Dim" , dd , sep="")				
@@ -1120,7 +1122,7 @@ if (!choice1){
         print( variance[ var.indices] , 4 )	}
       if ( ndim > 1){ 
         cat("\nCorrelation Matrix:\n" ) # , round( varianceM , 4 ))	
-        print( cov2cor(varianceM) , 4 )	
+        print( stats::cov2cor(varianceM) , 4 )	
       }
       cat("\n\nEAP Reliability:\n")
       print( round (EAP.rel,3) )

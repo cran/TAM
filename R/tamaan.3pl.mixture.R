@@ -33,7 +33,7 @@ tamaan.3pl.mixture <- function( res0 , anal.list , con , ... ){
 			ncat.ii <- items0[ii , "ncat"] - 1
 			l1 <- rep(0,ncat.ii)
 			for (hh in 1:ncat.ii){
-				l1[hh] <- qlogis( mean( resp[,ii] >= hh , na.rm=TRUE ) / ncat.ii )
+				l1[hh] <- stats::qlogis( mean( resp[,ii] >= hh , na.rm=TRUE ) / ncat.ii )
 								}
 			return(l1)
 					} )
@@ -46,15 +46,13 @@ tamaan.3pl.mixture <- function( res0 , anal.list , con , ... ){
 		
 			gammaslope <- gammaslope0			
 			gammaslope[ itempartable.int$index ] <-	rep( beta0 , ncl ) + 
-							rnorm( ncl*B0 , mean=0, sd = log(1+nn^(1/5) ) )
+							stats::rnorm( ncl*B0 , mean=0, sd = log(1+nn^(1/5) ) )
 			
 			N0 <- nrow(itempartable.slo)
 			if ( ! res0$raschtype ){
-				gammaslope[ itempartable.slo$index ] <-	runif( N0 , max(.2,1-nn/5) , min( 1.8 , 1+nn/5) )			
+				gammaslope[ itempartable.slo$index ] <-	stats::runif( N0 , max(.2,1-nn/5) , min( 1.8 , 1+nn/5) )			
 								}
 			
-#			gammaslope <- c( qlogis( runif( dim(res0$E)[4] - 1 ) ) , 1 )
-#			TP <- dim(res0$E)[3]
 			
 			# delta.inits
 			if (nn==1){ delta.inits <- NULL }
@@ -76,7 +74,7 @@ tamaan.3pl.mixture <- function( res0 , anal.list , con , ... ){
             if (con$progress){
 				cat( paste0( "*** Random Start " , nn  ,
 						" | Deviance = " , round( res$deviance , 2 ) , "\n") )
-				flush.console()
+				utils::flush.console()
 						}
 			if ( res$deviance < devmin ){
 				devmin <- res$deviance

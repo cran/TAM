@@ -16,8 +16,8 @@ IRT.linearCFA <- function( object , group=1 ){
 		M.trait <- rep(0,D)
 		SD.trait <- rep(0,D)
 		for (dd in 1:D){
-			M.trait[dd] <- m0 <- weighted.mean( theta[,dd]  , pi.k )
-			sd0 <- weighted.mean( theta[,dd]^2  , pi.k )
+			M.trait[dd] <- m0 <- stats::weighted.mean( theta[,dd]  , pi.k )
+			sd0 <- stats::weighted.mean( theta[,dd]^2  , pi.k )
 			SD.trait[dd] <- sqrt( sd0 - m0^2 )
 						}
 		# output data frame
@@ -45,18 +45,18 @@ IRT.linearCFA <- function( object , group=1 ){
 
 			# linear approximation factor model
 			form <- paste0( "cat ~ " , paste0( colnames(theta) , collapse = " + " ) )
-			mod <- lm( as.formula(form) , data = dfr.ii , weights = dfr.ii$count )
+			mod <- stats::lm( stats::as.formula(form) , data = dfr.ii , weights = dfr.ii$count )
 			# print( summary(mod) )
 
 			# fitted values
-			fitted_mod <- fitted(mod)
-			resid_mod <- resid(mod)
-			dfr[ii,"ResidVar"] <- weighted.mean( resid_mod^2 , dfr.ii$count )
+			fitted_mod <- stats::fitted(mod)
+			resid_mod <- stats::resid(mod)
+			dfr[ii,"ResidVar"] <- stats::weighted.mean( resid_mod^2 , dfr.ii$count )
 			dfr[ii, c("mu" , paste0("load.Dim" , 1:D) ) ] <- coef(mod)
 
 			# latent mean and latent SD (model-implied)
-			dfr[ ii , "Mlat" ] <- M1 <- weighted.mean( dfr.ii$cat , dfr.ii$count )
-			V1 <- weighted.mean( dfr.ii$cat^2 , dfr.ii$count )
+			dfr[ ii , "Mlat" ] <- M1 <- stats::weighted.mean( dfr.ii$cat , dfr.ii$count )
+			V1 <- stats::weighted.mean( dfr.ii$cat^2 , dfr.ii$count )
 			dfr[ ii , "SDlat" ] <- sqrt( V1 - M1^2 )		
 			# communality
 			dfr[ ii , "h2" ] <- 1 - ( dfr[ii, "ResidVar"] ) /  dfr[ii,"SDlat"]^2 

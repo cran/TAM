@@ -94,7 +94,7 @@ A generalized form of the Rasch model. In M. von Davier & C. H. Carstensen (Eds.
 
 \seealso{
 Fit statistics can be also calculated by the function \code{\link{msq.itemfit}}
-which avoids simulations and rather directly evaluates individual
+which avoids simulations and directly evaluates individual
 posterior distributions.
 	
 Item fit and person fit based on estimated person parameters can also be 
@@ -172,23 +172,23 @@ I <- 40		# 40 items
 N <- 1000       # 1000 persons
 
 delta <- seq(-2,2, len=I)
-theta <- rnorm(N, 0, 1)
+theta <- stats::rnorm(N, 0, 1)
 # simulate data
-prob <- plogis(outer(theta, delta, "-"))
-rand <- matrix(runif(N*I), nrow=N, ncol=I)
+prob <- stats::plogis(outer(theta, delta, "-"))
+rand <- matrix( stats::runif(N*I), nrow=N, ncol=I)
 resp <- 1*(rand < prob)
 colnames(resp) <- paste("I" , 1:I, sep="")
   
-#Introduce some local dependence
+#induce some local dependence
 for (item in c(10, 20, 30)){ 
  #  20% of the item responses for items 11, 21 and 31
  #are made equal to the previous item 
-  row <- round(runif(0.2*N)*N + 0.5)     
+  row <- round( stats::runif(0.2*N)*N + 0.5)     
   resp[row, item+1] <- resp[row, item]
 }
   
 #run TAM
-mod1 <- tam(resp)
+mod1 <- tam.mml(resp)
   
 #User-defined fit design matrix
 F <- array(0, dim=c(dim(mod1$A)[1], dim(mod1$A)[2], 6))
@@ -240,7 +240,7 @@ summary(sx2mod1)
 # compare results of CDM and mirt
 sx2comp <-  cbind( sx2mod1$itemfit.stat[ , c("S-X2" , "p") ]  , 
                     dfr[  , c("mirt.S_X2" , "mirt.p.S_X2") ] )
-round( sx2comp , 3 )
+round(sx2comp , 3 )
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

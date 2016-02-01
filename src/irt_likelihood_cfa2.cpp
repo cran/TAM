@@ -76,8 +76,11 @@ BEGIN_RCPP
      // OUTPUT              
                    
       return Rcpp::List::create(    
-         _["hwt"] = hwt ,    
-         _["N"] = N , _["I"] = I , _["TP"]=TP , _["D"] = D  
+         Rcpp::_["hwt"] = hwt ,    
+         Rcpp::_["N"] = N , 
+         Rcpp::_["I"] = I , 
+         Rcpp::_["TP"]=TP , 
+         Rcpp::_["D"] = D  
          ) ;  
 END_RCPP
 }

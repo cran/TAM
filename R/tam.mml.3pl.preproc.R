@@ -64,8 +64,8 @@
 								  }	
 								}  # end if len(ind.dd) > 0	  
 					} # end dd
-		  gam1 <- aggregate( Qdes$gamma.fixed , list(Qdes$gammapar) , mean )
-		  gam1 <- na.omit(gam1)
+		  gam1 <- stats::aggregate( Qdes$gamma.fixed , list(Qdes$gammapar) , mean )
+		  gam1 <- stats::na.omit(gam1)
 		  gammaslope.fixed <- gam1[ , c(1,2) ]
 		  colnames(gammaslope.fixed) <- NULL
 				}  # end ! is.null(Q.fixed)

@@ -25,10 +25,11 @@ function( resp , hwt ,  resp.ind ,
  		# original implementation without missings
 		#  -- itemwt0 <- matrix(rep(colSums(hwt), nitems), nrow=nnodes, ncol=nitems)
 		thetabar <- hwt %*% theta
-		sumbeta <- Y %t*% ( thetabar*pweights )
+		# sumbeta <- Y %t*% ( thetabar*pweights )
+		sumbeta <- crossprod( Y , thetabar*pweights )
 		# -- sumsig2 <- sum( (pweights*hwt) %*% theta2 )
 		# sumsig2 <- colSums((pweights*hwt) %*% theta2)
-        sumsig2 <- as.vector( t( colSums( pweights * hwt ) ) %*% theta2 )		
+        sumsig2 <- as.vector( crossprod( colSums( pweights * hwt ) , theta2 ) )		
  #cat("- sum sig2") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
 					}
 
@@ -60,18 +61,20 @@ function( resp , hwt ,  resp.ind ,
 		# This formula is not faster!
 		thetabar <- hwtS %*% theta
 # cat("- thetabar ") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						
-		sumbeta <- Y %t*% ( thetabar*pweights )
+		#sumbeta <- Y %t*% ( thetabar*pweights )
+		sumbeta <- crossprod( Y ,  thetabar*pweights )
 # cat("- tensor operation ") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1								
 		# -- sumsig2 <- sum( (pweights*hwt) %*% theta2 )
 		# sumsig2 <- colSums((pweights*hwtS) %*% theta2)      		
-		sumsig2 <- as.vector( t( colSums( pweights * hwtS ) ) %*% theta2 )
+		# sumsig2 <- as.vector( t( colSums( pweights * hwtS ) ) %*% theta2 )
+		sumsig2 <- as.vector( crossprod( colSums( pweights * hwtS ) , theta2 ) )
 # cat("- sum sig2 modified ") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
 					}				
 	# calculation of variance and regression coefficients					
     beta <- YYinv%*%sumbeta                     #new beta
     sumsig2 <- matrix(sumsig2,ndim,ndim)
     if (G==1){ 
-		variance <- (sumsig2-sumbeta %t*% beta )/nstud  #new variance
+		variance <- (sumsig2- crossprod( sumbeta , beta ) )/nstud  #new variance
 			}
 			
 	# fixed beta coefficients
@@ -93,15 +96,16 @@ function( resp , hwt ,  resp.ind ,
 				hwt <- hwt / rowSums( hwt )				
 						}
 		for (gg in 1:G){
-			#gg <- 1
+			#gg <- 1 
 			ind.gg <- which( group == gg )
 			thetabar <- hwt[ind.gg,]%*%theta
 	#		sumbeta <- Y[ind.gg,]%t*%( thetabar*pweights[ind.gg] )
-			sumbeta <- Y[ind.gg,]%t*%( thetabar*pweights[ind.gg] )
+			sumbeta <- crossprod( Y[ind.gg,] ,  thetabar*pweights[ind.gg] )
 			# -- sumsig2 <- sum( (pweights*hwt) %*% theta2 )
 			sumsig2 <- colSums((pweights[ind.gg]*hwt[ind.gg,]) %*% theta2)   
 			sumsig2 <- matrix(sumsig2,ndim,ndim)
-			variance[ind.gg] <- (sumsig2-sumbeta%t*%beta)/sum(pweights[ind.gg]) #new variance
+			# variance[ind.gg] <- (sumsig2-sumbeta%t*%beta)/sum(pweights[ind.gg]) #new variance
+			variance[ind.gg] <- (sumsig2- crossprod( sumbeta , beta) )/sum(pweights[ind.gg]) #new variance
 				}
 			}		# end multiple groups
     res <- list( "beta" = beta , "variance" = variance , "itemwt" = itemwt )

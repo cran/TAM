@@ -43,7 +43,7 @@ summary.tamaan.normal.skillspace <- function(object){
 		cat("------------------------------------------------------------\n")
 			cat("Covariances and Variances\n")
 			if ( object$G >1){
-				a1 <- aggregate( object$variance , list( object$group ) , mean )
+				a1 <- stats::aggregate( object$variance , list( object$group ) , mean )
 				object$variance <- a1[,2]
 						}
 			obji <- round( object$variance , 3 )
@@ -57,7 +57,7 @@ summary.tamaan.normal.skillspace <- function(object){
 			if ( object$G >1){
 				obji <- sqrt( object$variance )
 						} else {
-			obji <- cov2cor(object$variance)
+			obji <- stats::cov2cor(object$variance)
 			diag(obji) <- sqrt( diag( object$variance) )
 						}
 			if ( object$G >1){

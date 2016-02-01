@@ -6,7 +6,7 @@ summary.tam.mml.3pl <- function( object , file = NULL , ...){
 						}
 #	object <- tamobject
 	cat("------------------------------------------------------------\n")
-    d1 <- packageDescription("TAM")
+    d1 <- utils::packageDescription("TAM")
 	cat( paste( d1$Package , " " , d1$Version , " (" , d1$Date , ")" , 
 			sep="") , "\n\n" )	
 	cat( "Date of Analysis:" , paste( object$time[2] ) , "\n" )
@@ -90,7 +90,7 @@ summary.tam.mml.3pl <- function( object , file = NULL , ...){
 		cat("------------------------------------------------------------\n")
 			cat("Covariances and Variances\n")
 			if ( object$G >1){
-				a1 <- aggregate( object$variance , list( object$group ) , mean )
+				a1 <- stats::aggregate( object$variance , list( object$group ) , mean )
 				object$variance <- a1[,2]
 						}
 			obji <- round( object$variance , 3 )
@@ -104,7 +104,7 @@ summary.tam.mml.3pl <- function( object , file = NULL , ...){
 			if ( object$G >1){
 				obji <- sqrt( object$variance )
 						} else {
-			obji <- cov2cor(object$variance)
+			obji <- stats::cov2cor(object$variance)
 			diag(obji) <- sqrt( diag( object$variance) )
 						}
 			if ( object$G >1){

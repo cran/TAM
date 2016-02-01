@@ -135,12 +135,14 @@ tam.jml2 <-
     cB[is.na(cB)] <- 0
     
     # Item sufficient statistics
-    ItemScore <- (cResp %*% cA) %t*% pweights
+    # ItemScore <- (cResp %*% cA) %t*% pweights
+	ItemScore <- crossprod(cResp %*% cA , pweights )
     
     # Computer possible maximum parameter score for each person
     maxAi <-  - (apply(-(A) , 3 , rowMaxs , na.rm=TRUE))  
     personMaxA <- resp.ind %*% maxAi
-    ItemMax <- personMaxA %t*% pweights
+    # ItemMax <- personMaxA %t*% pweights
+	ItemMax <- crossprod( personMaxA , pweights )
     
     #Adjust perfect and zero scores for the parameters
     ItemScore[ItemScore==ItemMax] <- ItemScore[ItemScore==ItemMax] + adj #..."+" sign, because ItemScore is -ve)
@@ -200,7 +202,7 @@ tam.jml2 <-
         cat(disp)	
         cat("Iteration" , iter , "   " , paste( Sys.time() ) )
         #      cat( "\n" )
-        flush.console()
+        utils::flush.console()
       }
       olddeviance <- deviance
       
@@ -259,7 +261,7 @@ tam.jml2 <-
         cat( "\n  Maximum MLE/WLE change:" , round( maxthetachange , 6 ) )	  
         cat( "\n  Maximum item parameter change:" , round( maxChangeP , 6 ) )  
         cat( "\n" )
-        flush.console()
+        utils::flush.console()
       }
       #@ARb 2012-08-27
       # stop loop (break) if there is no change in deviation
@@ -280,7 +282,7 @@ tam.jml2 <-
 
     
     #WLE person separation reliability
-    varWLE <- var(thetaWLE)
+    varWLE <- stats::var(thetaWLE)
     WLEreliability <- (varWLE - mean(errorWLE^2)) / varWLE
     
     if (progress){ cat("\n Item fit calculation \n") }  

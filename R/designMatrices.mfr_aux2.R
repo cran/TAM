@@ -8,9 +8,9 @@
 				length(grep( vv , paste(formulaA) )) } )
 	h1 <- colnames(d1)[ h1 == 0 ]
 	d0 <- d0[ , ! ( colnames(d1) %in% h1 ) , drop=FALSE]
-	M2 <- model.matrix( #object= 
+	M2 <- stats::model.matrix( #object= 
          formulaA , data= d1 , 
-			contrasts.arg = lapply( d0 , contrasts, contrasts=FALSE) )
+			contrasts.arg = lapply( d0 , stats::contrasts, contrasts=FALSE) )
 	h2 <- colnames(M2)
 	h1 <- colnames(mm)
 	# extract facets
@@ -135,7 +135,7 @@
 					varsc <- setdiff( varsc , paste(bb) )	
 					h1 <- colSums( xsi.constraints[ varsc , , drop=FALSE]	)
 					varsc <- names(h1)[  h1 != 0 ]
-					varsc <- na.omit( varsc)
+					varsc <- stats::na.omit( varsc)
 					mult <- -1			
 						if ( length(varsc) == 0 ){
 							g1 <- unlist( lapply( s20 , FUN = function(ll){
@@ -150,7 +150,7 @@
    							    varsc <- setdiff( varsc , paste(bb) )	
 						        h1 <- colSums( xsi.constraints[ varsc , , drop=FALSE]	)					
 								varsc <- names(h1)[  h1 != 0 ]
-								varsc <- na.omit( varsc)
+								varsc <- stats::na.omit( varsc)
 								mult <- -1					
 													}
 						}

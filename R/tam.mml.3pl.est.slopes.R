@@ -7,7 +7,7 @@
 			n.ik , N.ik , gammaslope , E , FdesM , dimFdes ,
 			gammaslope.fixed , gammaslope.prior , maxgamma = 9.99 , Edes ){
 	  	  
-	  if (progress){ cat("\nM Step Slopes       |"); flush.console() }
+	  if (progress){ cat("\nM Step Slopes       |"); utils::flush.console() }
 		eps <- 1e-10
 		Nlam <- length(gammaslope)
 		Xlambda00 <- Xlambda0 <- Xlambda <- gammaslope
@@ -45,11 +45,11 @@
 		  if ( ! is.null(gammaslope.prior) ){
 			  h <- .0001	
 			  if ( ncol(gammaslope.prior) == 2 ){
-				  d0  <- log( dnorm( Xlambda , mean=gammaslope.prior[,1] , 
+				  d0  <- log( stats::dnorm( Xlambda , mean=gammaslope.prior[,1] , 
 								   sd=gammaslope.prior[,2] ) + eps)
-				  d0p  <- log( dnorm( Xlambda + h , mean=gammaslope.prior[,1] , 
+				  d0p  <- log( stats::dnorm( Xlambda + h , mean=gammaslope.prior[,1] , 
 								   sd=gammaslope.prior[,2] ) + eps)
-				  d0m  <- log( dnorm( Xlambda - h , mean=gammaslope.prior[,1] , 
+				  d0m  <- log( stats::dnorm( Xlambda - h , mean=gammaslope.prior[,1] , 
 								   sd=gammaslope.prior[,2] ) + eps)
 											}
 			  if ( ncol(gammaslope.prior) == 4 ){
@@ -93,7 +93,7 @@
 			se.Xlambda[ Xlambda.fixed[,1] ] <- 0		
 				}
 				
-		if (progress){ cat("-") ; flush.console() }		
+		if (progress){ cat("-") ; utils::flush.console() }		
 		iter <- iter + 1
 		parchange <- max( abs(Xlambda0-Xlambda))
 # cat(" +++ calc rest") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							
@@ -101,8 +101,7 @@
 		#********* end algorithm
 		if (oldfac > 0 ){
 			Xlambda <- oldfac*Xlambda00 + ( 1 - oldfac ) *Xlambda
-						}
-#	    if (progress){ cat("\n") ; flush.console() }						
+						}				
 		max.increment <- max( abs( Xlambda - Xlambda00 ))
 		res <- list("gammaslope" = Xlambda , "se.gammaslope" = se.Xlambda , 
 		         "max.increment.b"=max.increment , 

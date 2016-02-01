@@ -184,7 +184,8 @@ tam.mml.se <-
       }
       
       if(irtmodel=="GPCM.design"){
-        se.B[,-1,] <- sqrt( diag((E%*%diag(var.basispar)%*t%E)) )
+        # se.B[,-1,] <- sqrt( diag((E%*%diag(var.basispar)%*t%E)) )
+		se.B[,-1,] <- sqrt( diag(( E%*% diag(var.basispar) %*% t(E) )) )
       }
       
       cat("|\n")	

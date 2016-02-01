@@ -228,7 +228,7 @@ if a \code{userfct.variance} is provided.}
     If \code{snodes=0}, numerical integration is used. 
 
 \code{QMC}: A logical indicating whether quasi Monte Carlo integration
-   (Pan & Thomas, 2007) should be used. The default is \code{TRUE}. 
+   (Gonzales at al., 2006; Pan & Thompson, 2007) should be used. The default is \code{TRUE}. 
 Quasi Monte Carlo integrationn is a nonstochastic integration approach 
 but prevents the very demanding numeric integration using Gaussian quadrature. 
 In case of \code{QMC=FALSE}, "ordinary" stochastic integration is used 
@@ -379,7 +379,7 @@ quadrature with nodes defined in \code{control$nodes}. For \eqn{D}-dimensional
 IRT models, the \eqn{D}-dimensional cube consisting of the vector
 \code{control$nodes} in all dimensions is used. If the user specifies 
 \code{control$snodes} with a value larger than zero, then Quasi-Monte Carlo
-integration (Pan & Thomas, 2007) with \code{control$snodes} is used
+integration (Pan & Thomas, 2007; Gonzales et al., 2006) with \code{control$snodes} is used
 (because \code{control$QMC = TRUE} is set by default). If 
 \code{control$QMC=FALSE} is specified, then stochastic (Monte Carlo) integration
 is employed with \code{control$snodes} stochastic nodes.
@@ -491,6 +491,10 @@ A generalized form of the Rasch model. In M. von Davier & C. H. Carstensen (Eds.
 Embretson, S. E. (1999). Generating items during testing: 
 Psychometric issues and models. \emph{Psychometrika}, \bold{64}, 407-433.
 
+Gonzalez, J., Tuerlinckx, F., De Boeck, P., & Cools, R. (2006). 
+Numerical integration in logistic-normal models. 
+\emph{Computational Statistics & Data Analysis}, \bold{51}, 1535-1548.
+
 Pan, J., & Thompson, R. (2007). Quasi-Monte Carlo estimation in
 generalized linear mixed models. \emph{Computational Statistics &
 Data Analysis}, \bold{51}, 5765-5775.
@@ -515,7 +519,8 @@ For more than three dimensions, quasi-Monte Carlo or stochastic integration
 is recommended because otherwise problems in memory allocation and large
 computation time will result. Choose in \code{control} a suitable value of 
 the number of quasi Monte Carlo or stochastic nodes \code{snodes} 
-(say, larger than 1000). See Pan and Thompson (2007) for more details.
+(say, larger than 1000). See Pan and Thompson (2007) or Gonzales et al. (2006) 
+for more details.
 
 In faceted models (\code{tam.mml.mfr}), parameters which cannot be estimated
 are fixed to \code{99}.
@@ -702,7 +707,7 @@ xsi0 <- mod2$xsi$xsi
 xsi.fixed <- cbind( 1:(length(xsi0)) , xsi0 )   
         # define vector with fixed item difficulties
 mod2a <- tam.mml( resp=data.sim.rasch , xsi.fixed=xsi.fixed ,
-        B = mod2$B # fix slopes
+                 B = mod2$B # fix slopes
             )
 summary(mod2a)
 mod2a$B     # inspect used slope matrix
@@ -773,41 +778,41 @@ summary(mod3tC)
 set.seed(6778)     # set simulation seed
 N <- 2000          # number of persons
 # latent regressors Y
-Y <- cbind( rnorm( N , sd = 1.5) , rnorm(N , sd = .3 ) )
+Y <- cbind( stats::rnorm( N , sd = 1.5) , stats::rnorm(N , sd = .3 ) )
 # simulate theta
-theta <- rnorm( N ) + .4 * Y[,1] + .2 * Y[,2]  # latent regression model
+theta <- stats::rnorm( N ) + .4 * Y[,1] + .2 * Y[,2]  # latent regression model
 # number of items
 I <- 40
-p1 <- plogis( outer( theta , seq( -2 , 2 , len=I ) , "-" ) )
+p1 <- stats::plogis( outer( theta , seq( -2 , 2 , len=I ) , "-" ) )
 # simulate response matrix
-resp <- 1 * ( p1 > matrix( runif( N*I ) , nrow=N , ncol=I ) )
+resp <- 1 * ( p1 > matrix( stats::runif( N*I ) , nrow=N , ncol=I ) )
 colnames(resp) <- paste("I" , 1:I, sep="")
   
 # (2) estimate model
-mod2_1 <- tam(resp=resp , Y=Y)
+mod2_1 <- tam.mml(resp=resp , Y=Y)
 summary(mod2_1)
 
 # (3) setting initial values for beta coefficients
 #   beta_2 = .20 , beta_3 = .35 for dimension 1
 beta.inits <- cbind( c(2,3) , 1 , c(.2, .35 ) )
-mod2_2 <- tam(resp=resp , Y=Y , beta.inits=beta.inits)
+mod2_2 <- tam.mml(resp=resp , Y=Y , beta.inits=beta.inits)
 
 # (4) fix intercept to zero and third coefficient to .3
 beta.fixed <- cbind( c(1,3) , 1 , c(0, .3 ) )
-mod2_3 <- tam(resp=resp , Y=Y , beta.fixed=beta.fixed )
+mod2_3 <- tam.mml(resp=resp , Y=Y , beta.fixed=beta.fixed )
 
 # (5) same model but with R regression formula for Y
 dataY <- data.frame(Y)
 colnames(dataY) <- c("Y1","Y2")
-mod2_4 <- tam(resp=resp , dataY=dataY , formulaY = ~ Y1+Y2 )
+mod2_4 <- tam.mml(resp=resp , dataY=dataY , formulaY = ~ Y1+Y2 )
 summary(mod2_4)
 
 # (6) model with interaction of regressors
-mod2_5 <- tam(resp=resp , dataY=dataY , formulaY = ~ Y1*Y2 )
+mod2_5 <- tam.mml(resp=resp , dataY=dataY , formulaY = ~ Y1*Y2 )
 summary(mod2_5)
 
 # (7) no constraint on regressors (removing constraint from intercept)
-mod2_6 <- tam(resp=resp , Y=Y , beta.fixed=FALSE )
+mod2_6 <- tam.mml(resp=resp , Y=Y , beta.fixed=FALSE )
 
 #############################################################################
 # SIMULATED EXAMPLE 3: Multiple group estimation
@@ -816,10 +821,10 @@ mod2_6 <- tam(resp=resp , Y=Y , beta.fixed=FALSE )
 # (1) simulate data
 set.seed(6778)
 N <- 3000
-theta <- c( rnorm(N/2,mean=0,sd = 1.5) , rnorm(N/2,mean=.5,sd = 1)  )
+theta <- c( stats::rnorm(N/2,mean=0,sd = 1.5) , stats::rnorm(N/2,mean=.5,sd = 1)  )
 I <- 20
-p1 <- plogis( outer( theta , seq( -2 , 2 , len=I ) , "-" ) )
-resp <- 1 * ( p1 > matrix( runif( N*I ) , nrow=N , ncol=I ) )
+p1 <- stats::plogis( outer( theta , seq( -2 , 2 , len=I ) , "-" ) )
+resp <- 1 * ( p1 > matrix( stats::runif( N*I ) , nrow=N , ncol=I ) )
 colnames(resp) <- paste("I" , 1:I, sep="")
 group <- rep(1:2 , each=N/2 )
 
@@ -839,15 +844,15 @@ summary(mod3_1)
 set.seed(6778)
 library(mvtnorm)
 N <- 1000      
-Y <- cbind( rnorm( N ) , rnorm(N) )
-theta <- rmvnorm( N,mean=c(0,0), sigma=matrix( c(1,.5,.5,1) , 2 , 2 ))
+Y <- cbind( stats::rnorm( N ) , stats::rnorm(N) )
+theta <- mvtnorm::rmvnorm( N,mean=c(0,0), sigma=matrix( c(1,.5,.5,1) , 2 , 2 ))
 theta[,1] <- theta[,1] + .4 * Y[,1] + .2 * Y[,2]  # latent regression model
 theta[,2] <- theta[,2] + .8 * Y[,1] + .5 * Y[,2]  # latent regression model
 I <- 20
-p1 <- plogis( outer( theta[,1] , seq( -2 , 2 , len=I ) , "-" ) )
-resp1 <- 1 * ( p1 > matrix( runif( N*I ) , nrow=N , ncol=I ) )
-p1 <- plogis( outer( theta[,2] , seq( -2 , 2 , len=I ) , "-" ) )
-resp2 <- 1 * ( p1 > matrix( runif( N*I ) , nrow=N , ncol=I ) )
+p1 <- stats::plogis( outer( theta[,1] , seq( -2 , 2 , len=I ) , "-" ) )
+resp1 <- 1 * ( p1 > matrix( stats::runif( N*I ) , nrow=N , ncol=I ) )
+p1 <- stats::plogis( outer( theta[,2] , seq( -2 , 2 , len=I ) , "-" ) )
+resp2 <- 1 * ( p1 > matrix( stats::runif( N*I ) , nrow=N , ncol=I ) )
 resp <- cbind(resp1,resp2)
 colnames(resp) <- paste("I" , 1:(2*I), sep="")
   
@@ -948,18 +953,18 @@ library(mvtnorm)
 # (1) simulate data
 set.seed(4762)
 N <- 2000 # 2000 persons
-Y <- rnorm( N )
+Y <- stats::rnorm( N )
 theta <- mvtnorm::rmvnorm( N,mean=c(0,0), sigma=matrix( c(1,.5,.5,1) , 2 , 2 ))
 I <- 10
 # 10 items load on the first dimension
-p1 <- plogis( outer( theta[,1] , seq( -2 , 2 , len=I ) , "-" ) )
-resp1 <- 1 * ( p1 > matrix( runif( N*I ) , nrow=N , ncol=I ) )
+p1 <- stats::plogis( outer( theta[,1] , seq( -2 , 2 , len=I ) , "-" ) )
+resp1 <- 1 * ( p1 > matrix( stats::runif( N*I ) , nrow=N , ncol=I ) )
 # 10 items load on the second dimension
-p1 <- plogis( outer( theta[,2] , seq( -2 , 2 , len=I ) , "-" ) )
-resp2 <- 1 * ( p1 > matrix( runif( N*I ) , nrow=N , ncol=I ) )
+p1 <- stats::plogis( outer( theta[,2] , seq( -2 , 2 , len=I ) , "-" ) )
+resp2 <- 1 * ( p1 > matrix( stats::runif( N*I ) , nrow=N , ncol=I ) )
 # 20 items load on both dimensions
-p1 <- plogis( outer( 0.5*theta[,1] + 1.5*theta[,2] , seq( -2 , 2 , len=2*I ) , "-" ) )
-resp3 <- 1 * ( p1 > matrix( runif( N*2*I ) , nrow=N , ncol=2*I ) )
+p1 <- stats::plogis( outer( 0.5*theta[,1] + 1.5*theta[,2] , seq( -2 , 2 , len=2*I ) , "-" ) )
+resp3 <- 1 * ( p1 > matrix( stats::runif( N*2*I ) , nrow=N , ncol=2*I ) )
 #Combine the two sets of items into one response matrix
 resp <- cbind(resp1, resp2, resp3 )
 colnames(resp) <- paste("I" , 1:(4*I), sep="")
@@ -1184,19 +1189,21 @@ lambda <- c( 1 , 1.2 , 0.8 , 1 , 1.1 )
 # calculate item slopes
 a <- E \%*\% lambda
 
+# simulate
 N <- 4000
-theta <- rnorm( N )
+theta <- stats::rnorm( N )
 aM <- outer( rep(1,N) , a[,1] )
 bM <- outer( rep(1,N) , b )
-pM <- plogis( aM * ( matrix( theta , nrow=N , ncol=I  ) - bM ) )
-dat <- 1 * ( pM > runif( N*I ) )
+pM <- stats::plogis( aM * ( matrix( theta , nrow=N , ncol=I  ) - bM ) )
+dat <- 1 * ( pM > stats::runif( N*I ) )
 colnames(dat) <- paste("I" , 1:I , sep="")
 
+# estimate model
 mod7 <- tam.mml.2pl( resp = dat , irtmodel="GPCM.design" , E=E )
 mod7$B
 
 # recalculate estimated basis parameters
-lm( mod7$B[,2,1] ~ 0+ as.matrix(E ) )
+stats::lm( mod7$B[,2,1] ~ 0+ as.matrix(E ) )
   ##   Call:
   ##   lm(formula = mod7$B[, 2, 1] ~ 0 + as.matrix(E))
   ##   Coefficients:
@@ -1332,7 +1339,7 @@ mod10a2 <- tam.mml.mfr( resp=resp, facets=facets, formulaA = formulaA, pid=dat$p
 
 #***
 # Model 10_2: specification with long format response data
-resp.long=c(unlist( dat[ , -c(1:2) ] ))
+resp.long <- c(unlist( dat[ , -c(1:2) ] ))
 
 pid <- rep( dat$pid, ncol(dat[ , -c(1:2) ]) )
 itemnames <- rep(colnames(dat[ , -c(1:2) ]), each=nrow(dat[ , -c(1:2) ]))
@@ -1704,7 +1711,7 @@ dd1 <- 3 ; dd2 <- 4 ; corrs[dd1,dd2] <- corrs[dd2,dd1] <- .90
 # covariance matrix
 covar <- outer( sqrt( variances) , sqrt(variances) )*corrs
 # item thresholds and item discriminations
-d <- matrix( runif(40, -2 , 2 ) , ncol=1 )
+d <- matrix( stats::runif(40, -2 , 2 ) , ncol=1 )
 a <- matrix(NA , nrow=40,ncol=4)
 a[1:10,1] <- a[11:20,2] <- a[21:30,3] <- a[31:40,4] <- 1
 # simulate data

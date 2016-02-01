@@ -257,7 +257,7 @@ BEGIN_RCPP
      // OUTPUT              
                
      return Rcpp::List::create(   
-         _["dfr_fit"] = dfr_fit  
+            Rcpp::_["dfr_fit"] = dfr_fit  
          ) ;    
        
      // maximal list length is 20!  

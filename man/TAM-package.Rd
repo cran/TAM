@@ -18,8 +18,8 @@ Test Analysis Modules
 \tabular{ll}{
 Package: \tab \pkg{TAM}\cr
 Type: \tab Package\cr
-Version: \tab 1.15\cr
-Publication Year: \tab 2015\cr
+Version: \tab 1.16\cr
+Publication Year: \tab 2016\cr
 License: \tab GPL (>=2.0)\cr
 URL: \tab \url{http://www.edmeasurementsurveys.com/TAM/Tutorials/}\cr
 }
@@ -49,6 +49,8 @@ Formann, A. K. (1992). Linear logistic latent class analysis for polytomous data
 \emph{Journal of the American Statistical Association}, \bold{87}, 476-486.
 }
 \keyword{package}
+
+
 %\seealso{
 %%~~ Optional links to other man pages, e.g. ~~
 %%~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~

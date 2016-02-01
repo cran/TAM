@@ -50,14 +50,14 @@ function( resp , wlescore=NULL, pvscores=NULL , group=NULL , progress=TRUE){
 # print( paste( ii , cc ) ) ; flush.console()						
 # print(ind.cc)				
 				if ( ! is.null( wlescore ) ){
-					dfr.ii[cc , "rpb.WLE"] <- cor( dat.cc , wlescore , use="pairwise.complete.obs")
+					dfr.ii[cc , "rpb.WLE"] <- stats::cor( dat.cc , wlescore , use="pairwise.complete.obs")
 					dfr.ii[cc , "M.WLE" ] <- mean( wlescore[ ind.cc] , na.rm=TRUE )
-					dfr.ii[cc , "SD.WLE" ] <- sd( wlescore[ ind.cc] , na.rm=TRUE )
+					dfr.ii[cc , "SD.WLE" ] <- stats::sd( wlescore[ ind.cc] , na.rm=TRUE )
 								}
 				if ( ! is.null( pvscores ) ){
-					dfr.ii[cc , "rpb.PV"] <- rowMeans( cor( dat.cc , pvscores , use="pairwise.complete.obs") )
+					dfr.ii[cc , "rpb.PV"] <- rowMeans( stats::cor( dat.cc , pvscores , use="pairwise.complete.obs") )
 					dfr.ii[cc , "M.PV" ] <- mean( apply( pvscores[ ind.cc ,] , 2,mean , na.rm=TRUE ) )
-					dfr.ii[cc , "SD.PV" ] <- mean( apply( pvscores[ ind.cc ,] , 2, sd , na.rm=TRUE ) )
+					dfr.ii[cc , "SD.PV" ] <- mean( apply( pvscores[ ind.cc ,] , 2, stats::sd , na.rm=TRUE ) )
 								}
 					}
 			dfr <- rbind( dfr , dfr.ii )

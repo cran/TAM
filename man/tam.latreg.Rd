@@ -167,7 +167,7 @@ library(miceadds)
 # convert data list into a mice object
 mids1 <- miceadds::datalist2mids( datlist )
 # perform an ANOVA
-mod3a <- with( mids1 , lm(PVREAD ~ hisei*migra) )
+mod3a <- with( mids1 , stats::lm(PVREAD ~ hisei*migra) )
 summary( pool( mod3a ))
 mod3b <- miceadds::mi.anova( mids1 , "PVREAD ~ hisei*migra" )
 
@@ -240,7 +240,7 @@ lavmodel <- "
    SC ~~ MJ
         "        
 # process lavaan syntax
-res <- sirt::lavaanify.IRT( lavmodel , dat )        
+res <- lavaanify.IRT( lavmodel , dat )        
 # fit lavaan CFA model                        
 mod1 <- lavaan::cfa( res$lavaan.syntax , dat , std.lv=TRUE)
 summary(mod1 , standardized=TRUE , fit.measures=TRUE )
