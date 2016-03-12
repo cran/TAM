@@ -278,12 +278,13 @@ tam.jml2 <-
     # cat("\n WLE \n"); s2 <- Sys.time(); print(s2-s1) ; s1 <- s2    
     
     meanChangeWLE <- jmlWLE$meanChangeWLE
-    errorWLE <- jmlWLE$errorWLE
-
+    errorWLE <- jmlWLE$errorWLE[rp3$theta.index]
     
-    #WLE person separation reliability
-    varWLE <- stats::var(thetaWLE)
-    WLEreliability <- (varWLE - mean(errorWLE^2)) / varWLE
+    #WLE person separation reliability	
+	WLEreliability <- WLErel(thetaWLE , errorWLE, pweights)
+	
+    # varWLE <- stats::var(thetaWLE)
+    # WLEreliability <- (varWLE - mean(errorWLE^2)) / varWLE
     
     if (progress){ cat("\n Item fit calculation \n") }  
 #     #Compute fit statistics

@@ -394,8 +394,8 @@ if ( fix.devices ){
         
       }
       
-      #       options("device"=old.opt.dev)
-      #       options(show.error.messages = as.character(old.opt.err))        
+             options("device"=old.opt.dev)
+             options(show.error.messages = as.character(old.opt.err))        
     }
     
     #*****

@@ -18,11 +18,12 @@ version <- function(pkg="TAM"){
 # on attach TAM
 .onAttach <- function(libname,pkgname){
   d <- utils::packageDescription("TAM")
-  base::packageStartupMessage("::...........................::\n",
-		paste(":: " , d$Package," " , d$Version," (",d$Date,")", 
-          paste0(rep(" ", max(8-nchar(d$Version),0)), collapse=""), " ::",sep="") ,
-		paste("\n:: Test Analysis Modules     ::") ,
-		"\n::...........................::\n" )
+  base::packageStartupMessage(  # "::...........................::\n",
+		paste0("* " , d$Package," " , d$Version," (",d$Date,")" )  # , 
+#          paste0(rep(" ", max(8-nchar(d$Version),0)), collapse=""), " ::",sep="") ,
+#		paste("\n:: Test Analysis Modules     ::") ,
+#		"\n::...........................::\n" 
+						)
 }
 
 #*************************************************

@@ -648,7 +648,9 @@ tam.mml.3pl <-
 	if (G > 1){ unidim_simplify <- FALSE }
 	if ( YSD){ unidim_simplify <- FALSE }
 	#@@@@
-								
+							
+
+							
 	##############################################################
 	##############################################################
     ##############################################################   
@@ -904,7 +906,7 @@ a0 <- Sys.time()
 						nitems , A , AXsi , B, xsi , theta , nnodes , maxK ,
 						n.ik , N.ik , est.guess ,  old.increment.guess ,
 						guess.prior  , progress	)	  
-		  guess <- res$guess		  			  
+		  guess <- res$guess
 		  guess.change <- res$guess.change
 		  se.guess <- res$se.guess
 		  
@@ -928,8 +930,6 @@ a0 <- Sys.time()
 					}
 # cat("M steps slopes") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
       
-	  
-
       #***
       # decrease increments in every iteration
       if( increment.factor > 1){max.increment <-  1 / increment.factor^iter }
@@ -1051,9 +1051,10 @@ a0 <- Sys.time()
     for (kk in 1:maxK){  # kk <- 1
       # se.AXsi[,kk] <- sqrt( diag( A1[,kk,] %*% se.xsiD %*% t( A1[,kk,]) ) )
       #**** bugfix
+	  dim_A1 <- dim(A1)
       A1_kk <- A1[,kk,]
       if ( is.vector(A1_kk) ){
-        A1_kk <- matrix( A1_kk , nrow=1 , ncol=length(A1_kk) )
+        A1_kk <- matrix( A1_kk , nrow=dim_A1[1] , ncol=dim_A1[3] )
       }
       se.AXsi[,kk] <- sqrt( diag( A1_kk %*% se.xsiD %*% t( A1_kk ) ) )	
       #****		

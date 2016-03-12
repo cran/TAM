@@ -5,9 +5,11 @@
 summary.tam.modelfit <- function( object , ... ){
   #*****
   cat("Test of Global Model Fit (Maximum Chi Square)\n")
-  cat("p =" , round( object$modelfit.test$p.holm , 5 ) )
+  # cat("p =" , round( object$modelfit.test$p.holm , 5 ) )
+  print( round( object$modelfit.test , 5 ) ) 
+  
   #******
-  cat("\n\nMADaQ3 Statistic and Test of Global Model Fit (Maximum aQ3)\n")
+  cat("\nMADaQ3 Statistic and Test of Global Model Fit (Maximum aQ3)\n")
   obji <- round( object$stat.MADaQ3 , 4)
   print(obji)
   

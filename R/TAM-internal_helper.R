@@ -30,7 +30,9 @@ rowCumsums.TAM <- function(matr){
 # 'interval_index' searches an index when a frequency is exceeded
 # -> used in plausible value imputation
 interval_index <- function(matr,rn){ 
-	.Call("interval_index_C", matr , rn , PACKAGE = "TAM")
+	res <- .Call("interval_index_C", matr , rn , PACKAGE = "TAM")
+	res <- res + 1
+	return(res)
 					}					
 #############################################################
 # search the maximum in each matrix row

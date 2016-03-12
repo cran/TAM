@@ -1,4 +1,5 @@
 tam.wle <- function( tamobj, ... ){
+  CALL <- match.call()
   if(class(tamobj) == "tam.mml"){
     res <- tam.mml.wle2( tamobj, ...)
   }
@@ -8,7 +9,7 @@ tam.wle <- function( tamobj, ... ){
   if(class(tamobj) == "tam.jml"){
     res <- tam.jml.WLE( tamobj, ...)
   }
-  
+  attr(res,"call") <- CALL
   return( res )
 }
 
@@ -28,6 +29,7 @@ tam.mml.wle <-
     #  adj <- 0.3
     #  Msteps <- 20
     #  convM <- .0001
+	CALL <- match.call()
     B <- tamobj$B
     A <- tamobj$A
     nitems <- tamobj$nitems
@@ -37,11 +39,13 @@ tam.mml.wle <-
     ndim <- tamobj$ndim
     maxK <- tamobj$maxK
     resp <- tamobj$resp
+	pweights <- tamobj$pweights
     if ( ! is.null( score.resp) ){
       resp <- score.resp
       nstud <- nrow(resp)
       tamobj$resp.ind <- 1 - is.na(resp)
-      tamobj$pid <- 1:nstud
+      tamobj$pid <- 1:nstud	
+	  pweights <- 1 + 0 * tamobj$pid	  
     }  
     resp[ is.na(resp) ] <- 0  
     resp.ind <- tamobj$resp.ind  
@@ -228,10 +232,13 @@ tam.mml.wle <-
     # WLE reliability
     if ( ndim==1 ){
       ind <- which( res$N.items > 0 )
-      v1 <- stats::var( theta[ind] , na.rm=TRUE )	
-      v2 <- mean( error[ind]^2 , na.rm=TRUE)
+#      v1 <- stats::var( theta[ind] , na.rm=TRUE )	
+#       v1 <- weighted.var( x = theta[ind] , w = pweights  )
+#      v2 <- mean( error[ind]^2 , na.rm=TRUE)
+#	   v2 <- stats::weighted.mean( error[ind]^2 , w=pweights , na.rm=TRUE )	
       # WLE_Rel = ( v1 - v2 ) / v1 = 1 - v2 / v1
-      WLE.rel <- 1 - v2 / v1
+#      WLE.rel <- 1 - v2 / v1
+	  WLE.rel <- WLErel(theta=theta[ind] , error = error[ind] , w = pweights )	  
 	  if (WLE){ w1 <- "WLE" } else { w1 <- "MLE" }
 	  if (progress){
 		cat("----\n" , w1 ,"Reliability =" , round(WLE.rel,3) ,"\n" )
@@ -242,10 +249,14 @@ tam.mml.wle <-
       cat("\n-------\n")
       for (dd in 1:ndim){
         #	dd <- 1
-        v1 <- stats::var( res[,paste0("theta.Dim" , substring( 100+1:ndim , 2))[dd] ] , na.rm=TRUE)
-        v2 <- mean( res[,paste0("error.Dim" , substring( 100+1:ndim , 2))[dd] ]^2 , na.rm=TRUE)
+		ind1 <- paste0("theta.Dim" , substring( 100+1:ndim , 2))[dd]
+        # v1 <- stats::var( res[, ind1 ] , na.rm=TRUE)
+		ind2 <- paste0("error.Dim" , substring( 100+1:ndim , 2))[dd] 
+        # v2 <- mean( res[, ind2]^2 , na.rm=TRUE)				
         #		v2 <- mean( error^2 )
-        res[ ,paste0("WLE.rel.Dim" , substring( 100+ dd , 2)) ]	<- h1 <- 1 - v2 / v1
+        # res[ ,paste0("WLE.rel.Dim" , substring( 100+ dd , 2)) ]	<- h1 <- 1 - v2 / v1
+		h1 <- WLErel( theta=res[,ind1] , error=res[,ind2] , w = pweights )
+		res[ ,paste0("WLE.rel.Dim" , substring( 100+ dd , 2)) ]	<- h1
 		if (WLE){ w1 <- "WLE" } else { w1 <- "MLE" }
         cat(paste0(w1 , " Reliability (Dimension" , dd , ") = " , round(h1,3) ) , "\n" )
         #	  res$WLE.rel <- rep( WLE.rel , nrow(res) )
@@ -253,12 +264,19 @@ tam.mml.wle <-
     }				
     #  res <- list( "PersonScores" = PersonScores, "PersonMax" = PersonMax, "theta" = theta , "error" =  error )
 					
+	
+	attr(res,"ndim") <- ndim
+	attr(res,"nobs") <- nrow(res)
+	#*** collect reliabilities
+	i1 <- grep( "WLE.rel" , colnames(res), fixed = TRUE )
+	attr(res,"WLE.rel") <- res[1,i1]
+	attr(res,"call") <- CALL
+	class(res) <- c("tam.wle","data.frame")		
 	if (output.prob){
 		 res <- as.list(res)
 	     res$probs <- rprobsWLE
 					}	
 	
-
 	
     return(res)
   }
@@ -278,6 +296,8 @@ tam.mml.wle2 <-
     #  adj <- 0.3
     #  Msteps <- 20
     #  convM <- .0001
+	CALL <- match.call()
+	
     B <- tamobj$B
     A <- tamobj$A
     nitems <- tamobj$nitems
@@ -292,6 +312,7 @@ tam.mml.wle2 <-
       nstud <- nrow(resp)
       tamobj$resp.ind <- 1 - is.na(resp)
       tamobj$pid <- 1:nstud
+	  tamobj$pweights <- 1+0*tamobj$pid
     }  
     resp[ is.na(resp) ] <- 0  
     resp.ind <- tamobj$resp.ind  
@@ -300,7 +321,6 @@ tam.mml.wle2 <-
     cResp <- 1 * t( t(cResp) == rep(0:(maxK-1), nitems) )
     cB <- t( matrix( aperm( B , c(2,1,3) ) , nrow = dim(B)[3] , byrow = TRUE ) )
     cB[is.na(cB)] <- 0
-    
     #Compute person sufficient statistics (total score on each dimension)
     PersonScores <- cResp %*% cB
     
@@ -446,6 +466,7 @@ tam.mml.wle2 <-
     #    different items, so possible maximum could vary)
     #   WLE or MLE estimate, by dimension
     #   Standard errors of WLE/MLE estimates, by dimension
+
     
     if ( ndim> 1){
       colnames(error) <- paste0("error.Dim" , substring( 100+1:ndim , 2) )
@@ -477,13 +498,10 @@ tam.mml.wle2 <-
     }
     #***
     # WLE reliability
+	pweights <- tamobj$pweights
     if ( ndim==1 ){
       ind <- which( res$N.items > 0 )
-      v1 <- stats::var( theta[ind] , na.rm=TRUE )	
-      v2 <- mean( error[ind]^2 , na.rm=TRUE)
-      # WLE_Rel = ( v1 - v2 ) / v1 = 1 - v2 / v1
-      WLE.rel <- 1 - v2 / v1
-      WLE.rel <- 1 - v2 / v1
+	  WLE.rel <- WLErel(theta=theta[ind] , error = error[ind] , w = pweights )	  	  	  	 
 	  if (WLE){ w1 <- "WLE" } else { w1 <- "MLE" }
 	  if (progress){
 		cat("----\n" , w1 ,"Reliability =" , round(WLE.rel,3) ,"\n" )	  
@@ -495,15 +513,16 @@ tam.mml.wle2 <-
       cat("\n-------\n")
       for (dd in 1:ndim){
         #	dd <- 1
-        v1 <- stats::var( res[,paste0("theta.Dim" , substring( 100+1:ndim , 2))[dd] ] , na.rm=TRUE)
-        v2 <- mean( res[,paste0("error.Dim" , substring( 100+1:ndim , 2))[dd] ]^2 , na.rm=TRUE)
-        #		v2 <- mean( error^2 )
-        res[ ,paste0("WLE.rel.Dim" , substring( 100+ dd , 2)) ]	<- h1 <- 1 - v2 / v1
+		ind1 <- paste0("theta.Dim" , substring( 100+1:ndim , 2))[dd]
+		ind2 <- paste0("error.Dim" , substring( 100+1:ndim , 2))[dd] 		
+        h1 <- WLErel( theta=res[,ind1] , error=res[,ind2] , w = pweights )
+        res[ ,paste0("WLE.rel.Dim" , substring( 100+ dd , 2)) ]	<- h1  #  <- 1 - v2 / v1
 		if (WLE){ w1 <- "WLE" } else { w1 <- "MLE" }
         cat(paste0(w1 , " Reliability (Dimension" , dd , ") = " , round(h1,3) ) , "\n" )
         #	  res$WLE.rel <- rep( WLE.rel , nrow(res) )
       }
     }	
+
     
 	#*******************************
 	# check identifiability
@@ -528,12 +547,19 @@ tam.mml.wle2 <-
 		cat(" * Please proceed with caution.\n")		
 						}
 					
+
+	res <- as.data.frame(res)				
+	attr(res,"ndim") <- ndim
+	attr(res,"nobs") <- nrow(res)	
+	#*** collect reliabilities
+	i1 <- grep( "WLE.rel" , colnames(res), fixed = TRUE )
+	attr(res,"WLE.rel") <- res[[i1]][1]
+	attr(res,"call") <- CALL
+	class(res) <- c("tam.wle","data.frame")
 	if (output.prob){
 		 res <- as.list(res)
 	     res$probs <- rprobsWLE
 					}	
-	
-	
     #  res <- list( "PersonScores" = PersonScores, "PersonMax" = PersonMax, "theta" = theta , "error" =  error )
     return(res)
   }

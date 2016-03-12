@@ -1,5 +1,8 @@
 \name{tamaan}
 \alias{tamaan}
+\alias{summary.tamaan}
+\alias{print.tamaan}
+
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Wrapper Function for \pkg{TAM} Language
@@ -15,6 +18,10 @@ and mixture item response models can be estimated.
 
 \usage{
 tamaan(tammodel, resp, tam.method = NULL, control = list(), doparse=TRUE, ...)
+
+\method{summary}{tamaan}(object,file=NULL,\dots)
+
+\method{print}{tamaan}(x,\dots)
 }
 
 %- maybe also 'usage' for other objects documented here.
@@ -40,6 +47,13 @@ Further arguments to be passed to
 \code{tam.mml}, \code{tam.mml.2pl}
 or \code{tam.mml.3pl}.
 }
+  \item{object}{
+Object of class \code{tamaan}
+}
+\item{file}{
+A file name in which the summary output will be written 
+    }
+\item{x}{Object of class \code{tamaan}}    
 }
 
 %\details{

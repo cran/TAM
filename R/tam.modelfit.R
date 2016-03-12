@@ -130,7 +130,11 @@ tam.modelfit <- function( tamobj , progress=TRUE ){
   chisquare.itemfit$p.holm <- stats::p.adjust( chisquare.itemfit$p , method="holm") 
   
   # maximum chi square
-  modelfit.test <- data.frame("p.holm" = min( chi2.stat$p.holm[pair_exists] ) )
+  modelfit.test <- data.frame(
+        "maxX2" = max( chi2.stat$chi2) , 
+		"Npairs" = nrow(chi2.stat) , 
+		"p.holm" = min( chi2.stat$p.holm[pair_exists] ) 
+				)
   
   #******
   # modelfit.stat

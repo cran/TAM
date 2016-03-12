@@ -4,6 +4,7 @@
 \alias{tam.mml.wle}
 \alias{tam.mml.wle2}
 \alias{tam.jml.WLE}
+\alias{print.tam.wle}
 
 \title{
 Weighted Likelihood Estimation and Maximum Likelihood Estimation of
@@ -27,6 +28,8 @@ tam.mml.wle2(tamobj, score.resp=NULL, WLE=TRUE, adj=0.3, Msteps=20, convM=1e-04,
 
 tam.jml.WLE(tamobj, resp, resp.ind, A, B, nstud, nitems, maxK, convM, 
     PersonScores, theta, xsi, Msteps, WLE=FALSE, theta.fixed = NULL)
+    
+\method{print}{tam.wle}(x, digits=3, \dots)    
 }
 
 \arguments{
@@ -82,6 +85,8 @@ be included in the list of outputs.}
 	column includes the index whereas the second column includes
 the fixed value.}
 \item{\dots}{Further arguments to be passed}
+\item{x}{Object of class \code{tam.wle}}
+\item{digits}{Number of digits for rounding}
 }
 
 %\details{
@@ -125,7 +130,7 @@ response theory. \emph{Psychometrika}, \bold{54}, 427-450.
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-See the \code{\link[PP:PP_gpcm]{PP::PP_gpcm}} function
+See the \code{PP::PP_gpcm} function
 in the \pkg{PP} package for more person
 parameter estimators for the partial credit model (Penfield & Bergeron, 2005).
 	
@@ -292,4 +297,5 @@ head( round(dfr,3))
 \keyword{WLE}
 \keyword{MLE}
 \keyword{Person parameter estimation}
+\keyword{print}
 %% \keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

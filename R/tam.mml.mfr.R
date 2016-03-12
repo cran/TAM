@@ -1008,10 +1008,10 @@ if (!choice1){
     se.xsiD <- diag( se.xsi^2 )
     for (kk in 1:maxK){  # kk <- 1
       #	se.AXsi[,kk] <- sqrt( diag( A1[,kk,] %*% se.xsiD %*% t( A1[,kk,]) ) )
-      #**** bugfix
+	  dim_A1 <- dim(A1)
       A1_kk <- A1[,kk,]
       if ( is.vector(A1_kk) ){
-        A1_kk <- matrix( A1_kk , nrow=1 , ncol=length(A1_kk) )
+        A1_kk <- matrix( A1_kk , nrow=dim_A1[1] , ncol=dim_A1[3] )
       }
       se.AXsi[,kk] <- sqrt( diag( A1_kk %*% se.xsiD %*% t( A1_kk ) ) )	
       #****		

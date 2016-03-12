@@ -6,6 +6,8 @@
 \alias{tam.mml.mfr}
 \alias{summary.tam}
 \alias{summary.tam.mml}
+\alias{print.tam}
+\alias{print.tam.mml}
 
 
 \title{
@@ -55,7 +57,12 @@ tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
     
 \method{summary}{tam}(object,file=NULL,\dots)
 
-\method{summary}{tam.mml}(object,file=NULL,\dots)    
+\method{summary}{tam.mml}(object,file=NULL,\dots)
+
+\method{print}{tam}(x, \dots)
+
+\method{print}{tam.mml}(x, \dots)    
+
 }
 
 
@@ -313,6 +320,7 @@ A file name in which the summary output will be written
 \item{\dots}{
 	Further arguments to be passed
 	}   
+\item{x}{Object of class \code{tam} or \code{tam.mml}}	
 }
 
 
@@ -2031,6 +2039,43 @@ B[ ,2 , c(1,2)]  <- -1
 # estimate model
 mod2 <- tam.mml( resp=dat , A=A , B=B , control= list( maxiter=100) )
 summary(mod2)
+
+#############################################################################
+# EXAMPLE 24: Sum constraint on item-category parameters in partial credit model 
+#############################################################################
+
+data(data.gpcm,package="TAM")
+dat <- data.gpcm
+
+# check number of categories
+c1 <- tam.ctt3(dat)
+
+#--- fit with PCM
+mod1 <- tam.mml( dat )
+summary(mod1, file="mod1")
+
+#--- fit with constraint on sum of categories
+#** redefine design matrix
+A1 <- 0*mod1$A
+A1 <- A1[ ,, - dim(A1)[[3]]]
+str(A1)
+NP <- dim(A1)[[3]]
+# define item category parameters
+A1[1,2,1] <- A1[1,3,2] <- A1[1,4,3] <- -1 
+A1[2,2,4] <- A1[2,3,5] <- A1[2,4,6] <- -1 
+A1[3,2,7] <- A1[3,3,8] <- -1 
+A1[3,4,1:8] <- 1
+# check definition
+A1[1,,]
+A1[2,,]
+A1[3,,]
+
+#** estimate model
+mod2 <- tam.mml( dat , A = A1 , beta.fixed=FALSE)
+summary(mod2 , file="mod2")
+
+#--- compare model fit
+IRT.compareModels(mod1, mod2 )  # -> equivalent model fit
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

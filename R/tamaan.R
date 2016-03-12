@@ -120,6 +120,8 @@ tamaan <- function( tammodel , resp , tam.method=NULL,
 	res$tamaanify <- res0
 	
     class(res) <- "tamaan"
+	res$CALL <- cl
+	
 	return(res)
 				}
 ###########################################################

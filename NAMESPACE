@@ -27,6 +27,7 @@ importFrom(stats, as.formula)
 importFrom(stats, coef)
 importFrom(stats, complete.cases)
 importFrom(stats, contrasts)
+importFrom(stats, cov.wt)
 importFrom(stats, cov2cor)
 importFrom(stats, dbeta)
 importFrom(stats, dnorm)
@@ -71,7 +72,6 @@ import(CDM)
 importFrom(GPArotation, oblimin)
 importFrom(lavaan, lavaanify)
 importFrom(lavaan, parameterTable)
-
 importFrom(lattice, xyplot)
 importFrom(MASS, mvrnorm)
 importFrom(msm, dtnorm)
@@ -91,61 +91,69 @@ importFrom(WrightMap, wrightMap)
 ########################################################
 ################  EXPORTS ##############################
 
-export(
-   .A.matrix,
-   .A.PCM2,
-   .A.PCM3,
-   cfa.extract.itempars,
-   designMatrices,
-   designMatrices.mfr,
-   designMatrices.mfr2,
-   doparse,
-   IRT.drawPV,
-   IRT.informationCurves,
-   IRT.linearCFA,
-   IRT.residuals,
-   IRT.simulate,
-   IRT.threshold,
-   IRT.truescore,
-   IRT.WrightMap,
-   IRTLikelihood.cfa,
-   lavaanify.IRT,
-   msq.itemfit,
-   msq.itemfitWLE,
-   plotctt,
-   plotDevianceTAM,
-   tam,
-   tam,
-   tam.ctt,
-   tam.ctt2,
-   tam.ctt3,
-   tam.fa,
-   tam.fit,
-   tam.jml,
-   tam.jml.WLE,
-   tam.jml2,
-   tam.latreg,
-   tam.mml,
-   tam.mml.2pl,
-   tam.mml.3pl,
-   tam.mml.fit,
-   tam.mml.mfr,
-   tam.mml.wle,
-   tam.mml.wle2,
-   tam.modelfit,
-   tam.modelfit.args,
-   tam.modelfit.IRT,
-   tam.pv,
-   tam.Q3,
-   tam.se,
-   tam.threshold,
-   tam.wle,
-   tamaan,
-   tamaanify,
-   tampv2datalist
-       )
-
-
+export(.A.matrix)
+export(.A.PCM2)
+export(.A.PCM3)
+export(cfa.extract.itempars)
+export(DescribeBy)
+export(designMatrices)
+export(designMatrices.mfr)
+export(designMatrices.mfr2)
+export(doparse)
+export(EAPrel)
+export(IRT.drawPV)
+export(IRT.informationCurves)
+export(IRT.linearCFA)
+export(IRT.residuals)
+export(IRT.simulate)
+export(IRT.threshold)
+export(IRT.truescore)
+export(IRT.WrightMap)
+export(IRTLikelihood.cfa)
+export(IRTLikelihood.ctt)
+export(lavaanify.IRT)
+export(msq.itemfit)
+export(msq.itemfitWLE)
+export(plotctt)
+export(plotDevianceTAM)
+export(Scale)
+export(tam)
+export(tam)
+export(tam.ctt)
+export(tam.ctt2)
+export(tam.ctt3)
+export(tam.fa)
+export(tam.fit)
+export(tam.jml)
+export(tam.jml.WLE)
+export(tam.jml2)
+export(tam.latreg)
+export(tam.mml)
+export(tam.mml.2pl)
+export(tam.mml.3pl)
+export(tam.mml.fit)
+export(tam.mml.mfr)
+export(tam.mml.wle)
+export(tam.mml.wle2)
+export(tam.modelfit)
+export(tam.modelfit.args)
+export(tam.modelfit.IRT)
+export(tam.pv)
+export(tam.Q3)
+export(tam.se)
+export(tam.threshold)
+export(tam.wle)
+export(tamaan)
+export(tamaanify)
+export(tampv2datalist)
+export(weighted_curtosis)
+export(weighted_mean)
+export(weighted_quantile)
+export(weighted_sd)
+export(weighted_skewness)
+export(weighted_table)
+export(weighted_var)
+export(WLErel)
 
 
 # internal functions; not intended to be visible to users
@@ -158,85 +166,91 @@ export(
 ###########################################
 ############ S3 methods ###################
 
-S3method(anova, tam )
+S3method(anova, tam)
 S3method(anova, tam.latreg)
-S3method(anova, tam.mml )
+S3method(anova, tam.mml)
 S3method(anova, tam.mml.3pl)
 S3method(anova, tamaan)
-S3method(IRT.data, tam.mml )
+S3method(IRT.data, tam.mml)
 S3method(IRT.data, tam.mml.3pl)
-S3method(IRT.data, tamaan )
-S3method(IRT.expectedCounts, tam )
-S3method(IRT.expectedCounts, tam.mml )
+S3method(IRT.data, tamaan)
+S3method(IRT.expectedCounts, tam)
+S3method(IRT.expectedCounts, tam.mml)
 S3method(IRT.expectedCounts, tam.mml.3pl)
-S3method(IRT.expectedCounts, tamaan )
-S3method(IRT.factor.scores, tam )
-S3method(IRT.factor.scores, tam.mml )
+S3method(IRT.expectedCounts, tamaan)
+S3method(IRT.factor.scores, tam)
+S3method(IRT.factor.scores, tam.mml)
 S3method(IRT.factor.scores, tam.mml.3pl)
-S3method(IRT.factor.scores, tamaan )
-S3method(IRT.informationCurves, tam.mml )
-S3method(IRT.informationCurves, tam.mml.2pl )
-S3method(IRT.informationCurves, tam.mml.3pl )
-S3method(IRT.informationCurves, tam.mml.mfr )
-S3method(IRT.irfprob, tam )
-S3method(IRT.irfprob, tam.mml )
+S3method(IRT.factor.scores, tamaan)
+S3method(IRT.informationCurves, tam.mml)
+S3method(IRT.informationCurves, tam.mml.2pl)
+S3method(IRT.informationCurves, tam.mml.3pl)
+S3method(IRT.informationCurves, tam.mml.mfr)
+S3method(IRT.irfprob, tam)
+S3method(IRT.irfprob, tam.mml)
 S3method(IRT.irfprob, tam.mml.3pl)
-S3method(IRT.irfprob, tamaan )
-S3method(IRT.itemfit, tam.mml )
-S3method(IRT.itemfit, tam.mml.2pl )
-S3method(IRT.itemfit, tam.mml.3pl )
-S3method(IRT.itemfit, tam.mml.mfr )
-S3method(IRT.likelihood, tam )
-S3method(IRT.likelihood, tam.latreg )
-S3method(IRT.likelihood, tam.mml )
+S3method(IRT.irfprob, tamaan)
+S3method(IRT.itemfit, tam.mml)
+S3method(IRT.itemfit, tam.mml.2pl)
+S3method(IRT.itemfit, tam.mml.3pl)
+S3method(IRT.itemfit, tam.mml.mfr)
+S3method(IRT.likelihood, tam)
+S3method(IRT.likelihood, tam.latreg)
+S3method(IRT.likelihood, tam.mml)
 S3method(IRT.likelihood, tam.mml.3pl)
-S3method(IRT.likelihood, tamaan )
-S3method(IRT.modelfit, tam.mml )
+S3method(IRT.likelihood, tamaan)
+S3method(IRT.modelfit, tam.mml)
 S3method(IRT.modelfit, tam.mml.3pl)
-S3method(IRT.modelfit, tamaan )
-S3method(IRT.posterior, tam )
+S3method(IRT.modelfit, tamaan)
+S3method(IRT.posterior, tam)
 S3method(IRT.posterior, tam.latreg)
-S3method(IRT.posterior, tam.mml )
+S3method(IRT.posterior, tam.mml)
 S3method(IRT.posterior, tam.mml.3pl)
 S3method(IRT.posterior, tamaan)
-S3method(IRT.residuals, tam.mml )
-S3method(IRT.residuals, tam.mml.2pl )
-S3method(IRT.residuals, tam.mml.mfr )
-S3method(IRT.simulate, tam.mml )
-S3method(IRT.simulate, tam.mml.2pl )
-S3method(IRT.simulate, tam.mml.3pl )
-S3method(IRT.simulate, tam.mml.mfr )
+S3method(IRT.residuals, tam.mml)
+S3method(IRT.residuals, tam.mml.2pl)
+S3method(IRT.residuals, tam.mml.mfr)
+S3method(IRT.simulate, tam.mml)
+S3method(IRT.simulate, tam.mml.2pl)
+S3method(IRT.simulate, tam.mml.3pl)
+S3method(IRT.simulate, tam.mml.mfr)
 S3method(IRT.WrightMap, IRT.threshold)
-S3method(IRT.WrightMap, tam.mml )
+S3method(IRT.WrightMap, tam.mml)
 S3method(IRT.WrightMap, tamaan)
-S3method(logLik, tam )
-S3method(logLik, tam.latreg )
-S3method(logLik, tam.mml )
+S3method(logLik, tam)
+S3method(logLik, tam.latreg)
+S3method(logLik, tam.mml)
 S3method(logLik, tam.mml.3pl)
-S3method(logLik, tamaan )
-S3method(plot, IRT.informationCurves )
-S3method(plot, tam )
-S3method(plot, tam.jml )
-S3method(plot, tam.mml )
-S3method(predict, tam.mml )
-S3method(predict, tam.mml.3pl )
-S3method(predict, tamaan )
+S3method(logLik, tamaan)
+S3method(plot, IRT.informationCurves)
+S3method(plot, tam)
+S3method(plot, tam.jml)
+S3method(plot, tam.mml)
+S3method(predict, tam.mml)
+S3method(predict, tam.mml.3pl)
+S3method(predict, tamaan)
 S3method(print, IRT.threshold)
-S3method(residuals, tam.mml )
-S3method(residuals, tam.mml.2pl )
-S3method(residuals, tam.mml.mfr )
+S3method(print, tam)
+S3method(print, tam.latreg)
+S3method(print, tam.mml)
+S3method(print, tam.mml.3pl)
+S3method(print, tam.wle)
+S3method(print, tamaan)
+S3method(residuals, tam.mml)
+S3method(residuals, tam.mml.2pl)
+S3method(residuals, tam.mml.mfr)
 S3method(summary, IRT.linearCFA)
-S3method(summary, IRT.modelfit.tam.mml )
-S3method(summary, IRT.modelfit.tam.mml.3pl )
-S3method(summary, IRT.modelfit.tamaan )
+S3method(summary, IRT.modelfit.tam.mml)
+S3method(summary, IRT.modelfit.tam.mml.3pl)
+S3method(summary, IRT.modelfit.tamaan)
 S3method(summary, msq.itemfit)
 S3method(summary, msq.itemfitWLE)
-S3method(summary, tam )
-S3method(summary, tam.fit )
-S3method(summary, tam.jml )
-S3method(summary, tam.latreg )
-S3method(summary, tam.mml )
-S3method(summary, tam.mml.3pl )
-S3method(summary, tam.modelfit )
+S3method(summary, tam)
+S3method(summary, tam.fit)
+S3method(summary, tam.jml)
+S3method(summary, tam.latreg)
+S3method(summary, tam.mml)
+S3method(summary, tam.mml.3pl)
+S3method(summary, tam.modelfit)
 S3method(summary, tam.Q3)
-S3method(summary, tamaan )
+S3method(summary, tamaan)

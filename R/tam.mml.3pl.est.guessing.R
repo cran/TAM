@@ -17,7 +17,6 @@
 	  converge <- FALSE
 	  guess_old <- guess	 
 	  h <- .0001	
-
 	  
 	  while ( !converge & ( Miter <= Msteps ) ){		  
 	      res.p <- .mml.3pl.calc_prob.v5( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , 
@@ -55,13 +54,11 @@
 				der2 <- der2 + d2 
 									}
 									
-									
-									
 		  # aggregation over group of parameters
 		  der1 <- stats::aggregate( der1 , list( est.guess ) , sum )
 		  der2 <- stats::aggregate( der2 , list( est.guess ) , sum )	  	  		  
-		  der1 <- der1[ der1[,1] != 0  , ]
-		  der2 <- der2[ der2[,1] != 0  , ]
+		  der1 <- der1[ der1[,1] != 0  , , drop=FALSE]
+		  der2 <- der2[ der2[,1] != 0  , , drop=FALSE]
 		  increment <- der1[,2] / ( abs(der2[,2]) + eps )
 		  ci <- ceiling( abs(increment) / ( abs( old_increment) + eps ) )
 		  increment <- ifelse( abs( increment) > abs(old_increment)  , 
@@ -69,6 +66,7 @@
 		  increment <- increment[ est.guess ]
 #		   guess.logit[ ind.guess ] <- guess.logit[ind.guess ] + increment
 		   guess[ ind.guess ] <- guess[ind.guess ] + increment
+	   
 		  guess <- ifelse( ( guess < h ) & ( est.guess != 0 ) , 4*h , guess )
 #		   guess <- stats::plogis( guess.logit)
 		  old_increment <- max(abs(increment))

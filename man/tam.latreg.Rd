@@ -1,6 +1,7 @@
 \name{tam.latreg}
 \alias{tam.latreg}
 \alias{summary.tam.latreg}
+\alias{print.tam.latreg}
 
 %- Also NEED an '\alias' for EACH other topic documented here.
 
@@ -24,7 +25,9 @@ tam.latreg(like, theta=NULL, Y = NULL, group = NULL, formulaY = NULL, dataY = NU
    variance.inits = NULL, est.variance = TRUE, pweights = NULL, pid = NULL, 
    userfct.variance = NULL, variance.Npars = NULL, control = list())
    
-\method{summary}{tam.latreg}(object,file=NULL,\dots)   
+\method{summary}{tam.latreg}(object,file=NULL,\dots)
+
+\method{print}{tam.latreg}(x,\dots)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -101,6 +104,7 @@ Object of class \code{tam.latreg}
 \item{file}{
 A file name in which the summary output will be written 
     }
+\item{x}{Object of class \code{tam.latreg}}    
 \item{\dots}{
 	Further arguments to be passed
 }   

@@ -16,7 +16,7 @@ tampv2datalist <- function( tam.pv.object , pvnames = NULL , Y = NULL ,
     if ( is.null(pvnames) ){
         pvnames <- paste0("PV.Dim" , 1:ndim )
 						}						
-	# create list of multiply imputed dataset
+	# create list of multiply imputed datasets
 	datalist <- list( 1:nplausible )
 	for (ii in 1:nplausible){
 		# ii <- 1

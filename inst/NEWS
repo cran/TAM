@@ -42,6 +42,50 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 
 
+
+-------------------------------------------------------------
+CHANGES IN VERSION 1.17   (2016-03-11)  --  CRAN 1.17-0
+-------------------------------------------------------------
+
+FEATURES:
+* included function 'IRTLikelihood.ctt' which computes the 
+  individual likelihood under classical test theory and
+  normally distributed measurement errors
+
+BUG FIXES:
+* fixed a bug in plausible value imputation 'tam.pv' in case 
+  of 'normal.approx=FALSE' (thanks to Matthias Trendtel)
+* fixed a bug in plotting 'png' files in 'plot.tam'
+  (thanks to Rainer Alexandrowicz) 
+* fixed a bug in calculating standard errors with only one
+  estimated xsi parameter
+* fixed a crash in 'tam.jml2'
+* fixed a bug in 'tam.wle' when using the argument 'score.resp'
+
+NOTES:
+* included Example 24 for specifying sum constraints in partial
+  credit models (requested by Chen-Wei Liu) 
+* output of 'tam.wle' is now an object of class 'tam.wle'.
+  A print method for this class is defined.
+* WLE reliability in 'tam.wle' is now calculated by taken
+  sample weights 'pweights' into account
+* included Example 11 of 'tam.mml.3pl' with mixed item 
+  response format (thanks to a correspondence with Andreas Seifert)
+* included utility functions for weighted statistics 'weighted_Stats'
+* included utility functions 'WLErel' and 'EAPrel' for computation of 
+  WLE/EAP reliability
+* added 'print' methods for tam classes ('tam.mml', 'tamaan', ...)
+* added S3 methods 'Scale' and 'DescribeBy'. The application of these
+  methods to object classes will be included in future TAM versions.
+* slight change in summary output of 'IRT.modelfit'
+
+DATASETS INCLUDED OR MODIFIED:
+* ---
+
+EXAMPLES INCLUDED OR MODIFIED:
+* tam.mml (24), weighted_var (1), WLErel (1), tam.mml.3pl (11),
+  weighted_Stats (1,2,3), IRTLikelihood.ctt (1), tam.pv (2)
+
 -------------------------------------------------------------
 CHANGES IN VERSION 1.16   (2016-01-31)  --  CRAN 1.16-0
 -------------------------------------------------------------
@@ -69,7 +113,6 @@ Datasets included or modified:
 
 Examples included or modified:
 * IRT.truescore (2)
-
 
 -------------------------------------------------------------
 CHANGES IN VERSION 1.15   (2015-12-15)  --  CRAN 1.15-0

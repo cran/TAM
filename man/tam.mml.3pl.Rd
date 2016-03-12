@@ -1,5 +1,8 @@
 \name{tam.mml.3pl}
 \alias{tam.mml.3pl}
+\alias{summary.tam.mml.3pl}
+\alias{print.tam.mml.3pl}
+
 %- Also NEED an '\alias' for EACH other topic documented here.
 
 \title{
@@ -26,6 +29,10 @@ tam.mml.3pl(resp, Y = NULL, group = NULL, formulaY = NULL, dataY = NULL, ndim = 
   guess.prior = NULL, skillspace = "normal", theta.k = NULL, delta.designmatrix = NULL, 
   delta.fixed = NULL, delta.inits=NULL, pweights = NULL, item.elim = TRUE ,
   control = list(), Edes=NULL )
+  
+\method{summary}{tam.mml.3pl}(object,file=NULL,\dots)
+
+\method{print}{tam.mml.3pl}(x,\dots)  
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -202,7 +209,15 @@ See \code{\link{tam.mml}} for more details.
 }
 \item{Edes}{Compact form of design matrix. This argument is only
 	defined for convenience for models with random starting
-	values to avoid recalculations.}
+	values to avoid recalculations.}	
+  \item{object}{
+Object of class \code{tam.mml.3pl}
+}
+\item{file}{
+A file name in which the summary output will be written 
+    }
+\item{x}{Object of class \code{tam.mml.3pl}}  	
+\item{\dots}{Further arguments to be passed}
 }
 
 \details{
@@ -974,6 +989,52 @@ Q.fixed[ 6:7 , 2 ] <- 1
 mod3 <- tam.mml.3pl( resp=dat , gammaslope.des = "2PL" , Q=Q , Q.fixed = Q.fixed ,
             control=list( maxiter=10 , nodes = seq(-4,4,len=10) )  )
 summary(mod3)
+
+#############################################################################
+# EXAMPLE 11: Mixed response formats - Multiple choice and partial credit items
+#############################################################################
+
+data(data.timssAusTwn.scored)
+dat <- data.timssAusTwn.scored
+
+# select columns with item responses
+dat <- dat[ , grep("M0" , colnames(dat) ) ]
+I <- ncol(dat)   # number of items
+
+# The idea is to start with partial credit modelling
+# and then to include the guessing parameters
+
+#*** Model 0: Partial Credit Model
+mod0 <- tam.mml(dat)
+summary(mod0)
+
+#*** Model 1 and Model 2: include guessing parameters
+
+# multiple choice items
+guess_items <- which( apply( dat , 2 , max , na.rm=TRUE ) == 1 )
+# define guessing parameters
+guess0 <- rep(0,I)
+guess0[ guess_items ] <- .25  # set guessing probability to .25
+
+# define which guessing parameters should be estimated
+est.guess1 <- rep(0,I)  # all parameters are fixed
+est.guess2 <- 1 * ( guess0 == .25 )  # joint guessing parameter
+
+# use design matrix from partial credit model
+A0 <- mod0$A
+
+#--- Model 1: fixed guessing parameters of .25 and item slopes of 1
+mod1 <- tam.mml.3pl( dat , guess = guess0 , est.guess = est.guess1 , 
+            A = A0 , est.some.slopes=FALSE , control= list(maxiter=50) )
+summary(mod1)
+
+#--- Model 2: estimate joint guessing parameters and item slopes of 1
+mod2 <- tam.mml.3pl( dat , guess = guess0 , est.guess = est.guess2 , 
+            A = A0 , est.some.slopes=FALSE, control= list(maxiter=50) )                        
+summary(mod2)
+
+# model comparison
+IRT.compareModels(mod0,mod1,mod2)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

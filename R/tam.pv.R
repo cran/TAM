@@ -1,5 +1,4 @@
-tam.pv <-
-function( tamobj , nplausible = 10 , 
+tam.pv <- function( tamobj , nplausible = 10 , 
 			ntheta = 2000 , 
 			normal.approx = FALSE , 
             samp.regr = FALSE , theta.model = FALSE , np.adj = 8 ){
@@ -173,7 +172,7 @@ a0 <- Sys.time()
 
 			 #------
 			 # normal approximation (ndim > 1)
-			 if (  normal.approx  & ( ndim > 1 ) ){			     
+			 if (  normal.approx  & ( ndim > 1 ) ){		
 			    N <- nrow(hwt)			
 				MEAP <- matrix( 0 , nrow=N , ncol=ndim)	
 				SDEAP <- matrix( 0 , nrow=N , ncol=ndim)
@@ -218,8 +217,9 @@ a0 <- Sys.time()
 			 #------
 			 # no normal approximation
 			 if (  ! normal.approx  ){
-				rn1 <- stats::runif( nstud )
-				ind <- interval_index( hwt1 , rn1 )	
+				rn1 <- stats::runif( nstud )				
+				ind <- interval_index( hwt1 , rn1 )
+				ind <- ind - 1				
                 pv[ , (pp-1)*(ndim) + 1:ndim ] <- theta[ind , ]			
 									}
 

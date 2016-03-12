@@ -29,7 +29,9 @@ Variable names of generated plausible values
 Matrix with covariates
 }
   \item{Y.pid}{
-Person identifier in \code{Y} matrix
+Person identifier in \code{Y} matrix. It is not required that a person
+identifier is provided. In this case, the merge of the datasets will
+be conducted as for \code{rbind}.
 }
 }
 

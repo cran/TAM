@@ -156,7 +156,7 @@ dat <- data.pisaRead$data
 ## Note that reading items have variable names starting with R4
 
 # estimate 2PL model without covariates
-items <- grep("R4" , colnames(dat) )	# select test items from data
+items <- grep("R4" , colnames(dat) )    # select test items from data
 mod2a <- tam.mml.2pl( resp=dat[,items] )
 summary(mod2a)
 
@@ -167,7 +167,8 @@ xsi.fixed <- cbind( seq(1,length(xsi0)) , xsi0 )
    # fix item slopes using mod2$B
 # matrix of latent regressors female, hisei and migra
 Y <- dat[ , c("female" , "hisei" , "migra") ]
-mod2b <- tam.mml( resp=dat[,items] , B=mod2a$B , xsi.fixed=xsi.fixed , Y=Y)
+mod2b <- tam.mml( resp=dat[,items] , B=mod2a$B , xsi.fixed=xsi.fixed , Y=Y, 
+            pid = dat$idstud)
 
 # plausible value imputation with normality assumption
 # and ignoring uncertainty about regression coefficients
@@ -182,6 +183,7 @@ pv2e <- tam.pv( mod2b , samp.regr=TRUE , theta.model=TRUE , normal.approx=TRUE)
 #--- create list of multiply imputed datasets with plausible values
 # define dataset with covariates to be matched
 Y <- dat[ , c("idstud" , "idschool" , "female" , "hisei" , "migra") ]
+
 # define plausible value names
 pvnames <- c("PVREAD")
 # create list of imputed datasets
@@ -232,7 +234,15 @@ summary(mod2 , standardized=TRUE, rsquare=TRUE)
 # fit statistics
 inspect( mod2 , what="fit")
 
-#--- using mice
+#--- using mitools package
+library(mitools)
+# convert datalist into an object of class imputationList
+datlist1a <- mitools::imputationList( datlist1 )
+# fit linear regression
+mod1c <- with( datlist1a , stats::lm( PVREAD ~ migra + hisei ) )
+summary( mitools::MIcombine(mod1c) )
+
+#--- using mice package
 library(mice)
 library(miceadds)
 # convert datalist into a mids object
@@ -288,7 +298,6 @@ lavmodel <- "
         "
 mod1 <- semTools::lavaan.mi( lavmodel , data = datlist1 )        
 summary(mod1 , standardized=TRUE, rsquare=TRUE)
-
 
 #############################################################################
 # SIMULATED EXAMPLE 4: Plausible value imputation with measurement 
