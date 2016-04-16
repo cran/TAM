@@ -124,9 +124,12 @@ tam.mml <-
     # print( colSums( is.na(resp)) )
     
     # normalize person weights to sum up to nstud
-	pweights0 <- pweights
-    pweights <- nstud * pweights / sum(pweights)
-    # a matrix version of person weights
+	pweights0 <- pweights	
+	pweights <- nstud * pweights / sum(pweights)		
+	#@@--
+
+				
+	# a matrix version of person weights
     pweightsM <- outer( pweights , rep(1,nitems) )
     
     # calculate ndim if only B or Q are supplied
@@ -822,6 +825,7 @@ tam.mml <-
                    resp ,  est.slopegroups=NULL , 
 				   variance.Npars=variance.Npars , group )
 #    cat("TAM.ic") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1			
+
     #***
     # calculate counts
     res <- .tam.calc.counts( resp, theta , resp.ind , 

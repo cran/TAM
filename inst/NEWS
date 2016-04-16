@@ -42,6 +42,27 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 
 
+-------------------------------------------------------------
+CHANGES IN VERSION 1.99    (2016-04-15)  --  CRAN 1.99-6
+-------------------------------------------------------------
+
+Features:
+* ---
+
+Bug fixes:
+* fixed a bug in 'tam.wle' which occured if some persons were
+  eliminated from the analysis
+* fixed a recently induced bug in 'tam.wle' estimation of
+  multidimensional models (thanks to Sascha Bernholt)
+
+Notes:
+* ---
+
+Datasets included or modified:
+* ---
+
+Examples included or modified:
+* ---
 
 -------------------------------------------------------------
 CHANGES IN VERSION 1.17   (2016-03-11)  --  CRAN 1.17-0
@@ -83,8 +104,8 @@ DATASETS INCLUDED OR MODIFIED:
 * ---
 
 EXAMPLES INCLUDED OR MODIFIED:
-* tam.mml (24), weighted_var (1), WLErel (1), tam.mml.3pl (11),
-  weighted_Stats (1,2,3), IRTLikelihood.ctt (1), tam.pv (2)
+* tam.mml (24), WLErel (1), tam.mml.3pl (11), weighted_Stats (1,2,3),
+  IRTLikelihood.ctt (1), tam.pv (2)
 
 -------------------------------------------------------------
 CHANGES IN VERSION 1.16   (2016-01-31)  --  CRAN 1.16-0

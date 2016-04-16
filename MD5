@@ -1,4 +1,4 @@
-6ffd006bc081bfe6e557aaa2e6b3c0c9 *DESCRIPTION
+cdbf5c069d4b66d381a89be228c85780 *DESCRIPTION
 1c3f0373fbcdbf7954cc405ad019e779 *NAMESPACE
 b1d98dfe664447ad2990ffbe8dab627f *R/DescribeBy.R
 a5148f5ca185ec1298d83a001c915647 *R/IRT.WrightMap.R
@@ -106,7 +106,7 @@ c116ec6c3d4ef27c9956cba4cd5f9902 *R/tam.jml.xsi.R
 024dcad93b0a310dd7d7e64835cf6d0b *R/tam.mml.3pl.est.intercepts.R
 294f9f124dfe9e72763d6f7d357bcac2 *R/tam.mml.3pl.est.slopes.R
 53dc8af735f2eeee5a5f07c3cec12d80 *R/tam.mml.3pl.preproc.R
-2d7772a757f7aa98bfb7d0a07bb3ad07 *R/tam.mml.R
+c740887b1bdc0cc14494d4ca8d94c9b9 *R/tam.mml.R
 8e498c381d5867226399e6cadc7a5d2b *R/tam.mml.mfr.R
 ec3ffdd9bb04566b28cecb45e5053790 *R/tam.modelfit.R
 a7daf8bbcb0b4427283a8a73f63bbf4a *R/tam.modelfit.func.R
@@ -114,7 +114,7 @@ c9a460ed253d669e6bbbc5378bb4708d *R/tam.parameterfix.defaults.R
 866b5c7605b39c0217ddf7d95d4760f3 *R/tam.pv.R
 2b2524a77be2b43019cf0f4cd99e2529 *R/tam.q3.aux.R
 6b6d4ac6e4fe89f76450c8e97ea24a20 *R/tam.se.R
-3c4b243b5c464fe48590ced5401e7c48 *R/tam.wle.R
+18bfc67a8577a5cf3278e5e412d450f4 *R/tam.wle.R
 7f6254110d33a8ed53c7ff750a98cd7a *R/tam_thurstonian_threshold.R
 2f520f534d2ae636bc71bf23a556ad74 *R/tamaan.3pl.lca.R
 471665116ea33d2d7fc50296f08c2dc8 *R/tamaan.3pl.loclca.R
@@ -180,7 +180,7 @@ c9a1b0fff505a5d5de7f04419bcee494 *data/data.sim.rasch.missing.rda
 1a6795dc8c6ccf1677e0c0cfcac08310 *data/data.sim.rasch.rda
 3e1727849e5c061a1d3112e8a4aaaff1 *data/data.timssAusTwn.rda
 9d0d0666e881cf5b72366f10a45c7c7d *data/data.timssAusTwn.scored.rda
-e9999649ad3e350f7615064344d256bb *inst/NEWS
+9fad3b246431a76f6f5b9485f0585b18 *inst/NEWS
 990d8392a8f4f11951caba931f6388da *man/DescribeBy.Rd
 e9d5974829c3b296bcb4b5cb61103ca0 *man/IRT.WrightMap.Rd
 b42ce39cdb90af5b305eb3b988509576 *man/IRT.data.tam.Rd
@@ -200,7 +200,7 @@ e18ff37ea2f622be77f4f8e5392d73ce *man/IRT.truescore.Rd
 295d38119e40e68d184a86f2f15c5417 *man/IRTLikelihood.ctt.Rd
 b875b144f93309633b39d438acedd685 *man/Scale.Rd
 d0252a8829d571ea7cbff298893d5efd *man/TAM-internal.Rd
-1da5421c4eb71852b43b6ecec6fbca5e *man/TAM-package.Rd
+2cec8e055bf7bf00460ea01d0b52fc3d *man/TAM-package.Rd
 a30ecda3b2cdf0493c47da4bfe28389a *man/WLErel.Rd
 1845d7879b7c05f4666412c79c91e458 *man/anova.tam.Rd
 29f8b7c4bc05a1af2fbf44c3c6081b4e *man/cfa.extract.itempars.Rd

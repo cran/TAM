@@ -231,14 +231,8 @@ tam.mml.wle <-
     #***
     # WLE reliability
     if ( ndim==1 ){
-      ind <- which( res$N.items > 0 )
-#      v1 <- stats::var( theta[ind] , na.rm=TRUE )	
-#       v1 <- weighted.var( x = theta[ind] , w = pweights  )
-#      v2 <- mean( error[ind]^2 , na.rm=TRUE)
-#	   v2 <- stats::weighted.mean( error[ind]^2 , w=pweights , na.rm=TRUE )	
-      # WLE_Rel = ( v1 - v2 ) / v1 = 1 - v2 / v1
-#      WLE.rel <- 1 - v2 / v1
-	  WLE.rel <- WLErel(theta=theta[ind] , error = error[ind] , w = pweights )	  
+      ind <- which( res$N.items > 0 )	  
+	  WLE.rel <- WLErel(theta=theta[ind] , error = error[ind] , w = pweights[ind] )	  
 	  if (WLE){ w1 <- "WLE" } else { w1 <- "MLE" }
 	  if (progress){
 		cat("----\n" , w1 ,"Reliability =" , round(WLE.rel,3) ,"\n" )
@@ -269,7 +263,14 @@ tam.mml.wle <-
 	attr(res,"nobs") <- nrow(res)
 	#*** collect reliabilities
 	i1 <- grep( "WLE.rel" , colnames(res), fixed = TRUE )
-	attr(res,"WLE.rel") <- res[1,i1]
+    if (ndim==1){
+		attr(res,"WLE.rel") <- res[[i1]][1]
+				} else {
+		v1 <- as.numeric(res[1,i1])
+		names(v1) <- colnames(res)[i1]
+		attr(res,"WLE.rel") <- v1	
+				}	
+	#	attr(res,"WLE.rel") <- res[1,i1]
 	attr(res,"call") <- CALL
 	class(res) <- c("tam.wle","data.frame")		
 	if (output.prob){
@@ -500,8 +501,8 @@ tam.mml.wle2 <-
     # WLE reliability
 	pweights <- tamobj$pweights
     if ( ndim==1 ){
-      ind <- which( res$N.items > 0 )
-	  WLE.rel <- WLErel(theta=theta[ind] , error = error[ind] , w = pweights )	  	  	  	 
+      ind <- which( res$N.items > 0 )  
+	  WLE.rel <- WLErel(theta=theta[ind] , error = error[ind] , w = pweights[ind] )	  	  	  	 
 	  if (WLE){ w1 <- "WLE" } else { w1 <- "MLE" }
 	  if (progress){
 		cat("----\n" , w1 ,"Reliability =" , round(WLE.rel,3) ,"\n" )	  
@@ -547,13 +548,18 @@ tam.mml.wle2 <-
 		cat(" * Please proceed with caution.\n")		
 						}
 					
-
 	res <- as.data.frame(res)				
 	attr(res,"ndim") <- ndim
 	attr(res,"nobs") <- nrow(res)	
 	#*** collect reliabilities
 	i1 <- grep( "WLE.rel" , colnames(res), fixed = TRUE )
-	attr(res,"WLE.rel") <- res[[i1]][1]
+    if (ndim==1){
+		attr(res,"WLE.rel") <- res[[i1]][1]
+				} else {
+		v1 <- as.numeric(res[1,i1])
+		names(v1) <- colnames(res)[i1]
+		attr(res,"WLE.rel") <- v1	
+				}
 	attr(res,"call") <- CALL
 	class(res) <- c("tam.wle","data.frame")
 	if (output.prob){
