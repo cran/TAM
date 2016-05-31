@@ -45,6 +45,7 @@ tam.mml.fit <-
     nstud <- tamobj$nstud
     nitems <- tamobj$nitems
     maxK <- tamobj$maxK
+
     
 #    if( "formulaA" %in% names(tamobj) ) warning("tam.fit is experimental for objects obtained by tam.mml.mfr.")
     if ( is.null(FitMatrix) ) {
@@ -65,7 +66,6 @@ tam.mml.fit <-
 		FitMatrix3 <- FitMatrix3[ ,, paste(tamobj$xsi.facets$parameter) ]
 		FitMatrix <- FitMatrix3
 					}
-	
 					
     col.index <- rep( 1:nitems , each = maxK )
     cResp <- resp[ , col.index  ]*resp.ind[ , col.index ]
@@ -97,7 +97,7 @@ tam.mml.fit <-
 	N <- nrow(hwt)
     rn1M <- matrix( stats::runif(N*Nsimul) , nrow=N , ncol= Nsimul )        
 
-    
+   
     for (p in 1:np) {
       ip <- indexIP.list[[p]]
       xbari <- sapply( ip, function(i) colSums(FitMatrix[i,,p] * rprobs[i,,] , na.rm = TRUE ))
@@ -134,7 +134,6 @@ tam.mml.fit <-
 		nstud.ip <- rowSums( resp.ind[ , ip , drop=FALSE],na.rm = TRUE )
 		nstud.ip <- sum( 1*(nstud.ip > 0))
 				}
-	  
 	  
   
 	  if ( ! useRcpp ){
@@ -208,7 +207,14 @@ tam.mml.fit <-
 	  Infit_t[p] <- mean( Infit_t_SIM )
 	  Outfit_t[p] <- mean( Outfit_t_SIM )	  
 	  
-	  
+	#****	  
+	# include dimnames for FitMatrix if missing
+    if ( is.null( dimnames(FitMatrix) ) ){
+		nd <- dim(FitMatrix)[3]
+		dimnames(FitMatrix)[[3]] <- paste0("parm" , 1:nd)		
+			}		
+	#****
+	
 	if (progress){
 		if ( p %in% prbar ){
 		       cat("-") ; utils::flush.console()

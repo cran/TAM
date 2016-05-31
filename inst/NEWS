@@ -42,26 +42,56 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 
 
+
+
+-------------------------------------------------------------
+CHANGES IN VERSION 1.995    (2016-05-31)  --  CRAN 1.995-0
+-------------------------------------------------------------
+
+
+FEATURES:
+* ---
+
+BUG FIXSES:
+* fixed a bug in 'tam.fit' when proving a fit matrix F with
+  missing labels (thanks to Maxim Morin)
+
+NOTES:
+* included argument 'version' in 'msq.itemfit'. Another Rcpp
+  implementation (version=2) of the fit calculation has been 
+  added which avoids the storage of memory intensive objects
+  (previous function; version=1). Additionally, a pure 
+  R function of calculating fit can be requested using 
+  version=3 (thanks to Frank Musekamp).
+
+DATASETS INCLUDED OR MODIFIED:
+* ---
+
+EXAMPLES INCLUDED OR MODIFIED:
+* ---
+
+
+
 -------------------------------------------------------------
 CHANGES IN VERSION 1.99    (2016-04-15)  --  CRAN 1.99-6
 -------------------------------------------------------------
 
-Features:
+FEATURES:
 * ---
 
-Bug fixes:
+BUG FIXES:
 * fixed a bug in 'tam.wle' which occured if some persons were
   eliminated from the analysis
 * fixed a recently induced bug in 'tam.wle' estimation of
   multidimensional models (thanks to Sascha Bernholt)
 
-Notes:
+NOTES:
 * ---
 
-Datasets included or modified:
+DATASETS INCLUDED OR MODIFIED:
 * ---
 
-Examples included or modified:
+EXAMPLES INCLUDED OR MODIFIED:
 * ---
 
 -------------------------------------------------------------

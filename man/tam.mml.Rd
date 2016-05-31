@@ -98,7 +98,7 @@ tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
      (partial credit model with ConQuest parametrization 
      \code{'item+item*step'} and \code{RSM} (rating scale model; 
      the ConQuest parametrization \code{'item+step'}). \cr
-     For estimated item slopes (in \code{tam.mml.2pl})
+     For estimated item slopes (only available in \code{tam.mml.2pl})
      options are \code{2PL} (all slopes of item categories
      are estimated; Nominal Item Response Model), 
      \code{GPCM} (generalized partial credit

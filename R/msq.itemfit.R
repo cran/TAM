@@ -1,7 +1,7 @@
 
 #######################################
 # Item fit mean squares statistics
-msq.itemfit <- function( object , fitindices=NULL ){
+msq.itemfit <- function( object , fitindices=NULL , version = 2){
 		s1 <- Sys.time()
 		#--- collect necessary input
 		resp <- IRT.data(object)
@@ -60,12 +60,19 @@ msq.itemfit <- function( object , fitindices=NULL ){
 		
 		
 		irf1_ <- as.numeric(irf1)
-		res0 <- .Call( "msq_itemfit" , resp , irf1_ , K , TP , post1 , FIT_ , fitIndexM ,
-					               PACKAGE="TAM")$dfr_fit
-		res0 <- as.data.frame(res0)
-		colnames(res0) <- c("Outfit" , "Outfit_t" , "Infit" , "Infit_t")
-		dfr <- cbind( dfr , res0)
-		
+		if ( version == 1){	rcpp_fct <- "msq_itemfit" } 
+		if ( version == 2){	rcpp_fct <- "msq_itemfit2" } 				
+		if (version %in% c(1,2) ){
+			res0 <- .Call( rcpp_fct , resp , irf1_ , K , TP , post1 , FIT_ , fitIndexM ,
+									   PACKAGE="TAM")$dfr_fit
+			res0 <- as.data.frame(res0)
+			colnames(res0) <- c("Outfit" , "Outfit_t" , "Infit" , "Infit_t")		
+			dfr <- cbind( dfr , res0)
+								}
+		if (version == 3){
+			dfr <- msq.itemfit.R( dfr , FF , fitindices , fitgroups ,
+					       res , post1 , N , TP , I , K , resp )
+						  }	
 		#---   compute p values
 		dfr$Outfit_p <- 2 * stats::pnorm( -abs( dfr$Outfit_t )	)			
 		dfr$Infit_p <- 2 * stats::pnorm( -abs( dfr$Infit_t ))	
