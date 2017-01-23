@@ -149,6 +149,10 @@ function( resp , group = NULL , adj=.3 , disattenuate = FALSE ,
   
   #Compute possible maximum score for each person on each dimension
   PersonMaxB <- resp.ind %*% maxBi
+
+	if ( any(PersonMaxB == 0) ){
+		stop("Remove persons with only missing item responses!")	
+	}
   
   #Adjust perfect scores for each person on each dimension
   PersonScores[PersonScores==PersonMaxB] <- PersonScores[PersonScores==PersonMaxB] - adj

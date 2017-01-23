@@ -172,7 +172,11 @@ tam.jml2 <-
     
     #Compute possible maximum score for each person on each dimension
     PersonMaxB <- resp.ind %*% maxBi
-    
+	
+	if ( any(PersonMaxB == 0) ){
+		stop("Remove persons with only missing item responses!")	
+	}
+	
     #Adjust perfect scores for each person on each dimension
     PersonScores[PersonScores==PersonMaxB] <- PersonScores[PersonScores==PersonMaxB] - adj
     
@@ -211,7 +215,7 @@ tam.jml2 <-
       #    jmlAbility <- tam.jml.WLE ( resp , resp.ind, A, B, nstud, nitems, maxK, convM, 
       #                                PersonScores, theta, xsi, Msteps, WLE=FALSE)
       theta_old <- theta
-      jmlAbility <- tam.jml.WLE ( resp=resp , resp.ind=resp.ind[ rp3.sel$caseid,] , 
+      jmlAbility <- tam.jml.WLE( resp=resp , resp.ind=resp.ind[ rp3.sel$caseid,] , 
                                   A=A, B=B, 
                                   nstud=nrow(rp3.sel) , 
                                   nitems=nitems, maxK=maxK, convM=convM, 

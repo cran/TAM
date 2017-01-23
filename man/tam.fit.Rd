@@ -19,7 +19,7 @@ objects of classes \code{tam}, \code{tam.mml} and
 tam.fit(tamobj, ...)
 
 tam.mml.fit(tamobj, FitMatrix=NULL, Nsimul=NULL,progress=TRUE,
-   useRcpp=TRUE, seed=123, fit.facets=TRUE)
+   useRcpp=TRUE, seed=NA, fit.facets=TRUE)
 
 tam.jml.fit(tamobj)
 

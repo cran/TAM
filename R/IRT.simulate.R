@@ -62,7 +62,9 @@ simulate_mml <- function(object, iIndex = NULL, theta = NULL, nobs = NULL, ...){
     res[, ii] <-  c(cat.success.ii %*% rep(1, maxK))
   }
   
-  res[ is.na(object$resp) ] <- NA
+  if ( nrow(object$resp) == nnodes ){
+		res[ is.na(object$resp) ] <- NA
+  }
   
   #****
   # Output

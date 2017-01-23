@@ -373,7 +373,7 @@ Where \eqn{\beta} is a \eqn{N_Y} times \eqn{D} matrix of regression
 coefficients for \eqn{N_Y} covariates in \eqn{Y}.
 
 The multiple group model for groups 
-\eqn{g=1,...,G} is only implemented for unidimensional item
+\eqn{g=1,...,G} is implemented for unidimensional and multidimensional item
 response models. In this case, variance heterogeneity is allowed
 \deqn{ 
     \theta_p = Y \beta + \epsilon_p , \epsilon_p \sim N ( 0 , \sigma_g^2 )

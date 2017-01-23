@@ -103,6 +103,7 @@ See the \pkg{\link[WrightMap:WrightMap]{WrightMap}} package for functions
 connected to reading ConQuest files and creating Wright maps.
 ConQuest output files can be read into \R with the help of
 the \code{\link[WrightMap:CQmodel]{WrightMap::CQmodel}} function.
+See also the \code{\link{IRT.WrightMap}} function in \pkg{TAM}.
 
 See also the \pkg{eat} package (\url{https://r-forge.r-project.org/projects/eat/})
 for elaborate functionality for communication of ConQuest with \R.
@@ -126,8 +127,8 @@ https://shop.acer.edu.au/acer-shop/group/CON3.
 library(sirt)
 library(WrightMap)
 # In the following, ConQuest will also be used for estimation.
-path.conquest <- "C:\\Conquest"             # path of the ConQuest console.exe
-setwd( "p:\\my_files\\ConQuest_analyses" )  # working directory 
+path.conquest <- "C:/Conquest"             # path of the ConQuest console.exe
+setwd( "p:/my_files/ConQuest_analyses" )  # working directory 
 	
 #############################################################################
 # EXAMPLE 01: Rasch model data.cqc01

@@ -37,12 +37,13 @@ tam.jml.WLE <-
     # BBB	[ nitems , maxK ]
     maxChangeWLE <- 0
     thetaOld <- theta
+a0 <- Sys.time()
     while (!convergeWLE & ( iterWLE <= Msteps ) ) {  
       resWLE <- calc_prob.v5(iIndex = 1:nitems , A , AXsi , 
                              B , xsi , theta , nstud, maxK , recalc=FALSE )      	
       rprobsWLE <- resWLE[["rprobs"]] 
       rprobsWLE[ is.na( rprobsWLE ) ] <- 0
-      
+# cat("one iteration WLE -- calc prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1      
       
       B_bari <- B1[,1] * rprobsWLE[ , 1 , ]
       BB_bari <- BB[,1] * rprobsWLE[ , 1 , ]
@@ -99,6 +100,7 @@ tam.jml.WLE <-
       iterWLE <- iterWLE + 1 
       cat( "-"  ) 
       utils::flush.console()
+# cat("one iteration WLE rest") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
     }  # end of Newton-Raphson   
     cat("\n")
     meanChangeWLE <- mean(theta - thetaOld)

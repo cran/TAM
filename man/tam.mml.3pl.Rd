@@ -26,9 +26,9 @@ tam.mml.3pl(resp, Y = NULL, group = NULL, formulaY = NULL, dataY = NULL, ndim = 
   gammaslope.center.index=NULL ,  gammaslope.center.value=NULL , 
   gammaslope.prior = NULL, userfct.gammaslope = NULL , gammaslope.constr.Npars = 0 ,
   est.guess = NULL, guess = rep(0, ncol(resp)), 
-  guess.prior = NULL, skillspace = "normal", theta.k = NULL, delta.designmatrix = NULL, 
-  delta.fixed = NULL, delta.inits=NULL, pweights = NULL, item.elim = TRUE ,
-  control = list(), Edes=NULL )
+  guess.prior = NULL, max.guess = 0.5, skillspace = "normal", theta.k = NULL, 
+  delta.designmatrix = NULL, delta.fixed = NULL, delta.inits=NULL, pweights = NULL, 
+  item.elim = TRUE, control = list(), Edes=NULL )
   
 \method{summary}{tam.mml.3pl}(object,file=NULL,\dots)
 
@@ -177,6 +177,7 @@ Fixed or initial guessing parameters
      assumed that \eqn{c_i \sim N( a_i , b_i)}. The first column
      in \code{gammaslope.prior} is \eqn{a_i}, the second is \eqn{b_i}.
 }
+\item{max.guess}{Upper bound for guessing parameters}
   \item{skillspace}{
 Skill space: normal distribution (\code{"normal"}) or discrete
 distribution (\code{"discrete"}).

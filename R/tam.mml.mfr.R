@@ -53,7 +53,7 @@ tam.mml.mfr <-
     # attach control elements
     e1 <- environment()
     con <- list( nodes = seq(-6,6,len=21) , snodes = 0 , QMC=TRUE , 
-                 convD = .001 ,conv = .0001 , convM = .0001 , Msteps = 4 ,            
+                 convD = .001 ,conv = .0001 , convM = .0001 , Msteps = 10 ,            
                  maxiter = 1000 , max.increment = 1 , 
                  min.variance = .001 , progress = TRUE , ridge=0,seed= NULL ,
                  xsi.start0= 0 , increment.factor=1 , fac.oldxsi=0 , acceleration="none" ,
@@ -760,7 +760,7 @@ tam.mml.mfr <-
                                 theta2=theta2 , YYinv=YYinv , 
                                 ndim=ndim , nstud=nstud , beta.fixed=beta.fixed , variance=variance , 
                                 Variance.fixed=variance.fixed , group=group ,  G=G , snodes = snodes ,
-                                nomiss=nomiss)
+                                nomiss=nomiss )
 														
 	if ( ( iter < 2 ) & is.na(resr$variance) ){
 		stop("Choose argument control=list( xsi.start0=TRUE, ...) ")
@@ -1151,7 +1151,8 @@ if (!choice1){
     xsi1 <- merge( x = xsiFacet , y= obji , by="parameter" , all=TRUE )
     A1 <- xsi.constr$xsi.constraint %*% xsi
 	
-    xsi1[ match( rownames(xsi.constr$xsi.constraint) , xsi1$parameter) , "xsi" ] <- A1
+	incl <- match( rownames(xsi.constr$xsi.constraint) , xsi1$parameter)
+    xsi1[ incl , "xsi" ] <- A1
 
     xsi1 <- xsi1[ match( xsiFacet$parameter , xsi1$parameter) , ]
     xsi.facets <- xsi1
@@ -1162,6 +1163,12 @@ if (!choice1){
       xsi.facets <-  xsi.facets[ - i1 , ] 
     }
 
+	XX <- xsi.constr$xsi.constraint
+	incl <- match( rownames(XX) , xsi.facets$parameter)
+	vcov_xsi <- diag( obji$se.xsi^2 )
+	se2 <- sqrt( diag( XX %*% vcov_xsi %*% t(XX) ))
+	xsi.facets[ incl , "se.xsi"] <- se2
+	
 	#@@@@@@@@@@@@@@@@@@@@@@@@ control xsi.facets
 	if( xsi.constr$intercept_included ){	
 		ind <- which( paste(xsi.facets$facet) == "item" )

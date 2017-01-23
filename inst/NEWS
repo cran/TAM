@@ -31,8 +31,6 @@ and (if necessary) a corresponding dataset.
 
 URL:
 ----
-For TAM development versions see
-https://sites.google.com/site/alexanderrobitzsch/software
 
 For TAM tutorials see
 http://www.edmeasurementsurveys.com/TAM/Tutorials/
@@ -43,16 +41,47 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 
 
+-------------------------------------------------------------
+CHANGES IN VERSION 1.99992 (2017-01-23)  --  CRAN 1.99992-0
+-------------------------------------------------------------
+
+FEATURES:
+* ---
+ 
+BUG FIXES:
+* fixed incorrect handling of item renaming in 'tam.mml.mfr'
+  (thanks to Barth Riley) 
+* fixed a bug in calculation of p values in 'tam.fit'
+  (thanks to David Torres Irribarra)
+* fixed a bug in 'IRT.simulate' with used argument 'nobs'
+  (thanks to Mark Dulhunty)
+* the fixing of the random seed within the 'tam.fit' function
+  is removed (thanks to Sebastian Weirich)
+* fixed crucial bug in 3PL estimation in 'tam.mml.3pl' function
+  (thanks to Petra Kleiber)
+
+NOTES:
+* stop estimation in 'tam.jml' (and 'tam.jml2') if there are persons
+  with only missing item responses (communicated by Ricardo Primi)
+* included standard errors for constrained parameters in 'tam.mml.mfr'
+  similar to the software ConQuest software 
+  (requested by Florian Keller und Domenico Angelone)
+
+DATASETS INCLUDED OR MODIFIED:
+* ---
+
+EXAMPLES INCLUDED OR MODIFIED:
+* ---
+
 
 -------------------------------------------------------------
 CHANGES IN VERSION 1.995    (2016-05-31)  --  CRAN 1.995-0
 -------------------------------------------------------------
 
-
 FEATURES:
 * ---
 
-BUG FIXSES:
+BUG FIXES:
 * fixed a bug in 'tam.fit' when proving a fit matrix F with
   missing labels (thanks to Maxim Morin)
 
@@ -69,8 +98,6 @@ DATASETS INCLUDED OR MODIFIED:
 
 EXAMPLES INCLUDED OR MODIFIED:
 * ---
-
-
 
 -------------------------------------------------------------
 CHANGES IN VERSION 1.99    (2016-04-15)  --  CRAN 1.99-6

@@ -16,7 +16,7 @@ tam.mml.3pl <-
 			gammaslope.prior=NULL ,  userfct.gammaslope = NULL ,
 			gammaslope.constr.Npars = 0 ,
 			est.guess = NULL ,  guess = rep(0,ncol(resp)) , 
-			guess.prior=NULL ,
+			guess.prior=NULL , max.guess = .50 , 
             skillspace = "normal" , theta.k = NULL , 
             delta.designmatrix=NULL , delta.fixed=NULL , 
 			delta.inits = NULL ,  pweights = NULL , 
@@ -359,8 +359,9 @@ tam.mml.3pl <-
     }
     lipl <- cumsum( sapply( indexIP.list , FUN = function(ll){ length(ll) } ) )
     indexIP.list2 <- unlist(indexIP.list)
-    indexIP.no <- as.matrix( cbind( c(1 , lipl[-length(lipl)]+1 ) , lipl ) )  
-    
+    indexIP.no <- as.matrix( cbind( c(1 , lipl[-length(lipl)]+1 ) , lipl ) )      
+	
+	
     #**************************************************	
     col.index <- rep( 1:nitems , each = maxK )
     cResp <- (resp +1) *resp.ind
@@ -749,11 +750,13 @@ a0 <- Sys.time()
 	    #******************************************
         # M step: distribution parameter estimation of beta and variance
 	    if ( skillspace == "normal" ){
-		  resr <- mstep.regression( resp=resp , hwt=hwt , resp.ind=resp.ind , pweights=pweights , 
+		
+		  resr <- tam_mml_3pl_mstep_regression( resp=resp , hwt=hwt , resp.ind=resp.ind , pweights=pweights , 
 									pweightsM=pweightsM , Y=Y , theta=theta , theta2=theta2 , YYinv=YYinv , 
 									ndim=ndim , nstud=nstud , beta.fixed=beta.fixed , variance=variance , 
 									Variance.fixed=variance.fixed , group=group ,  G=G , snodes = snodes ,
-									thetasamp.density=thetasamp.density,nomiss=nomiss)		  
+									thetasamp.density=thetasamp.density,nomiss=nomiss,
+									iter = iter )		  
 		  beta <- resr$beta
 		  # cat("m step regression") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		  
 		  variance <- resr$variance	
@@ -836,11 +839,11 @@ a0 <- Sys.time()
 		
       ######################################
       # M-step item intercepts
-	  res <- .mml.3pl.est.intercepts( max.increment , np , est.xsi.index0 , 
+	  res <- tam.mml.3pl.est.intercepts( max.increment , np , est.xsi.index0 , 
 			Msteps , nitems , A , AXsi , B , xsi , guess , theta , nnodes , maxK ,
 			progress , itemwt , indexIP.no , indexIP.list2 ,
 			ItemScore , fac.oldxsi , rprobs , xsi.fixed , convM , rprobs0 ,
-			n.ik , N.ik , xsi.prior )
+			n.ik , N.ik , xsi.prior , indexIP.list)
 	  xsi <- res$xsi
 	  se.xsi <- res$se.xsi
       
@@ -897,15 +900,18 @@ a0 <- Sys.time()
 		  B <- .mml.3pl.computeB.v2( Edes , gammaslope , E )		  
 		  
 				}
-					
+
+# cat("M steps slopes") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						
+
+				
 	  #*********************
 	  # 3PL estimation
-	  if ( est.some.guess ){
+	  if ( est.some.guess ){	  
 	      oldguess <- guess
 		  res <- .mml.3pl.est.guessing( guess , Msteps , convM , 
 						nitems , A , AXsi , B, xsi , theta , nnodes , maxK ,
 						n.ik , N.ik , est.guess ,  old.increment.guess ,
-						guess.prior  , progress	)	  
+						guess.prior  , progress	, max.guess )	  
 		  guess <- res$guess
 		  guess.change <- res$guess.change
 		  se.guess <- res$se.guess
@@ -913,12 +919,10 @@ a0 <- Sys.time()
         #@@@@AAAA@@@@@
 		# acceleration
 		if ( guess_acceleration$acceleration != "none" ){		
-			# g1 <- qlogis( guess + 1E-5 )
 			g1 <- guess
 			guess_acceleration <- accelerate_parameters( xsi_acceleration=guess_acceleration , 
 							xsi= g1 , iter=iter , itermin=3 , 
 							ind = guess_acceleration$ind_guess)
-			#guess <- plogis( guess_acceleration$parm )
 			guess <- guess_acceleration$parm
 			guess[ guess < 0 ] <- 1E-5
 			guess.change <- max( abs(guess - oldguess))
@@ -928,7 +932,7 @@ a0 <- Sys.time()
 		  
 #		  old.increment.guess <- guess.change
 					}
-# cat("M steps slopes") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
+# cat("M steps guess") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
       
       #***
       # decrease increments in every iteration

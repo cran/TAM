@@ -11,7 +11,7 @@ tam.fit <- function( tamobj, ... ){
 
 tam.mml.fit <-
   function( tamobj, FitMatrix=NULL , Nsimul=NULL , progress = TRUE ,
-     useRcpp=TRUE , seed=123 , fit.facets=TRUE ){
+     useRcpp=TRUE , seed= NA , fit.facets=TRUE ){
     #####################################################
     # INPUT:
     # tamobj ... result from tam analysis
@@ -20,19 +20,23 @@ tam.mml.fit <-
     # progress ... fit progress
     ####################################################
     
-	if ( ! is.null(seed) ){
-	   set.seed(seed)  }
+	old_seed <- .Random.seed
+	this_envir <- base::environment()
 	
-	if ( is.null(Nsimul) ){
-			nstud <- tamobj$nstud
-			Nsimul <- 5
-			if ( nstud < 3000 ){ Nsimul <- 15 }			
-			if ( nstud < 1000 ){ Nsimul <- 40 }
-			if ( nstud < 400 ){ Nsimul <- 100 }						
-						}
-	 if (progress){
+	if ( ! base::is.na(seed) ){
+		base::set.seed(seed)  
+	}
+	
+	if ( base::is.null(Nsimul) ){
+		nstud <- tamobj$nstud
+		Nsimul <- 5
+		if ( nstud < 3000 ){ Nsimul <- 15 }			
+		if ( nstud < 1000 ){ Nsimul <- 40 }
+		if ( nstud < 400 ){ Nsimul <- 100 }						
+	}
+	if (progress){
 	    cat( paste0("Item fit calculation based on " , Nsimul , " simulations\n") )
-					}
+	}
 		
     resp <- tamobj$resp  
     rprobs <- tamobj$rprobs    	
@@ -227,15 +231,21 @@ tam.mml.fit <-
 	    "parameter" = dimnames(FitMatrix)[[3]] ,
 					  "Outfit" = Outfit , 
                       "Outfit_t" = Outfit_t, 
-					  "Outfit_p" = stats::pnorm(-abs(Outfit_t)) /2 ,
+					  "Outfit_p" = 2*stats::pnorm(-abs(Outfit_t)) ,
 					  "Outfit_pholm" =NA , 
 					  "Infit" = Infit , 
                       "Infit_t" = Infit_t,  
-					  "Infit_p" = stats::pnorm(-abs(Infit_t)) /2 ,
+					  "Infit_p" = 2*stats::pnorm(-abs(Infit_t)) ,
 					  "Infit_pholm" =NA 
 							)
 	res$Outfit_pholm <- stats::p.adjust( res$Outfit_p , method="holm")
 	res$Infit_pholm <- stats::p.adjust( res$Infit_p , method="holm")
+	#--- set seed back to previous values
+	# base::assign(".Random.seed", old_seed, 
+	#			envir = base::parent.env(this_envir) ) 		
+	# assign(".Random.seed", old_seed, envir=globalenv())
+
+	
     #data.frame( "Outfit" = round(Outfit,2) , "Outfit_t" = round(Outfit_t,1), "Infit" = round(Infit,2), Infit_t = round(Infit_t,1) )    
     res <- list( "itemfit" = res )
     class(res) <- "tam.fit"	
