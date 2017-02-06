@@ -102,13 +102,13 @@ DOEND
    mj ~~ 1*mj
    sc ~~ 1*sc
      "
-lavmodel <- lavaanify.IRT( lavmodel , data=dat2 )$lavaan.syntax
+lavmodel <- TAM::lavaanify.IRT( lavmodel , data=dat2 )$lavaan.syntax
 cat(lavmodel)
 
 mod4 <- lavaan::cfa( lavmodel , data=dat2 , std.lv=TRUE )
 summary(mod4, standardized=TRUE , rsquare=TRUE )
 # extract item parameters
-res4 <- cfa.extract.itempars( mod4 )
+res4 <- TAM::cfa.extract.itempars( mod4 )
 # create theta grid
 theta0 <- seq( -6 , 6 , len=15)
 theta <- expand.grid( theta0 , theta0 )
@@ -117,10 +117,10 @@ nu <- res4$nu
 psi <- res4$psi
 data <- dat2
 # evaluate likelihood using item parameters
-like2 <- IRTLikelihood.cfa( data=dat2 , theta=theta, L=L , nu=nu , psi=psi ) 
+like2 <- TAM::IRTLikelihood.cfa( data=dat2 , theta=theta, L=L , nu=nu , psi=psi ) 
 # The likelihood can also be obtained by direct evaluation
 # of the fitted cfa object "mod4"
-like4 <- IRTLikelihood.cfa( data=dat2 , cfaobj=mod4 ) 
+like4 <- TAM::IRTLikelihood.cfa( data=dat2 , cfaobj=mod4 ) 
 attr( like4 , "theta")
 # the theta grid is automatically created if theta is not
 # supplied as an argument

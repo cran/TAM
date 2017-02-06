@@ -30,7 +30,7 @@ mfr.dataprep <- function( formulaA , xsi.setnull , B , Q ,
 						}
 					}
 
-	dups <- base::duplicated( combi )
+	dups <- duplicated( combi )
 	dups1 <- combi[ dups ]
 	dups_combi <- any( dups )
     PSF <- FALSE	

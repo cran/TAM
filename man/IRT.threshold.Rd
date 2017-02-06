@@ -124,7 +124,7 @@ mod1 <- CDM::gdm( dat = resp , irtmodel="1PL" , theta.k=theta.k , skillspace="no
               centered.latent=TRUE)
 
 # compute thresholds
-thresh1 <- IRT.threshold(mod1)
+thresh1 <- TAM::IRT.threshold(mod1)
 print(thresh1)
 IRT.WrightMap(thresh1)
 
@@ -143,7 +143,7 @@ mod1 <- CDM::gdm( dat , irtmodel="1PL" , theta.k=theta.k , Qmatrix=Qmatrix ,
 summary(mod1)            
 
 # compute thresholds
-thresh1 <- IRT.threshold(mod1)
+thresh1 <- TAM::IRT.threshold(mod1)
 print(thresh1)
 
 #############################################################################
@@ -156,15 +156,15 @@ dat <- dat[ , grep("M03" , colnames(dat) ) ]
 summary(dat)
 
 # fit partial credit model
-mod <- tam.mml( dat )
+mod <- TAM::tam.mml( dat )
 # compute thresholds with tam.threshold function
-t1mod <- tam.threshold( mod )
+t1mod <- TAM::tam.threshold( mod )
 t1mod
 # compute thresholds with IRT.threshold function
-t2mod <- IRT.threshold( mod )
+t2mod <- TAM::IRT.threshold( mod )
 t2mod
 # compute item-wise thresholds
-t3mod <- IRT.threshold( mod , type="item")
+t3mod <- TAM::IRT.threshold( mod , type="item")
 t3mod
 }
 }

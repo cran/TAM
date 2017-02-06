@@ -147,13 +147,13 @@ data( data.gpcm )
 resp <- data.gpcm
 
 # parametrization for partial credit model
-A1 <- designMatrices( resp= resp )$A
+A1 <- TAM::designMatrices( resp= resp )$A
 # item difficulty and threshold parametrization
-A2 <- .A.PCM2( resp )
+A2 <- TAM::.A.PCM2( resp )
 # dispersion model of Andrich (1982)
-A3 <- .A.PCM3( resp )
+A3 <- TAM::.A.PCM3( resp )
 # rating scale model
-A4 <- designMatrices( resp= resp , modeltype="RSM" )$A
+A4 <- TAM::designMatrices( resp= resp , modeltype="RSM" )$A
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

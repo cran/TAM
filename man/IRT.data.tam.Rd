@@ -73,7 +73,7 @@ data(data.sim.rasch)
 dat <- data.sim.rasch
 
 # estimate model
-mod1 <- tam.mml(dat)
+mod1 <- TAM::tam.mml(dat)
 # extract dataset (and weights and group if available)
 dmod1 <- IRT.data(mod1)
 str(dmod1)

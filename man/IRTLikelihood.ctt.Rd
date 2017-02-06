@@ -70,18 +70,18 @@ errvar <- stats::runif( N , min = .6 , max = .9 )
 y <- theta + stats::rnorm( N , sd = sqrt( errvar) )
 
 #--- create likelihood object
-like1 <- IRTLikelihood.ctt( y=y , errvar=errvar , theta = NULL )
+like1 <- TAM::IRTLikelihood.ctt( y=y , errvar=errvar , theta = NULL )
 
 #--- estimate latent regression
 X <- data.frame(x1,x2)
-mod1 <- tam.latreg( like=like1 , Y = X )
+mod1 <- TAM::tam.latreg( like=like1 , Y = X )
 
 \dontrun{
 #--- draw plausible values
-pv1 <- tam.pv( mod1 , normal.approx = TRUE )
+pv1 <- TAM::tam.pv( mod1 , normal.approx = TRUE )
 
 #--- create datalist
-datlist1 <- tampv2datalist( pv1 , pvnames = "thetaPV" , Y=X )
+datlist1 <- TAM::tampv2datalist( pv1 , pvnames = "thetaPV" , Y=X )
 
 #--- statistical inference on plausible values using mitools package
 library(mitools)

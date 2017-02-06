@@ -192,12 +192,12 @@ a0 <- Sys.time()
 			# bootstrap sample of persons to get sampled beta coefficients
 			if ( ndim > 1 ){
 				N <- nrow(theta1)			
-				ind <- base::sample( 1:N , N , replace=TRUE)
+				ind <- sample( 1:N , N , replace=TRUE)
 				theta1 <- theta1[ ind , ]				
 				Y1 <- Y[ ind , , drop=FALSE ]
 						} else {
 				N <- length(theta1)
-				ind <- base::sample( 1:N , N , replace=TRUE)
+				ind <- sample( 1:N , N , replace=TRUE)
 				theta1 <- theta1[ ind ]				
 				Y1 <- Y[ ind , , drop=FALSE ]				
 								}

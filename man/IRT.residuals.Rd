@@ -93,9 +93,9 @@ data(data.read,package="sirt")
 dat <- data.read
 
 # for Rasch model
-mod <- tam.mml( dat )
+mod <- TAM::tam.mml( dat )
 # extract residuals
-res <- IRT.residuals( mod )
+res <- TAM::IRT.residuals( mod )
 str(res)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

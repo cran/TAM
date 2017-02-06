@@ -84,7 +84,7 @@ tam_mml_mstep_xsi <- function( max_increment , est.xsi.index0 , control ,
 		xsi <- xsi_acceleration$parm
 	}
 	#------ output
-	res <- base::list( xsi = xsi , xsi_accleration = xsi_acceleration 	,
+	res <- list( xsi = xsi , xsi_accleration = xsi_acceleration 	,
 				se.xsi = se.xsi , max_increment = max_increment )
-	base::return(res)				
+	return(res)				
 }

@@ -45,13 +45,13 @@ tam.jml.xsi2 <-
 # cat("one iteration xsi -- calc prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1 		  
 		  #compute probability weights, summed over students, so that there is no cycling through students for parameter estimation (p loop)
 		  M1 <- resp.ind[ rp3.sel$caseid , ] * rp3.pweightsM 
-		  t_rprobs <- base::aperm( rprobs , dim=c(3,2,1) )
+		  t_rprobs <- aperm( rprobs , dim=c(3,2,1) )
 		  for (k1 in 1:maxK) {
 		    M1_k1 <- t_rprobs[,k1,] * M1 
-			r[,k1] <- base::colSums( M1_k1 , na.rm=TRUE)
+			r[,k1] <- colSums( M1_k1 , na.rm=TRUE)
 
 			for (k2 in 1:maxK) {
-			  rr[,k1,k2] <- base::colSums( M1_k1 * t_rprobs[,k2,] , na.rm=TRUE)
+			  rr[,k1,k2] <- colSums( M1_k1 * t_rprobs[,k2,] , na.rm=TRUE)
 			}
 		  }		  
 		  
@@ -59,9 +59,9 @@ tam.jml.xsi2 <-
 # cat("one iteration xsi -- matrix 1 (V2)") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1 		  
 		  
 		  A_Sq <- AA_bari <- A_bari <- matrix( 0 , PP1 , nitems )
-		  t_r <- base::t( r )
-          t_rr <- base::aperm( rr , dim=c(3,2,1) ) 		  
-		  t_A.0 <- base::aperm( A.0 , dim=c(3,2,1) )
+		  t_r <- t( r )
+          t_rr <- aperm( rr , dim=c(3,2,1) ) 		  
+		  t_A.0 <- aperm( A.0 , dim=c(3,2,1) )
 		  for (kk in 1:maxK){ 
 			A0_r_kk <- A.0[ , kk , ] * r[ , kk ]
 			A_bari <- A_bari + t( A0_r_kk )

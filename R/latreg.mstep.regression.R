@@ -22,13 +22,13 @@ latreg.mstep.regression <- function( hwt ,
 			## %t*% 	Matrix product t(A) %*% B  -> crossprod	
 			## %t*t% 	Matrix product t(A) %*% t(B)		
 			##-----------
-			## Functions base::crossprod and base::tcrossprod
+			## Functions crossprod and tcrossprod
 			## t(x) %*% y (crossprod)
 			## x %*% t(y) (tcrossprod). 
 		# sumbeta <- Y %t*% ( thetabar*pweights )
-		sumbeta <- base::crossprod( Y , ( thetabar*pweights ) )
+		sumbeta <- crossprod( Y , ( thetabar*pweights ) )
         # sumsig2 <- as.vector( t( colSums( pweights * hwt ) ) %*% theta2 )		
-		sumsig2 <- as.vector( base::crossprod( colSums( pweights * hwt ) , theta2 ) )		
+		sumsig2 <- as.vector( crossprod( colSums( pweights * hwt ) , theta2 ) )		
  #cat("- sum sig2") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
 					}
 
@@ -49,7 +49,7 @@ latreg.mstep.regression <- function( hwt ,
 		thetabar <- hwtS %*% theta
 # cat("- thetabar ") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						
 		# sumbeta <- Y %t*% ( thetabar*pweights )
-		sumbeta <- base::crossprod( Y ,  thetabar*pweights )
+		sumbeta <- crossprod( Y ,  thetabar*pweights )
 # cat("- tensor operation ") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1								
 		sumsig2 <- as.vector( crossprod( colSums( pweights * hwtS ) , theta2 ) )
 # cat("- sum sig2 modified ") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
@@ -82,11 +82,11 @@ latreg.mstep.regression <- function( hwt ,
 			ind.gg <- which( group == gg )
 			thetabar <- hwt[ind.gg,]%*%theta
 			# sumbeta <- Y[ind.gg,]%t*%( thetabar*pweights[ind.gg] )
-			sumbeta <- base::crossprod( Y[ind.gg,] , thetabar*pweights[ind.gg] )
+			sumbeta <- crossprod( Y[ind.gg,] , thetabar*pweights[ind.gg] )
 			# -- sumsig2 <- sum( (pweights*hwt) %*% theta2 )
 			sumsig2 <- colSums((pweights[ind.gg]*hwt[ind.gg,]) %*% theta2)   
 			sumsig2 <- matrix(sumsig2,ndim,ndim)
-			variance[ind.gg] <- (sumsig2- base::crossprod( sumbeta , beta) ) / 
+			variance[ind.gg] <- (sumsig2- crossprod( sumbeta , beta) ) / 
 										sum(pweights[ind.gg]) #new variance
 				}
 			}		# end multiple groups

@@ -62,14 +62,14 @@ data(data.Students, package="CDM")
 dat <- data.Students[ , paste0("mj",1:4) ]
 
 # fit partial credit model
-mod1 <- tam.mml( dat ,control=list(maxiter=20) )
+mod1 <- TAM::tam.mml( dat ,control=list(maxiter=20) )
 summary(mod1)
 
 # true score conversion
-tmod1 <- IRT.truescore( mod1 )
+tmod1 <- TAM::IRT.truescore( mod1 )
 round( tmod1 , 4 )
 # true score conversion with user-defined theta grid
-tmod1b <- IRT.truescore( mod1 , theta=seq( -8,8, len=33 ) )
+tmod1b <- TAM::IRT.truescore( mod1 , theta=seq( -8,8, len=33 ) )
 # plot results
 plot( tmod1$theta , tmod1$truescore , type="l" , 
             xlab=expression(theta) , ylab=expression(tau( theta ) ) )
@@ -92,14 +92,14 @@ Q <- matrix( 1 , nrow=I , ncol=1 )
 Q[ ind , 1 ] <- .5    # score of 0.5 for polyomous items 
 
 # estimate model
-mod1 <- tam.mml( dat , Q=Q , irtmodel="PCM2" , control=list( nodes=seq(-10,10,len=61) ) )
+mod1 <- TAM::tam.mml( dat , Q=Q , irtmodel="PCM2" , control=list( nodes=seq(-10,10,len=61) ) )
 summary(mod1)
 
 # true score with scoring (0,1,2) which is the default of the function
-tmod1 <- IRT.truescore(mod1)
+tmod1 <- TAM::IRT.truescore(mod1)
 # true score with user specified weighting matrix
 Q <- mod1$B[,,1]
-tmod2 <- IRT.truescore(mod1, Q=Q)
+tmod2 <- TAM::IRT.truescore(mod1, Q=Q)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

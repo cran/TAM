@@ -54,7 +54,7 @@ data(data.numeracy)
 dat <- data.numeracy$scored
 
 #Run IRT analysis: Rasch model
-mod1 <- tam.mml(dat)
+mod1 <- TAM::tam.mml(dat)
 
 #Item difficulties
 mod1$xsi
@@ -62,7 +62,7 @@ ItemDiff <- mod1$xsi$xsi
 ItemDiff
 
 #Ability estimate - Weighted Likelihood Estimate
-Abil <- tam.wle(mod1)
+Abil <- TAM::tam.wle(mod1)
 Abil
 PersonAbility <- Abil$theta
 PersonAbility
@@ -100,18 +100,18 @@ scored <- sapply( seq(1,length(key)) ,
             FUN = function(ii){ 1*(raw_resp[,ii] == key[ii]) } )
 
 #run IRT analysis
-mod1 <- tam.mml(scored)
+mod1 <- TAM::tam.mml(scored)
 
 #Ability estimate - Weighted Likelihood Estimate
-Abil <- tam.wle(mod1)
+Abil <- TAM::tam.wle(mod1)
 
 #CTT statistics
-ctt1 <- tam.ctt(raw_resp, Abil$theta)
+ctt1 <- TAM::tam.ctt(raw_resp, Abil$theta)
 write.csv(ctt1,"D1_ctt1.csv")       # write statistics into a file
         # use maybe write.csv2 if ';' should be the column separator
 
 #Fit statistics
-Fit <- tam.fit(mod1)
+Fit <- TAM::tam.fit(mod1)
 Fit
 
 # plot expected response curves

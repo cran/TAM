@@ -73,7 +73,7 @@ See \code{\link[CDM:IRT.irfprob]{CDM::IRT.irfprob}}.
 	
 data(data.sim.rasch)
 # 1PL estimation
-mod1 <- tam.mml(resp=data.sim.rasch)
+mod1 <- TAM::tam.mml(resp=data.sim.rasch)
 IRT.irfprob(mod1)
 }
 

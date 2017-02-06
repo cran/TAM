@@ -8,17 +8,17 @@ citHeader("To cite the 'TAM' package in publications use:")
 citEntry(entry="Manual",
          title = "TAM: Test Analysis Modules",
          author = c(
-                   person(given = "Alexander",
-                          family = "Robitzsch"),
                    person(given = "Thomas",
                           family = "Kiefer"),
+                   person(given = "Alexander",
+                          family = "Robitzsch"),
 		person(given = c("Margaret"),
                           family = "Wu") ) ,
          year = year,
          note = vers,
 	 url = "https://CRAN.R-project.org/package=TAM" ,
          textVersion =
-         paste0("Robitzsch, A., Kiefer, T., & Wu, M. (",
+         paste0("Kiefer, T., Robitzsch, A. & Wu, M. (",
                year,
                "). TAM: Test analysis modules. ",
                vers, ". https://CRAN.R-project.org/package=TAM")

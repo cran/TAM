@@ -89,7 +89,7 @@ str(data.sim.rasch)
 dat <- data.sim.rasch
 
 # fit Rasch model
-mod1 <- tam.mml(resp=dat)
+mod1 <- TAM::tam.mml(resp=dat)
 # Wright map
 IRT.WrightMap( mod1 )
 # some customized plots
@@ -99,8 +99,8 @@ IRT.WrightMap( mod1 ,  show.thr.sym = FALSE, thr.lab.text = paste0("I",1:ncol(da
      label.items = "", label.items.ticks = FALSE)
 
 #--- direct specification with wrightMap function
-theta <- tam.wle(mod1)$theta
-thr <- tam.threshold(mod1)
+theta <- TAM::tam.wle(mod1)$theta
+thr <- TAM::tam.threshold(mod1)
 
 # default wrightMap plots
 WrightMap::wrightMap( theta , thr , label.items.srt = 90)
@@ -125,7 +125,7 @@ LAVAAN MODEL:
   SC =~ sc1__sc4
   SC ~~ 1*SC  
     "
-mod1 <- tamaan( tammodel , dat )
+mod1 <- TAM::tamaan( tammodel , dat )
 # create item level colors
 library(RColorBrewer)
 ncat <- 3               # number of category parameters
@@ -146,7 +146,7 @@ dat <- data.read
 # fit three-dimensional Rasch model
 Q <- matrix( 0 , nrow=12 , ncol=3 )
 Q[1:4,1] <- Q[5:8,2] <- Q[9:12,3] <- 1
-mod1 <- tam.mml( dat , Q=Q , control=list(maxiter=20 , snodes=1000)  )
+mod1 <- TAM::tam.mml( dat , Q=Q , control=list(maxiter=20 , snodes=1000)  )
 summary(mod1)
 # define matrix with colors for thresholds
 c1 <- matrix( c( rep(1,4) , rep(2,4) , rep(4,4)) , ncol=1 )
@@ -174,13 +174,13 @@ facets <- dat[, "rater", drop = FALSE]  # define facet (rater)
 pid <- dat$pid  # define person identifier (a person occurs multiple times)
 resp <- dat[, -c(1:2)]  # item response data
 formulaA <- ~item * rater  # formula
-mod <- tam.mml.mfr(resp = resp, facets = facets, formulaA = formulaA, pid = dat$pid)
+mod <- TAM::tam.mml.mfr(resp = resp, facets = facets, formulaA = formulaA, pid = dat$pid)
 
 # person parameters
-persons.mod <- tam.wle(mod)
+persons.mod <- TAM::tam.wle(mod)
 theta <- persons.mod$theta
 # thresholds
-thr <- tam.threshold(mod)
+thr <- TAM::tam.threshold(mod)
 item.labs <- c("I0001", "I0002", "I0003", "I0004", "I0005")
 rater.labs <- c("rater1", "rater2", "rater3")
 

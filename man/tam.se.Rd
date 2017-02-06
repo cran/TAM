@@ -86,9 +86,9 @@ Standard error estimation for loading parameters in case of
 	
 data(data.sim.rasch)
 # estimate Rasch model
-mod1 <- tam.mml(resp=data.sim.rasch[1:500,1:10]) 
+mod1 <- TAM::tam.mml(resp=data.sim.rasch[1:500,1:10]) 
 # standard error estimation
-se1 <- tam.se( mod1 ) 
+se1 <- TAM::tam.se( mod1 ) 
 # proportion of standard errors estimated by 'tam.se' and 'tam.mml'
 prop1 <- se1$xsi$se / mod1$xsi$se
 ##   > summary( prop1 )
@@ -106,10 +106,10 @@ formulaA <- ~ item*female
 resp <- data.ex08[["resp"]]
 facets <- as.data.frame( data.ex08[["facets"]] )
 # investigate DIF
-mod <- tam.mml.mfr( resp= resp , facets= facets , formulaA = formulaA )    
+mod <- TAM::tam.mml.mfr( resp= resp , facets= facets , formulaA = formulaA )    
 summary(mod)          
 # estimate standard errors
-semod <- tam.se(mod)
+semod <- TAM::tam.se(mod)
 prop1 <- semod$xsi$se / mod$xsi$se
 summary(prop1)
 # plot differences in standard errors

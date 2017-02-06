@@ -179,7 +179,7 @@ resp <- data.read
 
 #***
 # Model 1a: Exploratory factor analysis with 2 factors
-mod1a <- tam.fa( resp=resp , irtmodel="efa" , nfactors= 2  )
+mod1a <- TAM::tam.fa( resp=resp , irtmodel="efa" , nfactors= 2  )
 summary(mod1a)
 # varimax rotation
 stats::varimax(mod1a$B.stand)
@@ -195,12 +195,12 @@ GPArotation::quartimin( mod1a$B.stand )
 #***
 # Model 1b: Rasch testlet model with 3 testlets
 dims <- substring( colnames(resp),1,1 )	 # define dimensions
-mod1b <- tam.fa( resp=resp , irtmodel="bifactor1" , dims=dims )
+mod1b <- TAM::tam.fa( resp=resp , irtmodel="bifactor1" , dims=dims )
 summary(mod1b)
 
 #***
 # Model 1c: Bifactor model
-mod1c <- tam.fa( resp=resp , irtmodel="bifactor2" , dims=dims )
+mod1c <- TAM::tam.fa( resp=resp , irtmodel="bifactor2" , dims=dims )
 summary(mod1c)
 
 #***
@@ -208,7 +208,7 @@ summary(mod1c)
 #           specific factors
 dims1 <- dims
 dims1[c(3,5)] <- NA
-mod1d <- tam.fa( resp=resp , irtmodel="bifactor2" , dims=dims1 )
+mod1d <- TAM::tam.fa( resp=resp , irtmodel="bifactor2" , dims=dims1 )
 summary(mod1d)
 }
 }

@@ -22,7 +22,7 @@ tam.mml.3pl.est.intercepts <- function( max.increment , np , est.xsi.index0 ,
 		h <- 1E-4
 		
 		#----- switch with respect to existence of guessing parameter
-		guess_exists <- base::max( guess ) > eps
+		guess_exists <- max( guess ) > eps
 		
 		if ( ! guess_exists ){
 			# Only compute probabilities for items contributing to param p
@@ -42,14 +42,14 @@ tam.mml.3pl.est.intercepts <- function( max.increment , np , est.xsi.index0 ,
 			xxf <- res$xxf
 			ItemScore <- res$iscore					
 			# Compute the difference between sufficient statistic and expectation
-			diff <- base::as.vector(ItemScore) - xbar
+			diff <- as.vector(ItemScore) - xbar
 			#Compute the Newton-Raphson derivative for the equation to be solved
 			deriv <- xbar2 - xxf 	
 		}
 		
 		if ( guess_exists){
-			NX <- base::length(xsi)		
-			ll0 <- base::rep( NA , NX )
+			NX <- length(xsi)		
+			ll0 <- rep( NA , NX )
 			ll1m <- ll1p <- NA*ll0
 			for (xx in 1:NX){
 				# xx <- 1		

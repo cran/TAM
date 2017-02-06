@@ -116,7 +116,7 @@ lavmodel <- "
       "
 
 # process lavaan syntax
-lavpartable <- lavaanify.IRT(lavmodel)$lavpartable
+lavpartable <- TAM::lavaanify.IRT(lavmodel)$lavpartable
   ##     id lhs op rhs user group free ustart exo label eq.id unco
   ##  1   1   F =~  A1    1     1    1     NA   0           0    1
   ##  2   2   F =~  A2    1     1    2     NA   0     c     0    2
@@ -161,7 +161,7 @@ lavmodel <- "
    B1__B3 ~~ errB*B1__B3 
    A2__A4 ~~ erra1__erra3*A2__A4
     " 
-lav2 <- lavaanify.IRT( lavmodel , data=dat)
+lav2 <- TAM::lavaanify.IRT( lavmodel , data=dat)
 lav2$lavpartable
 cat( lav2$lavaan.syntax )
 
@@ -173,7 +173,7 @@ lavmodel <- "
    F1 ~~ 1*F1
    F2 ~~ 1*F2
     "   
-lav3 <- lavaanify.IRT( lavmodel , data=dat)
+lav3 <- TAM::lavaanify.IRT( lavmodel , data=dat)
 lav3$lavpartable
 cat( lav3$lavaan.syntax )
 
@@ -203,7 +203,7 @@ lavmodel <- "
     "   
     
 #*** process lavaan syntax    
-lav3 <- lavaanify.IRT( lavmodel , items=items)
+lav3 <- TAM::lavaanify.IRT( lavmodel , items=items)
 
 #*** inspect results
 lav3$lavpartable
@@ -229,7 +229,7 @@ lavmodel <- "
    O ~~ 1*O
    "
 # process lavaan syntax   
-res <- lavaanify.IRT( lavmodel , data = dat )
+res <- TAM::lavaanify.IRT( lavmodel , data = dat )
 # estimate lavaan model 
 mod1 <- lavaan::lavaan( model= res$lavaan.syntax , data=dat)
 summary(mod1 , standardized=TRUE , fit.measures = TRUE , rsquare=TRUE )
@@ -256,7 +256,7 @@ lavmodel <- "
   F ~~ 0*B
   A ~~ 0*B
    "
-res <- lavaanify.IRT( lavmodel , items = paste("I",1:6) )   
+res <- TAM::lavaanify.IRT( lavmodel , items = paste("I",1:6) )   
 cat(res$lavaan.syntax)
 
 #############################################################################
@@ -275,7 +275,7 @@ lavmodel <- "
 # observed items
 items <- c("y","x","z")
 # lavaanify
-res <- lavaanify.IRT( lavmodel , items )
+res <- TAM::lavaanify.IRT( lavmodel , items )
 cat(res$lavaan.syntax)
   ##   > cat(res$lavaan.syntax)
   ##   ytrue~xtrue

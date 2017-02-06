@@ -1,8 +1,8 @@
 Package: TAM
 Type: Package
 Title: Test Analysis Modules
-Version: 1.99992-0
-Date: 2017-01-23
+Version: 1.99993-0
+Date: 2017-02-06 10:44:51
 Author: 
     Thomas Kiefer [aut], Alexander Robitzsch [aut, cre], Margaret Wu [aut]
 Maintainer: Alexander Robitzsch <robitzsch@ipn.uni-kiel.de>
@@ -25,6 +25,6 @@ LinkingTo: Rcpp, RcppArmadillo
 License: GPL (>= 2)
 URL: http://www.edmeasurementsurveys.com/TAM/Tutorials/
 NeedsCompilation: yes
-Packaged: 2017-01-23 09:56:31 UTC; sunpn563
+Packaged: 2017-02-06 09:45:19 UTC; sunpn563
 Repository: CRAN
-Date/Publication: 2017-01-23 13:49:49
+Date/Publication: 2017-02-06 11:13:57

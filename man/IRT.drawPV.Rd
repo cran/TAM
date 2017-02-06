@@ -64,7 +64,7 @@ dat <- data.read
 # fit Rasch model
 mod <- rasch.mml2(dat)
 # draw 10 plausible values
-pv1 <- IRT.drawPV(mod, NPV=10)
+pv1 <- TAM::IRT.drawPV(mod, NPV=10)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

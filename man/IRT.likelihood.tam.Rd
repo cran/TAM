@@ -88,7 +88,7 @@ See \code{\link[CDM:IRT.likelihood]{CDM::IRT.likelihood}}.
 	
 data(data.sim.rasch)
 # 1PL estimation
-mod1 <- tam.mml(resp=data.sim.rasch)
+mod1 <- TAM::tam.mml(resp=data.sim.rasch)
 lmod1 <- IRT.likelihood(mod1)
 str(lmod1)
 pmod1 <- IRT.posterior(mod1)

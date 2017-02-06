@@ -110,9 +110,9 @@ in the \pkg{sirt} package (see Example 1 and Example 2).
 
 data(data.sim.rasch)
 # estimate Rasch model
-mod1 <- tam.mml(resp=data.sim.rasch) 
+mod1 <- TAM::tam.mml(resp=data.sim.rasch) 
 # item fit
-fit1 <- tam.fit( mod1 )
+fit1 <- TAM::tam.fit( mod1 )
 summary(fit1)
   ##   > summary(fit1)
   ##      parameter Outfit Outfit_t Outfit_p Infit Infit_t Infit_p
@@ -126,7 +126,7 @@ summary(fit1)
 library(sirt)
 
 # estimate WLE
-wle <- tam.wle(mod1)
+wle <- TAM::tam.wle(mod1)
 # extract item parameters
 b1 <- - mod1$AXsi[ , -1 ]
 # assess item fit and person fit
@@ -143,10 +143,10 @@ data( data.gpcm )
 dat <- data.gpcm
 
 # estimate partial credit model in ConQuest parametrization 'item+item*step'
-mod2 <- tam.mml( resp=dat , irtmodel="PCM2" )
+mod2 <- TAM::tam.mml( resp=dat , irtmodel="PCM2" )
 summary(mod2)
 # estimate item fit
-fit2 <- tam.fit(mod2)
+fit2 <- TAM::tam.fit(mod2)
 summary(fit2)
 
 #  => The first three rows of the data frame correspond to the fit statistics
@@ -155,7 +155,7 @@ summary(fit2)
 #--------
 # infit and oufit based on estimated WLEs
 # compute WLEs
-wle <- tam.wle(mod2)
+wle <- TAM::tam.wle(mod2)
 # extract item parameters
 b1 <- - mod2$AXsi[ , -1 ]
 # assess fit
@@ -188,7 +188,7 @@ for (item in c(10, 20, 30)){
 }
   
 #run TAM
-mod1 <- tam.mml(resp)
+mod1 <- TAM::tam.mml(resp)
   
 #User-defined fit design matrix
 F <- array(0, dim=c(dim(mod1$A)[1], dim(mod1$A)[2], 6))
@@ -198,7 +198,7 @@ F[,,3] <- mod1$A[,,20] + mod1$A[,,21]
 F[,,4] <- mod1$A[,,22] + mod1$A[,,23]
 F[,,5] <- mod1$A[,,30] + mod1$A[,,31]
 F[,,6] <- mod1$A[,,32] + mod1$A[,,33]
-fit <- tam.fit(mod1, FitMatrix=F)
+fit <- TAM::tam.fit(mod1, FitMatrix=F)
 summary(fit)
 
 #############################################################################
@@ -217,9 +217,9 @@ a[c(1,3)] <- c(.5 , 1.5 )
 # simulate data
 dat <- sirt::sim.raschtype( rnorm(N) , b=b , fixed.a=a )
 #*** estimate Rasch model
-mod1 <- tam.mml(resp=dat) 
+mod1 <- TAM::tam.mml(resp=dat) 
 #*** assess item fit by infit and outfit statistic
-fit1 <- tam.fit( mod1 )$itemfit
+fit1 <- TAM::tam.fit( mod1 )$itemfit
 round( cbind( "b"=mod1$item$AXsi_.Cat1 , fit1$itemfit[,-1] )[1:7,], 3 )  
 
 #*** compute item fit statistic in mirt package

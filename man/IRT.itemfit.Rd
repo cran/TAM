@@ -91,11 +91,11 @@ data(data.read,package="sirt")
 dat <- data.read
 
 #*** fit 1PL model
-mod1 <- tam.mml( dat )
+mod1 <- TAM::tam.mml( dat )
 summary(mod1)
 
 #*** fit 2PL model
-mod2 <- tam.mml.2pl( dat )
+mod2 <- TAM::tam.mml.2pl( dat )
 summary(mod2)
 
 #*** assess RMSEA item fit
@@ -120,7 +120,7 @@ a[c(3,8)] <- c( 1.7 , .4 )
 dat <- sirt::sim.raschtype( theta=rnorm(N) , b = b , fixed.a = a)
 
 # fit 1PL model
-mod <- tam.mml( dat )
+mod <- TAM::tam.mml( dat )
 
 # RMSEA item fit
 fmod <- IRT.itemfit(mod)

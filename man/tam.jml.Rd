@@ -190,17 +190,17 @@ maximum likelihood estimation see \code{\link{tam.mml}}.
 data(data.sim.rasch)
 resp <- data.sim.rasch[1:700 , seq( 1 , 40 , len=10)  ]  # subsample
 # estimate the Rasch model with JML (function 'tam.jml')
-mod1a <- tam.jml(resp=resp) 
+mod1a <- TAM::tam.jml(resp=resp) 
 summary(mod1a)
-itemfit <- tam.fit(mod1a)$fit.item
+itemfit <- TAM::tam.fit(mod1a)$fit.item
 
 # the same model but using function 'tam.jml2'
-mod1b <- tam.jml2(resp=resp)
+mod1b <- TAM::tam.jml2(resp=resp)
 summary(mod1b)
-itemfit <- tam.fit(mod1b)$fit.item
+itemfit <- TAM::tam.fit(mod1b)$fit.item
 
 # compare results with Rasch model estimated by MML
-mod1c <- tam.mml(resp=resp )
+mod1c <- TAM::tam.mml(resp=resp )
 # plot estimated parameters
 plot( mod1b$xsi , mod1c$xsi$xsi , pch=16 ,
     xlab= expression( paste( xi[i] , " (JML)" )) ,
@@ -209,7 +209,7 @@ plot( mod1b$xsi , mod1c$xsi$xsi , pch=16 ,
 lines( c(-5,5) , c(-5,5) , col="gray" )
 
 # Now, the adjustment pf .05 instead of the default .3 is used.
-mod1d <- tam.jml2(resp=resp , adj=.05)
+mod1d <- TAM::tam.jml2(resp=resp , adj=.05)
 # compare item parameters
 round( rbind( mod1b$xsi , mod1d$xsi ) , 3 )
   ##          [,1]   [,2]   [,3]   [,4]   [,5]  [,6]  [,7]  [,8]  [,9] [,10]
@@ -228,16 +228,16 @@ round( pers1[ c(698, 683, 608) , ] ,3  )
 \dontrun{
 #*** Models in which some item parameters are fixed
 xsi.fixed <- cbind( c(1,3,9,10) , c(-2 , -1.2 , 1.6 , 2 ) )
-mod1e <- tam.jml2( resp=resp , xsi.fixed = xsi.fixed )
+mod1e <- TAM::tam.jml2( resp=resp , xsi.fixed = xsi.fixed )
 summary(mod1e)
 # the same fixing in tam.jml
-mod1f <- tam.jml( resp=resp , xsi.fixed = xsi.fixed )
+mod1f <- TAM::tam.jml( resp=resp , xsi.fixed = xsi.fixed )
 summary(mod1f)
 
 #*** Model in which also some person parameters theta are fixed
 # fix theta parameters of persons 2, 3, 4 and 33 to values -2.9, ...
 theta.fixed <- cbind( c(2,3,4,33) , c( -2.9 , 4 , -2.9 , -2.9 ) )
-mod1g <- tam.jml( resp=resp , xsi.fixed = xsi.fixed , theta.fixed=theta.fixed )
+mod1g <- TAM::tam.jml( resp=resp , xsi.fixed = xsi.fixed , theta.fixed=theta.fixed )
 # look at estimated results
 ind.person <- c( 1:5 , 30:33 )
 cbind( mod1g$WLE , mod1g$errorWLE )[ind.person,]
@@ -248,7 +248,7 @@ cbind( mod1g$WLE , mod1g$errorWLE )[ind.person,]
 
 data(data.gpcm)
 # the same model but using function 'tam.jml2'
-mod2 <- tam.jml2(resp=data.gpcm)
+mod2 <- TAM::tam.jml2(resp=data.gpcm)
 mod2$xsi     # extract item parameters
 summary(mod2)
 tam.fit(mod2)	# item and person infit/outfit statistic
@@ -275,15 +275,15 @@ formulaA <- ~ item * rater      # formula
 
 # use MML function only to restructure data and input obtained design matrices
 # and processed response data to tam.jml (-> therefore use only 2 iterations) 
-mod3a <- tam.mml.mfr( resp=resp , facets=facets , formulaA = formulaA , 
+mod3a <- TAM::tam.mml.mfr( resp=resp , facets=facets , formulaA = formulaA , 
              pid=dat$pid ,  control=list(maxiter=2) )
 
 # use modified response data mod3a$resp and design matrix mod3a$A
 resp1 <- mod3a$resp
 # JML with 'tam.jml'
-mod3b <- tam.jml( resp=resp1 , A=mod3a$A , control=list(maxiter=200) )
+mod3b <- TAM::tam.jml( resp=resp1 , A=mod3a$A , control=list(maxiter=200) )
 # 'tam.jml2'
-mod3c <- tam.jml2( resp=resp1 , A=mod3a$A , control=list(maxiter=200) )	
+mod3c <- TAM::tam.jml2( resp=resp1 , A=mod3a$A , control=list(maxiter=200) )	
 
 #############################################################################
 # EXAMPLE 4: Multi faceted model with some anchored item and person parameters
@@ -294,7 +294,7 @@ resp <- data.exJ03$resp
 X <- data.exJ03$X
 
 #*** (0) preprocess data with tam.mml.facets
-mod0 <- tam.mml.mfr( resp=resp , facets = X , pid = X$rater , 
+mod0 <- TAM::tam.mml.mfr( resp=resp , facets = X , pid = X$rater , 
                 formulaA = ~ leader + item + step ,
                 control=list(maxiter=2) )
 summary(mod0)
@@ -305,7 +305,7 @@ summary(mod0)
 resp1 <- mod0$resp
 A1 <- mod0$A
 # estimate model with tam.jml
-mod1 <- tam.jml( resp=resp1 , A=A1 , control=list( Msteps=4 , maxiter=100 ) )
+mod1 <- TAM::tam.jml( resp=resp1 , A=A1 , control=list( Msteps=4 , maxiter=100 ) )
 summary(mod1)
 
 #*** (2) fix some parameters (persons and items)
@@ -320,7 +320,7 @@ xsi.index <- rbind( xsi.index1 , xsi.index2 )
 # fix some theta parameters of persons 1, 15 and 20
 theta.fixed <- cbind(  c(1,15,20) , c(0.4 , 1 , 0 ) )
 # estimate model
-mod2 <- tam.jml( resp=resp1 , A=A1 , xsi.fixed=xsi.fixed , theta.fixed=theta.fixed , 
+mod2 <- TAM::tam.jml( resp=resp1 , A=A1 , xsi.fixed=xsi.fixed , theta.fixed=theta.fixed , 
             control=list( Msteps=4 , maxiter=100 ) )                                
 summary(mod2)
 cbind( mod2$WLE , mod2$errorWLE )

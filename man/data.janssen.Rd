@@ -82,7 +82,7 @@ LAVAAN MODEL:
   # missing item numbers (e.g. PIS2) are ignored in the model
   F =~ PIS1__PIS5 + SCR6__SCR17
     "    
-mod3 <- tamaan( tammodel , resp=dat  )
+mod3 <- TAM::tamaan( tammodel , resp=dat  )
 summary(mod3)
 
 # extract item response functions
@@ -103,7 +103,7 @@ ANALYSIS:
 LAVAAN MODEL:
   F =~ PIS1__PIS5 + SCR6__SCR17
     "    
-mod3 <- tamaan( tammodel , resp=dat  )
+mod3 <- TAM::tamaan( tammodel , resp=dat  )
 summary(mod3)
 
 # extract item response functions

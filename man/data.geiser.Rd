@@ -66,7 +66,7 @@ tammodel <- "
   ITEM TYPE:
     ALL(Rasch)
     "
-mod1 <- tamaan( tammodel , dat)    
+mod1 <- TAM::tamaan( tammodel , dat)    
 summary(mod1)
 
 #**********************************************
@@ -76,7 +76,7 @@ tammodel <- "
     F =~ mrt1__mrt12
     F ~~ 1*F
     "
-mod2 <- tamaan( tammodel , dat)    
+mod2 <- TAM::tamaan( tammodel , dat)    
 summary(mod2)
 
 # model comparison Rasch vs. 2PL
@@ -93,7 +93,7 @@ ANALYSIS:
 LAVAAN MODEL:
   F =~ mrt1__mrt12
     "    
-mod3 <- tamaan( tammodel , resp=dat  )
+mod3 <- TAM::tamaan( tammodel , resp=dat  )
 summary(mod3)
 
 # extract item response functions
@@ -113,7 +113,7 @@ ANALYSIS:
 LAVAAN MODEL:
   F =~ mrt1__mrt12
     "    
-mod4 <- tamaan( tammodel , resp=dat )
+mod4 <- TAM::tamaan( tammodel , resp=dat )
 summary(mod4)
 
 # compare different models
@@ -138,7 +138,7 @@ LAVAAN MODEL:
 ITEM TYPE:
   ALL(Rasch);
     "    
-mod1 <- tamaan( tammodel , resp=dat  )
+mod1 <- TAM::tamaan( tammodel , resp=dat  )
 summary(mod1)
 
 #*********************************************************************
@@ -154,7 +154,7 @@ LAVAAN MODEL:
 ITEM TYPE:
   ALL(Rasch);
     "    
-mod2 <- tamaan( tammodel , resp=dat  )
+mod2 <- TAM::tamaan( tammodel , resp=dat  )
 summary(mod2)
 
 # plot item parameters
@@ -177,7 +177,7 @@ LAVAAN MODEL:
 ITEM TYPE:
   ALL(Rasch);
     "    
-mod3 <- tamaan( tammodel , resp=dat  )
+mod3 <- TAM::tamaan( tammodel , resp=dat  )
 summary(mod3)
 
 # plot item parameters

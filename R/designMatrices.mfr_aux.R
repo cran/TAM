@@ -182,14 +182,13 @@
 	# rows
 	if (vers){
 		rM0 <- rM
-		#*** change suggested by Barth Riley
-		itemren2 <- paste0(itemren[,1] , "-")
+		itemren2 <- paste0(itemren[,2] , "-")
 		nc2 <- nchar(itemren2)
 		N1 <- min(nc2)
 		N2 <- max(nc2)
 		for (nn in N1:N2){
 			i1 <- match( substring( rM0 , 1 , nn ) , itemren2 )
-			h1 <- paste0( itemren[ i1 ,2] , "-"  , substring( rM0 , nn+1 , nchar(rM0) ) )
+			h1 <- paste0( itemren[ i1 ,1] , "-"  , substring( rM0 , nn+1 , nchar(rM0) ) )
 			i2 <- ! is.na(i1)
 			rM0[ i2 ] <- h1[ i2]
 						  }
@@ -243,13 +242,13 @@ v0 <- Sys.time()
 	ind <- match(  cM , itemren[,2])
 	ind <- na.omit(ind)
 	cM0[ ind ] <- paste(itemren[,1])
-	itemren2 <- paste0(itemren[,1] , ":")
+	itemren2 <- paste0(itemren[,2] , ":")
 	nc2 <- nchar(itemren2)
 	N1 <- min(nc2)
 	N2 <- max(nc2)
 	for (nn in N1:N2){
 		i1 <- match( substring( cM0 , 1 , nn ) , itemren2 )
-		h1 <- paste0( itemren[ i1 ,2] , ":"  , substring( cM0 , nn+1 , nchar(cM0) ) )
+		h1 <- paste0( itemren[ i1 ,1] , ":"  , substring( cM0 , nn+1 , nchar(cM0) ) )
 		i2 <- ! is.na(i1)
 		cM0[ i2 ] <- h1[ i2]
 					  }

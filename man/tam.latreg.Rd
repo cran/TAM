@@ -155,14 +155,14 @@ mod <- sirt::rasch.copula2( dat[,items] , itemcluster=itemcluster , mmliter=5)
 like1 <- IRT.likelihood( mod )
 # fit latent regression model in TAM
 Y <- dat[ , c("migra" , "hisei", "female") ]
-mod2 <- tam.latreg( like1 , theta=attr(like1, "theta") , Y = Y , pid=dat$idstud )
+mod2 <- TAM::tam.latreg( like1 , theta=attr(like1, "theta") , Y = Y , pid=dat$idstud )
 summary(mod2)
 # plausible value imputation
-pv2 <- tam.pv( mod2 ) 
+pv2 <- TAM::tam.pv( mod2 ) 
 # create list of imputed datasets
 Y <- dat[ , c("idstud" , "idschool" , "female" , "hisei" , "migra") ]
 pvnames <- c("PVREAD")
-datlist <- tampv2datalist( pv2, pvnames = pvnames , Y=Y , Y.pid="idstud")
+datlist <- TAM::tampv2datalist( pv2, pvnames = pvnames , Y=Y , Y.pid="idstud")
 
 \dontrun{
 #--- fit some models
@@ -202,14 +202,14 @@ like <- IRT.likelihood(mod)
 str(like)
 
 # fit latent regression model in TAM
-mod2 <- tam.latreg( like , Y = X , pid=dat$idstud )
+mod2 <- TAM::tam.latreg( like , Y = X , pid=dat$idstud )
 summary(mod2)
 # plausible value imputation
-pv2 <- tam.pv( mod2 , samp.regr=TRUE , nplausible=5 ) 
+pv2 <- TAM::tam.pv( mod2 , samp.regr=TRUE , nplausible=5 ) 
 # create list of imputed datasets
 X <- dat[ , c("idstud" , "idschool" , "female" , "hisei" , "migra") ]
 pvnames <- c("PVREAD")
-datlist <- tampv2datalist( pv2, pvnames = pvnames , Y=X , Y.pid="idstud")
+datlist <- TAM::tampv2datalist( pv2, pvnames = pvnames , Y=X , Y.pid="idstud")
 str(datlist)
 
 # regression using semTools package
@@ -244,23 +244,23 @@ lavmodel <- "
    SC ~~ MJ
         "        
 # process lavaan syntax
-res <- lavaanify.IRT( lavmodel , dat )        
+res <- TAM::lavaanify.IRT( lavmodel , dat )        
 # fit lavaan CFA model                        
 mod1 <- lavaan::cfa( res$lavaan.syntax , dat , std.lv=TRUE)
 summary(mod1 , standardized=TRUE , fit.measures=TRUE )
 # extract likelihood
-like1 <- IRTLikelihood.cfa( dat , mod1 )
+like1 <- TAM::IRTLikelihood.cfa( dat , mod1 )
 str(like1)
 # fit latent regression model in TAM
 X <- dat[ , c("urban","female") ]
-mod2 <- tam.latreg( like1 , Y = X  )
+mod2 <- TAM::tam.latreg( like1 , Y = X  )
 summary(mod2)
 # plausible value imputation
-pv2 <- tam.pv( mod2 , samp.regr=TRUE , normal.approx=TRUE ) 
+pv2 <- TAM::tam.pv( mod2 , samp.regr=TRUE , normal.approx=TRUE ) 
 # create list of imputed datasets
 Y <- dat[ , c("urban" , "female" ) ]
 pvnames <- c("PVSC" , "PVMJ")
-datlist <- tampv2datalist( pv2, pvnames = pvnames , Y=Y )
+datlist <- TAM::tampv2datalist( pv2, pvnames = pvnames , Y=Y )
 str(datlist)
 }
 }

@@ -4,7 +4,7 @@ plot.IRT.informationCurves <- function(x , curve_type="test" , ... ){
 
 	theta <- x$theta[,1]
 	args <- list(...)
-	xlim <- base::range(theta)
+	xlim <- range(theta)
 	#************************************
     # collect arguments for plot
 	if ( sum( names(args) == c("xlim") ) == 1 ){

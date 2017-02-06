@@ -218,7 +218,7 @@ ITEM TYPE:
   B1__C4 (Rasch) ;
     "
 # process model    
-out <- tamaanify( tammodel , resp=dat)
+out <- TAM::tamaanify( tammodel , resp=dat)
 # inspect some output
 out$method          # used TAM function
 out$lavpartable     # lavaan parameter table
@@ -234,7 +234,7 @@ LAVAAN MODEL:
   F =~ A1__C4
     "
 # process syntax    
-out <- tamaanify( tammodel , resp=dat)
+out <- TAM::tamaanify( tammodel , resp=dat)
 str(out$E)     # E design matrix for estimation with tam.mml.3pl function
 
 \dontrun{
@@ -267,7 +267,7 @@ MODEL CONSTRAINT:
   lam9 == lam0
     "
 # parse syntax    
-mod1 <- tamaanify( tammodel , resp=dat)
+mod1 <- TAM::tamaanify( tammodel , resp=dat)
 mod1$A          # design matrix A for intercepts
 mod1$L[,1,]     # design matrix L for loadings
 }
@@ -292,7 +292,7 @@ LAVAAN MODEL:
   act1__act3 | t1
   sc2 | t2
     "
-out <- tamaanify( tammodel , resp=dat)
+out <- TAM::tamaanify( tammodel , resp=dat)
 out$A    # design matrix for item intercepts
 out$Q    # loading matrix for items
 
@@ -315,7 +315,7 @@ tammodel <- "
                 + (-0.2)*z1
   "
 # tamaanify model
-res <- tamaanify( tammodel , dat )
+res <- TAM::tamaanify( tammodel , dat )
 res$MODELCONSTRAINT.dfr 
 res$modelconstraint.loading
 }

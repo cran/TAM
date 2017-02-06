@@ -139,7 +139,7 @@ dat <- data.cqc01
 
 #********************************************
 #*** Model 01: Estimate Rasch model
-mod01 <- tam.mml(dat)
+mod01 <- TAM::tam.mml(dat)
 summary(mod01)
 
 #------- ConQuest
@@ -174,9 +174,9 @@ dat <- data.cqc02
 
 #********************************************
 # Model 02a: Partial credit model in ConQuest parametrization 'item+item*step'
-mod02a <- tam.mml( dat , irtmodel="PCM2" )
+mod02a <- TAM::tam.mml( dat , irtmodel="PCM2" )
 summary(mod02a , file = "mod02a") 
-fit02a <- tam.fit(mod02a)
+fit02a <- TAM::tam.fit(mod02a)
 summary(fit02a)
 
 #--- ConQuest
@@ -195,7 +195,7 @@ plot(res02a , item.table="item")
 
 #********************************************
 # Model 02b: Rating scale model
-mod02b <- tam.mml( dat , irtmodel="RSM" )
+mod02b <- TAM::tam.mml( dat , irtmodel="RSM" )
 summary( mod02b )
 
 #############################################################################
@@ -208,7 +208,7 @@ resp <- data.cqc03[ , c("crit1","crit2") ]
 
 #********************************************
 # Model 03a: 'item+step+rater'
-mod03a <- tam.mml.mfr( resp , facets=data.cqc03[,"rater",drop=FALSE] ,
+mod03a <- TAM::tam.mml.mfr( resp , facets=data.cqc03[,"rater",drop=FALSE] ,
             formulaA = ~ item+step+rater , pid = data.cqc03$pid )
 summary( mod03a )
 
@@ -228,7 +228,7 @@ plot(res03a)
 
 #********************************************
 # Model 03b: 'item:step+rater'
-mod03b <- tam.mml.mfr( resp , facets=data.cqc03[,"rater",drop=FALSE] ,
+mod03b <- TAM::tam.mml.mfr( resp , facets=data.cqc03[,"rater",drop=FALSE] ,
             formulaA = ~ item + item:step+rater , pid = data.cqc03$pid )
 summary( mod03b )
 
@@ -255,7 +255,7 @@ for (rr in raters){
   ##   5 10005  NA  NA   1   1  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
   ##   6 10006  NA  NA   1   1  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
 # estimate model 03c
-mod03c <- tam.mml( dat1[,-1] , pid = dat1$pid )
+mod03c <- TAM::tam.mml( dat1[,-1] , pid = dat1$pid )
 summary( mod03c )
 
 #############################################################################
@@ -269,21 +269,21 @@ facets <- data.cqc04[ , c("rater" , "topic") ]
 #********************************************
 # Model 04a: 'item*step+rater+topic'
 formulaA <- ~ item*step + rater + topic
-mod04a <- tam.mml.mfr( resp , facets= facets ,
+mod04a <- TAM::tam.mml.mfr( resp , facets= facets ,
             formulaA = formulaA , pid = data.cqc04$pid )
 summary( mod04a )
 
 #********************************************
 # Model 04b: 'item*step+rater+topic+item*rater+item*topic'
 formulaA <- ~ item*step + rater + topic + item*rater + item*topic
-mod04b <- tam.mml.mfr( resp , facets= facets ,
+mod04b <- TAM::tam.mml.mfr( resp , facets= facets ,
             formulaA = formulaA , pid = data.cqc04$pid )
 summary( mod04b )
 
 #********************************************
 # Model 04c: 'item*step' with fixing rater and topic parameters to zero
 formulaA <- ~ item*step + rater + topic
-mod04c0 <- tam.mml.mfr( resp , facets= facets ,
+mod04c0 <- TAM::tam.mml.mfr( resp , facets= facets ,
             formulaA = formulaA , pid = data.cqc04$pid , control=list(maxiter=4) )
 summary( mod04c0 )
 # fix rater and topic parameter to zero
@@ -300,7 +300,7 @@ xsi.fixed[,2] <- 0
   ##   topicFami   11    0
   ##   topicScho   12    0
   ##   topicSpor   13    0
-mod04c1 <- tam.mml.mfr( resp , facets= facets ,
+mod04c1 <- TAM::tam.mml.mfr( resp , facets= facets ,
              formulaA = formulaA , pid = data.cqc04$pid , xsi.fixed=xsi.fixed )
 summary( mod04c1 )
 
@@ -320,7 +320,7 @@ mod05a <-tam.mml(resp= resp , irtmodel="PCM2" )
 # Model 05b: Partial credit model with latent regressors
 mod05b <-tam.mml(resp= resp , irtmodel="PCM2" ,  Y = data.cqc05[,1:3] )
 # Plausible value imputation
-pvmod05b <- tam.pv( mod05b ) 
+pvmod05b <- TAM::tam.pv( mod05b ) 
 }
 }
 

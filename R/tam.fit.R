@@ -21,13 +21,13 @@ tam.mml.fit <-
     ####################################################
     
 	old_seed <- .Random.seed
-	this_envir <- base::environment()
+	this_envir <- environment()
 	
-	if ( ! base::is.na(seed) ){
-		base::set.seed(seed)  
+	if ( ! is.na(seed) ){
+		set.seed(seed)  
 	}
 	
-	if ( base::is.null(Nsimul) ){
+	if ( is.null(Nsimul) ){
 		nstud <- tamobj$nstud
 		Nsimul <- 5
 		if ( nstud < 3000 ){ Nsimul <- 15 }			
@@ -241,8 +241,8 @@ tam.mml.fit <-
 	res$Outfit_pholm <- stats::p.adjust( res$Outfit_p , method="holm")
 	res$Infit_pholm <- stats::p.adjust( res$Infit_p , method="holm")
 	#--- set seed back to previous values
-	# base::assign(".Random.seed", old_seed, 
-	#			envir = base::parent.env(this_envir) ) 		
+	# assign(".Random.seed", old_seed, 
+	#			envir = parent.env(this_envir) ) 		
 	# assign(".Random.seed", old_seed, envir=globalenv())
 
 	

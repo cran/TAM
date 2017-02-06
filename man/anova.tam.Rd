@@ -92,10 +92,10 @@ information criteria.
 	
 data(data.sim.rasch)
 # 1PL estimation
-mod1 <- tam.mml(resp=data.sim.rasch)
+mod1 <- TAM::tam.mml(resp=data.sim.rasch)
 logLik(mod1)
 # 2PL estimation
-mod2 <- tam.mml.2pl(resp=data.sim.rasch , irtmodel="2PL")
+mod2 <- TAM::tam.mml.2pl(resp=data.sim.rasch , irtmodel="2PL")
 logLik(mod2)
 # Model comparison
 anova( mod1 , mod2 )
@@ -111,9 +111,9 @@ anova( mod1 , mod2 )
 data(data.read,package="sirt")
 
 # 1-dimensional model
-mod1 <- tam.mml.2pl(resp= data.read ) 
+mod1 <- TAM::tam.mml.2pl(resp= data.read ) 
 # 2-dimensional model
-mod2 <- tam.fa(resp= data.read , irtmodel="efa" , nfactors=2 ,
+mod2 <- TAM::tam.fa(resp= data.read , irtmodel="efa" , nfactors=2 ,
              control=list(maxiter=150) ) 
 # Model comparison
 anova( mod1 , mod2 )

@@ -84,7 +84,7 @@ model <- "
  "   
 
 # process string
-out <- doparse(model) 
+out <- TAM::doparse(model) 
 cat(out)
   ##    # items I1,...,I10 load on G
   ##       G =~ lamg1 * I1
@@ -131,7 +131,7 @@ model <- "
  DOEND
  "   
 # process string
-out <- doparse(model) 
+out <- TAM::doparse(model) 
 cat(out)
   ##       G =~ lamg1 * I1
   ##       G =~ lamg2 * I2

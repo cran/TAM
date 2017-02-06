@@ -107,18 +107,18 @@ correlation of an item and a test score (here the WLE).
 
 data(data.mc)
 # estimate Rasch model for scored data.mc data
-mod <- tam.mml( resp=data.mc$scored )
+mod <- TAM::tam.mml( resp=data.mc$scored )
 # estimate WLE
-w1 <- tam.wle( mod )
+w1 <- TAM::tam.wle( mod )
 # estimate plausible values
 set.seed(789)
-p1 <- tam.pv( mod , ntheta=500 , normal.approx=TRUE )$pv
+p1 <- TAM::tam.pv( mod , ntheta=500 , normal.approx=TRUE )$pv
 
 # CTT results for raw data
-stat1 <- tam.ctt( resp=data.mc$raw , wlescore=w1$theta , pvscores=p1[,-1] )
-stat1a <- tam.ctt2( resp=data.mc$raw , wlescore=w1$theta )  # faster
-stat1b <- tam.ctt2( resp=data.mc$raw )  # only frequencies
-stat1c <- tam.ctt3( resp=data.mc$raw , wlescore=w1$theta )  # faster
+stat1 <- TAM::tam.ctt( resp=data.mc$raw , wlescore=w1$theta , pvscores=p1[,-1] )
+stat1a <- TAM::tam.ctt2( resp=data.mc$raw , wlescore=w1$theta )  # faster
+stat1b <- TAM::tam.ctt2( resp=data.mc$raw )  # only frequencies
+stat1c <- TAM::tam.ctt3( resp=data.mc$raw , wlescore=w1$theta )  # faster
 
 # plot empirical item response curves
 plotctt( resp=data.mc$raw , theta = w1$theta , Ncuts =5 , ask=TRUE)
@@ -131,13 +131,13 @@ plotctt( resp=data.mc$raw , theta = w1$theta , Ncuts =5 , ask=TRUE ,
         package="graphics" , col.list = col.list )      
 
 # CTT results for scored data
-stat2 <- tam.ctt( resp=data.mc$scored , wlescore=w1$theta , pvscores=p1[,-1] )
+stat2 <- TAM::tam.ctt( resp=data.mc$scored , wlescore=w1$theta , pvscores=p1[,-1] )
 
 # descriptive statistics for different groups
 # define group identifier
 group <- c( rep(1,70) , rep(2,73) )
-stat3 <- tam.ctt( resp=data.mc$raw , wlescore=w1$theta , pvscores=p1[,-1] , group=group)
-stat3a <- tam.ctt2( resp=data.mc$raw , wlescore=w1$theta ,  group=group)
+stat3 <- TAM::tam.ctt( resp=data.mc$raw , wlescore=w1$theta , pvscores=p1[,-1] , group=group)
+stat3a <- TAM::tam.ctt2( resp=data.mc$raw , wlescore=w1$theta ,  group=group)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

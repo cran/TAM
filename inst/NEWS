@@ -39,6 +39,28 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
+-------------------------------------------------------------
+CHANGES IN VERSION 1.99993 (2017-02-06)  --  CRAN 1.99993-0
+-------------------------------------------------------------
+
+FEATURES:
+* ---
+ 
+BUG FIXES:
+* changed handling of item names in 'tam.mml.mfr' back to
+  TAM 1.995-0 version (problem communicated by Barth Riley)
+* fixed a bug in 'tam.mml.2pl' for irtmodel='GPCM.design' with
+  provided design matrices for item slopes
+  (thanks to Matthias Trendtel) 
+
+NOTES:
+* ---
+
+DATASETS INCLUDED OR MODIFIED:
+* ---
+
+EXAMPLES INCLUDED OR MODIFIED:
+* ---
 
 
 -------------------------------------------------------------

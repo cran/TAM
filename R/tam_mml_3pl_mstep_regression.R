@@ -89,7 +89,7 @@ tam_mml_3pl_mstep_regression <- function( resp , hwt ,  resp.ind ,
 	
 	#---- user function variance
 	if ( ! is.null( userfct.variance ) ){  
-		variance <- base::do.call( userfct.variance , base::list(variance=variance) )			
+		variance <- do.call( userfct.variance , list(variance=variance) )			
 	}		
 
 	#--- variance acceleration
@@ -103,7 +103,7 @@ tam_mml_3pl_mstep_regression <- function( resp , hwt ,  resp.ind ,
 
 	
 	#---- output
-    res <- base::list( "beta" = beta , "variance" = variance , "itemwt" = itemwt )
-	base::return(res)
+    res <- list( "beta" = beta , "variance" = variance , "itemwt" = itemwt )
+	return(res)
 }
 ############################################################################

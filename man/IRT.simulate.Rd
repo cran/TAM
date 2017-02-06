@@ -68,32 +68,32 @@ Data frame with simulated item responses
 data(data.sim.rasch)
 
 #** (1) estimate model
-mod1 <- tam.mml(resp = data.sim.rasch ) 
+mod1 <- TAM::tam.mml(resp = data.sim.rasch ) 
 
 #** (2) simulate data
-sim.dat <- IRT.simulate(mod1)
+sim.dat <- TAM::IRT.simulate(mod1)
 
 \dontrun{
 #** (3) use a subset of items with the argument iIndex
 set.seed(976)
 iIndex <- sort(sample(ncol(data.sim.rasch), 15))  # randomly select 15 items
-sim.dat <- IRT.simulate(mod1, iIndex = iIndex)
-mod.sim.dat <- tam.mml(sim.dat)
+sim.dat <- TAM::IRT.simulate(mod1, iIndex = iIndex)
+mod.sim.dat <- TAM::tam.mml(sim.dat)
 
 #** (4) specify number of persons in addition
-sim.dat <- IRT.simulate(mod1, nobs = 1500, iIndex = iIndex)
+sim.dat <- TAM::IRT.simulate(mod1, nobs = 1500, iIndex = iIndex)
 
 # Rasch - constraint = "items" ----
-mod1 <- tam.mml(resp = data.sim.rasch,  constraint = "items" , 
+mod1 <- TAM::tam.mml(resp = data.sim.rasch,  constraint = "items" , 
                 control=list( xsi.start0=1 , fac.oldxsi=.5) ) 
 
 # provide abilities
 theta0 <- matrix( rnorm(1500, mean=0.5, sd= sqrt(mod1$variance)) , ncol=1 )
 # simulate data
-data <- IRT.simulate(mod1, theta = theta0 )
+data <- TAM::IRT.simulate(mod1, theta = theta0 )
 # estimate model based on simulated data
 xsi.fixed <- cbind(1:nrow(mod1$item), mod1$item$xsi.item)
-mod2 <- tam.mml(data , xsi.fixed=xsi.fixed )
+mod2 <- TAM::tam.mml(data , xsi.fixed=xsi.fixed )
 summary(mod2)
 
 #############################################################################
@@ -102,10 +102,10 @@ summary(mod2)
 
 data(data.sim.rasch)
 # estimate 2PL
-mod2 <- tam.mml.2pl(resp = data.sim.rasch, irtmodel = "2PL")
+mod2 <- TAM::tam.mml.2pl(resp = data.sim.rasch, irtmodel = "2PL")
 # simulate 2PL
-sim.dat <- IRT.simulate(mod2)
-mod.sim.dat <- tam.mml.2pl(resp = sim.dat, irtmodel = "2PL") 
+sim.dat <- TAM::IRT.simulate(mod2)
+mod.sim.dat <- TAM::tam.mml.2pl(resp = sim.dat, irtmodel = "2PL") 
 
 #############################################################################
 # SIMULATED EXAMPLE 3: Simulate multiple group model
@@ -120,14 +120,16 @@ p1 <- stats::plogis( outer( theta , seq( -2 , 2 , len=I ) , "-" ) )
 resp <- 1 * ( p1 > matrix( stats::runif( N*I ) , nrow=N , ncol=I ) )
 colnames(resp) <- paste("I" , 1:I, sep="")
 group <- rep(1:2 , each=N/2 )
-mod3 <- tam.mml(resp, group = group)
+mod3 <- TAM::tam.mml(resp, group = group)
 
 # simulate data
-sim.dat.g1 <- IRT.simulate(mod3, theta = matrix( stats::rnorm(N/2, mean = 0, sd = 1.5) , ncol=1) )
-sim.dat.g2 <- IRT.simulate(mod3, theta = matrix( stats::rnorm(N/2, mean = .5, sd = 1) , ncol=1) )
+sim.dat.g1 <- TAM::IRT.simulate(mod3, 
+                   theta = matrix( stats::rnorm(N/2, mean = 0, sd = 1.5), ncol=1) )
+sim.dat.g2 <- TAM::IRT.simulate(mod3, 
+                   theta = matrix( stats::rnorm(N/2, mean = .5, sd = 1), ncol=1) )
 sim.dat <- rbind( sim.dat.g1 , sim.dat.g2)
 # estimate model
-mod3s <- tam.mml( sim.dat , group = group)
+mod3s <- TAM::tam.mml( sim.dat , group = group)
 
 #############################################################################
 # SIMULATED EXAMPLE 4: Multidimensional model and latent regression
@@ -153,15 +155,15 @@ Q[cbind(1:(2*I), c(rep(1, I), rep(2, I)))] <- 1
 Q
 
 # (3) estimate models 
-mod4 <- tam.mml(resp = resp, Q = Q, Y = Y, control = list(  maxiter = 15))
+mod4 <- TAM::tam.mml(resp = resp, Q = Q, Y = Y, control = list(  maxiter = 15))
 
 # simulate new item responses 
 theta <- mvtnorm::rmvnorm(N, mean = c(0,0), sigma = matrix(c(1,.5,.5,1), 2, 2))
 theta[,1] <- theta[,1] + .4 * Y[,1] + .2 * Y[,2]  # latent regression model
 theta[,2] <- theta[,2] + .8 * Y[,1] + .5 * Y[,2]  # latent regression model
   
-sim.dat <- IRT.simulate(mod4, theta = theta)
-mod.sim.dat <- tam.mml(resp = sim.dat, Q = Q, Y = Y, control = list( maxiter = 15))
+sim.dat <- TAM::IRT.simulate(mod4, theta = theta)
+mod.sim.dat <- TAM::tam.mml(resp = sim.dat, Q = Q, Y = Y, control = list( maxiter = 15))
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

@@ -100,11 +100,11 @@ data(data.read , package="sirt")
 dat <- data.read
 
 # fit 2PL model
-mod1 <- tam.mml.2pl( dat ) 
+mod1 <- TAM::tam.mml.2pl( dat ) 
 summary(mod1)
 
 # compute information curves at grid seq(-5,5,length=100)
-imod1 <- IRT.informationCurves( mod1 , theta= seq(-5,5,len=100)  )
+imod1 <- TAM::IRT.informationCurves( mod1 , theta= seq(-5,5,len=100)  )
 str(imod1)
 # plot test information
 plot( imod1 )
@@ -124,15 +124,15 @@ items <- grep( "M0" , colnames(dat) , value=TRUE )
 resp <- dat[, items ]
 
 #*** Model 1: Partial credit model
-mod1 <- tam.mml( resp )
+mod1 <- TAM::tam.mml( resp )
 summary(mod1)
 # information curves
-imod1 <- IRT.informationCurves( mod1 , theta= seq(-3,3,len=20)  )
+imod1 <- TAM::IRT.informationCurves( mod1 , theta= seq(-3,3,len=20)  )
 
 #*** Model 2: Generalized partial credit model
-mod2 <- tam.mml.2pl( resp , irtmodel="GPCM")
+mod2 <- TAM::tam.mml.2pl( resp , irtmodel="GPCM")
 summary(mod2)
-imod2 <- IRT.informationCurves( mod2 )
+imod2 <- TAM::IRT.informationCurves( mod2 )
 
 #*** Model 3: Mixed 3PL and generalized partial credit model
 psych::describe(resp)
@@ -147,14 +147,14 @@ guess.prior[ est.guess  > 0 , 1] <- 5
 guess.prior[ est.guess  > 0 , 2] <- 17
 
 # fit model
-mod3 <- tam.mml.3pl( resp , gammaslope.des = "2PL" , est.guess=est.guess , guess=guess ,
+mod3 <- TAM::tam.mml.3pl( resp , gammaslope.des = "2PL" , est.guess=est.guess , guess=guess ,
            guess.prior = guess.prior ,  
            control=list( maxiter=100 , Msteps=10 , fac.oldxsi=0.1 ,
                         nodes = seq(-8,8,len=41) ) ,  est.variance=FALSE )
 summary(mod3)
 
 # information curves
-imod3 <- IRT.informationCurves( mod3 )
+imod3 <- TAM::IRT.informationCurves( mod3 )
 imod3
 
 #*** estimate model in mirt package

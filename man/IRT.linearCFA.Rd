@@ -93,11 +93,11 @@ Q <- matrix( 0 , nrow=8 , ncol=2 )
 Q[1:4,1] <- Q[5:8,2] <- 1
 
 #*** Model 1: Two-dimensional 2PL model
-mod1 <- tam.mml.2pl( dat , Q=Q  , control=list( nodes=seq(-4,4,len=12) ) )
+mod1 <- TAM::tam.mml.2pl( dat , Q=Q  , control=list( nodes=seq(-4,4,len=12) ) )
 summary(mod1)
 
 # linear approximation CFA
-cfa1 <- IRT.linearCFA(mod1)
+cfa1 <- TAM::IRT.linearCFA(mod1)
 summary(cfa1)
 
 # linear CFA in lavaan package
@@ -121,11 +121,11 @@ vars <- scan(nlines=1 , what="character")
 dat <- data.Students[ , vars]
 
 #*** Model 1: 2PL model
-mod1 <- tam.mml.2pl( dat )
+mod1 <- TAM::tam.mml.2pl( dat )
 summary(mod1)
 
 # linear approximation CFA
-cfa1 <- IRT.linearCFA(mod1)
+cfa1 <- TAM::IRT.linearCFA(mod1)
 summary(cfa1)
 
 # linear CFA

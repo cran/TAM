@@ -143,19 +143,19 @@ See the S3 method \code{\link{IRT.factor.scores.tam}}.
 #############################################################################
 data(data.sim.rasch)
 # estimate Rasch model
-mod1 <- tam.mml(resp=data.sim.rasch) 
+mod1 <- TAM::tam.mml(resp=data.sim.rasch) 
 # WLE estimation
-wle1 <- tam.wle( mod1 )
+wle1 <- TAM::tam.wle( mod1 )
   ## ----
   ## WLE Reliability = 0.894 
 
 # scoring for a different dataset containing same items (first 10 persons in 
 #  sim.rasch)
-wle2 <- tam.wle( mod1 , score.resp=data.sim.rasch[1:10,])
+wle2 <- TAM::tam.wle( mod1 , score.resp=data.sim.rasch[1:10,])
 
 \dontrun{
 # compare results to earlier WLE implementation
-wle3 <- tam.mml.wle( mod1 )
+wle3 <- TAM::tam.mml.wle( mod1 )
 stopifnot( all(wle3==wle1) )
 
 #############################################################################
@@ -180,11 +180,11 @@ resp[3,1:4] <- NA
   ##   63  1  1  0  0  1  0  1  1  1  1  1  1
 
 # estimate 3-dimensional Rasch model
-mod <- tam.mml( resp=resp , Q=Q , control=list(snodes=1000,maxiter=50) )
+mod <- TAM::tam.mml( resp=resp , Q=Q , control=list(snodes=1000,maxiter=50) )
 summary(mod)
 
 # WLE estimates
-wmod <- tam.wle(mod , Msteps=3)
+wmod <- TAM::tam.wle(mod , Msteps=3)
 summary(wmod)
   ##   head(round(wmod,2))
   ##      pid N.items PersonScores.Dim01 PersonScores.Dim02 PersonScores.Dim03
@@ -225,11 +225,11 @@ I <- ncol(dat)
 #*** Model 1: Partial Credit Model
 
 # estimation in TAM
-mod1 <- tam.mml( dat )
+mod1 <- TAM::tam.mml( dat )
 summary(mod1)
 
 #-- WLE estimation in TAM
-tamw1 <- tam.wle( mod1 )
+tamw1 <- TAM::tam.wle( mod1 )
 
 #-- WLE estimation with PP package
 # convert AXsi parameters into thres parameters for PP
@@ -259,11 +259,11 @@ lines( c(-10,10) , c(-10,10) )
 #*** Model 2: Generalized partial Credit Model
 
 # estimation in TAM
-mod2 <- tam.mml.2pl( dat , irtmodel="GPCM" )
+mod2 <- TAM::tam.mml.2pl( dat , irtmodel="GPCM" )
 summary(mod2)
 
 #-- WLE estimation in TAM
-tamw2 <- tam.wle( mod2 )
+tamw2 <- TAM::tam.wle( mod2 )
 
 #-- WLE estimation in PP
 # convert AXsi parameters into thres and slopes parameters for PP

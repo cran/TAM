@@ -81,7 +81,7 @@ See \code{\link[CDM:IRT.factor.scores]{CDM::IRT.factor.scores}}.
 	
 data(data.sim.rasch)
 # 1PL estimation
-mod1 <- tam.mml(resp=data.sim.rasch)
+mod1 <- TAM::tam.mml(resp=data.sim.rasch)
 # EAP
 pmod1 <- IRT.factor.scores( mod1 )
 # WLE

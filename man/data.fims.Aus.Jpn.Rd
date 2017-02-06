@@ -66,7 +66,7 @@ items <- grep("M1" , colnames(data.fims.Aus.Jpn.scored) , value=TRUE)
 ##    [8] "M1PTI14" "M1PTI17" "M1PTI18" "M1PTI19" "M1PTI21" "M1PTI22" "M1PTI23"
 
 # Run partial credit model
-mod1 <- tam.mml(scored[,items])
+mod1 <- TAM::tam.mml(scored[,items])
 
 # extract values of the gender variable into a variable called "gender".
 gender <- scored[,"SEX"]
@@ -88,7 +88,7 @@ stats::aggregate(raw_score,by=list(gender),FUN=mean)
 formulaA <- ~item+gender+item*gender	# define facets analysis
 facets <- as.data.frame(gender)         # data frame with student covariates
 # facets model for studying differential item functioning
-mod2 <- tam.mml.mfr( resp= scored[,items], facets= facets , formulaA = formulaA )
+mod2 <- TAM::tam.mml.mfr( resp= scored[,items], facets= facets , formulaA = formulaA )
 summary(mod2)
 }
 }

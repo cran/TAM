@@ -83,7 +83,7 @@ lavmodel <- "
 mod1 <- lavaan::cfa( lavmodel , data=dat1 , std.lv=TRUE )
 summary(mod1, standardized=TRUE , rsquare=TRUE )
 # extract parameters
-res1 <- cfa.extract.itempars( mod1 )
+res1 <- TAM::cfa.extract.itempars( mod1 )
 
 #*** Model 2: Scale mj - explicit modelling of item intercepts
 lavmodel <- "
@@ -93,7 +93,7 @@ lavmodel <- "
      "
 mod2 <- lavaan::cfa( lavmodel , data=dat1 , std.lv=TRUE )
 summary(mod2, standardized=TRUE , rsquare=TRUE )
-res2 <- cfa.extract.itempars( mod2 )
+res2 <- TAM::cfa.extract.itempars( mod2 )
 
 #*** Model 3: Tau-parallel measurements scale mj
 lavmodel <- "
@@ -106,7 +106,7 @@ lavmodel <- "
      "
 mod3 <- lavaan::cfa( lavmodel , data=dat1 , std.lv=TRUE )
 summary(mod3, standardized=TRUE , rsquare=TRUE )
-res3 <- cfa.extract.itempars( mod3 )
+res3 <- TAM::cfa.extract.itempars( mod3 )
 
 #*** Model 4: Two-dimensional CFA with scales mj and sc
 dat2 <- dat[ , c(paste0("mj",1:4), paste0("sc",1:4)) ] 
@@ -118,11 +118,11 @@ lavmodel <- "
    mj ~~ 1*mj
    sc ~~ 1*sc
      "
-lavmodel <- lavaanify.IRT( lavmodel , data=dat2 )$lavaan.syntax
+lavmodel <- TAM::lavaanify.IRT( lavmodel , data=dat2 )$lavaan.syntax
 cat(lavmodel)
 mod4 <- lavaan::cfa( lavmodel , data=dat2 , std.lv=TRUE )
 summary(mod4, standardized=TRUE , rsquare=TRUE )
-res4 <- cfa.extract.itempars( mod4 )
+res4 <- TAM::cfa.extract.itempars( mod4 )
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

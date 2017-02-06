@@ -10,19 +10,19 @@ plot.tam <- function(x, items=1:x$nitems, type="expected" ,
 #  requireNamespace("plyr")
 time1 <- NULL
 if ( fix.devices ){
-  old.opt.dev <- base::getOption("device")
-  old.opt.err <- c( base::getOption("show.error.messages"))
+  old.opt.dev <- getOption("device")
+  old.opt.err <- c( getOption("show.error.messages"))
   old.par.ask <- graphics::par("ask")
   # remember new pars' values
   old.par.xpd <- graphics::par("xpd")
   old.par.mar <- graphics::par("mar")
   
-  base::on.exit( base::options("device"=old.opt.dev))
-  base::on.exit( base::options("show.error.messages"=old.opt.err), add=TRUE)
-  base::on.exit( graphics::par("ask"=old.par.ask), add=TRUE)
+  on.exit( options("device"=old.opt.dev))
+  on.exit( options("show.error.messages"=old.opt.err), add=TRUE)
+  on.exit( graphics::par("ask"=old.par.ask), add=TRUE)
   # restore new pars' values
-  base::on.exit( graphics::par("xpd"=old.par.xpd), add=TRUE)
-  base::on.exit( graphics::par("mar"=old.par.mar), add=TRUE)
+  on.exit( graphics::par("xpd"=old.par.xpd), add=TRUE)
+  on.exit( graphics::par("mar"=old.par.mar), add=TRUE)
 }  
   
   tamobj <- x

@@ -133,7 +133,7 @@ Mstep_slope.v2 <-
 					se.B[,,dd]  <- outer( sqrt( 1 / abs( deriv.temp )) , mK-1 ) 
 					}
         }  # end GPCM
-        if ( irtmodel == "GPCM.design"){						
+        if ( irtmodel == "GPCM.design"){	  		
           diff.temp <- ( t(E) %*% diff.temp )[,1]
           deriv.temp <- ( t(E^2) %*% deriv.temp )[,1]
           increment.temp <- diff.temp*abs(1/( deriv.temp + 10^(-20) ) )  
@@ -153,19 +153,18 @@ Mstep_slope.v2 <-
 			  if (Biter==1){ se.B[,ll,dd]  <- m1 }	  
 				}
 		#**** Bug fix ARb 2015-12-16
-		nB <- dim(B)	
-		# B_ind <- 1 * ( B_obs != 0 )
+		#**** Change ARb  2017-01-24
+		nB <- dim(B)		
 		B_ind <- 1 * ( B_orig != 0 )
 		for (dd in 1:nB[3]){
 			# dd <- 1
 			EB <- E %*% basispar[,dd] 
 			for (cc in 1:(nB[2]-1)){ 
 			#	cc <- 1
-				B[,cc+1,dd] <- cc * EB * B_ind[,cc,dd]
-								}
-						}
+				B[,cc+1,dd] <- cc * EB * B_ind[,cc+1,dd]
+			}
+		}
 		B00 <- B
-
         } # end GPCM.design																			
         
         #**********

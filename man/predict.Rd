@@ -75,7 +75,7 @@ See \code{\link[CDM:predict]{predict}} (\pkg{CDM}).
 	
 data(data.sim.rasch)
 # 1PL estimation
-mod1 <- tam.mml(resp=data.sim.rasch)
+mod1 <- TAM::tam.mml(resp=data.sim.rasch)
 # predict method
 prmod1 <- IRT.predict(mod1, data.sim.rasch)
 str(prmod1)

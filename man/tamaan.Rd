@@ -115,7 +115,7 @@ ITEM TYPE:
   ALL(Rasch);
     " 
 # estimate model  
-mod1 <- tamaan( tammodel , resp=dat)
+mod1 <- TAM::tamaan( tammodel , resp=dat)
 summary(mod1)
 
 \dontrun{
@@ -127,7 +127,7 @@ LAVAAN MODEL:
   F1 =~ A1__B1 + B3 + C1__C3
   F1 ~~ F1
     "
-mod2 <- tamaan( tammodel , resp=dat)
+mod2 <- TAM::tamaan( tammodel , resp=dat)
 summary(mod2)
 
 #*********************************************************************	
@@ -146,7 +146,7 @@ LAVAAN MODEL:
   G  ~~ 0.3*F2
   G  ~~ 0.7*G
     "
-mod3 <- tamaan( tammodel , resp=dat , control=list(maxiter=30))
+mod3 <- TAM::tamaan( tammodel , resp=dat , control=list(maxiter=30))
 summary(mod3)
 
 #*********************************************************************
@@ -179,7 +179,7 @@ MODEL CONSTRAINT:
   lam8 == lam0
   lam9 == lam0
     "
-mod4 <- tamaan( tammodel , resp=dat , control=list(maxiter=5) )
+mod4 <- TAM::tamaan( tammodel , resp=dat , control=list(maxiter=5) )
 summary(mod4)
 
 #*********************************************************************
@@ -193,7 +193,7 @@ ANALYSIS:
 LAVAAN MODEL:
   F =~ A1__C4
     "    
-mod5 <- tamaan( tammodel , resp=dat , control=list(maxiter=100)  )
+mod5 <- TAM::tamaan( tammodel , resp=dat , control=list(maxiter=100)  )
 summary(mod5)
 
 #*********************************************************************
@@ -207,7 +207,7 @@ ANALYSIS:
 LAVAAN MODEL:
   F =~ A1__C4
     "       
-mod6 <- tamaan( tammodel , dat )  
+mod6 <- TAM::tamaan( tammodel , dat )  
 summary(mod6)
 
 #*********************************************************************
@@ -222,7 +222,7 @@ LAVAAN MODEL:
   F =~ A1__C4
   B2 | 0*t1
     "
-mod7 <- tamaan( tammodel , resp=dat)
+mod7 <- TAM::tamaan( tammodel , resp=dat)
 summary(mod7)
 
 #*********************************************************************
@@ -248,7 +248,7 @@ MODEL PRIOR:
   DOEND
     "
 # estimate model
-mod8 <- tamaan( tammodel , resp=dat )
+mod8 <- TAM::tamaan( tammodel , resp=dat )
 summary(mod8)
 
 #*********************************************************************
@@ -266,7 +266,7 @@ LAVAAN MODEL:
   A2 | .7*t1
     "
 # estimate model    
-mod9 <- tamaan( tammodel , resp=dat , control=list(maxiter=30) )
+mod9 <- TAM::tamaan( tammodel , resp=dat , control=list(maxiter=30) )
 summary(mod9)
 
 #############################################################################
@@ -291,7 +291,7 @@ LAVAAN MODEL:
   FA ~~ FS
     "
 # estimate model    
-mod1 <- tamaan( tammodel , dat , control=list(maxiter=10)  )
+mod1 <- TAM::tamaan( tammodel , dat , control=list(maxiter=10)  )
 summary(mod1)
 
 #*********************************************************************
@@ -309,10 +309,10 @@ LAVAAN MODEL:
   act1 + act3 | a13_t2 * t2
     "
 # only create design matrices with tamaanify
-mod2 <- tamaanify( tammodel , dat  )
+mod2 <- TAM::tamaanify( tammodel , dat  )
 mod2$lavpartable
 # estimate model (only few iterations as a test)
-mod2 <- tamaan( tammodel , dat , control=list(maxiter=10)  )
+mod2 <- TAM::tamaan( tammodel , dat , control=list(maxiter=10)  )
 summary(mod2)
 
 #*********************************************************************
@@ -335,7 +335,7 @@ MODEL CONSTRAINT:
   a5 ==    q2 + q1
     "
 # estimate
-mod3 <- tamaan( tammodel , dat , control=list(maxiter=300 )  )
+mod3 <- TAM::tamaan( tammodel , dat , control=list(maxiter=300 )  )
 summary(mod3)
 
 #*********************************************************************
@@ -350,7 +350,7 @@ LAVAAN MODEL:
   F =~ act1__act5
     "
 # estimate model
-mod4 <- tamaan( tammodel , resp=dat)
+mod4 <- TAM::tamaan( tammodel , resp=dat)
 summary(mod4)
 
 #*********************************************************************
@@ -377,10 +377,10 @@ tammodel <- "
     ALL(PCM)
   "
 # estimate model
-mod5 <- tamaan( tammodel , dat1 )
+mod5 <- TAM::tamaan( tammodel , dat1 )
 summary(mod5)
 # compare with PCM2 parametrization in tam.mml
-mod5b <- tam.mml( dat1 , irtmodel="PCM2" )
+mod5b <- TAM::tam.mml( dat1 , irtmodel="PCM2" )
 summary(mod5b)
 
 #*********************************************************************
@@ -411,10 +411,10 @@ tammodel <- "
     ALL(PCM)
   "
 # estimate model
-mod6 <- tamaan( tammodel , dat1 )
+mod6 <- TAM::tamaan( tammodel , dat1 )
 summary(mod6)
 # compare with RSM in tam.mml
-mod6b <- tam.mml( dat1 , irtmodel="RSM" )
+mod6b <- TAM::tam.mml( dat1 , irtmodel="RSM" )
 summary(mod6b)
 
 #*********************************************************************
@@ -434,7 +434,7 @@ ITEM TYPE:
   mj4(PCM,1)
    " 
 # estimate model
-mod7 <- tamaan( tammodel , dat )
+mod7 <- TAM::tamaan( tammodel , dat )
 summary(mod7)
 # -> This function can also be applied for the generalized partial credit
 #    model (GPCM). 

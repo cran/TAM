@@ -127,7 +127,7 @@ for a general plot method.
 #############################################################################
 
 data(data.sim.rasch)
-mod <- tam.mml(data.sim.rasch)
+mod <- TAM::tam.mml(data.sim.rasch)
 # expected response curves
 plot(mod, items=1:5, export=FALSE)
 # item response curves
@@ -146,7 +146,7 @@ dat[ dat[,1] == 3 , 1 ] <- 2   # modify data
 dat[ 1:20, 2 ] <- 4
 
 # estimate model
-mod1 <- tam.mml( dat )
+mod1 <- TAM::tam.mml( dat )
 # plot item response curves and expected response curves
 plot(mod1, type="items", export=FALSE)
 plot(mod1, type="expected", export=FALSE )

@@ -60,7 +60,7 @@ Martin Hecht, Sebastian Weirich, Alexander Robitzsch
 data(data.sim.rasch)
 
 # 2PL model
-mod1 <- tam.mml.2pl(resp=data.sim.rasch ) 
+mod1 <- TAM::tam.mml.2pl(resp=data.sim.rasch ) 
 # plot deviance change
 plotDevianceTAM( mod1 )
 # plot deviance

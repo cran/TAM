@@ -61,7 +61,7 @@ with fitted models in \pkg{TAM}, see
 data( data.gpcm )
 
 # Model 1: partial credit model
-mod1 <- tam.mml( resp=data.gpcm ,control=list( maxiter=200) )
+mod1 <- TAM::tam.mml( resp=data.gpcm ,control=list( maxiter=200) )
 summary(mod1)
   ##   Item Parameters -A*Xsi
   ##        item   N     M AXsi_.Cat1 AXsi_.Cat2 AXsi_.Cat3 B.Cat1.Dim1 B.Cat2.Dim1 B.Cat3.Dim1
@@ -95,9 +95,9 @@ Q[ seq(1,length(items1) ) , 1 ] <- 1
 Q[ length(items1) + seq(1,length(items2) ) , 2 ] <- 1
 
 # fit two-dimensional model
-mod1 <- tam.mml( dat , Q=Q )
+mod1 <- TAM::tam.mml( dat , Q=Q )
 # compute thresholds (specify a probability level of .625)
-tmod1 <- tam.threshold( mod1  , prob.lvl = .625 )
+tmod1 <- TAM::tam.threshold( mod1  , prob.lvl = .625 )
 
 #############################################################################
 # EXAMPLE 3: Creating Wright maps with the WrightMap package
@@ -110,15 +110,15 @@ data(sim.rasch)
 dat <- sim.rasch
 
 # estimate Rasch model in TAM
-mod1 <- tam.mml(dat)
+mod1 <- TAM::tam.mml(dat)
 summary(mod1)
 
 #--- A: creating a Wright map with WLEs
 
 # compute WLE
-wlemod1 <- tam.wle(mod1)$theta
+wlemod1 <- TAM::tam.wle(mod1)$theta
 # extract thresholds
-tmod1 <- tam.threshold(mod1)
+tmod1 <- TAM::tam.threshold(mod1)
 # create Wright map
 WrightMap::wrightMap( thetas = wlemod1 , thresholds= tmod1 , label.items.srt=-90)
 

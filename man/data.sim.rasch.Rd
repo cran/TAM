@@ -61,37 +61,37 @@ Y <- cbind( stats::rnorm( N , sd = 1.5) , stats::rnorm(N , sd = .3 ) )
 # Loading Matrix
 # B <- array( 0 , dim = c( I , 2 , 1 )  )
 # B[1:(nrow(B)), 2, 1] <- 1
-B <- designMatrices(resp = data.sim.rasch)[["B"]]
+B <- TAM::designMatrices(resp = data.sim.rasch)[["B"]]
   
 # estimate Rasch model
-mod1_1 <- tam.mml(resp=data.sim.rasch , Y=Y)
+mod1_1 <- TAM::tam.mml(resp=data.sim.rasch , Y=Y)
 
 # standard errors
-res1 <- tam.se(mod1_1)
+res1 <- TAM::tam.se(mod1_1)
 
 # Compute fit statistics
 tam.fit(mod1_1)
 
 # plausible value imputation
 # PV imputation has to be adpated for multidimensional case!
-pv1 <- tam.pv( mod1_1 , nplausible = 7 , # 7 plausible values 
+pv1 <- TAM::tam.pv( mod1_1 , nplausible = 7 , # 7 plausible values 
                samp.regr = TRUE       # sampling of regression coefficients
               )
               
 # item parameter constraints
 xsi.fixed <- matrix( c( 1, -2,5, -.22,10, 2 ), nrow=3 , ncol=2 , byrow=TRUE)
 xsi.fixed
-mod1_4 <- tam.mml( resp=data.sim.rasch , xsi.fixed=xsi.fixed )
+mod1_4 <- TAM::tam.mml( resp=data.sim.rasch , xsi.fixed=xsi.fixed )
 
 # missing value handling
 data(data.sim.rasch.missing)
-mod1_2 <- tam.mml(data.sim.rasch.missing , Y = Y)
+mod1_2 <- TAM::tam.mml(data.sim.rasch.missing , Y = Y)
 
 # handling of sample (person) weights
 data(data.sim.rasch.pweights)
 N <- 1000
 pweights <- c(  rep(3,N/2) , rep( 1, N/2 ) )
-mod1_3 <- tam.mml( data.sim.rasch.pweights , control = list(conv = .001) , 
+mod1_3 <- TAM::tam.mml( data.sim.rasch.pweights , control = list(conv = .001) , 
                pweights = pweights )
   }
 }

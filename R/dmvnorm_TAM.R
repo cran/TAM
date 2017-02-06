@@ -3,7 +3,7 @@
 dmvnorm_TAM <- function( x , mean , sigma , log = FALSE ){
 	# copied and slightly extended from the mvtnorm::dmvnorm function
 	mu <- mean
-	dec <- base::chol(sigma)
+	dec <- chol(sigma)
     muM <- mu
 	if (is.vector(x)){
 		x <- matrix( x , nrow=1)
@@ -15,7 +15,7 @@ dmvnorm_TAM <- function( x , mean , sigma , log = FALSE ){
 					}
 	D <- ncol(muM)
 #	tmp <- forwardsolve(dec, t(x - muM), transpose = TRUE)
-    tmp <- base::backsolve(dec, t(x - muM ), transpose = TRUE)
+    tmp <- backsolve(dec, t(x - muM ), transpose = TRUE)
     rss <- colSums(tmp^2)
     logretval <- -sum(log(diag(dec))) - 0.5 * D * log(2 * pi) - 0.5 * rss
 	if (! log){	logretval <- exp(logretval )}

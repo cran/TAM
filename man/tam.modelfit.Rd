@@ -204,9 +204,9 @@ dat <- data.cqc01
 
 #*****************************************************
 #*** Model 1: Rasch model
-mod1 <- tam.mml( dat )
+mod1 <- TAM::tam.mml( dat )
 # assess model fit
-res1 <- tam.modelfit( tamobj = mod1 )
+res1 <- TAM::tam.modelfit( tamobj = mod1 )
 summary(res1)
 # display item pairs with five largest adjusted Q3 statistics
 res1$stat.itempair[1:5,c("item1","item2","aQ3","p","p.holm")]
@@ -218,7 +218,7 @@ summary(fmod1)
 
 #*****************************************************
 #*** Model 2: 2PL model
-mod2 <- tam.mml.2pl( dat )
+mod2 <- TAM::tam.mml.2pl( dat )
 # IRT.modelfit
 fmod2 <- IRT.modelfit(mod2)
 summary(fmod2)
@@ -237,10 +237,10 @@ I <- 20      # number of items
 library(sirt)
 dat <- sirt::sim.raschtype( rnorm(N) , b=seq(-1.5,1.5,len=I) )
 #*** estimation
-mod1 <- tam.mml( dat )
+mod1 <- TAM::tam.mml( dat )
 summary(dat)
 #*** model fit
-res1 <- tam.modelfit( tamobj = mod1)
+res1 <- TAM::tam.modelfit( tamobj = mod1)
 summary(res1)
 
 #############################################################################
@@ -251,11 +251,11 @@ data(data.gpcm)
 dat <- data.gpcm
 
 # estimate partial credit model
-mod1 <- tam.mml( dat)
+mod1 <- TAM::tam.mml( dat)
 summary(mod1)
 
 # assess model fit
-tmod1 <- tam.modelfit( mod1 )
+tmod1 <- TAM::tam.modelfit( mod1 )
 summary(tmod1)
 
 #############################################################################
@@ -267,20 +267,20 @@ data(data.read, package="sirt")
 dat <- data.read
 
 #**** Model 1: 1PL model
-mod1 <- tam.mml( dat )
+mod1 <- TAM::tam.mml( dat )
 summary(mod1)
 
 #**** Model 2: 2PL model
-mod2 <- tam.mml.2pl( dat )
+mod2 <- TAM::tam.mml.2pl( dat )
 summary(mod2)
 
 #**** assess model fits
 # Q3 based on posterior
-fmod1 <- tam.modelfit(mod1)
-fmod2 <- tam.modelfit(mod2)
+fmod1 <- TAM::tam.modelfit(mod1)
+fmod2 <- TAM::tam.modelfit(mod2)
 # Q3 based on WLEs
-q3_mod1 <- tam.Q3(mod1)
-q3_mod2 <- tam.Q3(mod2)
+q3_mod1 <- TAM::tam.Q3(mod1)
+q3_mod2 <- TAM::tam.Q3(mod2)
 summary(fmod1)
 summary(fmod2)
 summary(q3_mod1)

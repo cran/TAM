@@ -125,15 +125,15 @@ data(data.sim.rasch)
 resp <- data.sim.rasch[ 1:500 , 1:15 ]  # select subsample of students and items
 
 # estimate Rasch model
-mod <- tam.mml(resp)
+mod <- TAM::tam.mml(resp)
 
 # draw 5 plausible values without a normality
 # assumption of the posterior and 2000 ability nodes
-pv1a <- tam.pv( mod , nplausible=5 , ntheta=2000 )
+pv1a <- TAM::tam.pv( mod , nplausible=5 , ntheta=2000 )
 
 # draw 5 plausible values with a normality
 # assumption of the posterior and 500 ability nodes
-pv1b <- tam.pv( mod , nplausible=5 , ntheta=500 , normal.approx=TRUE )
+pv1b <- TAM::tam.pv( mod , nplausible=5 , ntheta=500 , normal.approx=TRUE )
 
 # distribution of first plausible value from imputation pv1
 hist(pv1a$pv$PV1.Dim1 )
@@ -157,7 +157,7 @@ dat <- data.pisaRead$data
 
 # estimate 2PL model without covariates
 items <- grep("R4" , colnames(dat) )    # select test items from data
-mod2a <- tam.mml.2pl( resp=dat[,items] )
+mod2a <- TAM::tam.mml.2pl( resp=dat[,items] )
 summary(mod2a)
 
 # fix item parameters for plausible value imputation
@@ -167,18 +167,18 @@ xsi.fixed <- cbind( seq(1,length(xsi0)) , xsi0 )
    # fix item slopes using mod2$B
 # matrix of latent regressors female, hisei and migra
 Y <- dat[ , c("female" , "hisei" , "migra") ]
-mod2b <- tam.mml( resp=dat[,items] , B=mod2a$B , xsi.fixed=xsi.fixed , Y=Y, 
+mod2b <- TAM::tam.mml( resp=dat[,items] , B=mod2a$B , xsi.fixed=xsi.fixed , Y=Y, 
             pid = dat$idstud)
 
 # plausible value imputation with normality assumption
 # and ignoring uncertainty about regression coefficients
 #    -> the default is samp.regr=FALSE
-pv2c <- tam.pv( mod2b , nplausible=10 , ntheta=500 , normal.approx=TRUE )
+pv2c <- TAM::tam.pv( mod2b , nplausible=10 , ntheta=500 , normal.approx=TRUE )
 # sampling of regression coefficients
-pv2d <- tam.pv( mod2b , nplausible=10 , ntheta=500 , samp.regr=TRUE)
+pv2d <- TAM::tam.pv( mod2b , nplausible=10 , ntheta=500 , samp.regr=TRUE)
 # sampling of regression coefficients, normal approximation using the
 # theta grid from the model
-pv2e <- tam.pv( mod2b , samp.regr=TRUE , theta.model=TRUE , normal.approx=TRUE)
+pv2e <- TAM::tam.pv( mod2b , samp.regr=TRUE , theta.model=TRUE , normal.approx=TRUE)
 
 #--- create list of multiply imputed datasets with plausible values
 # define dataset with covariates to be matched
@@ -187,13 +187,13 @@ Y <- dat[ , c("idstud" , "idschool" , "female" , "hisei" , "migra") ]
 # define plausible value names
 pvnames <- c("PVREAD")
 # create list of imputed datasets
-datlist1 <- tampv2datalist( pv2e , pvnames = pvnames , Y=Y , Y.pid="idstud")
+datlist1 <- TAM::tampv2datalist( pv2e , pvnames = pvnames , Y=Y , Y.pid="idstud")
 str(datlist1)
 
 # create a matrix of covariates with different set of students than in pv2e
 Y1 <- Y[ seq( 1 , 600 , 2 ) , ]
 # create list of multiply imputed datasets
-datlist2 <- tampv2datalist( pv2e , pvnames = c("PVREAD"), Y=Y1 , Y.pid="idstud")
+datlist2 <- TAM::tampv2datalist( pv2e , pvnames = c("PVREAD"), Y=Y1 , Y.pid="idstud")
 
 #--- fit some models in lavaan and semTools
 library(lavaan)
@@ -276,17 +276,17 @@ Q <- array( 0 , dim = c( 2*I , 2 ))
 Q[cbind(1:(2*I), c( rep(1,I) , rep(2,I) ))] <- 1
 
 # (3) fit latent regression model
-mod <- tam.mml( resp=resp , Y=Y , Q=Q , control=list(maxiter=5) )
+mod <- TAM::tam.mml( resp=resp , Y=Y , Q=Q , control=list(maxiter=5) )
 
 # (4) draw plausible values with normal approximation using the orginal theta grid
-pv1 <- tam.pv( mod , normal.approx=TRUE , theta.model = TRUE )
+pv1 <- TAM::tam.pv( mod , normal.approx=TRUE , theta.model = TRUE )
 
 # (5) convert plausible values to list of imputed datasets
 Y1 <- data.frame(Y)
 colnames(Y1) <- paste0("Y",1:2)
 pvnames <- c("PVFA","PVFB")
 # create list of imputed datasets
-datlist1 <- tampv2datalist( pv1 , pvnames = pvnames , Y=Y1 )
+datlist1 <- TAM::tampv2datalist( pv1 , pvnames = pvnames , Y=Y1 )
 str(datlist1)
 
 # (6) apply statistical models
@@ -330,14 +330,14 @@ summary(mod0)
 #***********************
 #*** Model 1: latent regression model with true covariates X
 xsi.fixed <- cbind( 1:I , itemdiff )
-mod1 <- tam.mml( dat , xsi.fixed=xsi.fixed , Y=X)
+mod1 <- TAM::tam.mml( dat , xsi.fixed=xsi.fixed , Y=X)
 summary(mod1)
 
 # draw plausible values
-res1a <- tam.pv( mod1 , normal.approx=TRUE , ntheta=200 , samp.regr=TRUE)
+res1a <- TAM::tam.pv( mod1 , normal.approx=TRUE , ntheta=200 , samp.regr=TRUE)
 # create list of multiply imputed datasets
 library(miceadds)
-datlist1a <- tampv2datalist( res1a , Y=X ) 
+datlist1a <- TAM::tampv2datalist( res1a , Y=X ) 
 imp1a <- miceadds::datalist2mids( datlist1a )
 
 # fit linear model
@@ -354,7 +354,7 @@ summary(mod1a , standardized=TRUE, rsquare=TRUE)
 
 #***********************
 #*** Model 2: latent regression model with error-prone covariates X.err
-mod2 <- tam.mml( dat , xsi.fixed=xsi.fixed , Y=X.err)
+mod2 <- TAM::tam.mml( dat , xsi.fixed=xsi.fixed , Y=X.err)
 summary(mod2)
 
 #***********************
@@ -375,20 +375,20 @@ ident <- diag(2)
 X.adj <- ( X.err - muM ) \%*\% W   + muM \%*\% ( ident - W )
 
 # fit latent regression model
-mod3 <- tam.mml( dat , xsi.fixed=xsi.fixed , Y=X.adj)
+mod3 <- TAM::tam.mml( dat , xsi.fixed=xsi.fixed , Y=X.adj)
 summary(mod3)
 
 # draw plausible values
-res3a <- tam.pv( mod3 , normal.approx=TRUE , ntheta=200 , samp.regr=TRUE)
+res3a <- TAM::tam.pv( mod3 , normal.approx=TRUE , ntheta=200 , samp.regr=TRUE)
 
 # create list of multiply imputed datasets
 library(semTools)
 
 #*** PV dataset 1
 # datalist with error-prone covariates
-datlist3a <- tampv2datalist( res3a , Y=X.err ) 
+datlist3a <- TAM::tampv2datalist( res3a , Y=X.err ) 
 # datalist with adjusted covariates
-datlist3b <- tampv2datalist( res3a , Y=X.adj ) 
+datlist3b <- TAM::tampv2datalist( res3a , Y=X.adj ) 
 
 # linear regression with measurement errors in X
 lavmodel <- "
@@ -417,7 +417,7 @@ library(mice)
 library(miceadds)
 
 # creating the likelihood for plausible value for abilities
-mod11 <- tam.mml( dat , xsi.fixed = xsi.fixed )
+mod11 <- TAM::tam.mml( dat , xsi.fixed = xsi.fixed )
 likePV <- IRT.likelihood(mod11)
 # creating the likelihood for error-prone covariate X2
 lavmodel <- "
@@ -426,7 +426,7 @@ lavmodel <- "
     "
 mod12 <- lavaan::cfa( lavmodel , data = as.data.frame(X.err) )
 summary(mod12)
-likeX2 <- IRTLikelihood.cfa( data= X.err , cfaobj=mod12)
+likeX2 <- TAM::IRTLikelihood.cfa( data= X.err , cfaobj=mod12)
 str(likeX2)
 
 #-- create data input for mice package
