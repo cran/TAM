@@ -40,6 +40,30 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 
 -------------------------------------------------------------
+VERSIONS TAM 1.99999  |  2017-03-02  |  Last: TAM 1.99999-31
+-------------------------------------------------------------
+
+FEATURES:
+* ---
+ 
+BUG FIXES:
+* removed adjustment for WLE estimation of extreme scores in 
+  'adj' in 'tam.wle'. Now, WLE estimation in TAM should be
+  equivalent to ConQuest software, sirt::IRT.mle and
+  mirt::fscores. The adjustment 'adj' is only applicable for
+  MLE estimation in 'tam.wle'. The WLE estimation of the recent
+  TAM version is equivalent to 'adj=0' of previous TAM versions.
+
+NOTES:
+* restructured Rcpp functions
+
+DATASETS INCLUDED OR MODIFIED:
+* ---
+
+EXAMPLES INCLUDED OR MODIFIED:
+* ---
+
+-------------------------------------------------------------
 CHANGES IN VERSION 1.99993 (2017-02-06)  --  CRAN 1.99993-0
 -------------------------------------------------------------
 
@@ -61,7 +85,6 @@ DATASETS INCLUDED OR MODIFIED:
 
 EXAMPLES INCLUDED OR MODIFIED:
 * ---
-
 
 -------------------------------------------------------------
 CHANGES IN VERSION 1.99992 (2017-01-23)  --  CRAN 1.99992-0
@@ -94,7 +117,6 @@ DATASETS INCLUDED OR MODIFIED:
 
 EXAMPLES INCLUDED OR MODIFIED:
 * ---
-
 
 -------------------------------------------------------------
 CHANGES IN VERSION 1.995    (2016-05-31)  --  CRAN 1.995-0

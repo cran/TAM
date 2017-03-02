@@ -92,8 +92,7 @@ tam.mml.3pl <-
 				}
 
 	if ( is.null(Edes) ){			
-		Edes <- .Call("mml_3pl_nonzero_entries", as.vector(E) , dim(E) ,
-				   PACKAGE="TAM")$E_design
+		Edes <- mml_3pl_nonzero_entries( as.vector(E) , dim(E) )$E_design
 						}
 											
 	 # B <-.mml.3pl.computeB( E , gammaslope )
@@ -537,8 +536,7 @@ tam.mml.3pl <-
       # use simplified design for F
 	  dimFdes <- dim(Fdes)
  
-	  res <- .Call("mml3_calc_Fdes" , as.vector(Fdes) , dimFdes=dimFdes ,
-				       PACKAGE="TAM" )	  
+	  res <- mml3_calc_Fdes( as.vector(Fdes) , dimFdes )
 	  FdesM <- res$FdesM[ 1:res$NFdesM , ]
 	
 	#*****

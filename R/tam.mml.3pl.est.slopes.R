@@ -35,9 +35,8 @@
 # cat(" +++ calc prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1				
 		# init derivatives		
 		d2.b <- d1.b <- rep(eps,Nlam)			
-		res <- .Call("mml3_slca_deriv" ,FdesM , dimFdes , gammaslope , as.vector(rprobs) ,
-			as.vector(n.ik) , as.vector(N.ik) , guess , as.vector(rprobs0)  ,
-			PACKAGE="TAM")   
+		res <- mml3_slca_deriv(FdesM , dimFdes , gammaslope , as.vector(rprobs) ,
+			as.vector(n.ik) , as.vector(N.ik) , guess , as.vector(rprobs0) )   
 		d1.b <- res$d1b
 		d2.b <- res$d2b	
 # cat(" +++ calc slca deriv") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1					

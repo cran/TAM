@@ -1,59 +1,32 @@
-//  Code created: 2014-03-19 09:11:51
 
+// [[Rcpp::depends(RcppArmadillo)]]
 
-// includes from the plugin
 #include <RcppArmadillo.h>
 #include <Rcpp.h>
-
-
-#ifndef BEGIN_RCPP
-#define BEGIN_RCPP
-#endif
-
-#ifndef END_RCPP
-#define END_RCPP
-#endif
 
 using namespace Rcpp;
 
 
-// user includes
-
-
-// declarations
-extern "C" {
-SEXP tam_wle_Bs( SEXP rprobsWLEL, SEXP respind, SEXP BL, SEXP BBL, SEXP BBBL, SEXP ndim, SEXP nitems, SEXP maxK, SEXP nstud) ;
-}
-
-// definition
-
-SEXP tam_wle_Bs( SEXP rprobsWLEL, SEXP respind, SEXP BL, SEXP BBL, SEXP BBBL, SEXP ndim, SEXP nitems, SEXP maxK, SEXP nstud){
-BEGIN_RCPP
-	    /////////////////////////////////////    
-	    // INPUT    
-		  Rcpp::NumericMatrix RPROBS(rprobsWLEL);
-	    Rcpp::NumericMatrix RESPIND(respind);
-	    Rcpp::NumericMatrix CBL(BL);
-	    Rcpp::NumericMatrix CBB(BBL);
-	    Rcpp::NumericMatrix CBBB(BBBL);
-	    
+///********************************************************************
+///** kernelplsaux
+// [[Rcpp::export]]           
+Rcpp::List tam_wle_Bs( Rcpp::NumericMatrix RPROBS, 
+	Rcpp::NumericMatrix RESPIND, Rcpp::NumericMatrix CBL, 
+	Rcpp::NumericMatrix CBB, Rcpp::NumericMatrix CBBB, 
+	int cndim, int cnitems, int cmaxK, int cnstud){
+   
 	    ///////////////////////////////////////////////////////////
 	    // INPUT indices
-	    int cndim = as<int>(ndim);
-	    int cnitems = as<int>(nitems);
-	    int cmaxK = as<int>(maxK);
-	    int cnstud = as<int>(nstud);
 	    int citstud = cnitems*cnstud;
 	    
 	    ////////////////////////////////////////////////////////////
 	    // define output vectors
-	    NumericMatrix B_bari (citstud, cndim);
-	    NumericMatrix BB_bari (citstud, cndim*cndim);
-	    NumericMatrix BBB_bari (citstud, cndim);
-	    
-	    NumericMatrix B_Sq (citstud, cndim*cndim);
-	    NumericMatrix B2_B (citstud, cndim);
-	    NumericMatrix B_Cube (citstud, cndim);
+	    Rcpp::NumericMatrix B_bari (citstud, cndim);
+	    Rcpp::NumericMatrix BB_bari (citstud, cndim*cndim);
+	    Rcpp::NumericMatrix BBB_bari (citstud, cndim);
+	    Rcpp::NumericMatrix B_Sq (citstud, cndim*cndim);
+	    Rcpp::NumericMatrix B2_B (citstud, cndim);
+	    Rcpp::NumericMatrix B_Cube (citstud, cndim);
 	    
 	    /////////////////////////////////////////////////////////
 	    // CALCULATIONS
@@ -87,8 +60,7 @@ BEGIN_RCPP
 	    }
 	    
 	    ///////////////////////////////////////////////////////
-	    ///////////// O U T P U T   ///////////////////////////
-	    
+	    ///////////// O U T P U T   ///////////////////////////	    
 	    return Rcpp::List::create(
                     Rcpp::_["B_bari"]=B_bari, 
                     Rcpp::_["BB_bari"]=BB_bari, 
@@ -96,31 +68,19 @@ BEGIN_RCPP
                     Rcpp::_["B_Sq"]=B_Sq, 
                     Rcpp::_["B2_B"]=B2_B, 
                     Rcpp::_["B_Cube"]=B_Cube );
-END_RCPP
 }
 
-// declarations
-extern "C" {
-	SEXP tam_wle_errinv( SEXP errl, SEXP ndim, SEXP nstud);
-}
+///********************************************************************
+///** tam_wle_errinv
+// [[Rcpp::export]]           
+Rcpp::NumericMatrix tam_wle_errinv( Rcpp::NumericMatrix myERR, 
+	int cndim, int cnstud ){
 
-// definition
-SEXP tam_wle_errinv( SEXP errl, SEXP ndim, SEXP nstud ){
-BEGIN_RCPP
-	/////////////////////////////////////
-	// INPUT
-	Rcpp::NumericMatrix myERR(errl);
-	
-	///////////////////////////////////////////////////////////
-	// INPUT indices
-	int cndim = as<int>(ndim);
-	int cnstud = as<int>(nstud);
-	
 	////////////////////////////////////////////////////////////
 	// define output vectors
 	arma::mat ERR_j = arma::zeros(cndim, cndim);
 	arma::mat ERR_j_inv;
-	NumericMatrix ERR_inv (cnstud, cndim*cndim);
+	Rcpp::NumericMatrix ERR_inv (cnstud, cndim*cndim);
 	
 	/////////////////////////////////////////////////////////
 	// CALCULATIONS
@@ -131,7 +91,7 @@ BEGIN_RCPP
 			}
 		}
 		
-		ERR_j_inv = arma::mat(inv(ERR_j));
+		ERR_j_inv = arma::mat( arma::inv(ERR_j) );
 		
 		for(int dd1=0; dd1<cndim; dd1++){// dimension loop 1
 			for(int dd2=0; dd2<cndim; dd2++){// dimension loop 2
@@ -142,6 +102,5 @@ BEGIN_RCPP
 	
 	///////////////////////////////////////////////////////
 	///////////// O U T P U T   ///////////////////////////
-	return ( wrap(ERR_inv) );
-END_RCPP
+	return ERR_inv;
 }

@@ -1,18 +1,7 @@
-//  Code created: 2015-01-11 16:27:27
 
 
-// includes from the plugin
 
 #include <Rcpp.h>
-
-
-#ifndef BEGIN_RCPP
-#define BEGIN_RCPP
-#endif
-
-#ifndef END_RCPP
-#define END_RCPP
-#endif
 
 using namespace Rcpp;
 
@@ -20,24 +9,14 @@ using namespace Rcpp;
 // user includes
 
 
-// declarations
-extern "C" {
-SEXP irt_likelihood_cfa2( SEXP data_, SEXP nu_, SEXP psi_, SEXP L_, SEXP theta_) ;
-}
 
-// definition
-
-SEXP irt_likelihood_cfa2( SEXP data_, SEXP nu_, SEXP psi_, SEXP L_, SEXP theta_ ){
-BEGIN_RCPP
-  
-       
-     Rcpp::NumericMatrix data(data_);          
-     Rcpp::NumericVector nu(nu_) ;  
-     Rcpp::NumericMatrix psi(psi_);  
-     Rcpp::NumericMatrix L(L_);  
-     Rcpp::NumericMatrix theta(theta_);  
-       
-       
+///********************************************************************
+///** irt_likelihood_cfa2
+// [[Rcpp::export]]   
+Rcpp::List irt_likelihood_cfa2( Rcpp::NumericMatrix data, 
+	Rcpp::NumericVector nu, Rcpp::NumericMatrix psi, 
+	Rcpp::NumericMatrix L, Rcpp::NumericMatrix theta ){
+ 
      int N = data.nrow();  
      int I = data.ncol();  
      int D = L.ncol();  
@@ -71,10 +50,8 @@ BEGIN_RCPP
         } // end ii  
       }   // end tt	  
      		  
-     		  
      //*************************************************      
-     // OUTPUT              
-                   
+     // OUTPUT                                
       return Rcpp::List::create(    
          Rcpp::_["hwt"] = hwt ,    
          Rcpp::_["N"] = N , 
@@ -82,8 +59,8 @@ BEGIN_RCPP
          Rcpp::_["TP"]=TP , 
          Rcpp::_["D"] = D  
          ) ;  
-END_RCPP
 }
+///********************************************************************
 
 
 

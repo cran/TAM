@@ -97,12 +97,12 @@ stud_prior.v2 <-
 # auxiliary functions for calculation of prior functions  
 prior.normal.density.R <- 
 function( theta_ , mu_ , varInverse_ , coeff_){
-	.Call("prior_normal_density_C",  theta_ , mu_ , 
-			varInverse_ , coeff_ , PACKAGE = "TAM")
+	prior_normal_density_C(  theta_ , mu_ , 
+			varInverse_ , coeff_ )
 } 
 
 prior.normal.densityALL.R <- 
  function( theta_ , mu_ , varInverse_ , coeff_){
- 	.Call("prior_normal_densityALL_C",  theta_ , mu_ , 
-		varInverse_  , coeff_ , PACKAGE = "TAM")
+ 	prior_normal_densityALL_C(  theta_ , mu_ , 
+		varInverse_  , coeff_ )
  } 

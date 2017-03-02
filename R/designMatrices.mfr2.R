@@ -154,8 +154,7 @@ designMatrices.mfr2 <-
 #     cat(" ---  after gresp   " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    
     # This step is time-consuming!!	
 	#**** ARb 2014-05-30
-	gresp <- .Call("gresp_extend" ,  as.matrix(gresp) , as.numeric( X[,"step"] ) ,
-				PACKAGE="TAM")
+	gresp <- gresp_extend(  as.matrix(gresp) , as.numeric( X[,"step"] ) )
     # cat(" ---  after gresp   " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    
     # This step is time-consuming!!
 # cat(" ---  after gresp (2) " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1     					    
@@ -177,21 +176,19 @@ designMatrices.mfr2 <-
 #      gresp.noStep[ outer(rnFacets, rnX.noStep, "!=") ] <- NA
 # cat("gresp NA " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1	
 		#**** ARb 2014-05-30
-	  gresp <- .Call("gresp_na_facets" , as.matrix(gresp) , rnFacets , rnX ,
-					PACKAGE="TAM")
-	  gresp.noStep <- .Call("gresp_na_facets" , as.matrix(gresp.noStep ) , rnFacets , rnX.noStep ,
-					PACKAGE="TAM")	  
+	  gresp <- gresp_na_facets( as.matrix(gresp) , rnFacets , rnX )
+	  gresp.noStep <- gresp_na_facets( as.matrix(gresp.noStep ) , rnFacets , rnX.noStep )
 #cat("gresp NA2 " ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1	
     }
 
 #cat(" ---  after other facets" ) ; z1 <- Sys.time() ; print(z1-z0) ; z0 <- z1    	
     colnames(gresp) <- rownames(X)
 #    X$empty <- 1* (colSums( gresp, na.rm=TRUE ) == 0)
-	X$empty <- .Call( "colsums_gresp" , gresp , PACKAGE="TAM")
+	X$empty <- colsums_gresp( gresp )
 	
     colnames(gresp.noStep) <- rownames(X.noStep)
 #    X.noStep$empty <- 1* (colSums( gresp.noStep, na.rm=TRUE ) == 0)
-	X.noStep$empty <- .Call( "colsums_gresp" , gresp.noStep , PACKAGE="TAM")
+	X.noStep$empty <- colsums_gresp( gresp.noStep)
 
     ### output
     ind <- X[,"empty"] == 1

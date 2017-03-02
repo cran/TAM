@@ -1,48 +1,21 @@
 
 
-
-// includes from the plugin
-
 #include <Rcpp.h>
-
-
-#ifndef BEGIN_RCPP
-#define BEGIN_RCPP
-#endif
-
-#ifndef END_RCPP
-#define END_RCPP
-#endif
 
 using namespace Rcpp;
 
 
-// user includes
+///********************************************************************
+///** tam_q3_calc_V2q3jack
+// [[Rcpp::export]]           
+Rcpp::List tam_q3_calc_V2q3jack( Rcpp::NumericMatrix residM, 
+	Rcpp::NumericMatrix resp_ind ){
 
-
-// declarations
-extern "C" {
-SEXP tam_q3_calc_V2q3jack( SEXP residM_, SEXP resp_ind_) ;
-}
-
-// definition
-
-SEXP tam_q3_calc_V2q3jack( SEXP residM_, SEXP resp_ind_ ){
-BEGIN_RCPP
-   
-       
-     Rcpp::NumericMatrix residM(residM_);          
-     Rcpp::NumericMatrix resp_ind(resp_ind_);          
-       
-       
      int I=residM.ncol();  
      int N=residM.nrow();  
      int RR=I*(I-1)/2 ;  
      int JJ=0;  
-       
      Rcpp::NumericMatrix dfr(RR,4) ;  
-       
-       
      Rcpp::NumericMatrix sumresidii1(RR,JJ+1) ;  
      Rcpp::NumericMatrix sumresidii2(RR,JJ+1) ;  
      Rcpp::NumericMatrix sumresidsqii1(RR,JJ+1) ;  
@@ -57,11 +30,9 @@ BEGIN_RCPP
      double mii2=0;  
      double sdii1=0;  
      double sdii2=0;  
-     double covii1ii2=0;  
-       
+     double covii1ii2=0;         
      double tmp1=0;  
      double t1=0;  
-     // int jj1=0;  
      int rr=0;  
      int nrr=0;  
        
@@ -111,69 +82,39 @@ BEGIN_RCPP
      for (rr=0;rr<RR;rr++){  
           dfr(rr,3) = dfr(rr,2) - mQ3 ;  
              	}  
-       
-       
      //*************************************************      
-     // OUTPUT              
-                   
+     // OUTPUT                                 
      return Rcpp::List::create(   
            Rcpp::_["dfr"] = dfr   
          ) ;    
-       
-     // Rcpp::Rcout << "tmp1 " <<  tmp1 <<  std::flush << std::endl ;
-END_RCPP
 }
 
 
-// declarations
-extern "C" {
-SEXP tam_q3_calc_V2counts( SEXP resp0_, SEXP resp_ind_, SEXP rprobs_, SEXP hwt_, SEXP maxKi_, SEXP maxK_) ;
-}
-
-// definition
-
-SEXP tam_q3_calc_V2counts( SEXP resp0_, SEXP resp_ind_, SEXP rprobs_, SEXP hwt_, SEXP maxKi_, SEXP maxK_ ){
-BEGIN_RCPP
-   
-     // res1 <- tam_q3_calc_counts( resp , resp.ind , rprobs , hwt , maxKi )  
+///********************************************************************
+///** tam_q3_calc_V2counts
+// [[Rcpp::export]]           
+Rcpp::List tam_q3_calc_V2counts( Rcpp::NumericMatrix resp0, 
+	Rcpp::NumericMatrix resp_ind, Rcpp::NumericVector rprobs, 
+	Rcpp::NumericMatrix hwt, Rcpp::NumericVector maxKi, int maxK ){
         
-        
-     Rcpp::NumericMatrix resp0(resp0_);          
-     Rcpp::NumericMatrix resp_ind(resp_ind_);  
-     Rcpp::NumericVector rprobs(rprobs_) ;         
-     Rcpp::NumericMatrix hwt(hwt_);  
-     Rcpp::NumericVector maxKi(maxKi_);  
-     int maxK=as<int>(maxK_) ;  
-       
-       
      int I=resp0.ncol();  
      int N=resp0.nrow();  
      int RR = I * (I-1) / 2 ;  
      int TP=hwt.ncol();  
-       
      int maxK2 = maxK*maxK ;  
      double g1=0;  
-       
      Rcpp::NumericMatrix obs_counts(RR,maxK*maxK);  
      Rcpp::NumericMatrix exp_counts(RR,maxK*maxK);  
      Rcpp::NumericVector hwtii(TP);  
      Rcpp::NumericVector hwtiifull(TP);  
      Rcpp::NumericMatrix maxKiM(RR,5);  
-       
-       
      // calculate hwtii with full item responses  
-       
      for (int tt=0;tt<TP;tt++){  
         for (int nn=0;nn<N;nn++){  
      	    hwtiifull[tt] += hwt(nn,tt) ;  
      		} // end nn  
      }  // end tt  
-       
-       
-       
      int rr=0;  
-       
-       
      for (int ii1=0; ii1 < I -1 ; ii1++){  
      for (int ii2=ii1+1;ii2 <I;ii2++){  
        
@@ -216,11 +157,8 @@ BEGIN_RCPP
      rr ++ ;  
      }  
      }  
-       
-       
      //*************************************************      
-     // OUTPUT              
-                   
+     // OUTPUT                                 
      return Rcpp::List::create(   
          Rcpp::_["obs_counts"] = obs_counts ,  
          Rcpp::_["exp_counts"] = exp_counts ,  
@@ -229,45 +167,24 @@ BEGIN_RCPP
          Rcpp::_["maxK"] = maxK ,  
          Rcpp::_["maxK2"] = maxK2  
          ) ;    
-       
-     // Rcpp::Rcout << "tmp1 " <<  tmp1 <<  std::flush << std::endl ;
-END_RCPP
 }
 
 
-// declarations
-extern "C" {
-SEXP tam_calccov( SEXP counts_, SEXP scorematrix_, SEXP adjust_) ;
-}
-
-// definition
-
-SEXP tam_calccov( SEXP counts_, SEXP scorematrix_, SEXP adjust_ ){
-BEGIN_RCPP
-   
-     // res1 <- tam_q3_calc_counts( resp , resp.ind , rprobs , hwt , maxKi )  
-        
-        
-     Rcpp::NumericMatrix counts(counts_);          
-     Rcpp::NumericMatrix scorematrix(scorematrix_);  
-     Rcpp::NumericVector adjust(adjust_) ;  
-       
-       
-       
-       
+///********************************************************************
+///** tam_calccov
+// [[Rcpp::export]]           
+Rcpp::List tam_calccov( Rcpp::NumericMatrix counts, 
+	Rcpp::NumericMatrix scorematrix, Rcpp::NumericVector adjust ){
+             
      int RR=counts.nrow();  
      int NC=counts.ncol();  
-       
-     // int maxK = sqrt( NC );  
-       
      Rcpp::NumericVector cov_ij(RR);  
      Rcpp::NumericVector cor_ij(RR);  
      Rcpp::NumericVector n_ij(RR);  
      Rcpp::NumericMatrix mean_ij(RR,2);  
      Rcpp::NumericMatrix sd_ij(RR,2);  
      double crrcc=0;  
-       
-       
+             
      for (int rr=0;rr<RR;rr++){  
        
      for (int cc=0;cc<NC;cc++){  
@@ -287,15 +204,11 @@ BEGIN_RCPP
        	}  
       cov_ij[rr] = cov_ij[rr] - n_ij[rr] * mean_ij(rr,0)*mean_ij(rr,1) ;  
       cov_ij[rr] = cov_ij[rr] / ( n_ij[rr] - adjust[0] ) ;  
-      cor_ij[rr] = cov_ij[rr] / sd_ij(rr,0) / sd_ij(rr,1) ;  
-        
-       
+      cor_ij[rr] = cov_ij[rr] / sd_ij(rr,0) / sd_ij(rr,1) ;         
       }  
-        
-        
+
      //*************************************************      
-     // OUTPUT              
-                   
+     // OUTPUT                 
      return Rcpp::List::create(   
          Rcpp::_["cov_ij"] = cov_ij ,  
          Rcpp::_["cor_ij"] = cor_ij ,  
@@ -303,32 +216,15 @@ BEGIN_RCPP
          Rcpp::_["M_ij"] = mean_ij ,  
          Rcpp::_["SD_ij"] = sd_ij  
          ) ;    
-       
-     // Rcpp::Rcout << "tmp1 " <<  tmp1 <<  std::flush << std::endl ;
-END_RCPP
 }
 
+///********************************************************************
+///** tam_q3_calc_residM
+// [[Rcpp::export]]           
+Rcpp::List tam_q3_calc_residM( Rcpp::NumericVector rprobs, 
+	Rcpp::NumericMatrix resp, int I, int TP, int maxK, 
+	Rcpp::NumericVector maxKi, Rcpp::NumericMatrix hwt ){
 
-
-// declarations
-extern "C" {
-SEXP tam_q3_calc_residM( SEXP rprobs_, SEXP resp_, SEXP I_, SEXP TP_, SEXP maxK_, SEXP maxKi_, SEXP hwt_) ;
-}
-
-// definition
-
-SEXP tam_q3_calc_residM( SEXP rprobs_, SEXP resp_, SEXP I_, SEXP TP_, SEXP maxK_, SEXP maxKi_, SEXP hwt_ ){
-BEGIN_RCPP
-   
-       
-     Rcpp::NumericVector rprobs(rprobs_);          
-     Rcpp::NumericMatrix resp(resp_);  
-     int I=as<int>(I_) ;  
-     int TP=as<int>(TP_) ;  
-     int maxK=as<int>(maxK_) ;  
-     Rcpp::NumericMatrix hwt(hwt_);  
-     Rcpp::NumericVector maxKi(maxKi_);  
-       
      int N = resp.nrow();  
      Rcpp::NumericMatrix residM(N,I) ;  
        
@@ -341,8 +237,6 @@ BEGIN_RCPP
      //	residM[,ii] <- residM[,ii] + rowSums(v1)*kk    
      //			}  
      //		}  
-       
-       
      for (int nn=0;nn < N ; nn++){  
      for (int ii=0; ii < I ; ii++){  
      for (int kk=1;kk<maxKi[ii]+1;kk++){  
@@ -354,18 +248,10 @@ BEGIN_RCPP
         }  
         	  
      //*************************************************      
-     // OUTPUT              
-                   
+     // OUTPUT                                 
      return Rcpp::List::create(   
          Rcpp::_["residM"] = residM        
          ) ;    
-       
-     // Rcpp::Rcout << "tmp1 " <<  tmp1 <<  std::flush << std::endl ;
-END_RCPP
 }
-
-
-
-
 
 

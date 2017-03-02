@@ -67,9 +67,9 @@ IRTLikelihood.cfa <- function( data , cfaobj=NULL ,
 		psi <- as.matrix(psi)
 		L <- as.matrix(L)	
 		theta <- as.matrix(theta)	
-		hwt <- .Call(  "irt_likelihood_cfa2" , data , nu , psi , L , theta )		
+		hwt <- irt_likelihood_cfa2( data , nu , psi , L , theta )		
 		hwt <- hwt$hwt
-				}	
+	}	
 	res <- hwt
 	attr(res,"theta") <- theta
 	attr(res,"prob.theta") <- NA

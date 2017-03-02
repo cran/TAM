@@ -1,47 +1,26 @@
 
 
-// includes from the plugin
+// [[Rcpp::depends(RcppArmadillo)]]
 
+#include <RcppArmadillo.h>
 #include <Rcpp.h>
-
-
-#ifndef BEGIN_RCPP
-#define BEGIN_RCPP
-#endif
-
-#ifndef END_RCPP
-#define END_RCPP
-#endif
 
 using namespace Rcpp;
 
 
-// user includes
 
-
-// declarations
-extern "C" {
-SEXP tam_ctt_C( SEXP tdat, SEXP wle, SEXP maxK, SEXP est_wle, SEXP prg_) ;
-}
-
-// definition
-
-SEXP tam_ctt_C( SEXP tdat, SEXP wle, SEXP maxK, SEXP est_wle, SEXP prg_ ){
-BEGIN_RCPP
-  
-       
-     Rcpp::CharacterMatrix TDAT(tdat);          
-     Rcpp::NumericVector WLE (wle);  
-     Rcpp::NumericVector MAXK (maxK);  
-     int EST_WLE=as<int>(est_wle) ;  
-     Rcpp::NumericVector prg (prg_); 
+///********************************************************************
+///** tam_ctt_C
+// [[Rcpp::export]]           
+Rcpp::List tam_ctt_C( Rcpp::CharacterMatrix TDAT, 
+	Rcpp::NumericVector WLE, Rcpp::NumericVector MAXK, 
+	int EST_WLE , Rcpp::NumericVector prg ){
 
      int N = TDAT.ncol() ;  
      int I = TDAT.nrow() ;  
      int K = MAXK[0];  
      int LP = prg.size() ;
-     int IK = I*K;       
-      
+     int IK = I*K;        
      Rcpp::NumericMatrix des( I*K , 9 ) ;  
      Rcpp::CharacterVector desV( I*K ) ;  
        
@@ -146,53 +125,27 @@ BEGIN_RCPP
               Rcpp::_["desV"] = desV   ,
               Rcpp::_["LP"] = LP
             		) ;  
-       
-       
-      
-               
-               
-     //  Rcpp::Rcout << "cx " << cx  << std::endl ;                                       
-     //   Rcpp::Rcout << "cy " << cy  << std::endl ;                                       
-             
-END_RCPP
 }
 
 
-
-
-
-// declarations
-extern "C" {
-SEXP tamctt3csource( SEXP tdat, SEXP wle, SEXP maxK, SEXP est_wle, SEXP prg_) ;
-}
-
-// definition
-
-SEXP tamctt3csource( SEXP tdat, SEXP wle, SEXP maxK, SEXP est_wle, SEXP prg_ ){
-BEGIN_RCPP
+///********************************************************************
+///** tamctt3csource
+// [[Rcpp::export]]           
+Rcpp::List tamctt3csource( Rcpp::CharacterMatrix TDAT, 
+	Rcpp::NumericVector WLE, Rcpp::NumericVector MAXK, 
+	int EST_WLE , Rcpp::NumericVector prg ){
         
-              
-          Rcpp::CharacterMatrix TDAT(tdat);            
-          Rcpp::NumericVector WLE (wle);    
-          Rcpp::NumericVector MAXK (maxK);    
-          int EST_WLE=as<int>(est_wle) ;    
-          Rcpp::NumericVector prg (prg_);   
-       
           int N = TDAT.ncol() ;    
           int I = TDAT.nrow() ;    
           int K = MAXK[0];    
           int LP = prg.size() ;  
           int NC_ii = 0 ;  
           int IK = I*K;         
-          double eps = .00000001 ;   
+          double eps = 1e-7 ;   
           bool r1 ;
              
           Rcpp::NumericMatrix des( I*K , 9 ) ;    
           Rcpp::CharacterVector desV( I*K ) ;    
-       
-     // Rcpp::Rcout << "hallo3333"  << std::endl ;           
-           
-       
           Rcpp::NumericVector wles1 (K);  
           Rcpp::NumericVector wles2 (K) ;    
           Rcpp::NumericVector wles3 (K) ;    
@@ -200,8 +153,6 @@ BEGIN_RCPP
           Rcpp::NumericVector freq (K) ;                    
           Rcpp::NumericVector freq2 (K) ;                    
           Rcpp::NumericVector mw (K) ;             
-       
-           
           int start_cc = 0 ;    
           int cc1 ;   
           int pp=0;       
@@ -209,10 +160,6 @@ BEGIN_RCPP
           double freqall =0 ;     
           double wles3tot=0 ;       
           double wles4tot=0 ;  
-       
-     //      int nn = 0 ;  
-       
-       
          //////////////////////////////////////////////////////////////  
          ////////// begin items ///////////////////////////////////////  
          for ( int ii=0; ii<I ; ii++){    
@@ -220,11 +167,8 @@ BEGIN_RCPP
           Rcpp::CharacterVector TDAT_ii = TDAT.row(ii) ;    
           Rcpp::CharacterVector uii = Rcpp::unique( TDAT_ii ) ;         
           Rcpp::IntegerVector  uii_match = match( TDAT_ii , uii );  
-       
-            
-          // Rcpp::IntegerVector uii = table( TDAT_ii ) ;    
-          NC_ii = uii.size() ;    
 
+          NC_ii = uii.size() ;    
              if ( NC_ii > K){  
                  Rcout << "allocate of at least " << NC_ii << "needed!" << std::flush ;    
                  Rcpp::stop("Maximum allocation reached! Increase 'allocate'!");  
@@ -288,10 +232,6 @@ BEGIN_RCPP
                                   ( des(cc1,1) * ( des(cc1,1)-1 + eps ) ) ) ;     
                          }                         
                      }          
-                           
-                           
-                           
-                         
           // increment start index         
           start_cc = start_cc + NC_ii ;  
                          
@@ -313,19 +253,5 @@ BEGIN_RCPP
                     Rcpp::_["desV"] = desV   ,  
                     Rcpp::_["LP"] = LP   
                  		) ;    
-              
-              
-                      
-                      
-          //  Rcpp::Rcout << "cx " << cx  << std::endl ;                                         
-          //   Rcpp::Rcout << "cy " << cy  << std::endl ;                                         
-                    
-       
-     
-END_RCPP
 }
-
-
-
-
 

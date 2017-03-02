@@ -23,17 +23,17 @@ rowcumsums <-
 
 ###################################################################
 rowCumsums.TAM <- function(matr){ 
-	.Call("rowCumsums2_source", matr , PACKAGE = "TAM")
-					}
+	rowCumsums2_source( matr )
+}
 ###################################################################					
 #****					
 # 'interval_index' searches an index when a frequency is exceeded
 # -> used in plausible value imputation
 interval_index <- function(matr,rn){ 
-	res <- .Call("interval_index_C", matr , rn , PACKAGE = "TAM")
+	res <- interval_index_C( matr , rn )
 	res <- res + 1
 	return(res)
-					}					
+}					
 #############################################################
 # search the maximum in each matrix row
 rowMaxs <-
@@ -64,7 +64,10 @@ theta.sq <-
 #*******************************
 # faster Rcpp function  
 theta.sq2 <- function(theta){
-	theta2 <- .Call("theta_sq_cpp", theta , PACKAGE = "TAM")
+	D <- ncol(theta)
+	TP <- nrow(theta)
+	theta2 <- theta_sq_cpp( theta )
+    theta2 <- array(theta2 , dim=c(TP,D,D) )		
     return("theta2" = theta2)
   }  
   

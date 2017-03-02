@@ -207,8 +207,7 @@ rownames.design2 <- function(X){
 	index_matr <- index_matr[ order( index_matr[ , 1] ) , ]
 
 	SG <- length(stepgroups2)	
-	res <- .Call( "a_matrix_cumsum" , as.matrix(index_matr)-1 , as.matrix(mm) , SG ,
-				PACKAGE="TAM")
+	res <- a_matrix_cumsum( as.matrix(index_matr)-1 , as.matrix(mm) , SG )
 	mm.sg.temp <- res$cumsum_mm
 	rownames(mm.sg.temp) <- paste0("I", seq(1,nrow(mm.sg.temp) ) )
 	ind2 <- seq( 1 , NRX+SG , maxK+1 )

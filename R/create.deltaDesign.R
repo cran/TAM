@@ -20,5 +20,5 @@ create.deltaDesign <- function(X , main=2 , int=TRUE ){
 					}
 				}
 	return(deltaD)
-		}
+}
 ############################################################

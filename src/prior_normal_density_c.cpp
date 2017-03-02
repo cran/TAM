@@ -1,22 +1,8 @@
 
-
-// includes from the plugin
-
 #include <Rcpp.h>
-
-
-#ifndef BEGIN_RCPP
-#define BEGIN_RCPP
-#endif
-
-#ifndef END_RCPP
-#define END_RCPP
-#endif
 
 using namespace Rcpp;
 
-
-// user includes
 
 
 /////////////////////////////////////////////////////////////////////
@@ -26,32 +12,18 @@ using namespace Rcpp;
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 
-// declarations
-extern "C" {
-SEXP prior_normal_density_C( SEXP theta_, SEXP mu_, SEXP varInverse_, SEXP coeff_) ;
-}
+///********************************************************************
+///** prior_normal_density_C
+// [[Rcpp::export]]           
+Rcpp::NumericMatrix prior_normal_density_C( Rcpp::NumericMatrix theta, 
+	Rcpp::NumericMatrix mu, Rcpp::NumericMatrix varInverse, 
+	Rcpp::NumericVector COEFF ){
 
-// definition
-
-SEXP prior_normal_density_C( SEXP theta_, SEXP mu_, SEXP varInverse_, SEXP coeff_ ){
-BEGIN_RCPP
-  
-       
-       
-     Rcpp::NumericMatrix theta(theta_);    
-     Rcpp::NumericMatrix mu(mu_);          
-     Rcpp::NumericMatrix varInverse(varInverse_);  
-     Rcpp::NumericVector COEFF(coeff_);  
-       
      int nnodes = theta.nrow() ;  
      int ndim = theta.ncol() ;  
      int nstud = mu.nrow() ;  
-       
      double coeff = COEFF[0] ;  
-       
      Rcpp::NumericMatrix gwt(nstud,nnodes) ;  
-       
-       
      Rcpp::NumericVector x1(ndim) ;  
        
      //*****************************************  
@@ -84,9 +56,7 @@ BEGIN_RCPP
      } // end nn  
                
      //// OUTPUT  
-     return ( wrap(gwt) ) ;  
-         
-END_RCPP
+     return gwt ;           
 }
 
 
@@ -98,32 +68,18 @@ END_RCPP
 /////////////////////////////////////////////////////////////////////
 
 
-// declarations
-extern "C" {
-SEXP prior_normal_densityALL_C( SEXP theta_, SEXP mu_, SEXP varInverse_, SEXP coeff_) ;
-}
 
-// definition
+///********************************************************************
+///** prior_normal_densityALL_C
+// [[Rcpp::export]]           
+Rcpp::NumericVector prior_normal_densityALL_C( Rcpp::NumericMatrix theta, 
+	Rcpp::NumericMatrix mu, Rcpp::NumericMatrix varInverse, 
+	Rcpp::NumericVector COEFF ){
 
-SEXP prior_normal_densityALL_C( SEXP theta_, SEXP mu_, SEXP varInverse_, SEXP coeff_ ){
-BEGIN_RCPP
-  
-       
-       
-     Rcpp::NumericMatrix theta(theta_);    
-     Rcpp::NumericMatrix mu(mu_);          
-     Rcpp::NumericMatrix varInverse(varInverse_);  
-     Rcpp::NumericVector COEFF(coeff_);  
-       
      int nnodes = theta.nrow() ;  
      int ndim = theta.ncol() ;  
-     // int nstud = mu.nrow() ;  
-       
-     double coeff = COEFF[0] ;  
-       
+     double coeff = COEFF[0] ;         
      Rcpp::NumericVector gwt(nnodes) ;  
-       
-       
      Rcpp::NumericVector x1(ndim) ;  
        
      //*****************************************  
@@ -154,10 +110,9 @@ BEGIN_RCPP
          } // end qq  
                
      //// OUTPUT  
-     return ( wrap(gwt) ) ;  
-         
-END_RCPP
+     return gwt ;  
 }
+///********************************************************************
 
 
 

@@ -70,7 +70,7 @@ summary(mod1)
   ##   3 Benefit 392 1.163     -1.233     -0.404      1.806           1           2           3
 
 # Calculation of Thurstonian thresholds
-tam.threshold(mod1)
+TAM::tam.threshold(mod1)
   ##                Cat1      Cat2     Cat3
   ##   Comfort -1.325226 2.0717468 3.139801
   ##   Work    -1.777679 0.6459045 1.971222

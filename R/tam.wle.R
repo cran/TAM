@@ -48,7 +48,11 @@ tam.mml.wle <-
 	  pweights <- 1 + 0 * tamobj$pid	  
     }  
     resp[ is.na(resp) ] <- 0  
-    resp.ind <- tamobj$resp.ind  
+    resp.ind <- tamobj$resp.ind
+	#*** readjust in case of WLE
+	if (WLE){
+		adj <- 0
+	}
     col.index <- rep( 1:nitems , each = maxK )
     cResp <- resp[ , col.index  ]*resp.ind[ , col.index ]
     cResp <- 1 * t( t(cResp) == rep(0:(maxK-1), nitems) )
@@ -79,7 +83,7 @@ tam.mml.wle <-
     }
     
     #Initialise theta (WLE) values for all students
-    theta <- log(PersonScores/(PersonMax-PersonScores)) #log of odds ratio of raw score
+    theta <- log((PersonScores+.5)/(PersonMax-PersonScores+1)) #log of odds ratio of raw score
     
     ######################################
     #Compute WLE
@@ -316,7 +320,13 @@ tam.mml.wle2 <-
 	  tamobj$pweights <- 1+0*tamobj$pid
     }  
     resp[ is.na(resp) ] <- 0  
-    resp.ind <- tamobj$resp.ind  
+    resp.ind <- tamobj$resp.ind
+
+	#*** readjust in case of WLE
+	if (WLE){
+		adj <- 0
+	}
+	
     col.index <- rep( 1:nitems , each = maxK )
     cResp <- resp[ , col.index  ]*resp.ind[ , col.index ]
     cResp <- 1 * t( t(cResp) == rep(0:(maxK-1), nitems) )
@@ -346,7 +356,7 @@ tam.mml.wle2 <-
     }
     
     #Initialise theta (WLE) values for all students
-    theta <- log(PersonScores/(PersonMax-PersonScores)) #log of odds ratio of raw score
+    theta <- log((PersonScores+.5)/(PersonMax-PersonScores+1)) #log of odds ratio of raw score
     
     ######################################
     #Compute WLE
@@ -378,8 +388,8 @@ tam.mml.wle2 <-
       rprobsWLEL <- matrix(rprobsWLE, nitems*maxK, nstud )
       
       rprobsWLEL[is.na(rprobsWLEL)] <- 0
-      resB <- .Call("tam_wle_Bs", rprobsWLEL, resp.ind, BL, BBL, BBBL, 
-                        ndim, nitems, maxK, nstud, PACKAGE="TAM")
+      resB <- tam_wle_Bs( rprobsWLEL, resp.ind, BL, BBL, BBBL, 
+                        ndim, nitems, maxK, nstud )
       B_bari <- array(resB$B_bari, dim=c(nstud, nitems,ndim))
       BB_bari <- array(resB$BB_bari, dim=c(nstud, nitems, ndim, ndim))
       BBB_bari <- array(resB$BBB_bari, dim=c(nstud, nitems, ndim))
@@ -396,10 +406,10 @@ tam.mml.wle2 <-
       } else {
         ## diag err_i= forall i
         diag_ind <- cbind(rep(1:nstud, each=ndim), 1:ndim, 1:ndim)
-        err[diag_ind] <- err[diag_ind]+10^-15    
+        err[diag_ind] <- err[diag_ind]+1E-15    
         errl <- matrix(err, nstud, ndim*ndim)
       
-        err_inv <- .Call( "tam_wle_errinv" , errl, ndim, nstud , PACKAGE="TAM" )
+        err_inv <- tam_wle_errinv( errl, ndim, nstud )
       }
         
       err_inv <- array(abs(err_inv),dim=c(nstud,ndim,ndim))
@@ -468,6 +478,8 @@ tam.mml.wle2 <-
     #   WLE or MLE estimate, by dimension
     #   Standard errors of WLE/MLE estimates, by dimension
 
+# Revalpr("theta")	
+# Revalpr("err_inv")	
     
     if ( ndim> 1){
       colnames(error) <- paste0("error.Dim" , substring( 100+1:ndim , 2) )

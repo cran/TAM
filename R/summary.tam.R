@@ -5,7 +5,7 @@ summary.tam.mml <- summary.tam.2pl <-
 function( object , file = NULL , ...){
 
 
-	osink( file = file , prefix = "__SUMMARY.Rout" )
+	CDM::osink( file = file , suffix = "__SUMMARY.Rout" )
 						
     # object      ... object from tam.mml                #
 #	object <- tamobject
@@ -177,7 +177,7 @@ function( object , file = NULL , ...){
 						}
 			}
 	#******
-	csink(file)
+	CDM::csink(file)
 	
-			}
+}
 #*******************************************************

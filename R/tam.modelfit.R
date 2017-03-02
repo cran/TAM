@@ -24,14 +24,13 @@ tam.modelfit <- function( tamobj , progress=TRUE ){
     #		cat(paste0("     |",paste0(rep("*", 10),collapse="") , "|\n     |"))
   }
   RR <- I*(I-1) / 2 
-  res0 <- .Call("tam_q3_calc_residM" , as.vector( rprobs ) , as.matrix(resp) , 
-                I , TP , maxK ,  maxKi , hwt , PACKAGE="TAM" )								
+  res0 <- tam_q3_calc_residM( as.vector( rprobs ) , as.matrix(resp) , 
+                I , TP , maxK ,  maxKi , hwt )								
   residM <- res0$residM
   resp[ resp.ind == 0 ] <- NA
   residM <- resp - residM
   # cat("calc residM Rcpp") ; zz1 <- Sys.time(); print(zz1-zz0) ; zz0 <- zz1		
-  res0 <- .Call("tam_q3_calc_V2q3jack", residM , as.matrix(resp.ind)  ,
-                PACKAGE="TAM")
+  res0 <- tam_q3_calc_V2q3jack( residM , as.matrix(resp.ind) )
   # cat("calc tam_q3_calc_V2q3jack") ; zz1 <- Sys.time(); print(zz1-zz0) ; zz0 <- zz1		
   dfr <- as.data.frame( res0$dfr )
   colnames(dfr) <- c("index1" , "index2" , "Q3" , "aQ3" )
@@ -66,9 +65,8 @@ tam.modelfit <- function( tamobj , progress=TRUE ){
   if (progress){
     cat("**** Calculate Counts \n") ; utils::flush.console()
   }
-  res1 <- .Call("tam_q3_calc_V2counts" , as.matrix(resp0) , as.matrix(resp.ind) , 
-                as.vector(rprobs) , as.matrix(hwt) , maxKi , maxK ,
-                PACKAGE="TAM")
+  res1 <- tam_q3_calc_V2counts( as.matrix(resp0) , as.matrix(resp.ind) , 
+                as.vector(rprobs) , as.matrix(hwt) , maxKi , maxK )
   obs_counts <- res1$obs_counts
   exp_counts <- res1$exp_counts
   pair_exists <- rowSums(obs_counts) > 0
@@ -88,8 +86,8 @@ tam.modelfit <- function( tamobj , progress=TRUE ){
   if (progress){
     cat("**** Calculate Covariances \n") ; utils::flush.console()
   }
-  res2 <- .Call("tam_calccov" , obs_counts , scorematrix , adjust_= 1 , PACKAGE="TAM")
-  res2e <- .Call("tam_calccov" , exp_counts , scorematrix , adjust_= 0 , PACKAGE="TAM" )
+  res2 <- tam_calccov( obs_counts , scorematrix , adjust = 1 )
+  res2e <- tam_calccov( exp_counts , scorematrix , adjust = 0 )
   
   # compute fit statistics
   residcov <- 100*mean( abs( res2$cov_ij - res2e$cov_ij ), na.rm=TRUE )

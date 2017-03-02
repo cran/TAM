@@ -39,9 +39,9 @@ function( resp , wlescore=NULL , group=NULL , allocate=30 ,
 		
 		if ( ! progress ){ prg <- 1 }
 	    resp <- as.matrix( t(resp) )
-	    res <- .Call("tamctt3csource", 
-				tdat= resp , wle=wlescore , maxK=maxK , est_wle=est_wle ,
-				prg_=prg , PACKAGE = "TAM")        
+	    res <- tamctt3csource(
+				resp , wlescore , maxK , est_wle ,
+				prg )
 		ind <- which( paste(res$desV) !="" )
 		res1 <- res$des[ ind , ]
 		dfr.gg <- data.frame( "group"=groups[gg] , 

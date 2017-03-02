@@ -6,15 +6,15 @@ plotDevianceTAM   <- function ( tam.obj , omitUntil = 1, reverse = TRUE ,
 		devhistory <- tam.obj$deviance.history
         if(omitUntil>0)  {
 				devChange <- devhistory[-c(1:omitUntil),2]
-						} else { 
+		} else { 
 				devChange <- devhistory[,2]
-							}
+		}
 		if ( change ){ 	
 			devChange <- diff(devChange) 	
 				ylab1 <- "Deviance Change"
-					} else {
+		} else {
 				ylab1 <- "Deviance"
-						}
+		}
 		
         if(reverse)      {devChange <- -1 *  devChange }
         devChange <- data.frame ( nr = omitUntil + 1:length(devChange), devChange)
@@ -30,5 +30,5 @@ plotDevianceTAM   <- function ( tam.obj , omitUntil = 1, reverse = TRUE ,
 		graphics::abline( a=0 , b=0 )                                   
 		dcr       <- devChange[devChange[,2]<0,]               
         graphics::points( dcr[,1] , dcr[,2] , pch=20, cex = cex , col="red") 
-			}
+}
 ###############################################################################

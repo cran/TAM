@@ -1,41 +1,15 @@
 
 
-// includes from the plugin
-
 #include <Rcpp.h>
-
-
-#ifndef BEGIN_RCPP
-#define BEGIN_RCPP
-#endif
-
-#ifndef END_RCPP
-#define END_RCPP
-#endif
 
 using namespace Rcpp;
 
 
-// user includes
+///********************************************************************
+///** mml3_calc_Fdes
+// [[Rcpp::export]]           
+Rcpp::List mml3_calc_Fdes( Rcpp::NumericVector XDES , Rcpp::NumericVector dimXdes ){
 
-
-// declarations
-extern "C" {
-SEXP mml3_calc_Fdes( SEXP Fdes_, SEXP dimFdes_) ;
-}
-
-// definition
-
-SEXP mml3_calc_Fdes( SEXP Fdes_, SEXP dimFdes_ ){
-BEGIN_RCPP
-  
-       
-     Rcpp::NumericVector XDES(Fdes_);          
-     Rcpp::NumericVector dimXdes(dimFdes_);        
-       
-     // $dimXdes  
-     // [1]  6  4 21 19  
-       
      int I= dimXdes[0] ;  
      int maxK= dimXdes[1] ;  
      int TP= dimXdes[2] ;  
@@ -69,56 +43,30 @@ BEGIN_RCPP
      }  
      }  
      }  
-       
-       
      //*************************************************      
-     // OUTPUT              
-                   
+     // OUTPUT                            
      return Rcpp::List::create(    
          Rcpp::_["NFdesM"] = ind  ,  
          Rcpp::_["FdesM" ] = XdesM  
          ) ;  
-END_RCPP
 }
 
 
+///********************************************************************
+///** mml3_slca_deriv
+// [[Rcpp::export]]           
+Rcpp::List mml3_slca_deriv( Rcpp::NumericMatrix XdesM, 
+	Rcpp::NumericVector dimXdes, Rcpp::NumericVector Xlambda, 
+	Rcpp::NumericVector probs, 
+	Rcpp::NumericVector nik, Rcpp::NumericVector Nik, 
+	Rcpp::NumericVector guess, Rcpp::NumericVector probs0 ){
 
-// declarations
-extern "C" {
-SEXP mml3_slca_deriv( SEXP FdesM_, SEXP dimFdes_, SEXP gammaslope_, SEXP probs_, 
-	SEXP nik_, SEXP Nik_, SEXP guess_, SEXP probs0_) ;
-}
-
-// definition
-
-SEXP mml3_slca_deriv( SEXP FdesM_, SEXP dimFdes_, SEXP gammaslope_, SEXP probs_, 
-	SEXP nik_, SEXP Nik_, SEXP guess_, SEXP probs0_ ){
-BEGIN_RCPP
-  
-       
-     Rcpp::NumericMatrix XdesM(FdesM_);          
-     Rcpp::NumericVector dimXdes(dimFdes_);        
-     Rcpp::NumericVector Xlambda(gammaslope_);  
-     Rcpp::NumericVector probs(probs_) ;  
-     Rcpp::NumericVector nik(nik_) ;  
-     Rcpp::NumericVector Nik(Nik_) ;  
-     Rcpp::NumericVector guess(guess_) ;  
-     Rcpp::NumericVector probs0(probs0_) ;  
-       
-     // $dimXdes  
-     // [1]  6  4 21 19  
-       
      int I= dimXdes[0] ;  
      int maxK= dimXdes[1] ;  
      int TP= dimXdes[2] ;  
-     int Nlam = dimXdes[3] ;  
-       
+     int Nlam = dimXdes[3] ;         
      int RR = XdesM.nrow() ;  
-       
      double eps10 = 1E-7;
-     
-     // int PP = I * maxK * TP ;  
-       
      Rcpp::NumericVector d1b(Nlam);  
      Rcpp::NumericVector d2b(Nlam);  
        
@@ -132,8 +80,6 @@ BEGIN_RCPP
      //        # n.ik  num [1:I, 1:maxK, 1:TP]  
      //        # N.ik  num [1:I,1:TP]  
      //        # Xdes  num [1:I, 1:maxK, 1:TP, 1:Nlam]           
-       
-       
      ///*********************  
      // First derivative  
        
@@ -213,72 +159,40 @@ BEGIN_RCPP
                     probs0[ ii + I*0 + I*maxK*tt ] * ( guess[ii] * nik[ii+I*hh+I*maxK*tt] /  
                     	     pow( probs[ ii + I*hh + I*maxK*tt ] , 2.0) - Nik[ii + I*tt ] );
                    }
-       		}  // end if guess[ii] > 0  		  
-       		  
-       		  
-        			}  
-       
-        			  
+       		}  // end if guess[ii] > 0  		  		  
+       }  
      //*************************************************      
-     // OUTPUT              
-                   
+     // OUTPUT                                 
       return Rcpp::List::create(    
          Rcpp::_["d1b" ] = d1b ,  
          Rcpp::_["d2b" ] = d2b   
          ) ;  
-END_RCPP
 }
 
 
+///********************************************************************
+///** mml3pl_tam_calcexp
+// [[Rcpp::export]]           
+Rcpp::List mml3pl_tam_calcexp( int NP , 
+	Rcpp::NumericMatrix rprobs, Rcpp::NumericMatrix A, 
+	Rcpp::NumericMatrix INDEXIPNO, Rcpp::NumericVector INDEXIPLIST2, 
+	Rcpp::NumericVector ESTXSIINDEX, int C, 
+	Rcpp::NumericMatrix ITEMWT, Rcpp::NumericMatrix rprobs0, 
+	Rcpp::NumericVector GUESS, Rcpp::NumericVector nik, 
+	Rcpp::NumericVector ni ){
 
-// declarations
-extern "C" {
-SEXP mml3pl_tam_calcexp( SEXP np, SEXP rprobsL, SEXP AL, SEXP indexIPno, 
-	SEXP indexIPlist2, SEXP estxsiindex, SEXP CC, SEXP itemwt, SEXP rprobsL0, 
-	SEXP guess, SEXP nik_, SEXP ni_) ;
-}
-
-// definition
-
-SEXP mml3pl_tam_calcexp( SEXP np, SEXP rprobsL, SEXP AL, SEXP indexIPno, 
-	SEXP indexIPlist2, SEXP estxsiindex, SEXP CC, SEXP itemwt, SEXP rprobsL0, 
-	SEXP guess, SEXP nik_, SEXP ni_ ){
-BEGIN_RCPP
-  
-         
-          /////////////////////////////////////    
-          // INPUT    
-              
-          int NP = as<int>(np);    
-          Rcpp::NumericMatrix rprobs(rprobsL);    
-          Rcpp::NumericMatrix A(AL);    
-          Rcpp::NumericMatrix INDEXIPNO(indexIPno);    
-          Rcpp::NumericVector INDEXIPLIST2(indexIPlist2);    
-          Rcpp::NumericVector ESTXSIINDEX(estxsiindex);    
-          int C = as<int>(CC);    
-          Rcpp::NumericMatrix ITEMWT(itemwt);    
-          Rcpp::NumericMatrix rprobs0(rprobsL0);      
-          Rcpp::NumericVector GUESS(guess) ;  
-          Rcpp::NumericVector nik(nik_) ;  
-          Rcpp::NumericVector ni(ni_) ;  
-            
-          // Rcpp::Numeric C(CC); => Rcpp does not have a class Numeric!    
-              
           ////////////////////////////////////////////////////////////    
           // define output vectors    
-          NumericVector XBAR (NP) ;  
-          NumericVector iscore (NP) ;  
-          NumericVector XBAR2 (NP) ;    
-          NumericVector XXF (NP) ;    
-              
+          Rcpp::NumericVector XBAR (NP) ;  
+          Rcpp::NumericVector iscore (NP) ;  
+          Rcpp::NumericVector XBAR2 (NP) ;    
+          Rcpp::NumericVector XXF (NP) ;    
           ///////////////////////////////////////////////////////////    
           // DEFINE indices    
-              
           int TP = rprobs.ncol();    
           int NEXI = ESTXSIINDEX.size() ;    
           int NR = rprobs.nrow();    
           int II = NR / C ;     
-            
           // II ... number of items  
           // TP ... number of theta points  
           // CC ... number of categories  
@@ -344,46 +258,25 @@ BEGIN_RCPP
               
           ///////////////////////////////////////////////////////    
           ///////////// O U T P U T   ///////////////////////////    
-              
           return Rcpp::List::create(  
           	     	Rcpp::_["xbar"]=XBAR , 
                         Rcpp::_["xbar2"]=XBAR2 , 
                         Rcpp::_["xxf"]=XXF ,  
           	     	Rcpp::_["iscore"] = iscore  
           	     	);   
-       
-       
-     
-END_RCPP
 }
 
+///********************************************************************
+///** mml_3pl_compute_B_rcpp
+// [[Rcpp::export]]           
+Rcpp::List mml_3pl_compute_B_rcpp( Rcpp::NumericMatrix Edes, 
+	Rcpp::NumericVector gammaslope, Rcpp::NumericVector dimE ){
 
-
-
-
-// declarations
-extern "C" {
-SEXP mml_3pl_compute_B_rcpp( SEXP Edes_, SEXP gammaslope_, SEXP dimE_) ;
-}
-
-// definition
-
-SEXP mml_3pl_compute_B_rcpp( SEXP Edes_, SEXP gammaslope_, SEXP dimE_ ){
-BEGIN_RCPP
-  
-       
-     Rcpp::NumericMatrix Edes(Edes_);          
-     Rcpp::NumericVector gammaslope(gammaslope_);   
-     Rcpp::NumericVector dimE(dimE_);   
-       
      int NE=Edes.nrow();  
      int I=dimE[0];  
      int K=dimE[1];  
      int D=dimE[2];  
-     // int L=dimE[3];  
-       
-     Rcpp::NumericVector B(I*K*D);  
-       
+     Rcpp::NumericVector B(I*K*D);
      int ii=0;  
      int kk=0;  
      int dd=0;  
@@ -400,47 +293,29 @@ BEGIN_RCPP
      	B[ind] += Edes(lz,5)*gammaslope[ll];  
      	// ind = ii + I*kk + I*K*dd + I*K*D*ll;  
      		}  
-       
-       
      //*************************************************      
-     // OUTPUT              
-                   
+     // OUTPUT                   
       return Rcpp::List::create(    
          Rcpp::_["E_design"] = Edes ,  
          Rcpp::_["B"] = B  
          ) ;  
-END_RCPP
 }
 
 
-
-// declarations
-extern "C" {
-SEXP mml_3pl_nonzero_entries( SEXP E_, SEXP dimE_) ;
-}
-
-// definition
-
-SEXP mml_3pl_nonzero_entries( SEXP E_, SEXP dimE_ ){
-BEGIN_RCPP
-  
-       
-     Rcpp::NumericVector E(E_);          
-     Rcpp::NumericVector dimE(dimE_);   
-       
+///********************************************************************
+///** mml_3pl_nonzero_entries
+// [[Rcpp::export]]           
+Rcpp::List mml_3pl_nonzero_entries( Rcpp::NumericVector E, 
+	Rcpp::NumericVector dimE ){
+     
      int NE = E.size();   
-       
      int I=dimE[0];  
      int K=dimE[1];  
      int D=dimE[2];  
      int L=dimE[3];  
-       
      Rcpp::NumericMatrix E_design(NE,6);  
-       
      int lz=0;  
-       
      int ind=0;  
-       
        
      for (int ll=0;ll<L;ll++){  
      for (int dd=0;dd<D;dd++){  
@@ -464,18 +339,10 @@ BEGIN_RCPP
      E_design = E_design( Rcpp::Range(0,lz-1) , Rcpp::Range(0,5) ) ;  
        
      //*************************************************      
-     // OUTPUT              
-                   
+     // OUTPUT                                 
       return Rcpp::List::create(    
          Rcpp::_["E_design"] = E_design ,  
          Rcpp::_["maxE"] = lz   
          ) ;  
-END_RCPP
 }
-
-
-
-
-
-
 

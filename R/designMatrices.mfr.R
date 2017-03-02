@@ -138,8 +138,7 @@ z0 <- tamcat( " ---  after gresp selection   " , z0 , tamcat_active )
 
     # This step is time-consuming!!
 	#**** ARb 2014-05-30
-	gresp <- .Call("gresp_extend" , as.matrix(gresp) , as.numeric( X[,"step"] ) ,
-					PACKAGE="TAM")    
+	gresp <- gresp_extend( as.matrix(gresp) , as.numeric( X[,"step"] ) )
 z0 <- tamcat( " ---  after gresp   " , z0 , tamcat_active )      
         
     ind.resp.cols <- as.numeric(X.noStep.ind)
@@ -159,11 +158,9 @@ z0 <- tamcat( " ---  rownames.design2   " , z0 , tamcat_active )
 #      gresp[ outer(rnFacets, rnX, "!=") ] <- NA
       #      gresp.noStep <- gresp.noStep * (1* outer(rnFacets, rnX.noStep, "=="))
 #      gresp.noStep[ outer(rnFacets, rnX.noStep, "!=") ] <- NA
-	  gresp <- .Call("gresp_na_facets" ,  as.matrix(gresp) , rnFacets , rnX ,
-				PACKAGE="TAM")
+	  gresp <- gresp_na_facets(  as.matrix(gresp) , rnFacets , rnX )
 z0 <- tamcat( " ---  gresp na facets gresp   " , z0 , tamcat_active )  				
-	  gresp.noStep <- .Call("gresp_na_facets", as.matrix(gresp.noStep ) , rnFacets , rnX.noStep ,
-				PACKAGE="TAM"	  )	
+	  gresp.noStep <- gresp_na_facets( as.matrix(gresp.noStep ) , rnFacets , rnX.noStep )
 z0 <- tamcat( " ---  gresp na facets gresp.noStep   " , z0 , tamcat_active )  				
       
     }
@@ -177,13 +174,13 @@ z0 <- tamcat( " ---  gresp na facets gresp.noStep   " , z0 , tamcat_active )
 # X$empty <- colsums_gresp2( gresp )
 # data communication with Rcpp does need no computation time
 
-	X$empty <- .Call( "colsums_gresp" , gresp , PACKAGE="TAM")
+	X$empty <- colsums_gresp( gresp )
 z0 <- tamcat( " ---  col sums (gresp) in X (Rcpp)" , z0 , tamcat_active )  				 
 
 
     colnames(gresp.noStep) <- rownames(X.noStep)	
 #    X.noStep$empty <- 1* (colSums( gresp.noStep, na.rm=TRUE ) == 0)
-	X.noStep$empty <- .Call( "colsums_gresp" , gresp.noStep , PACKAGE="TAM")
+	X.noStep$empty <- colsums_gresp( gresp.noStep )
 z0 <- tamcat( " ---  col sums (gresp noStep) in X (Rcpp)" , z0 , tamcat_active )  				 
 
     ### output

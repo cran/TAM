@@ -16,8 +16,8 @@
 #############################################################
 # faster function for computation of item loadings
 .mml.3pl.computeB.v2 <- function( Edes , gammaslope , E ){
-	B <- .Call("mml_3pl_compute_B_rcpp" ,
-			Edes , gammaslope , dim(E) , PACKAGE="TAM")$B
+	B <- mml_3pl_compute_B_rcpp(
+			Edes , gammaslope , dim(E) )$B
 	B <- array( B , dim(E)[1:3] )
 	return(B)
 		}

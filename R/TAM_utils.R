@@ -8,18 +8,7 @@ Rsessinfo <- function(){
              , " | nodename = " , si["nodename"] , " | login = " , si["login"] )
             }
 #************************************************
-			
-#************************************************
-# sinking output
-osink <- function( file , prefix){
-	if ( ! is.null( file ) ){
-		sink( paste0( file , prefix) , split=TRUE )
-						}
-				}			
-csink <- function( file){
-	if ( ! is.null( file ) ){  sink()	}	
-					}			
-#************************************************
+
 
 #************************************************
 # print CALL in summary										

@@ -30,26 +30,10 @@ calc_posterior.v2 <-
     storage.mode(resp) <- "integer"
 	
 	fx0 <- fx
-
-
-#***
-# eps <- .001
-# rprobs <- rprobs + eps
-#***
-	
 	
 # cat("vor calcfx") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
     fx <- .Call("calcfx", fx, rprobs, resp.ind.list, resp)
 # cat("nach calcfx") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
-
-
-
-	# logprobs
-#	eps <- 1E-10
-#	rprobs <- log(rprobs + eps )
-#	fx1 <- .Call("calcfx_logprobs", fx=fx0, rprobs, resp.ind.list, resp)
-#	fx <- exp(fx1)
-# cat("nach calcfx_logprobs") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1			
 	
 	if (avoid.zerosum ){	
 		fxs <- rowSums( fx )

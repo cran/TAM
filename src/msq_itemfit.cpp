@@ -1,49 +1,25 @@
 
 
-// includes from the plugin
+
+// [[Rcpp::depends(RcppArmadillo)]]
+
 #include <RcppArmadillo.h>
 #include <Rcpp.h>
-
-
-#ifndef BEGIN_RCPP
-#define BEGIN_RCPP
-#endif
-
-#ifndef END_RCPP
-#define END_RCPP
-#endif
 
 using namespace Rcpp;
 
 
-// user includes
+///********************************************************************
+///** msq_itemfit
+// [[Rcpp::export]]           
+Rcpp::List msq_itemfit( Rcpp::NumericMatrix resp, 
+	Rcpp::NumericVector irf1, int K, int TP, 
+	Rcpp::NumericMatrix post1, Rcpp::NumericMatrix FIT, 
+	Rcpp::NumericMatrix fitIndexM ){
 
-
-// declarations
-extern "C" {
-SEXP msq_itemfit( SEXP resp_, SEXP irf1_, SEXP K_, SEXP TP_, SEXP post1_, SEXP FIT_, SEXP fitIndexM_) ;
-}
-
-// definition
-
-SEXP msq_itemfit( SEXP resp_, SEXP irf1_, SEXP K_, SEXP TP_, SEXP post1_, SEXP FIT_, SEXP fitIndexM_ ){
-BEGIN_RCPP
-   
-       
-     Rcpp::NumericMatrix resp(resp_);          
-     Rcpp::NumericVector irf1(irf1_);  
-     int K = as<int>(K_);  
-     int TP = as<int>(TP_);  
-     Rcpp::NumericMatrix post1(post1_);          
-     Rcpp::NumericMatrix FIT(FIT_);   
-     Rcpp::NumericMatrix fitIndexM(fitIndexM_);  
-       
-       
      int N=resp.nrow();  
      int I=resp.ncol();  
-     int FF = FIT.nrow();  
-       
-       
+     int FF = FIT.nrow();    
      Rcpp::NumericVector probs_categ(N*K*TP*I);   
      // Rcpp::NumericVector pred(N*TP*I);  
      arma::cube pred(N,TP,I);  
@@ -53,7 +29,6 @@ BEGIN_RCPP
        
      // create output table  
      Rcpp::NumericMatrix dfr_fit(FF,4);  
-       
        
      ////********************************************************  
      ///   model predictions  
@@ -101,7 +76,6 @@ BEGIN_RCPP
      ////********************************************************  
      ///   calculation of fit statistics  
      ///*********************************************************	       
-       
      Rcpp::NumericVector fit0(N);  
      Rcpp::NumericVector fit1(N);  
      Rcpp::NumericVector fit_temp(N);  
@@ -110,7 +84,6 @@ BEGIN_RCPP
      Rcpp::NumericMatrix v0(N,TP);  
      Rcpp::NumericVector vec1(N);  
      Rcpp::NumericVector vec0(N);  
-       
        
      double N1=0 ;  
      double term1=0;  
@@ -145,14 +118,9 @@ BEGIN_RCPP
          		}  
      dfr_fit(ff,0) = term1 / N1 ;    		  
          		  
-       
      //**********************************  
      //  OUTFIT t Statistic  
-       
-       
-       
      double qi=0;  
-       
      for (int nn=0;nn<N;nn++){  // beg nn    
        vec1[nn] = 0 ;     
        for (int tt=0;tt<TP;tt++){ kurt_ii(nn,tt) = 0 ; }  
@@ -178,10 +146,6 @@ BEGIN_RCPP
      qi = qi / pow(N1 , 2.0 ) - 1 / N1 ;  
      //  dfr[ff,"Outfit_t"] <- ( fit0^(1/3)-1 )* 3 / sqrt(qi) + sqrt(qi) / 3   
      dfr_fit(ff,1) = ( pow( dfr_fit(ff,0) , ot ) - 1 ) * 3 / sqrt( qi ) + sqrt( qi ) / 3 ;  
-       
-       
-       
-       
        
      //**********************************  
      //  INFIT Calculation  
@@ -214,13 +178,9 @@ BEGIN_RCPP
      	term2 += fit1[nn];  
          		}  
      dfr_fit(ff,2) = term1 / term2 ;    		  
-         		  
-       
+    
      //**********************************  
-     //  INFIT t Statistic  
-       
-       
-       
+     //  INFIT t Statistic    
      for (int nn=0;nn<N;nn++){  // beg nn    
        vec1[nn] = 0 ;     
        for (int tt=0;tt<TP;tt++){ kurt_ii(nn,tt) = 0 ; }  
@@ -248,61 +208,29 @@ BEGIN_RCPP
      dfr_fit(ff,3) = ( pow( dfr_fit(ff,2) , ot ) - 1 ) * 3 / sqrt( qi ) + sqrt( qi ) / 3 ;  
        
      }  
-       
-       
-     //	Rcpp::Rcout << "Ntot=" <<  Ntot <<  std::flush << std::endl ;  
-         		  
-         		  
      //*************************************************      
      // OUTPUT              
-               
      return Rcpp::List::create(   
             Rcpp::_["dfr_fit"] = dfr_fit  
          ) ;    
-       
-     // maximal list length is 20!  
-       
-       
-     // Rcpp::Rcout << "tmp1 " <<  tmp1 <<  std::flush << std::endl ;  
-       
-       
-     
-END_RCPP
 }
+///********************************************************************
 
 
 
+///********************************************************************
+///** msq_itemfit2
+// [[Rcpp::export]]           
+Rcpp::List msq_itemfit2( Rcpp::NumericMatrix resp, 
+	Rcpp::NumericVector irf1, int K, int TP, 
+	Rcpp::NumericMatrix post1, Rcpp::NumericMatrix FIT, 
+	Rcpp::NumericMatrix fitIndexM ){
 
-// declarations
-extern "C" {
-SEXP msq_itemfit2( SEXP resp_, SEXP irf1_, SEXP K_, SEXP TP_, SEXP post1_, SEXP FIT_, SEXP fitIndexM_) ;
-}
-
-// definition
-
-SEXP msq_itemfit2( SEXP resp_, SEXP irf1_, SEXP K_, SEXP TP_, SEXP post1_, SEXP FIT_, SEXP fitIndexM_ ){
-BEGIN_RCPP
-  
-              
-          Rcpp::NumericMatrix resp(resp_);            
-          Rcpp::NumericVector irf1(irf1_);    
-          int K = as<int>(K_);    
-          int TP = as<int>(TP_);    
-          Rcpp::NumericMatrix post1(post1_);            
-          Rcpp::NumericMatrix FIT(FIT_);     
-          Rcpp::NumericMatrix fitIndexM(fitIndexM_);    
-              
-              
           int N=resp.nrow();    
           int I=resp.ncol();    
           int FF = FIT.nrow();    
-              
-              
           Rcpp::NumericMatrix pred(N,TP*I);    
           Rcpp::NumericMatrix var1(N,TP*I);    
-     //     Rcpp::NumericMatrix resid1(N,TP*I);    
-     //     Rcpp::NumericMatrix sresid1(N,TP*I);    
-                 
           // create output table    
           Rcpp::NumericMatrix dfr_fit(FF,4);    
               
@@ -347,8 +275,6 @@ BEGIN_RCPP
             			}    
           	       } // end nn    
           	     } // end ii    
-              
-          	         
           ////********************************************************    
           ///   calculation of fit statistics    
           ///*********************************************************	         
@@ -357,12 +283,8 @@ BEGIN_RCPP
           Rcpp::NumericVector fit1(N);    
           Rcpp::NumericVector fit_temp(N);    
           Rcpp::NumericVector fit_temp2(N);    
-     //     Rcpp::NumericMatrix kurt_ii(N,TP);    
-     //     Rcpp::NumericMatrix v0(N,TP);    
           Rcpp::NumericVector vec1(N);    
           Rcpp::NumericVector vec0(N);    
-              
-              
           double N1=0 ;    
           double term1=0;    
           double term2=0;    
@@ -397,13 +319,8 @@ BEGIN_RCPP
           	term1 += fit0[nn] ;    
               		}    
           dfr_fit(ff,0) = term1 / N1 ;    		    
-              		    
-              
           //**********************************    
           //  OUTFIT t Statistic    
-              
-              
-              
           double qi=0;    
               
           for (int nn=0;nn<N;nn++){  // beg nn      
@@ -431,14 +348,8 @@ BEGIN_RCPP
           qi = qi / pow(N1 , 2.0 ) - 1 / N1 ;    
           //  dfr[ff,"Outfit_t"] <- ( fit0^(1/3)-1 )* 3 / sqrt(qi) + sqrt(qi) / 3     
           dfr_fit(ff,1) = ( pow( dfr_fit(ff,0) , ot ) - 1 ) * 3 / sqrt( qi ) + sqrt( qi ) / 3 ;    
-              
-              
-              
-              
-              
           //**********************************    
           //  INFIT Calculation    
-              
           N1=0;    
           for (int nn=0;nn<N;nn++){  // beg nn	    
               fit0[nn] = 0 ;	    
@@ -471,9 +382,6 @@ BEGIN_RCPP
               
           //**********************************    
           //  INFIT t Statistic    
-              
-              
-              
           for (int nn=0;nn<N;nn++){  // beg nn      
             vec1[nn] = 0 ;       
             // for (int tt=0;tt<TP;tt++){ kurt_ii(nn,tt) = 0 ; }    
@@ -502,30 +410,13 @@ BEGIN_RCPP
               
           }    
               
-              
-          //	Rcpp::Rcout << "Ntot=" <<  Ntot <<  std::flush << std::endl ;    
-              		    
-              		    
           //*************************************************        
           // OUTPUT                
-                      
           return Rcpp::List::create(     
                  Rcpp::_["dfr_fit"] = dfr_fit    
               ) ;      
-              
-          // maximal list length is 20!    
-              
-              
-          // Rcpp::Rcout << "tmp1 " <<  tmp1 <<  std::flush << std::endl ;    
-              
-              
-            
-       
-       
-       
-     
-END_RCPP
 }
+///********************************************************************
 
 
 

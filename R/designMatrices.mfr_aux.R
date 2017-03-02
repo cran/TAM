@@ -1,8 +1,4 @@
 
-
-					
-					
-
 .generate.interactions <- function(X , facets , formulaA , mm ){	
 	d1 <- d0 <- X	
 	h1 <- sapply( colnames(d1) , FUN = function(vv){

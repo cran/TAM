@@ -17,19 +17,8 @@ Test Analysis Modules
     also supported.
 }
 \details{
-\tabular{ll}{
-Package: \tab \pkg{TAM}\cr
-Type: \tab Package\cr
-Version: \tab 1.99993 \cr
-Publication Year: \tab 2017\cr
-License: \tab GPL (>=2.0)\cr
-URL: \tab \url{http://www.edmeasurementsurveys.com/TAM/Tutorials/}\cr
-}
-% \tab \url{https://www.bifie.at/} \cr 
-
 See \url{http://www.edmeasurementsurveys.com/TAM/Tutorials/} for 
 tutorials of the \pkg{TAM} package.
-
 }
 \author{
 Thomas Kiefer [aut], Alexander Robitzsch [aut, cre], Margaret Wu [aut]

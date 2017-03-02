@@ -48,8 +48,9 @@ tam.jml.WLE(tamobj, resp, resp.ind, A, B, nstud, nitems, maxK, convM,
      should be used.
 }
   \item{adj}{
-     Adjustment in WLE estimation for extreme scores (i.e. all or none
-     items were correctly solved)
+     Adjustment in MLE estimation for extreme scores (i.e. all or none
+     items were correctly solved). This argument is not used if
+     \code{WLE=TRUE}.
 }
   \item{Msteps}{
      Maximum number of iterations

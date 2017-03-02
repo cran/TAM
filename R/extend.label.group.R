@@ -37,9 +37,8 @@ extend.label.group <- function( label.group ){
 	ii <- ii0
     l1 <- as.numeric( substring( str1 , ii+1 )    )
     str2 <- seq( l1[1] , l1[2] )
-    str2 <- paste0( substring( str1 , 1 , ii  )[1] , str2 )
-	
+    str2 <- paste0( substring( str1 , 1 , ii  )[1] , str2 )	
     return( str2 )
-        }
+}
 #######################################################
 

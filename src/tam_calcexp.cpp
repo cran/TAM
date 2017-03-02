@@ -1,55 +1,25 @@
 
 
-
-// includes from the plugin
-
 #include <Rcpp.h>
-
-
-#ifndef BEGIN_RCPP
-#define BEGIN_RCPP
-#endif
-
-#ifndef END_RCPP
-#define END_RCPP
-#endif
 
 using namespace Rcpp;
 
 
-// user includes
 
 
-// declarations
-extern "C" {
-SEXP TAM_CALCEXP( SEXP np, SEXP rprobsL, SEXP AL, SEXP indexIPno, 
-	 SEXP indexIPlist2, SEXP estxsiindex, SEXP CC, SEXP itemwt) ;
-}
-
-// definition
-
-SEXP TAM_CALCEXP( SEXP np, SEXP rprobsL, SEXP AL, SEXP indexIPno, 
-	 SEXP indexIPlist2, SEXP estxsiindex, SEXP CC, SEXP itemwt ){
-BEGIN_RCPP
-  
-     /////////////////////////////////////  
-     // INPUT  
-       
-     int NP = as<int>(np);  
-     Rcpp::NumericMatrix rprobs(rprobsL);  
-     Rcpp::NumericMatrix A(AL);  
-     Rcpp::NumericMatrix INDEXIPNO(indexIPno);  
-     Rcpp::NumericVector INDEXIPLIST2(indexIPlist2);  
-     Rcpp::NumericVector ESTXSIINDEX(estxsiindex);  
-     int C = as<int>(CC);  
-     Rcpp::NumericMatrix ITEMWT(itemwt);  
-     // Rcpp::Numeric C(CC); => Rcpp does not have a class Numeric!  
-       
+///********************************************************************
+///** TAM_CALCEXP
+// [[Rcpp::export]]           
+Rcpp::List TAM_CALCEXP( int NP, Rcpp::NumericMatrix rprobs, 
+	Rcpp::NumericMatrix A, Rcpp::NumericMatrix INDEXIPNO, 
+	Rcpp::NumericVector INDEXIPLIST2, Rcpp::NumericVector ESTXSIINDEX, 
+	int C, Rcpp::NumericMatrix ITEMWT ){
+         
      ////////////////////////////////////////////////////////////  
      // define output vectors  
-     NumericVector XBAR (NP) ;  
-     NumericVector XBAR2 (NP) ;  
-     NumericVector XXF (NP) ;  
+     Rcpp::NumericVector XBAR (NP) ;  
+     Rcpp::NumericVector XBAR2 (NP) ;  
+     Rcpp::NumericVector XXF (NP) ;  
        
      ///////////////////////////////////////////////////////////  
      // DEFINE indices  
@@ -95,49 +65,25 @@ BEGIN_RCPP
      	} // end xsi index  
        
      ///////////////////////////////////////////////////////  
-     ///////////// O U T P U T   ///////////////////////////  
-       
+     ///////////// O U T P U T   ///////////////////////////         
      return Rcpp::List::create(
            Rcpp::_["xbar"]=XBAR , 
            Rcpp::_["xbar2"]=XBAR2 , 
            Rcpp::_["xxf"]=XXF  
                 ); 
-END_RCPP
 }
+///********************************************************************
 
 
 
-
-
-// declarations
-extern "C" {
-SEXP TAM_CALCEXP2( SEXP np, SEXP rprobsL, SEXP AL, SEXP indexIPno, 
-	 SEXP indexIPlist2, SEXP estxsiindex, SEXP CC, SEXP itemwt ,
-	 SEXP NR_ , SEXP TP_ ) ;
-}
-
-// definition
-
-SEXP TAM_CALCEXP2( SEXP np, SEXP rprobsL, SEXP AL, SEXP indexIPno, 
-	 SEXP indexIPlist2, SEXP estxsiindex, SEXP CC, SEXP itemwt ,
-	 SEXP NR_ , SEXP TP_){
-BEGIN_RCPP
+///********************************************************************
+///** TAM_CALCEXP2
+// [[Rcpp::export]]           
+Rcpp::List TAM_CALCEXP2( int NP, Rcpp::NumericVector rprobs, 
+	Rcpp::NumericVector A, Rcpp::NumericMatrix INDEXIPNO, 
+	Rcpp::NumericVector INDEXIPLIST2, Rcpp::NumericVector ESTXSIINDEX, 
+	int C, Rcpp::NumericMatrix ITEMWT , int NR , int TP){
   
-     /////////////////////////////////////  
-     // INPUT  
-       
-     int NP = as<int>(np);  
-     Rcpp::NumericVector rprobs(rprobsL);  
-     Rcpp::NumericVector A(AL);  
-     Rcpp::NumericMatrix INDEXIPNO(indexIPno);  
-     Rcpp::NumericVector INDEXIPLIST2(indexIPlist2);  
-     Rcpp::NumericVector ESTXSIINDEX(estxsiindex);  
-     int C = as<int>(CC);  
-     Rcpp::NumericMatrix ITEMWT(itemwt);
-     int NR = as<int>(NR_);     
-     int TP = as<int>(TP_);
-
-       
      ////////////////////////////////////////////////////////////  
      // define output vectors  
      NumericVector XBAR (NP) ;  
@@ -146,10 +92,7 @@ BEGIN_RCPP
        
      ///////////////////////////////////////////////////////////  
      // DEFINE indices  
-       
-//     int TP = rprobs.ncol();  
      int NEXI = ESTXSIINDEX.size() ;  
-//     int NR = rprobs.nrow();  
      int II = NR / C ;   
        
      /////////////////////////////////////////////////////////  
@@ -189,49 +132,34 @@ BEGIN_RCPP
      	} // end xsi index  
        
      ///////////////////////////////////////////////////////  
-     ///////////// O U T P U T   ///////////////////////////  
-       
+     ///////////// O U T P U T   ///////////////////////////         
      return Rcpp::List::create(
                 Rcpp::_["xbar"]=XBAR , 
                 Rcpp::_["xbar2"]=XBAR2 , 
                 Rcpp::_["xxf"]=XXF  
                     ); 
-END_RCPP
 }
 
 
 
-// declarations
-extern "C" {
-SEXP redefine_vector_na( SEXP A_, SEXP val_) ;
-}
+///********************************************************************
+///** redefine_vector_na
+// [[Rcpp::export]]           
+Rcpp::NumericVector redefine_vector_na( Rcpp::NumericVector A, 
+	double val ){
 
-// definition
-
-SEXP redefine_vector_na( SEXP A_, SEXP val_ ){
-BEGIN_RCPP
-  
-     Rcpp::NumericVector A(A_);          
-     double val = as<double>(val_);  
-       
-     int N = A.size();  
-       
-       
-     Rcpp::NumericVector A1(N);  
-       
+     int N = A.size();    
+     Rcpp::NumericVector A1(N);         
      for( int nn=0;nn<N;nn++){  
-     if ( R_IsNA( A[nn] ) ){  
-     	A1[nn] = val ;  
-     		} else {  
-     	A1[nn] = A[nn];  
-     		}  
-     	}  
-       
+	     if ( R_IsNA( A[nn] ) ){  
+		A1[nn] = val ;  
+	     } else {  
+		A1[nn] = A[nn];  
+             }  
+     }    
      //*************************************************      
      // OUTPUT              
-       
-     return( wrap( A1 ) );
-END_RCPP
+     return A1;
 }
 
 

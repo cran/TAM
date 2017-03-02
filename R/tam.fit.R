@@ -196,10 +196,9 @@ tam.mml.fit <-
 	
       # calculate fit in Rcpp	
 	  if ( useRcpp ){
-		res0 <- .Call( "tam_fit_simul" , 
+		res0 <- tam_fit_simul(
 					rn1M , c_hwt , Ax , xbar , var1 , Uz2 , Vz2 , nstud.ip ,
-					pweights , 
-					PACKAGE="TAM" )
+					pweights )
 		Outfit_SIM <- res0$Outfit_SIM
 		Infit_SIM <- res0$Infit_SIM
 		Infit_t_SIM <- res0$Infit_t_SIM

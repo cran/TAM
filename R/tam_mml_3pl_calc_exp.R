@@ -23,9 +23,9 @@ tam_mml_3pl_calc_exp <- function( rprobs , A , np , est.xsi.index , itemwt ,
 
 	#******
 	# Call .mml.3pl function  (define CALL)	
-	res <- .Call("mml3pl_tam_calcexp" ,  np , rprobsL , AL ,	indexIP.no , 
+	res <- mml3pl_tam_calcexp(  np , rprobsL , AL ,	indexIP.no , 
 			    indexIP.list2 , est.xsi.index , CC , itemwt , rprobsL0 , 
-			    guess , nik , ni , PACKAGE="TAM")
+			    guess , nik , ni )
 	return(res)
 		}
 		

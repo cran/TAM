@@ -1,62 +1,28 @@
 
 
-// includes from the plugin
-
 #include <Rcpp.h>
-
-
-#ifndef BEGIN_RCPP
-#define BEGIN_RCPP
-#endif
-
-#ifndef END_RCPP
-#define END_RCPP
-#endif
 
 using namespace Rcpp;
 
 
-// user includes
+///********************************************************************
+///** tam_fit_simul
+// [[Rcpp::export]]           
+Rcpp::List tam_fit_simul( Rcpp::NumericMatrix rn1M, 
+	Rcpp::NumericMatrix c_hwt, Rcpp::NumericMatrix Ax, 
+	Rcpp::NumericMatrix xbar, Rcpp::NumericMatrix var1, 
+	Rcpp::NumericMatrix Uz2, Rcpp::NumericMatrix Vz2, 
+	Rcpp::NumericVector nstud_ip, Rcpp::NumericVector pweights ){
 
-
-// declarations
-extern "C" {
-SEXP tam_fit_simul( SEXP rn1M_, SEXP c_hwt_, SEXP Ax_, SEXP xbar_, SEXP var1_, 
-	SEXP Uz2_, SEXP Vz2_, SEXP nstud_ip_, SEXP pweights_) ;
-}
-
-// definition
-
-SEXP tam_fit_simul( SEXP rn1M_, SEXP c_hwt_, SEXP Ax_, SEXP xbar_, SEXP var1_, 
-	SEXP Uz2_, SEXP Vz2_, SEXP nstud_ip_, SEXP pweights_ ){
-BEGIN_RCPP
-  
-       
-     Rcpp::NumericMatrix rn1M(rn1M_);          
-     Rcpp::NumericMatrix c_hwt(c_hwt_);  
-     Rcpp::NumericMatrix Ax(Ax_);  
-     Rcpp::NumericMatrix xbar(xbar_);  
-     Rcpp::NumericMatrix var1(var1_);  
-     Rcpp::NumericMatrix Uz2(Uz2_);  
-     Rcpp::NumericMatrix Vz2(Vz2_);  
-     Rcpp::NumericVector nstud_ip(nstud_ip_);  
-     Rcpp::NumericVector pweights(pweights_);  
-       
-       
-     // derived quantities  
-       
      int N = rn1M.nrow() ;  
      int Nsimul = rn1M.ncol() ;  
      int TP=c_hwt.ncol();  
-       
-       
      Rcpp::NumericVector j(N);  
      Rcpp::NumericVector wt_numer(N);  
      Rcpp::NumericVector wt_denom(N);  
      Rcpp::NumericVector z2(N);  
      Rcpp::NumericVector wt_var(N);  
      Rcpp::NumericVector varz2(N);  
-       
      Rcpp::NumericVector Outfit_SIM(Nsimul);  
      Rcpp::NumericVector Infit_SIM(Nsimul);  
      Rcpp::NumericVector Infit_t_SIM(Nsimul);  
@@ -103,12 +69,9 @@ BEGIN_RCPP
      // calculation of fit statistics  
        
      //      Outfit[p] <- sum( z2*pweights, na.rm = TRUE  ) / nstud.ip  
-     //      Outfit_SIM[hh] <- Outfit[p]  
-       
+     //      Outfit_SIM[hh] <- Outfit[p] 
      //  Infit[p] <- sum( wt_numer*pweights,na.rm = TRUE )  
-     //       /sum(wt_denom*pweights,na.rm = TRUE  )  
-       
-       
+     //       /sum(wt_denom*pweights,na.rm = TRUE  )         
      tmp2=0;  
      tmp3a=0;  
      tmp3b=0;  
@@ -151,7 +114,6 @@ BEGIN_RCPP
          Rcpp::_["Infit_t_SIM"] = Infit_t_SIM ,  
          Rcpp::_["Outfit_t_SIM"] = Outfit_t_SIM  
          ) ;  
-END_RCPP
 }
 
 
