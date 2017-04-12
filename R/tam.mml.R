@@ -503,11 +503,19 @@ tam.mml <-
       if ( snodes > 0){
         #      theta <- beta[ rep(1,snodes) , ] +  t ( t(chol(variance)) %*% t(theta0.samp) )
 		
+		
 		# theta <- beta[ rep(1,snodes) , ] + fac0* (theta0.samp %*% chol(variance) )
 		theta <- beta[ rep(1,snodes) , ] + theta0.samp %*% chol(variance) 
 		
         # calculate density for all nodes
-        thetasamp.density <- mvtnorm::dmvnorm( theta , mean = as.vector(beta[1,]) , sigma = variance )
+        thetasamp.density <- mvtnorm::dmvnorm( theta , mean = as.vector(beta[1,]) ,
+						sigma = variance )
+
+#***
+# theta <- theta0.samp
+#thetasamp.density <- 1+0*thetasamp.density
+#***						
+						
         # recalculate theta^2
         #      theta2 <- matrix( theta.sq(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
         theta2 <- matrix( theta.sq2(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
@@ -515,7 +523,7 @@ tam.mml <-
       olddeviance <- deviance
 # a0 <- Sys.time()	
       # calculation of probabilities
-      res <- calc_prob.v5(iIndex=1:nitems , A=A , AXsi=AXsi , B=B , xsi=xsi , theta=theta , 
+      res <- tam_mml_calc_prob(iIndex=1:nitems , A=A , AXsi=AXsi , B=B , xsi=xsi , theta=theta , 
                           nnodes=nnodes , maxK=maxK , recalc=TRUE )	
       rprobs <- res[["rprobs"]]
       AXsi <- res[["AXsi"]]
@@ -526,14 +534,14 @@ tam.mml <-
 #cat("calc_prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
       
       # calculate student's prior distribution
-      gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
-                           nnodes=nnodes , ndim=ndim,YSD=YSD , unidim_simplify=unidim_simplify ,
+      gwt <- tam_stud_prior(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
+                           nnodes=nnodes , ndim=ndim, YSD=YSD , unidim_simplify=unidim_simplify ,
 						   snodes = snodes )
 						   
 # cat("stud_prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						 
 
       # calculate student's likelihood
-      res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=gwt , resp=resp , nitems=nitems , 
+      res.hwt <- tam_calc_posterior(rprobs=rprobs , gwt=gwt , resp=resp , nitems=nitems , 
                                    resp.ind.list=resp.ind.list , normalization=TRUE , 
                                    thetasamp.density=thetasamp.density , snodes=snodes ,
                                    resp.ind=resp.ind  ,  avoid.zerosum=TRUE	)	
@@ -547,6 +555,7 @@ tam.mml <-
       oldbeta <- beta
       oldvariance <- variance 
 # cat("before mstep regression") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						           
+
 
       # M step: estimation of beta and variance
       resr <- mstep.regression( resp=resp , hwt=hwt , resp.ind=resp.ind , pweights=pweights , 
@@ -572,13 +581,13 @@ tam.mml <-
 
       
       if (G == 1){
-        diag(variance) <- diag(variance) + 10^(-10)
+        diag(variance) <- diag(variance) + 1E-10
       }
       
 	    
 	  # function for reducing the variance	  
 	  if ( ! is.null( userfct.variance ) ){  
-			variance <- do.call( userfct.variance , list(variance ) )			
+			variance <- do.call( userfct.variance , list(variance) )			
 				}
 
         #@@@@AAAA@@@@@
@@ -607,14 +616,14 @@ tam.mml <-
 
         
         if (Miter > 1){ 
-          res.p <- calc_prob.v5( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , 
+          res.p <- tam_mml_calc_prob( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , 
                                  xsi=xsi , theta=theta , nnodes=nnodes, maxK=maxK)					
           rprobs <- res.p[["rprobs"]]            
         }
 # cat("calc prob") ; z1 <- Sys.time(); print(z1-z0) ; z0 <- z1		
 
 	
-        res <- calc_exp_TK3( rprobs , A , np , est.xsi.index , itemwt ,
+        res <- tam_calc_exp( rprobs , A , np , est.xsi.index , itemwt ,
                              indexIP.no , indexIP.list2 , Avector )
 # cat("calc_exp") ; z1 <- Sys.time(); print(z1-z0) ; z0 <- z1									 
         xbar <- res$xbar
@@ -738,8 +747,8 @@ tam.mml <-
         cat( " | Deviance change:", round( devch  , 4 ) )
 		cat( " | Relative deviance change:", round( a01  , 8 ) )
         if ( devch < 0 & iter > 1 ){ 
-          cat ("\n!!! Deviance increases!                                        !!!!") 
-          cat ("\n!!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!") 			
+          cat("\n!!! Deviance increases!                                        !!!!") 
+          cat("\n!!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!") 			
         }
         
         
@@ -933,10 +942,10 @@ tam.mml <-
     xsi <- obji
     
 	#**** calculate individual likelihood
-      res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=1+0*gwt , resp=resp , nitems=nitems , 
+      res.hwt <- tam_calc_posterior(rprobs=rprobs , gwt=1+0*gwt , resp=resp , nitems=nitems , 
                                    resp.ind.list=resp.ind.list , normalization=FALSE , 
                                    thetasamp.density=thetasamp.density , snodes=snodes ,
-                                   resp.ind=resp.ind	)	
+                                   resp.ind=resp.ind)	
       res.like <- res.hwt[["hwt"]] 	
 	
 	

@@ -63,7 +63,7 @@ tam.mml.se <-
     cat("|\n|")    
     # compute likelihood
     # prior distribution for each student (normal density)
-    res0a <- stud_prior.v2( theta=theta , Y=Y , beta=beta , variance=variance , 
+    res0a <- tam_stud_prior( theta=theta , Y=Y , beta=beta , variance=variance , 
                             nstud=nstud , nnodes=nnodes , ndim=ndim , YSD=YSD ,
 							unidim_simplify=FALSE )
     
@@ -77,12 +77,12 @@ tam.mml.se <-
         xsi0[ pp ] <- xsi0[ pp] + mult[mm] * numdiff.parm
         ll0 <- 0
         # calculate probabilities
-        res0 <- calc_prob.v5( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , 
+        res0 <- tam_mml_calc_prob( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , 
                               xsi=xsi0 , theta=theta , nnodes=nnodes , maxK=maxK )
         rprobs <- res0[["rprobs"]]
         # posterior distribution
         # calculate student's likelihood
-        res0b <- calc_posterior.v2(rprobs=rprobs , gwt=res0a , resp=resp , 
+        res0b <- tam_calc_posterior(rprobs=rprobs , gwt=res0a , resp=resp , 
                                    nitems=nitems , resp.ind.list=resp.ind.list , 
                                    normalization = FALSE , thetasamp.density = NULL , 
                                    snodes = 0 )$hwt

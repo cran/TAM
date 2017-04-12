@@ -34,7 +34,7 @@ tam.threshold <- function (tamobj, prob.lvl=0.5)
 		}
 	
     while (max(abs(oldthresh-thresh)) > 0.0001) {
-      res.p <- calc_prob.v5( iIndex=i:i , A=A , AXsi=AXsi , B=B0, 
+      res.p <- tam_mml_calc_prob( iIndex=i:i , A=A , AXsi=AXsi , B=B0, 
                              xsi=xsi , theta=matrix(thresh,nrow=mc,ncol=1) , 
 							 nnodes=mc, maxK=maxK)        	
       rprobs <- res.p[["rprobs"]]

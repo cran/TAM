@@ -31,7 +31,7 @@ tam.jml.xsi <-
     old_increment <- rep(5,max(p_loop))
     cat(" Item parameter estimation |")
     while (!convergeAllP & ( iterP <= Msteps ) ) {  
-      res.p <- calc_prob.v5( iIndex = 1:nitems , A , AXsi , 
+      res.p <- tam_mml_calc_prob( iIndex = 1:nitems , A , AXsi , 
                              B , xsi , theta , nstud, maxK , TRUE )        	
       rprobs <- res.p[["rprobs"]]               
       
@@ -55,15 +55,12 @@ tam.jml.xsi <-
 			  A_Sq <- A_Sq + t( A.0[,kk1,] * A.0[,kk2,] * rr[ , kk1 , kk2 ] )	
 			}
 		  }		
-
-
         
 #        expected <- sum (A_bari, na.rm=TRUE) # sum over items 
 #        err <- sum (AA_bari - A_Sq, na.rm=TRUE)   #sum over the items  
 		  expected <- rowSums (A_bari, na.rm=TRUE) # sum over items
 		  err <- rowSums(AA_bari - A_Sq, na.rm=TRUE)   #sum over the items		
-		
-		
+				
 		  err_inv <- abs (1/( abs(err) + 10^(-10) ))		  
 		  scores <- ItemScore * ( ! convergeP ) - expected
 		  increment <-  err_inv*scores

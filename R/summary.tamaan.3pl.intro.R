@@ -11,7 +11,7 @@ summary.tamaan.3pl.intro <- function(object){
 				sep="") , "\n\n" )	
 		cat( "Date of Analysis:" , paste( object$time[2] ) , "\n" )
 		cat("Computation time:" , print(object$time[2] - object$time[1]), "\n")
-		cat( Rsessinfo() , "\n\n")			
+		cat( tam_rsessinfo() , "\n\n")			
 		cat("Multidimensional Item Response Model in TAM \n\n")
 		irtmodel <- object$irtmodel
 		cat("IRT Model" , irtmodel , " (Function 'tam.mml.3pl')\n")

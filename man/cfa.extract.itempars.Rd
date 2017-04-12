@@ -85,6 +85,7 @@ summary(mod1, standardized=TRUE , rsquare=TRUE )
 # extract parameters
 res1 <- TAM::cfa.extract.itempars( mod1 )
 
+\dontrun{
 #*** Model 2: Scale mj - explicit modelling of item intercepts
 lavmodel <- "
    mj =~ mj1 + mj2 + mj3 + mj4
@@ -123,6 +124,7 @@ cat(lavmodel)
 mod4 <- lavaan::cfa( lavmodel , data=dat2 , std.lv=TRUE )
 summary(mod4, standardized=TRUE , rsquare=TRUE )
 res4 <- TAM::cfa.extract.itempars( mod4 )
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

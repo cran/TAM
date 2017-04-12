@@ -39,7 +39,7 @@ tam.jml.WLE <-
     thetaOld <- theta
 a0 <- Sys.time()
     while (!convergeWLE & ( iterWLE <= Msteps ) ) {  
-      resWLE <- calc_prob.v5(iIndex = 1:nitems , A , AXsi , 
+      resWLE <- tam_mml_calc_prob(iIndex = 1:nitems , A , AXsi , 
                              B , xsi , theta , nstud, maxK , recalc=FALSE )      	
       rprobsWLE <- resWLE[["rprobs"]] 
       rprobsWLE[ is.na( rprobsWLE ) ] <- 0

@@ -27,6 +27,6 @@ tam_mml_3pl_calc_exp <- function( rprobs , A , np , est.xsi.index , itemwt ,
 			    indexIP.list2 , est.xsi.index , CC , itemwt , rprobsL0 , 
 			    guess , nik , ni )
 	return(res)
-		}
+}
 		
 .mml.3pl.calc_exp_TK3 <- tam_mml_3pl_calc_exp		

@@ -57,6 +57,10 @@ interval_index_C <- function(MATR, RN) {
     .Call('TAM_interval_index_C', PACKAGE = 'TAM', MATR, RN)
 }
 
+calc_prob_subtract_max <- function(rr0M, NI, NK, TP) {
+    .Call('TAM_calc_prob_subtract_max', PACKAGE = 'TAM', rr0M, NI, NK, TP)
+}
+
 mml3_calc_Fdes <- function(XDES, dimXdes) {
     .Call('TAM_mml3_calc_Fdes', PACKAGE = 'TAM', XDES, dimXdes)
 }

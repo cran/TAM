@@ -44,19 +44,19 @@ informationCurves_mml <- function( object , h=.0001 ,
 	# calculate probabilities
 	if ( class(object) %in% c("tam.mml","tam.mml.2pl" ,
 				"tam.mml.mfr") ){		
-		p0 <- calc_prob.v5(iIndex, A, AXsi, B, xsi, theta, nnodes, 
+		p0 <- tam_mml_calc_prob(iIndex, A, AXsi, B, xsi, theta, nnodes, 
 					maxK, recalc=TRUE)$rprobs
-		p1 <- calc_prob.v5(iIndex, A, AXsi, B, xsi, theta + h, 
+		p1 <- tam_mml_calc_prob(iIndex, A, AXsi, B, xsi, theta + h, 
 				nnodes, maxK, recalc=TRUE)$rprobs
-		p2 <- calc_prob.v5(iIndex, A, AXsi, B, xsi, theta - h, 
+		p2 <- tam_mml_calc_prob(iIndex, A, AXsi, B, xsi, theta - h, 
 				nnodes, maxK, recalc=TRUE)$rprobs
 								}
 	if ( class(object) %in% c("tam.mml.3pl" ) ){	
-		p0 <- .mml.3pl.calc_prob.v5(iIndex, A, AXsi, B, xsi, theta, 
+		p0 <- tam_mml_3pl_calc_prob(iIndex, A, AXsi, B, xsi, theta, 
 			nnodes, maxK, recalc=TRUE , guess)
-		p1 <- .mml.3pl.calc_prob.v5(iIndex, A, AXsi, B, xsi, theta - h, 
+		p1 <- tam_mml_3pl_calc_prob(iIndex, A, AXsi, B, xsi, theta - h, 
 			nnodes, maxK, recalc=TRUE , guess)
-		p2 <- .mml.3pl.calc_prob.v5(iIndex, A, AXsi, B, xsi, theta + h, 
+		p2 <- tam_mml_3pl_calc_prob(iIndex, A, AXsi, B, xsi, theta + h, 
 			nnodes, maxK, recalc=TRUE , guess)
 						}
 			

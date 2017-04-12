@@ -10,6 +10,7 @@
 /* .Call calls */
 extern SEXP calcfx(SEXP, SEXP, SEXP, SEXP);
 extern SEXP TAM_a_matrix_cumsum(SEXP, SEXP, SEXP);
+extern SEXP TAM_calc_prob_subtract_max(SEXP, SEXP, SEXP, SEXP);
 extern SEXP TAM_colsums_gresp(SEXP);
 extern SEXP TAM_gresp_extend(SEXP, SEXP);
 extern SEXP TAM_gresp_na_facets(SEXP, SEXP, SEXP);
@@ -42,6 +43,7 @@ extern SEXP TAM_theta_sq_cpp(SEXP);
 static const R_CallMethodDef CallEntries[] = {
     {"calcfx",                        (DL_FUNC) &calcfx,                         4},
     {"TAM_a_matrix_cumsum",           (DL_FUNC) &TAM_a_matrix_cumsum,            3},
+    {"TAM_calc_prob_subtract_max",    (DL_FUNC) &TAM_calc_prob_subtract_max,     4},
     {"TAM_colsums_gresp",             (DL_FUNC) &TAM_colsums_gresp,              1},
     {"TAM_gresp_extend",              (DL_FUNC) &TAM_gresp_extend,               2},
     {"TAM_gresp_na_facets",           (DL_FUNC) &TAM_gresp_na_facets,            3},

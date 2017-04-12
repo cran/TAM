@@ -8,12 +8,12 @@ IRT.irfprob.character <- function(object, A, B,
   
   if(object %in% c("tam.mml", "tam.mml.2pl",
                    "tam.mml.mfr")){		
-    res <- calc_prob.v5(iIndex, A, AXsi, B, xsi, theta, nnodes, 
+    res <- tam_mml_calc_prob(iIndex, A, AXsi, B, xsi, theta, nnodes, 
                  maxK, recalc = TRUE)$rprobs
     
   }
   if(object %in% c("tam.mml.3pl")){	
-    res <- .mml.3pl.calc_prob.v5(iIndex, A, AXsi, B, xsi, theta, 
+    res <- tam_mml_3pl_calc_prob(iIndex, A, AXsi, B, xsi, theta, 
                                nnodes, maxK, recalc = TRUE, guess)$rprobs
   }
   attr(res,"theta") <- theta

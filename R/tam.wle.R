@@ -104,7 +104,7 @@ tam.mml.wle <-
     
     # Begin iterations
     while (!converge & ( Miter <= Msteps ) ) {  
-      resWLE <- calc_prob.v5(iIndex = 1:nitems , A , AXsi , 
+      resWLE <- tam_mml_calc_prob(iIndex = 1:nitems , A , AXsi , 
                              B , xsi , theta , nstud, maxK , recalc=FALSE )      	
       rprobsWLE <- resWLE[["rprobs"]] 
       B_bari <- array(0,dim=c(nstud, nitems, ndim))

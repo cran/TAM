@@ -25,7 +25,7 @@
 	  
 	  while ( !converge & ( Miter <= Msteps ) ){	
 
-	      res.p <- .mml.3pl.calc_prob.v5( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , 
+	      res.p <- tam_mml_3pl_calc_prob( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , 
                                  xsi=xsi , theta=theta , nnodes=nnodes, maxK=maxK , 
 								 guess=guess )					
           rprobs00 <- rprobs <- res.p[["rprobs"]]
@@ -49,10 +49,10 @@
 		  }
 
 		  
-	      rprobs1 <- .mml.3pl.calc_prob.v5( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , 
+	      rprobs1 <- tam_mml_3pl_calc_prob( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , 
                                  xsi=xsi , theta=theta , nnodes=nnodes, maxK=maxK , 
 								 guess=guess + h )$rprobs		
-	      rprobs2 <- .mml.3pl.calc_prob.v5( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , 
+	      rprobs2 <- tam_mml_3pl_calc_prob( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , 
                                  xsi=xsi , theta=theta , nnodes=nnodes, maxK=maxK , 
 								 guess=guess - h )$rprobs		
 		   #*** calculate log-likelihood

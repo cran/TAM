@@ -21,7 +21,7 @@ See \url{http://www.edmeasurementsurveys.com/TAM/Tutorials/} for
 tutorials of the \pkg{TAM} package.
 }
 \author{
-Thomas Kiefer [aut], Alexander Robitzsch [aut, cre], Margaret Wu [aut]
+Alexander Robitzsch [aut, cre], Thomas Kiefer [aut], Margaret Wu [aut]
 
 Maintainer: Alexander Robitzsch <robitzsch@ipn.uni-kiel.de>
 }

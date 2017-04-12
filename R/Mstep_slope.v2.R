@@ -34,7 +34,7 @@ Mstep_slope.v2 <-
     }							
     while (!converge & ( Biter <= Msteps ) ) {  
       #compute expectation
-      res.p <- calc_prob.v5( iIndex= items.temp , A=A , AXsi=AXsi , B=B, 
+      res.p <- tam_mml_calc_prob( iIndex= items.temp , A=A , AXsi=AXsi , B=B, 
                              xsi=xsi , theta=theta , nnodes=nnodes, maxK=maxK)    			
       rprobs <- res.p[["rprobs"]] 
       #########################################

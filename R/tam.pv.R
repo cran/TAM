@@ -115,7 +115,7 @@ a0 <- Sys.time()
 # cat("start prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
  
       if ( ! latreg ){				
- 	    res <- .mml.3pl.calc_prob.v5( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , xsi=xsi , theta=theta , 
+ 	    res <- tam_mml_3pl_calc_prob( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , xsi=xsi , theta=theta , 
  	                         nnodes=nnodes, maxK=maxK , recalc=TRUE , guess=guess)
 		rprobs <- res[["rprobs"]]
 		AXsi <- res[["AXsi"]]
@@ -123,7 +123,7 @@ a0 <- Sys.time()
 # cat("calc prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1			
 
 		# calculate student's prior distribution    	
-		gwt <- stud_prior.v2( theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
+		gwt <- tam_stud_prior( theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
                           nnodes=nnodes , ndim=ndim , YSD=YSD , unidim_simplify=FALSE,
 						  snodes = snodes )
 # cat("stud prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							  
@@ -132,7 +132,7 @@ a0 <- Sys.time()
         #**** 
 		# posterior distribution
 		if ( ! latreg ){		
-			hwt <- calc_posterior.v2( rprobs=rprobs , gwt=gwt , resp=tamobj$resp , nitems=nitems , 
+			hwt <- tam_calc_posterior( rprobs=rprobs , gwt=gwt , resp=tamobj$resp , nitems=nitems , 
 		                          resp.ind.list=tamobj$resp.ind.list , normalization=TRUE , 
 		                          thetasamp.density=NULL , snodes=0 )$hwt
 						}
@@ -270,6 +270,5 @@ a0 <- Sys.time()
 				"pid" = tamobj$pid , "pweights" = tamobj$pweights )
 	class(res) <- "tam.pv"
     return(res)
-    }
-##################################################################
+}
 ##################################################################

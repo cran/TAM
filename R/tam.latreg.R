@@ -269,7 +269,7 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
       # cat("calc_prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
       
       # calculate student's prior distribution
-      gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
+      gwt <- tam_stud_prior(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
                            nnodes=nnodes , ndim=ndim,YSD=YSD, unidim_simplify=FALSE)
 	  # compute posterior	  
 	  hwt <- like * gwt
@@ -352,8 +352,8 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
         devch <- -( deviance - olddeviance )
         cat( " | Deviance change:", round( devch  , 4 ) )
         if ( devch < 0 & iter > 1 ){ 
-          cat ("\n!!! Deviance increases!                                        !!!!") 
-          cat ("\n!!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!") 			
+          cat("\n!!! Deviance increases!                                        !!!!") 
+          cat("\n!!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!") 			
         }
         
         

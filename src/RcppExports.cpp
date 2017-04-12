@@ -215,6 +215,20 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// calc_prob_subtract_max
+Rcpp::NumericMatrix calc_prob_subtract_max(Rcpp::NumericMatrix rr0M, int NI, int NK, int TP);
+RcppExport SEXP TAM_calc_prob_subtract_max(SEXP rr0MSEXP, SEXP NISEXP, SEXP NKSEXP, SEXP TPSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type rr0M(rr0MSEXP);
+    Rcpp::traits::input_parameter< int >::type NI(NISEXP);
+    Rcpp::traits::input_parameter< int >::type NK(NKSEXP);
+    Rcpp::traits::input_parameter< int >::type TP(TPSEXP);
+    __result = Rcpp::wrap(calc_prob_subtract_max(rr0M, NI, NK, TP));
+    return __result;
+END_RCPP
+}
 // mml3_calc_Fdes
 Rcpp::List mml3_calc_Fdes(Rcpp::NumericVector XDES, Rcpp::NumericVector dimXdes);
 RcppExport SEXP TAM_mml3_calc_Fdes(SEXP XDESSEXP, SEXP dimXdesSEXP) {

@@ -10,7 +10,7 @@ print_tam <- function( x , ...){
 			"" )		
 
 	# print Call
-    print_CALL(object$CALL)	
+    tam_print_call(object$CALL)	
 
     cat("Multidimensional Item Response Model in TAM \n")
 	# irtmodel <- object$irtmodel	

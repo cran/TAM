@@ -11,7 +11,6 @@ summary.msq.itemfit <- function( object , ... ){
 			sep="") , "\n\n" )	
 	cat( "Date of Analysis:" , paste( object$time[2] ) , "\n" )
 	cat("Computation time:" , print(object$time[2] - object$time[1]), "\n\n")
-	# cat( Rsessinfo() , "\n\n")			
 
 	cat("MSQ item fit statitics (Function 'msq.itemfit')\n\n")
 

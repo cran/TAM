@@ -164,6 +164,23 @@ plot( 1:6 , ipars[,3] , type="o" , ylim=c(-3,2) , pch=16 ,
 lines( 1:6 , ipars[,4] , type="l", col=2 , lty=2)
 points( 1:6 , ipars[,4] ,  col=2 , pch=2)
 
+# extract individual posterior distribution
+post2 <- IRT.posterior(mod2)
+str(post2)
+# num [1:519, 1:30] 0.000105 0.000105 0.000105 0.000105 0.000105 ...
+# - attr(*, "theta")= num [1:30, 1:30] 1 0 0 0 0 0 0 0 0 0 ...
+# - attr(*, "prob.theta")= num [1:30, 1] 1.21e-05 2.20e-04 2.29e-03 1.37e-02 4.68e-02 ...
+# - attr(*, "G")= num 1
+
+# There are 2 classes and 15 theta grid points for each class
+# The loadings of the theta grid on items are as follows
+mod2$E[1,2,,"mrt1_F_load_Cl1"]
+mod2$E[1,2,,"mrt1_F_load_Cl2"]
+
+# compute individual posterior probability for class 1 (first 15 columns)
+round( rowSums( post2[ , 1:15] ) , 3 )
+# columns 16 to 30 refer to class 2
+
 #*********************************************************************
 #*** Model 3: Mixed Rasch model with three classes
 tammodel <- "

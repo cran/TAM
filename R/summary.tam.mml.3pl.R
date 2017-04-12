@@ -6,15 +6,16 @@ summary.tam.mml.3pl <- function( object , file = NULL , ...){
 						}
 #	object <- tamobject
 	cat("------------------------------------------------------------\n")
-    d1 <- utils::packageDescription("TAM")
-	cat( paste( d1$Package , " " , d1$Version , " (" , d1$Date , ")" , 
-			sep="") , "\n\n" )	
+	cat( tam_packageinfo("TAM") , "\n" )	
+	cat( tam_rsessinfo() , "\n\n")	
+			
 	cat( "Date of Analysis:" , paste( object$time[2] ) , "\n" )
-	cat("Computation time:" , print(object$time[2] - object$time[1]), "\n")
-	cat( Rsessinfo() , "\n\n")			
+	cat("Computation time:" , print(object$time[2] - object$time[1]), "\n\n")
+	
     cat("Multidimensional Item Response Model in TAM \n\n")
 	irtmodel <- object$irtmodel
-	cat("IRT Model" , irtmodel , " (Function 'tam.mml.3pl')\n")
+	cat("IRT Model" , irtmodel , " (Function 'tam.mml.3pl')")
+    tam_print_call(object$CALL)	
 	
 	cat("------------------------------------------------------------\n")
 	cat( "Number of iterations =" , object$iter , "\n\n" )
@@ -81,6 +82,7 @@ summary.tam.mml.3pl <- function( object , file = NULL , ...){
 	#***********************
 	# summary distribution: normal distribution
 	PK <- ncol( object$theta)
+	G <- object$G
 	
 	if (object$skillspace == "normal"){	
 		cat("------------------------------------------------------------\n")
@@ -90,29 +92,47 @@ summary.tam.mml.3pl <- function( object , file = NULL , ...){
 		cat("------------------------------------------------------------\n")
 			cat("Covariances and Variances\n")
 			if ( object$G >1){
-				a1 <- stats::aggregate( object$variance , list( object$group ) , mean )
-				object$variance <- a1[,2]
-						}
+				group_names <- paste0("Group" , object$groups )	
+			}
 			obji <- round( object$variance , 3 )
 			if ( object$G >1){
-	#			names(obji) <- paste0("Group" , seq(1,object$G) )
-				names(obji) <- paste0("Group" , object$groups )
-						}		
-			print( obji )
+				names(obji) <- group_names
+				for (gg in 1:G){
+				    var_gg <- object$variance[gg,,,drop=FALSE]
+					ndim <- dim(var_gg)[3]
+					var_gg <- matrix( var_gg , nrow=ndim , ncol=ndim )				
+					obji <- round( var_gg , 3)	
+					cat(group_names[gg],"\n")
+					print(obji)
+				}
+			}			
+			if (G==1){			
+				print( obji )
+			}
 		cat("------------------------------------------------------------\n")
 			cat("Correlations and Standard Deviations (in the diagonal)\n")
-			if ( object$G >1){
-				obji <- sqrt( object$variance )
-						} else {
-			obji <- stats::cov2cor(object$variance)
-			diag(obji) <- sqrt( diag( object$variance) )
-						}
-			if ( object$G >1){
-	# 		names(obji) <- paste0("Group" , seq(1,object$G) )
-				names(obji) <- paste0("Group" , object$groups )			
-						}		
-			obji <- round( obji, 3 )
-			print( obji )
+			if ( object$G > 1){
+				# obji <- object$variance
+				group_names <- paste0("Group" , object$groups )	
+				for (gg in 1:G){
+				    var_gg <- object$variance[gg,,,drop=FALSE]
+					ndim <- dim(var_gg)[3]
+					var_gg <- matrix( var_gg , nrow=ndim , ncol=ndim )				
+					obji <- stats::cov2cor( var_gg )
+					diag(obji) <- sqrt( diag( var_gg ) )
+					obji <- round( obji , 3)	
+					cat(group_names[gg],"\n")
+					print(obji)
+				}
+			} else {
+				obji <- stats::cov2cor(object$variance)
+				diag(obji) <- sqrt( diag( object$variance) )
+			}
+
+			if (object$G == 1){
+				obji <- round( obji, 3 )
+				print( obji )
+			}
 		cat("------------------------------------------------------------\n")
 		 cat("Regression Coefficients\n")
 			obji <- round( object$beta , 5 )

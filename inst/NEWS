@@ -39,6 +39,40 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
+
+-------------------------------------------------------------
+VERSIONS TAM 2.0  |  2017-04-12  |  Last: TAM 2.0-37
+-------------------------------------------------------------
+
+FEATURES:
+* extended multiple group models to multidimensional IRT
+  models in 'tam.mml.3pl' (see Example 1.9)
+ 
+BUG FIXES:
+* fixed a bug in 'tam.mml.3pl' with option skillspace='normal'
+  and estimated means (i.e., means not fixed to zero)
+* fixed a bug in handling multiple groups in 'tam.mml.3pl'
+  (thanks to Laura Zieger)
+
+NOTES:
+* changed calculation of item response probabilities to avoid
+  numerical overflow
+* removed dependencies to the packages msm and tensor
+* included example for extracting posterior probabilities in
+  Rasch mixture models (requested by Ling Liaw)
+* changed order of items in output of value 'item' in 'tam.mml.mfr'  
+* exported utility functions 'tam_packageinfo', 'tam_print_call' and
+  'tam_rsessinfo' for usage in other packages
+* added 'logLik' method for objects of class 'tam.jml'
+* moved function 'tam.jml2' into 'tam.jml' (now available as the 
+  default with argument 'version=2')
+
+DATASETS INCLUDED OR MODIFIED:
+* ---
+
+EXAMPLES INCLUDED OR MODIFIED:
+* data.geiser (2), tam.mml.3pl (1.9), tam.jml (1,2,3)
+
 -------------------------------------------------------------
 VERSIONS TAM 1.99999  |  2017-03-02  |  Last: TAM 1.99999-31
 -------------------------------------------------------------

@@ -65,7 +65,7 @@ if ( fix.devices ){
   resp.ind <- tamobj$resp.ind
   resp[resp.ind==0] <- NA
   AXsi <- matrix(0,nrow=nitems,ncol=maxK )
-  res <- calc_prob.v5(iIndex=1:nitems , A=A , AXsi=AXsi , B=B , xsi=xsi , theta=theta , 
+  res <- tam_mml_calc_prob(iIndex=1:nitems , A=A , AXsi=AXsi , B=B , xsi=xsi , theta=theta , 
                       nnodes=nnodes , maxK=maxK , recalc=TRUE )  
   rprobs <- res[["rprobs"]]
   AXsi <- res[["AXsi"]]

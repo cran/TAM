@@ -16,9 +16,7 @@
 	  parchange <- 1
 	  oldfac <- fac.oldxsi
 	  iter <- 1
-	  	  
-
-		  
+	  	  		  
 	while( ( iter <= msteps ) & ( parchange > convM)  ){		
 	    Xlambda0 <- gammaslope <- Xlambda		
 # a0 <- Sys.time()		
@@ -28,7 +26,7 @@
 
  
 		# calculate probabilities
-		res <- .mml.3pl.calc_prob.v5(iIndex=1:nitems, A, AXsi, B, xsi, theta, 
+		res <- tam_mml_3pl_calc_prob(iIndex=1:nitems, A, AXsi, B, xsi, theta, 
 					nnodes, maxK, recalc=TRUE , guess=guess )
 		rprobs <- res$rprobs
 		rprobs0 <- res$rprobs0	
@@ -52,13 +50,13 @@
 								   sd=gammaslope.prior[,2] ) + eps)
 											}
 			  if ( ncol(gammaslope.prior) == 4 ){
-				  d0  <- log( msm::dtnorm( Xlambda , mean=gammaslope.prior[,1] , 
+				  d0  <- log( tam_dtnorm( Xlambda , mean=gammaslope.prior[,1] , 
 								   sd=gammaslope.prior[,2] , lower=gammaslope.prior[,3] ,
 								   upper=gammaslope.prior[,4] ) + eps)
-				  d0p  <- log( msm::dtnorm( Xlambda + h , mean=gammaslope.prior[,1] , 
+				  d0p  <- log( tam_dtnorm( Xlambda + h , mean=gammaslope.prior[,1] , 
 								   sd=gammaslope.prior[,2] , lower=gammaslope.prior[,3] ,
 								   upper=gammaslope.prior[,4] ) + eps)
-				  d0m  <- log( msm::dtnorm( Xlambda - h , mean=gammaslope.prior[,1] , 
+				  d0m  <- log( tam_dtnorm( Xlambda - h , mean=gammaslope.prior[,1] , 
 								   sd=gammaslope.prior[,2] , lower=gammaslope.prior[,3] ,
 								   upper=gammaslope.prior[,4] ) + eps)
 											}			  

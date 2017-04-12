@@ -37,7 +37,7 @@ tam.jml.xsi2 <-
     while (!convergeAllP & ( iterP <= Msteps ) ) {
    
 # a0 <- Sys.time()
-		  res.p <- calc_prob.v5( iIndex = 1:nitems , A , AXsi , 
+		  res.p <- tam_mml_calc_prob( iIndex = 1:nitems , A , AXsi , 
 								 B , xsi , theta[ rp3.sel$caseid ,,drop=FALSE ] , 
 								 nrow(rp3.sel) , maxK , TRUE )      		
 		  rprobs <- res.p[["rprobs"]]       
@@ -53,9 +53,7 @@ tam.jml.xsi2 <-
 			for (k2 in 1:maxK) {
 			  rr[,k1,k2] <- colSums( M1_k1 * t_rprobs[,k2,] , na.rm=TRUE)
 			}
-		  }		  
-		  
-
+		  }		  		  
 # cat("one iteration xsi -- matrix 1 (V2)") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1 		  
 		  
 		  A_Sq <- AA_bari <- A_bari <- matrix( 0 , PP1 , nitems )
@@ -65,8 +63,6 @@ tam.jml.xsi2 <-
 		  for (kk in 1:maxK){ 
 			A0_r_kk <- A.0[ , kk , ] * r[ , kk ]
 			A_bari <- A_bari + t( A0_r_kk )
-			# A_bari <- A_bari + t_A.0[ , kk , ] * t_r[ kk ,  ]
-			# AA_bari <- AA_bari + t( A.0[ , kk , ]^2 * r[ , kk ] )		
 			AA_bari <- AA_bari + t( A.0[ , kk , ] * A0_r_kk )		
 		  }
 		  for (kk1 in 1:maxK){ 

@@ -82,14 +82,17 @@ tam.mml.3pl <-
 	#********************
 	# compute B from E or an input statement
 	 # starting values gammaslope
-	  if ( is.null( gammaslope ) ){
-		   Ngam <- dim(E)[4]
-		   if ( est.some.slopes){
-			gammaslope <- stats::runif( Ngam , .9 , 1.1 )
-					} else { 
+		if ( is.null( gammaslope ) ){
+			Ngam <- dim(E)[4]
+			if ( est.some.slopes){
+				gammaslope <- stats::runif( Ngam , .9 , 1.1 )
+			} else { 
 			gammaslope <- rep(1,Ngam ) 
-					}
-				}
+			}
+		}
+		if ( ! is.null( gammaslope.fixed ) ){
+			gammaslope[ gammaslope.fixed[,1] ] <- gammaslope.fixed[,2]			  	  
+		}
 
 	if ( is.null(Edes) ){			
 		Edes <- mml_3pl_nonzero_entries( as.vector(E) , dim(E) )$E_design
@@ -243,8 +246,7 @@ tam.mml.3pl <-
     #---end 2PL---
     ################################
     # number of parameters
-    np <- dim(A)[[3]]
-    
+    np <- dim(A)[[3]]    
     # xsi inits
     if ( ! is.null(xsi.inits) ){
       #    xsi <- xsi.inits 
@@ -256,21 +258,32 @@ tam.mml.3pl <-
       est.xsi.index <- setdiff( 1:np , xsi.fixed[,1] )
     } else { est.xsi.index <- 1:np }
     est.xsi.index -> est.xsi.index0
+	
+	
+	#*** group declarations	
+    if ( ! is.null(group) ){
+		groups <- sort(unique(group))
+		G <- length(groups)
+		group <- match( group , groups )
+		group1 <- group
+	} else {
+		  G <- 1 
+		  groups <- NULL
+	}
+	
+	#****************************
     # variance inits  
-    # initialise conditional variance 
-    if ( !is.null( variance.inits ) ){
-      variance <- variance.inits
-    } else variance <- diag( ndim ) 
-    if ( !is.null(variance.fixed) ){
-      variance[ variance.fixed[,1:2 ,drop=FALSE] ] <- variance.fixed[,3]
-      variance[ variance.fixed[,c(2,1) ,drop=FALSE] ] <- variance.fixed[,3]	
-    }
+    # initialise conditional variance 	
+	res <- tam_mml_3pl_variance_fixed( variance=variance , variance.inits=variance.inits , 
+				G=G , ndim=ndim , variance.fixed=variance.fixed, est.variance=est.variance)		
+	variance.fixed <- res$variance.fixed
+	variance <- res$variance
+
+
+# stop()
+	
     # group indicators for variance matrix
     if ( ! is.null(group) ){ 
-      groups <- sort(unique(group))
-      G <- length(groups)
-      group <- match( group , groups )
-	  group1 <- group
       # user must label groups from 1, ... , G
       #    if ( length( setdiff( 1:G , groups)  ) > 0 ){
       #      stop("Label groups from 1, ...,G\n")
@@ -279,11 +292,16 @@ tam.mml.3pl <-
       for (gg in 1:G){
         var.indices[gg] <- which( group == gg )[1]				
       }
-    } else { 
-      G <- 1 
-      groups <- NULL
-    } 
+	  if ( is.null( variance.inits ) ){
+		variance <- array( 0 , dim=c(G,ndim,ndim) )
+		for (gg in 1:G){
+			variance[gg,,] <- diag(ndim)
+		}
+	  }	  
+    }
     
+		
+	
     # beta inits
     # (Y'Y)
     if ( ! is.null( formulaY ) ){
@@ -539,6 +557,21 @@ tam.mml.3pl <-
 	  res <- mml3_calc_Fdes( as.vector(Fdes) , dimFdes )
 	  FdesM <- res$FdesM[ 1:res$NFdesM , ]
 	
+		#**** AXsi parameters
+		iIndex <- 1:dim(A)[1]		
+		LI <- length(iIndex)
+		LXsi <- dim(A)[3]
+		AXsi.tmp <- array( 0 , dim = c( LI , maxK , nnodes ) )
+		for (kk in 1:maxK){
+			A_kk <- matrix( A[ iIndex , kk , ] , nrow = LI , ncol = LXsi )
+			AXsi.tmp[, kk , 1:nnodes ] <- A_kk %*% xsi
+		}		 
+		AXsi[iIndex,] <- AXsi.tmp[,,1]
+	
+		#****
+		# compute B matrix	
+		B <- .mml.3pl.computeB.v2( Edes , gammaslope , E )		
+
 	#*****
 	#@@@@ 2015-06-26
 #	Avector <- as.vector(A)
@@ -550,7 +583,7 @@ tam.mml.3pl <-
     se.B <- 0*B 
     
     YSD <- max( apply( Y , 2 , stats::sd ) )
-    if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }
+    if (YSD > 1E-15 ){ YSD <- TRUE } else { YSD <- FALSE }
 
 	#*****
 	#@@@@ speed gains, further auxiliary objects, 2015-06-26
@@ -558,8 +591,10 @@ tam.mml.3pl <-
 	Avector[ is.na(Avector) ] <- 0
 	unidim_simplify <- TRUE
 	if (G > 1){ unidim_simplify <- FALSE }
-	if ( YSD){ unidim_simplify <- FALSE }	
-	if (  is.null(beta.fixed) ){ unidim_simplify <- FALSE }
+	if (YSD){ unidim_simplify <- FALSE }	
+	if ( is.null(beta.fixed) ){ 
+		unidim_simplify <- FALSE 
+	}	
 	#@@@@
 
 	#@@@@AAAA@@@@@
@@ -605,7 +640,14 @@ tam.mml.3pl <-
 	#@@@@AAAA@@@@@		
 	
 	
-	
+	#************************
+	# group indices definition
+	group_indices <- as.list(1:G)
+	for (gg in 1:G){
+		group_indices[[gg]] <- which( group == gg )
+	}
+	#**************************
+
     
     hwt.min <- 0
     rprobs.min <- 0
@@ -619,9 +661,9 @@ tam.mml.3pl <-
 	a4 <- 0
     a44 <- 1000
 	old.increment.guess <- .6
-	se.gammaslope <- NULL
-	
+	se.gammaslope <- NULL	
 	se.guess <- 0*guess
+	no_stochastic_nodes <- snodes == 0
 	
 	
     # display
@@ -655,126 +697,111 @@ tam.mml.3pl <-
     ##############################################################   
     # EM loop starts here
     while ( ( (!betaConv | !varConv)  | ((a1 > conv) | (a44 > conv) | (a02 > convD)) )  & (iter < maxiter) ) { 
-a0 <- Sys.time()
-	  delta0 <- delta
+ a0 <- Sys.time()
+		delta0 <- delta
 	  
-      iter <- iter + 1
-      if (progress){ 
-        cat(disp)	
-        cat("Iteration" , iter , "   " , paste( Sys.time() ) )
-        cat("\nE Step\n") ; flush.console()
-      }
-      # calculate nodes for Monte Carlo integration	
-      if ( snodes > 0){
-        #      theta <- beta[ rep(1,snodes) , ] +  
-        #				t ( t(chol(variance)) %*% t(theta0.samp) )
-        theta <- beta[ rep(1,snodes) , ] + theta0.samp %*% chol(variance) 
-        
-        # calculate density for all nodes
-        thetasamp.density <- mvtnorm::dmvnorm( theta , mean = as.vector(beta[1,]) , sigma = variance )
-        # recalculate theta^2
-        #      theta2 <- matrix( theta.sq(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
-        theta2 <- matrix( theta.sq2(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
-      }			
-      olddeviance <- deviance
-	  
-      # calculation of probabilities
-      res <- .mml.3pl.calc_prob.v5(iIndex=1:nitems , A=A , AXsi=AXsi , B=B , xsi=xsi , theta=theta , 
-                          nnodes=nnodes , maxK=maxK , recalc=TRUE ,
-						  guess=guess )	
-      rprobs <- res[["rprobs"]]
-	  rprobs0 <- res$rprobs0
-      AXsi <- res[["AXsi"]]
- 
- 
+		iter <- iter + 1
+		if (progress){ 
+			cat(disp)	
+			cat("Iteration" , iter , "   " , paste( Sys.time() ) )
+			cat("\nE Step\n") ; flush.console()
+		}
+		# calculate nodes for Monte Carlo integration	
+		if ( snodes > 0){
+			#      theta <- beta[ rep(1,snodes) , ] +  
+			#				t ( t(chol(variance)) %*% t(theta0.samp) )
+			theta <- beta[ rep(1,snodes) , ] + theta0.samp %*% chol(variance)         
+			# calculate density for all nodes
+			thetasamp.density <- mvtnorm::dmvnorm( theta , mean = as.vector(beta[1,]) , sigma = variance )
+			# recalculate theta^2
+			#      theta2 <- matrix( theta.sq(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
+			theta2 <- matrix( theta.sq2(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
+		}			
+		olddeviance <- deviance	  
+		
+		#--- calculation of probabilities
+		res <- tam_mml_3pl_calc_prob(iIndex=1:nitems , A=A , AXsi=AXsi , B=B , xsi=xsi , 
+						theta=theta , nnodes=nnodes , maxK=maxK , recalc=TRUE ,
+						guess=guess )	
+		rprobs <- res[["rprobs"]]
+		rprobs0 <- res$rprobs0
+		AXsi <- res[["AXsi"]]
+ 	
 # cat("calc_prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
-
     
-
-	  #***********************************
-	  # student's prior distribution
-	  if (skillspace == "normal" ){	  	 	# normal distribution
-		  gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , 
-					variance=variance , nstud=nstud , 
-					nnodes=nnodes , ndim=ndim,YSD=YSD , unidim_simplify=unidim_simplify , 
-					snodes = snodes )
-						   							   
-		 if ( snodes == 0 ){
-			gwt <- gwt / rowSums( gwt ) 
-							}
-							
-									}
-
-      if ( skillspace != "normal" ){		# non-normal distribution			
-		  for (gg in 1:G){
-			ind.gg <- group1.list[[gg]]
-#			calcpik <- ( is.null(delta.designmatrix) ) | ( iter <= 3) 
-			calcpik <- FALSE
-#			calcpik <- TRUE
-			if ( calcpik ){
-				pi.k[,gg] <- colSums( ( pweights*hwt )[ind.gg,] )
-				pi.k[,gg] <- pi.k[,gg] / sum( pi.k[,gg] )
-							}
-			gwt[ind.gg,] <- matrix( pi.k[,gg] , nrow=length(ind.gg) , 
-					ncol=ntheta , byrow=TRUE )						
-                					  }
-							}
+		#***********************************
+		# student's prior distribution
+		
+		#--- normal distribution	
+		if (skillspace == "normal" ){	  	 			
+			gwt <- tam_stud_prior_multiple_groups(theta=theta, Y=Y, beta=beta , 
+						variance=variance, nstud=nstud ,  G = G , group_indices = group_indices,
+						nnodes=nnodes, ndim=ndim, YSD=YSD, unidim_simplify=unidim_simplify , 
+						snodes=snodes, normalize=no_stochastic_nodes )						   							  						
+		}
+		#--- non-normal distribution
+		if ( skillspace != "normal" ){		# non-normal distribution			
+			for (gg in 1:G){
+				ind.gg <- group1.list[[gg]]
+				gwt[ind.gg,] <- matrix( pi.k[,gg] , nrow=length(ind.gg) , 
+									ncol=ntheta , byrow=TRUE )						
+            }
+		}
 									
-#	 cat("stud prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1				
+# cat("stud prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1				
 	  
 	  
-	  #******************************************
-	  # likelihood	and posterior  
+		#******************************************
+		# likelihood	and posterior  
 				
-      # calculate student's likelihood	
-	   gwt1 <- gwt
-	   res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=gwt1 , resp=resp , nitems=nitems , 
+		# calculate student's likelihood	
+		gwt1 <- gwt	   
+		res.hwt <- tam_calc_posterior(rprobs=rprobs , gwt=gwt1 , resp=resp , nitems=nitems , 
 	                               resp.ind.list=resp.ind.list , normalization=FALSE , 
                                    thetasamp.density=thetasamp.density , snodes=snodes ,
                                    resp.ind=resp.ind , logprobs=TRUE , avoid.zerosum=TRUE )
-#	   hwt0 <- hwt <- res.hwt$hwt * gwt   
-	   hwt0 <- hwt <- res.hwt[["hwt"]]  	   
-       hwt <- hwt / rowSums( hwt )	   	   
+		# hwt0 <- hwt <- res.hwt$hwt * gwt   
+		hwt0 <- hwt <- res.hwt[["hwt"]]  	   
+		hwt <- hwt / rowSums( hwt )	   	   
 	   
-# cat("posterior v2") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
+# cat("\nposterior v2") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
       
-      if (progress){ cat("M Step Intercepts   |"); flush.console() }
-      # collect old values for convergence indication
+		if (progress){ cat("M Step Intercepts   |"); flush.console() }
+		# collect old values for convergence indication
 
-      oldxsi <- xsi
-      oldbeta <- beta
-      oldvariance <- variance 
+		oldxsi <- xsi
+		oldbeta <- beta
+		oldvariance <- variance 
      
 	    #******************************************
         # M step: distribution parameter estimation of beta and variance
 	    if ( skillspace == "normal" ){
-		
-		  resr <- tam_mml_3pl_mstep_regression( resp=resp , hwt=hwt , resp.ind=resp.ind , pweights=pweights , 
-									pweightsM=pweightsM , Y=Y , theta=theta , theta2=theta2 , YYinv=YYinv , 
-									ndim=ndim , nstud=nstud , beta.fixed=beta.fixed , variance=variance , 
-									Variance.fixed=variance.fixed , group=group ,  G=G , snodes = snodes ,
-									thetasamp.density=thetasamp.density,nomiss=nomiss,
-									iter = iter )		  
-		  beta <- resr$beta
-		  # cat("m step regression") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		  
-		  variance <- resr$variance	
-		  if( ndim == 1 ){  # prevent negative variance
-			variance[ variance < min.variance ] <- min.variance 
-			}
-		  itemwt <- resr$itemwt		  
-		  # constraint cases (the design matrix A has no constraint on items)
-		  if ( max(abs(beta-oldbeta)) < conv){    
-			betaConv <- TRUE       # not include the constant as it is constrained
-		  }		
-		  
-		  if (G == 1){
-			diag(variance) <- diag(variance) + 10^(-10)
-		  }
-		  if (max(abs(variance-oldvariance)) < conv) varConv <- TRUE	  
-			}  # end skillspace == "normal"
+
+			resr <- tam_mml_3pl_mstep_regression( resp=resp , hwt=hwt , resp.ind=resp.ind , 
+						pweights=pweights , 
+						pweightsM=pweightsM , Y=Y , theta=theta , theta2=theta2 , YYinv=YYinv , 
+						ndim=ndim , nstud=nstud , beta.fixed=beta.fixed , variance=variance , 
+						Variance.fixed=variance.fixed , group=group ,  G=G , snodes = snodes ,
+						thetasamp.density=thetasamp.density,nomiss=nomiss,
+						iter = iter , group_indices = group_indices )		  
+			beta <- resr$beta
+			# cat("m step regression") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		  
+			variance <- resr$variance			
+			if (G == 1){
+				if( ndim == 1 ){  # prevent negative variance
+					variance[ variance < min.variance ] <- min.variance 
+				}			
+				diag(variance) <- diag(variance) + 1E-10
+			}			
+			itemwt <- resr$itemwt		  
+			# constraint cases (the design matrix A has no constraint on items)
+			if ( max(abs(beta-oldbeta)) < conv){    
+				betaConv <- TRUE       # not include the constant as it is constrained
+			}				  
+			if (max(abs(variance-oldvariance)) < conv) varConv <- TRUE	  
+		}  # end skillspace == "normal"
 		#******************************************
-		
-		
+
 		#******************************************
 		# skill space estimation non-normal distribution	
 		if ( skillspace != "normal" ){
@@ -787,8 +814,9 @@ a0 <- Sys.time()
 							}
 						
 			# log-linear smoothing of skill space
-			res <- .mml.3pl.skillspace( Ngroup, pi.k , 
-						delta.designmatrix , G , delta , delta.fixed )
+			res <- tam_mml_3pl_skillspace( Ngroup=Ngroup, pi.k=pi.k , 
+						delta.designmatrix=delta.designmatrix, G=G , delta=delta , 
+						delta.fixed=delta.fixed )
 			pi.k <- res$pi.k
 			delta <- res$delta	
 			covdelta <- res$covdelta
@@ -804,21 +832,13 @@ a0 <- Sys.time()
 			
 			varConv <- TRUE
 			betaConv <- TRUE			
-									}
+		}
       
-		if (skillspace == "normal"){
-		   if (G==1){  diag(variance) <- diag(variance)+10^(-14)	 }
-			if ( ! est.variance ){ 
-			  if ( G == 1 ){ variance <- cov2cor(variance)  } # fix variance at 1  
-			  if ( G > 1 ){ variance[ group == 1 ] <- 1 }     
-			# fix variance of first group to 1
-							}
-						}
+					
 #      }
       
       #---end 2PL---
-      # stop("er")
-# cat("sufficient statistics 2PL") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
+# cat("\nsufficient statistics 2PL") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
 
 	#******
 	# generate input for fixed parameters
@@ -826,14 +846,14 @@ a0 <- Sys.time()
 	B.fixed.estimated <- generate.B.fixed.estimated(B)
       	  
       
-	  ######################################
-	  # calculation of expected counts
-	  
-		res <- .mml.3pl.expected.counts( datindw , nitems , maxK , ntheta , hwt)
+		######################################
+		# calculation of expected counts	  
+		res <- tam_mml_3pl_expected_counts( datindw=datindw , nitems=nitems , 
+					maxK=maxK , ntheta=ntheta , hwt=hwt)
 		n.ik <- res$n.ik
 		N.ik <- res$N.ik
 		
-# cat("expected counts") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
+# cat("\nexpected counts") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
 		
       ######################################
       # M-step item intercepts
@@ -844,7 +864,7 @@ a0 <- Sys.time()
 			n.ik , N.ik , xsi.prior , indexIP.list)
 	  xsi <- res$xsi
 	  se.xsi <- res$se.xsi
-      
+     
         #@@@@AAAA@@@@@
 		# acceleration
 		if ( xsi_acceleration$acceleration != "none" ){		
@@ -854,7 +874,7 @@ a0 <- Sys.time()
 								}
 	    #@@@@AAAA@@@@@	  
 	  
-# cat("M steps intercepts") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
+# cat("\nM steps intercepts") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
 
       ###############################################
 	  # M-step item slopes	  
@@ -877,7 +897,7 @@ a0 <- Sys.time()
 
 		gammaslope <- .mml.3pl.gammaslope.center( gammaslope , gammaslope.center.index  ,
 				gammaslope.center.value  )
-									
+			
 		  # userfunction gammaslope
 		  if ( ! is.null( userfct.gammaslope ) ){
 				gammaslope <- do.call( userfct.gammaslope , list(gammaslope) )
@@ -899,7 +919,7 @@ a0 <- Sys.time()
 		  
 				}
 
-# cat("M steps slopes") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						
+# cat("\nM steps slopes") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						
 
 				
 	  #*********************
@@ -930,27 +950,18 @@ a0 <- Sys.time()
 		  
 #		  old.increment.guess <- guess.change
 					}
-# cat("M steps guess") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
+# cat("\nM steps guess") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
       
       #***
       # decrease increments in every iteration
       if( increment.factor > 1){max.increment <-  1 / increment.factor^iter }
 
-	    
-      # calculate deviance
-      if ( snodes == 0 ){ 
-#        deviance <- - 2 * sum( pweights * log( res.hwt$rfx * thetawidth ) )
-		 # rfx <- rowSums( hwt * gwt )
-		 rfx <- rowSums( hwt0 )
-		 deviance <- - 2 * sum( pweights * log( rfx ) )
-      } else {
-        #      deviance <- - 2 * sum( pweights * log( res.hwt$rfx ) )
-#        deviance <- - 2 * sum( pweights * log( rowMeans( res.hwt$swt ) ) )
-# Revalpr("sum(res.hwt$rfx)")		
-       #	   deviance <- - 2 * sum( pweights * log( rowMeans( res.hwt$hwt ) ) )
-        deviance <- - 2 * sum( pweights * log( res.hwt$rfx   ) )		
-		
-      }
+		#--- compute deviance
+		res1 <- tam_mml_3pl_deviance( hwt0=hwt0, rfx=rfx, res.hwt=res.hwt, 
+						pweights=pweights , snodes=snodes )  
+		deviance <- res1$deviance
+		rfx <- res1$rfx
+						
       deviance.history[iter,2] <- deviance
       a01 <- abs( ( deviance - olddeviance ) / deviance  )
       a02 <- abs( ( deviance - olddeviance )  )	
@@ -982,8 +993,8 @@ a0 <- Sys.time()
         cat( " | Deviance change:", round( devch  , 4 ) )
 		cat( " | Relative deviance change:", round( a01  , 8 ) )		
         if ( devch < 0 & iter > 1 ){ 
-          cat ("\n!!! Deviance increases!                                        !!!!") 
-          cat ("\n!!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!") 			
+          cat("\n!!! Deviance increases!                                        !!!!") 
+          cat("\n!!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!") 			
         }
         cat( "\n  Maximum intercept parameter change:" , round( a1 , 6 ) )
         if ( est.some.slopes ){				
@@ -1001,7 +1012,8 @@ a0 <- Sys.time()
 			if ( G == 1 ){ 
 			  cat( "\n  Variance: " , round( variance[ ! lower.tri(variance)] , 4 ) , " | Maximum change:" , round( a3 , 6 ) )  
 			} else {
-			  cat( "\n  Variance: " , round( variance[var.indices] , 4 ) ,
+			  # cat( "\n  Variance: " , round( variance[var.indices] , 4 ) ,
+			  cat( "\n  Variance: " , round( unlist(variance) , 4 ) ,
 				   " | Maximum change:" , round( a3 , 6 ) )  		
 			}					
 			cat( "\n  beta ",round(beta,4)  )
@@ -1062,34 +1074,38 @@ a0 <- Sys.time()
       #****		
     } 
     ##*** Information criteria
-    ic <- .mml.3pl.TAM.ic( nstud=nstud100 , deviance , xsi , xsi.fixed ,
+    ic <- tam_mml_3pl_ic( nstud=nstud100 , deviance , xsi , xsi.fixed ,
                    beta , beta.fixed , ndim , variance.fixed , G ,
                    irtmodel ,B_orig=B_orig ,  B.fixed , E , est.variance , resp ,
                    est.slopegroups , skillspace , delta , delta.fixed , est.guess ,
 				   fulldesign , est.some.slopes , gammaslope ,
 				   gammaslope.fixed , gammaslope.constr.V , gammaslope.constr.Npars ,
 				   gammaslope.center.index  , gammaslope.prior , 
-				   numdiff.parm=5*1E-4 )
+				   numdiff.parm = 5*1E-4 )
 # cat("q200\n")
     #***
     # calculate counts
-    res <- .tam.calc.counts( resp, theta , resp.ind , 
-                             group , maxK , pweights , hwt )
+    res <- tam.calc.counts( resp=resp, theta=theta , resp.ind=resp.ind , 
+                             group=group , maxK=maxK , pweights=pweights , hwt=hwt )
     if ( skillspace == "normal"){							 
 		n.ik <- res$n.ik
 		pi.k <- res$pi.k   
-				}
+	}
+	
     #****
     # collect item parameters
-    item1 <- .mml.3pl.TAM.itempartable( resp , maxK , AXsi , B , ndim ,
-                                resp.ind , rprobs,n.ik,pi.k , guess , est.guess )
+    item1 <- tam_mml_3pl_itempartable( resp=resp , maxK=maxK , AXsi=AXsi , 
+					B=B, ndim=ndim, resp.ind=resp.ind, rprobs=rprobs, 
+					n.ik=n.ik, pi.k=pi.k, guess=guess , est.guess=est.guess )
 # cat("q300\n")
 								
 	# distribution moments
 	if ( skillspace != "normal" ){
 		D <- ncol(theta.k)
-		moments <- .mml.3pl.distributionmoments( D =D , G =G , pi.k=pi.k , theta.k=theta.k )
-								} else { moments <- NULL }
+		moments <- tam_mml_3pl_distributionmoments( D=D, G=G, pi.k=pi.k, theta.k=theta.k )
+	} else { 
+		moments <- NULL 
+	}
 								
     #####################################################
     # post ... posterior distribution	
@@ -1156,19 +1172,20 @@ a0 <- Sys.time()
 		  cat("Regression Coefficients\n")
 		  print( beta , 4  )
 		  cat("\nVariance:\n" ) # , round( varianceM , 4 ))
-		  if ( ( G==1 ) ){ 
+		  if ( G==1 ){ 
 			varianceM <- matrix( variance , nrow=ndim , ncol=ndim ) 
 			print( varianceM , 4 )	
 		  } else { 
-			print( variance[ var.indices] , 4 )	}
-		  if ( ndim > 1){ 
+			print( unlist(variance) , 4 )	
+		}
+		  if ( ( ndim > 1 ) & ( G == 1 ) ){ 
 			cat("\nCorrelation Matrix:\n" ) # , round( varianceM , 4 ))	
 			print( cov2cor(varianceM) , 4 )	
 				}
 		  }
 	  #****	  
       cat("\n\nEAP Reliability:\n")
-      print( round (EAP.rel,3) )
+      print( round(EAP.rel,3) )
       cat("\n-----------------------------")
       devmin <- which.min( deviance.history[,2] )
       if ( devmin < iter ){
@@ -1192,7 +1209,7 @@ a0 <- Sys.time()
 	names(gammaslope) <- dimnames(E)[[4]]
 	
 	#**** calculate individual likelihood
-      res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=1+0*gwt , resp=resp , nitems=nitems , 
+      res.hwt <- tam_calc_posterior(rprobs=rprobs , gwt=1+0*gwt , resp=resp , nitems=nitems , 
                                    resp.ind.list=resp.ind.list , normalization=FALSE , 
                                    thetasamp.density=thetasamp.density , snodes=snodes ,
                                    resp.ind=resp.ind	)	
@@ -1246,5 +1263,5 @@ a0 <- Sys.time()
     )
     class(res) <- "tam.mml.3pl"
     return(res)
-  }
+}
 

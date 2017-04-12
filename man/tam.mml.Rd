@@ -884,7 +884,7 @@ tammodel <- "
     F2 ~~ F2
     F1 ~~ F2
     "
-mod4_1t <- TAM::tamaan( tammodel , resp , control=list(maxiter=10))
+mod4_1t <- TAM::tamaan( tammodel , resp , control=list(maxiter=100))
 summary(mod4_1t)
 
 #************************************************************
@@ -908,7 +908,7 @@ tammodel <- "
   ITEM TYPE:
     ALL(Rasch)
     "
-mod4_2t <- TAM::tamaan( tammodel , resp , control=list(maxiter=10))
+mod4_2t <- TAM::tamaan( tammodel , resp)
 summary(mod4_2t)
 
 #************************************************************
@@ -924,17 +924,17 @@ tammodel <- "
     F2 ~~ F2
     F1 ~~ F2
     "
-mod4_3t <- TAM::tamaan( tammodel , resp , control=list(maxiter=10))
+mod4_3t <- TAM::tamaan( tammodel , resp )
 summary(mod4_3t)
 
 #************************************************************
-# Model 4.4: Rasch model with 2000 quasi monte carlo nodes and a maximum of 15 iterations
+# Model 4.4: Rasch model with 2000 quasi monte carlo nodes
 # -> nodes are useful for more than 3 or 4 dimensions
-mod4_4 <- TAM::tam.mml( resp=resp , Q=Q , control=list(snodes=2000,maxiter=15) )
+mod4_4 <- TAM::tam.mml( resp=resp , Q=Q , control=list(snodes=2000) )
 
 #************************************************************
 # Model 4.5: Rasch model with 2000 stochastic nodes
-mod4_5 <- TAM::tam.mml( resp=resp, Q=Q,control=list(snodes=2000,QMC=FALSE,maxiter=15))
+mod4_5 <- TAM::tam.mml( resp=resp, Q=Q,control=list(snodes=2000,QMC=FALSE))
 
 #************************************************************
 # Model 4.6: estimate two dimensional Rasch model with regressors
@@ -951,7 +951,7 @@ tammodel <- "
   ITEM TYPE:
     ALL(Rasch)
     "
-mod4_6t <- TAM::tamaan( tammodel , resp , Y=Y , control=list(maxiter=10))
+mod4_6t <- TAM::tamaan( tammodel , resp , Y=Y )
 summary(mod4_6t)
 
 #############################################################################
@@ -981,7 +981,7 @@ colnames(resp) <- paste("I" , 1:(4*I), sep="")
 Q <- cbind(c(rep(1,10),rep(0,10),rep(1,20)), c(rep(0,10),rep(1,10),rep(1,20)))
 
 # (3) model: within item dimensionality and 2PL estimation  
-mod5 <- TAM::tam.mml.2pl(resp, Q=Q, irtmodel="2PL" , control=list(maxiter=20) )
+mod5 <- TAM::tam.mml.2pl(resp, Q=Q, irtmodel="2PL" )
 summary(mod5)
 
 # item difficulties
@@ -1488,8 +1488,7 @@ tammodel <- "
   ##         I\%T1 + I\%T2 | b\%*t1
   ##       DOEND    
 # estimate model    
-mod13at <- TAM::tamaan( tammodel , resp = data.long ,  beta.fixed=beta.fixed ,
-                 control=list(maxiter=10))
+mod13at <- TAM::tamaan( tammodel , resp = data.long ,  beta.fixed=beta.fixed )
 summary(mod13at)
 
 #***
@@ -1639,7 +1638,7 @@ data <- data.ex15
 #***
 # Model 15a: 
 mod15a <- TAM::tam.mml.mfr(resp = data[,-c(1:2)],facets=data[,"group",drop=FALSE], 
-    formulaA = ~ item + group*item , pid = data$pid , control=list(maxiter=50))
+    formulaA = ~ item + group*item , pid = data$pid )
 # See output:
   ## 
   ##   Iteration 47     2013-09-10 16:51:39
@@ -1657,7 +1656,7 @@ mod15a <- TAM::tam.mml.mfr(resp = data[,-c(1:2)],facets=data[,"group",drop=FALSE
 #            increment.factor 
 mod15b <- TAM::tam.mml.mfr(resp = data[,-c(1:2)],facets=data[,"group",drop=FALSE], 
             formulaA = ~ group*item , pid = data$pid ,
-            control=list(maxiter= 50 , increment.factor=1.03 , fac.oldxsi=.4 ) )
+            control=list( increment.factor=1.03 , fac.oldxsi=.4 ) )
            
 #***
 # Model 15c: Alternatively, just choose more iterations in M-step by "Msteps=10"
@@ -1733,8 +1732,8 @@ Q[,1] <- 1
 Q[1:10,2] <- Q[11:20,3] <- Q[21:30,4] <- Q[31:40,5] <- 1
 
 # define maximum number of iterations and number of quasi monte carlo nodes
-maxit <- 5  ; snodes <- 300	# this specification is only for speed reasons
-# maxit <- 50 ; snodes <- 1500
+# maxit <- 5  ; snodes <- 300	# this specification is only for speed reasons
+maxit <- 200 ; snodes <- 1500
 
 #*****************
 # Model 1: Rasch testlet model

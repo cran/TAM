@@ -88,10 +88,13 @@ tam.mml.3pl(resp, Y = NULL, group = NULL, formulaY = NULL, dataY = NULL, ndim = 
      with initial \eqn{\beta} values
 }
   \item{variance.fixed}{
-     An optional matrix with three columns for fixing
+     An optional matrix. In case of a single group it is a matrix with three columns for fixing
      entries in covariance matrix:
      1st column: dimension 1, 2nd column: dimension 2,
-     3rd column: fixed value
+     3rd column: fixed value of covariance/variance. 
+     In case of multiple groups, it is a matrix with four columns
+     1st column: group index (from \eqn{1,\ldots,G}, 2nd column: dimension 1, 
+     3rd column: dimension 2, 4th column: fixed value of covariance     
 }
   \item{variance.inits}{
      Initial covariance matrix in estimation. All matrix entries have to be
@@ -312,7 +315,7 @@ for a similar method.
 data(data.sim.rasch)
 dat <- data.sim.rasch
 # some control arguments
-ctl.list <- list(maxiter= 20 ) # increase the number of iterations in applications!
+ctl.list <- list(maxiter=100) # increase the number of iterations in applications!
 
 #*** Model 1: Rasch model, normal trait distribution
 mod1 <- TAM::tam.mml.3pl(resp=dat , skillspace= "normal" , est.some.slopes=FALSE , 
@@ -445,6 +448,17 @@ mod8 <- TAM::tam.mml.3pl(resp= dat, control= ctl.list ,  E=E ,  skillspace="disc
      gammaslope.constr.c=gammaslope.constr.c )            
 summary(mod8)
 
+#*** Model 9: Multidimensional multiple group model
+N <- nrow(dat)
+I <- ncol(dat)
+group <- c( rep(1,N/4) , rep(2,N/4) , rep(3,N/2) )
+Q <- matrix(0,nrow=I,ncol=2)
+Q[ 1:(I/2) , 1] <- Q[ seq(I/2+1,I) , 2] <- 1
+# estimate model
+mod9 <- TAM::tam.mml.3pl(resp=dat, skillspace="normal", est.some.slopes=FALSE, 
+               group=group, Q=Q)
+summary(mod9)
+
 #############################################################################
 # EXAMPLE 2: Polytomous data
 #############################################################################
@@ -455,8 +469,7 @@ dat <- data.mg[1:1000, paste0("I",1:11)]
 #*******************************************************
 #*** Model 1: 1-dimensional 1PL estimation, normal skill distribution
 mod1 <- TAM::tam.mml.3pl(resp=dat , skillspace="normal" , 
-           control= list( maxiter= 30 )  , gammaslope.des = "2PL" ,  
-           est.some.slopes=FALSE ,  est.variance=TRUE  )
+           gammaslope.des = "2PL", est.some.slopes=FALSE ,  est.variance=TRUE  )
 summary(mod1)
 
 #*******************************************************
@@ -471,8 +484,7 @@ xsi.fixed <- cbind( 13 , 0 )
 gammaslope.fixed <- cbind( 10 , 1 )
 # estimate model
 mod2 <- TAM::tam.mml.3pl(resp=dat , skillspace="discrete" , theta.k=theta.k ,
-          delta.designmatrix=delta.designmatrix,  control= list(maxiter=30),
-          gammaslope.des = "2PL" , xsi.fixed=xsi.fixed , 
+          delta.designmatrix=delta.designmatrix, gammaslope.des = "2PL" , xsi.fixed=xsi.fixed , 
           gammaslope.fixed=gammaslope.fixed)
 summary(mod2)
 
@@ -484,8 +496,7 @@ Q <- matrix(0,11,2)
 Q[1:6,1] <- 1   # items 1 to 6 load on dimension 1
 Q[7:11,2] <- 1  # items 7 to 11 load on dimension 2
 # estimate model
-mod3 <- TAM::tam.mml.3pl(resp=dat , control= list(maxiter=30),
-          gammaslope.des = "2PL" , Q=Q )                                                           
+mod3 <- TAM::tam.mml.3pl(resp=dat, gammaslope.des = "2PL" , Q=Q )
 summary(mod3)
 
 #############################################################################

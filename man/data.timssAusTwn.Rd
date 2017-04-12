@@ -93,8 +93,8 @@ dotchart(t(tthresh), pch=19)
 plot( mod1 , ask=TRUE)
 
 #Re-run IRT analysis in JML
-mod1.2 <- TAM::tam.jml2(Scored)
-var(mod1.2$WLE)
+mod1.2 <- TAM::tam.jml(Scored)
+stats::var(mod1.2$WLE)
 
 #Re-run the model with "not-reached" coded as incorrect.
 Scored2 <- Scored
@@ -117,7 +117,7 @@ ctt <- TAM::tam.ctt(resp, ability$theta)
 write.csv(ctt,"TIMSS_CTT.csv")
 
 #plot histograms of ability and item parameters in the same graph
-windows (width=4.45, height=4.45, pointsize=12)
+windows(width=4.45, height=4.45, pointsize=12)
 layout(matrix(c(1,1,2),3,byrow=TRUE))
 layout.show(2)
 hist(ability$theta,xlim=c(-3,3),breaks=20)

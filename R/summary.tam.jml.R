@@ -3,19 +3,15 @@
 summary.tam.jml <- function( object , file = NULL , ...){
 	if ( ! is.null( file ) ){
 		sink( paste0( file , "__SUMMARY.Rout") , split=TRUE )
-						}
-    # object      ... object from tam.mml                #
-#	object <- tamobject
+	}
+
 	cat("------------------------------------------------------------\n")
-    d1 <- utils::packageDescription("TAM")
-	cat( paste( d1$Package , " " , d1$Version , " (" , d1$Date , ")" , 
-			sep="") , "\n\n" )	
-	cat( "Start of Analysis:" , paste( object$time[1] ) , "\n" )
-#	cat( "Date of Analysis:" , paste( object$time["s2"] ) , "\n" )
-	cat( "End of Analysis:" , paste( object$time[2] ) , "\n" )
-# print( object$time[2] - object$time[1] )
-	cat("Computation time:" , print( object$time[2] - object$time[1] ) , "\n")
-	cat( Rsessinfo() , "\n\n")			
+	cat( tam_packageinfo("TAM") , "\n" )	
+	cat( tam_rsessinfo() , "\n\n")		
+			
+	cat("Start of Analysis:" , paste( object$time[1] ) , "\n" )
+	cat("End of Analysis:" , paste( object$time[2] ) , "\n" )
+	cat("Computation time:" , print( object$time[2] - object$time[1] ) , "\n\n")
     cat("Joint Maximum Likelihood Estimation in TAM \n\n")
 	irtmodel <- object$irtmodel
 	cat("IRT Model" , irtmodel , "\n")
@@ -109,7 +105,7 @@ summary.tam.jml <- function( object , file = NULL , ...){
 #			}
 	#******
 	if ( ! is.null( file ) ){
-		sink(  )
-						}
-			}
+		sink()
+	}
+}
 #*******************************************************

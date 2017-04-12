@@ -1,7 +1,8 @@
 
 ############################################
 # model prior parsing
-tamaanify.modelprior <- function(res){
+tamaanify.modelprior <- function(res)
+{
 	t1 <- res$tammodel.dfr
 	gammaslope.prior <- NULL	
 	xsi.prior <- NULL
@@ -10,7 +11,6 @@ tamaanify.modelprior <- function(res){
 	dfr <- matrix( 0 , nrow=0, ncol=2 )
 
 	#********************
-
 	if ( length(ind) > 0 ){
 		n1 <- t1[ ind , "part_begin" ]
 		t1 <- t1[ ( t1$part_begin == n1 ) , ]
@@ -39,8 +39,6 @@ tamaanify.modelprior <- function(res){
 		dfr$par4 <- as.numeric(unlist( lapply( l1 , FUN = function(uu){ 
 					if ( length(uu) >= 5 ){ gg <- uu[5] } else {gg <- NA}
 					return(gg) } ) ))
-
-
 					
 		#********
 		# type of prior parameter
@@ -55,10 +53,10 @@ tamaanify.modelprior <- function(res){
 		if ( nrow(dfr0) > 0 ){
 			gammaslope.prior[ dfr0$gammaslope_index , ] <- 
 					as.matrix( dfr0[ , c("par1","par2") ] )
-							}	
+		}	
 		if ( nrow(gammaslope.prior) == 0 ){
 				gammaslope.prior <- NULL
-									}							
+		}							
 		#*** index A parameters
 		A <- res$A
 		dfr$A_index <- match( paste(dfr$parm) , dimnames(A)[[3]] )
@@ -72,17 +70,15 @@ tamaanify.modelprior <- function(res){
 		if ( nrow(dfr0) > 0 ){
 			xsi.prior[ dfr0$A_index , ] <- 
 					as.matrix( dfr0[ , c("par1","par2") ] )		
-							}		
-					}
+		}		
+	}
 	
-		#**** index priors guessing parameters			
-		if ( nrow(dfr) > 0 ){
-			guess.prior <- NULL
-			lavpartable <- res$lavpartable
-			lav1 <- lavpartable[ lavpartable$op == "?=" , ]
-			dfr$guess_index <- match( paste(dfr$parm) , paste( lav1$label ) )
-						 
-	
+	#**** index priors guessing parameters			
+	if ( nrow(dfr) > 0 ){
+		guess.prior <- NULL
+		lavpartable <- res$lavpartable
+		lav1 <- lavpartable[ lavpartable$op == "?=" , ]
+		dfr$guess_index <- match( paste(dfr$parm) , paste( lav1$label ) )						
 		if ( sum( 1 - is.na( dfr$guess_index )  ) > 0 ){
 			items <- colnames(res$resp)
 			I <- length(items)
@@ -91,8 +87,7 @@ tamaanify.modelprior <- function(res){
 			est.guess <- res$est.guess
 			for (kk in 1:2){
 				guess.prior[,kk] <- ifelse( est.guess == 0 , 0 , guess.prior[,kk] )
-							}
-			
+			}			
 			dfr0 <- dfr[ ! is.na( dfr$guess_index ) , ]
 			NP <- nrow(lav1)
 			lav1 <- lav1[ paste(lav1$label) %in% paste(dfr0$parm) , ]
@@ -100,14 +95,12 @@ tamaanify.modelprior <- function(res){
 			dfr11 <- dfr0[ ind , ]
 			rownames(dfr11) <- paste0( lav1$lhs )
 			guess.prior[ rownames(dfr11) , ] <- as.matrix(dfr11[ , c("par1" , "par2") ])
-								}
-							}
-			
-
-		if ( is.null( res$gammaslope.prior) ){
-			res$gammaslope.prior <- gammaslope.prior
-											}
-		res$xsi.prior <- xsi.prior
-		res$guess.prior <- guess.prior
-		return(res)
 		}
+	}			
+	if ( is.null( res$gammaslope.prior) ){
+			res$gammaslope.prior <- gammaslope.prior
+	}
+	res$xsi.prior <- xsi.prior
+	res$guess.prior <- guess.prior
+	return(res)
+}

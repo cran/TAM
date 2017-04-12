@@ -38,7 +38,7 @@ tam.jml.fit <-
     NU <- length(theta.unique)
     B_bari <- array(0,dim=c(NU, nitems))
     BB_bari <- array(0, dim=c(NU, nitems))  
-    res <- calc_prob.v5(iIndex = 1:nitems , A , AXsi , 
+    res <- tam_mml_calc_prob(iIndex = 1:nitems , A , AXsi , 
                         B , xsi , theta= matrix( theta.unique , nrow=NU , ncol=1) , 
                         NU, maxK , recalc=FALSE )        
     rprobs <- res[["rprobs"]] 

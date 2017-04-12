@@ -21,12 +21,12 @@ tam_mml_mstep_xsi <- function( max_increment , est.xsi.index0 , control ,
 # z0 <- Sys.time()
         
         if (Miter > 1){ 
-          res.p <- calc_prob.v5( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , 
+          res.p <- tam_mml_calc_prob( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , 
                                  xsi=xsi , theta=theta , nnodes=nnodes, maxK=maxK)					
           rprobs <- res.p[["rprobs"]]            
         }
 # cat("calc prob") ; z1 <- Sys.time(); print(z1-z0) ; z0 <- z1		
-        res <- calc_exp_TK3( rprobs , A , np , est.xsi.index , itemwt ,
+        res <- tam_calc_exp( rprobs , A , np , est.xsi.index , itemwt ,
                              indexIP.no , indexIP.list2 , Avector )
 # cat("calc_exp") ; z1 <- Sys.time(); print(z1-z0) ; z0 <- z1									 
         xbar <- res$xbar

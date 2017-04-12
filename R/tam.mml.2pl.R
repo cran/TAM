@@ -517,20 +517,20 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
     }			
     olddeviance <- deviance
     # calculation of probabilities
-    res <- calc_prob.v5(iIndex=1:nitems , A=A , AXsi=AXsi , B=B , xsi=xsi , theta=theta , 
+    res <- tam_mml_calc_prob(iIndex=1:nitems , A=A , AXsi=AXsi , B=B , xsi=xsi , theta=theta , 
                         nnodes=nnodes , maxK=maxK , recalc=TRUE )	
     rprobs <- res[["rprobs"]]
     AXsi <- res[["AXsi"]]
 # cat("calc_prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
 	
     # calculate student's prior distribution
-    gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
+    gwt <- tam_stud_prior(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
                          nnodes=nnodes , ndim=ndim,YSD=YSD , unidim_simplify=unidim_simplify,
 						 snodes = snodes )
 # cat("stud prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
 						 
     # calculate student's likelihood
-    res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=gwt , resp=resp , nitems=nitems , 
+    res.hwt <- tam_calc_posterior(rprobs=rprobs , gwt=gwt , resp=resp , nitems=nitems , 
                                  resp.ind.list=resp.ind.list , normalization=TRUE , 
                                  thetasamp.density=thetasamp.density , snodes=snodes ,
 						         resp.ind=resp.ind	, avoid.zerosum=TRUE )	
@@ -640,8 +640,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
         rprobs <- res.p[["rprobs"]]            
       }
 
-
-		res <- calc_exp_TK3( rprobs , A , np , est.xsi.index , itemwt ,
+		res <- tam_calc_exp( rprobs , A , np , est.xsi.index , itemwt ,
 			indexIP.no , indexIP.list2 , Avector )
         xbar <- res$xbar
 		xbar2 <- res$xbar2
@@ -788,8 +787,8 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 	  cat( " | Deviance change:", round( devch  , 4 ) )
 	  cat( " | Relative deviance change:", round( a01  , 8 ) )	  
 	  if ( devch < 0 & iter > 1 ){ 
-			cat ("\n!!! Deviance increases!                                        !!!!") 
-			cat ("\n!!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!") 			
+			cat("\n!!! Deviance increases!                                        !!!!") 
+			cat("\n!!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!") 			
 					}
       cat( "\n  Maximum intercept parameter change:" , round( a1 , 6 ) )
 	  if (irtmodel %in% c("GPCM","2PL","2PL.group") ){
@@ -962,10 +961,10 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 	rownames(obji) <- dimnames(A)[[3]]	
 	xsi <- obji
 	
-	 res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=1+0*gwt , resp=resp , nitems=nitems , 
+	 res.hwt <- tam_calc_posterior(rprobs=rprobs , gwt=1+0*gwt , resp=resp , nitems=nitems , 
                                    resp.ind.list=resp.ind.list , normalization=FALSE , 
                                    thetasamp.density=thetasamp.density , snodes=snodes ,
-                                   resp.ind=resp.ind	)	
+                                   resp.ind=resp.ind )	
       res.like <- res.hwt[["hwt"]] 	
 	
   # Output list

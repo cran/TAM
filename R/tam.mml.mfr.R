@@ -729,20 +729,20 @@ tam.mml.mfr <-
       }			
       olddeviance <- deviance
       # calculation of probabilities
-      res <- calc_prob.v5(iIndex=1:nitems , A=A , AXsi=AXsi , B=B , xsi=xsi , theta=theta , 
+      res <- tam_mml_calc_prob(iIndex=1:nitems , A=A , AXsi=AXsi , B=B , xsi=xsi , theta=theta , 
                           nnodes=nnodes , maxK=maxK , recalc=TRUE )	
       # cat("calc prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1							  
 
       rprobs <- res[["rprobs"]]
       AXsi <- res[["AXsi"]]
       # calculate student's prior distribution
-      gwt <- stud_prior.v2(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
+      gwt <- tam_stud_prior(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
                            nnodes=nnodes , ndim=ndim,YSD=YSD , unidim_simplify=unidim_simplify ,
 							snodes = snodes )
       #print( head(gwt))						   
       
       # calculate student's likelihood
-      res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=gwt , resp=gresp.noStep , 
+      res.hwt <- tam_calc_posterior(rprobs=rprobs , gwt=gwt , resp=gresp.noStep , 
 					nitems=nitems , resp.ind.list= resp.ind.list , normalization=TRUE , 
                     thetasamp.density=thetasamp.density , snodes=snodes ,
                     resp.ind=resp.ind	, avoid.zerosum=TRUE)	
@@ -810,7 +810,7 @@ tam.mml.mfr <-
       while (!converge & ( Miter <= Msteps ) ) {	  
         # Only compute probabilities for items contributing to param p
         if (Miter > 1){ 
-          res.p <- calc_prob.v5( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , 
+          res.p <- tam_mml_calc_prob( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , 
                                  xsi=xsi , theta=theta , nnodes=nnodes, maxK=maxK)					
           rprobs <- res.p[["rprobs"]]            
         }
@@ -819,7 +819,7 @@ tam.mml.mfr <-
         #	indexIP.no <- cbind( c(1 , lipl[-length(lipl)]+1 ) , lipl )
         # ==> Vector with start and end indices for item parameter estimation
         
-        res <- calc_exp_TK3( rprobs , A , np , est.xsi.index , itemwt ,
+        res <- tam_calc_exp( rprobs , A , np , est.xsi.index , itemwt ,
                              indexIP.no , indexIP.list2 , Avector )
         xbar <- res$xbar
         xbar2 <- res$xbar2
@@ -951,10 +951,10 @@ if (!choice1){
       if (progress){ 
         cat( paste( "\n  Deviance =" , round( deviance , 4 ) ))        
         cat( " | Deviance change:", round( devch  , 4 ) )		
-	cat( " | Relative deviance change:", round( a01  , 8 ) )
+		cat( " | Relative deviance change:", round( a01  , 8 ) )
         if ( devch < 0 & iter > 1 ){ 
-          cat ("\n!!! Deviance increases!                                        !!!!") 
-          cat ("\n!!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!") 			
+          cat("\n!!! Deviance increases!                                        !!!!") 
+          cat("\n!!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!") 			
         }
         cat( "\n  Maximum intercept parameter change:" , round( a1 , 6 ) )
         cat( "\n  Maximum regression parameter change:" , round( a2 , 6 ) )  
@@ -1026,21 +1026,17 @@ if (!choice1){
     
     #***
     # calculate counts
-    res <- .tam.calc.counts( resp = gresp.noStep, theta , 
+    res <- tam.calc.counts( resp = gresp.noStep, theta=theta , 
 				resp.ind=gresp.noStep.ind , 
-                group , maxK , pweights , hwt )
+                group=group, maxK=maxK, pweights=pweights, hwt=hwt )
     n.ik <- res$n.ik
     pi.k <- res$pi.k 
-    
-    
+        
     #****
-    # collect item parameters
-    
-    #	item1 <- .TAM.itempartable( resp , maxK , AXsi , B , ndim ,
-    #				 resp.ind , rprobs,n.ik,pi.k)
-    item1 <- .TAM.itempartable( resp=gresp.noStep , maxK , AXsi , B , ndim ,
-                                resp.ind=gresp.noStep.ind , rprobs,n.ik,pi.k)
-    
+    # collect item parameters    
+    item1 <- tam_itempartable( resp=gresp.noStep , maxK=maxK , AXsi=AXsi, B=B, 
+					ndim=ndim, resp.ind=gresp.noStep.ind, 
+					rprobs=rprobs, n.ik=n.ik, pi.k=pi.k, order=TRUE )    
   
     #####################################################
     # post ... posterior distribution	
@@ -1204,10 +1200,10 @@ if (!choice1){
     if(delete.red.items) resp <- resp[,-miss.items]
     colnames(resp) <- dimnames(A)[[1]]
     
-	 res.hwt <- calc_posterior.v2(rprobs=rprobs , gwt=1+0*gwt , resp=resp , nitems=nitems , 
+	 res.hwt <- tam_calc_posterior(rprobs=rprobs , gwt=1+0*gwt , resp=resp , nitems=nitems , 
                                    resp.ind.list=resp.ind.list , normalization=FALSE , 
                                    thetasamp.density=thetasamp.density , snodes=snodes ,
-                                   resp.ind=resp.ind	)	
+                                   resp.ind=resp.ind )	
       res.like <- res.hwt[["hwt"]] 		
 
 	
