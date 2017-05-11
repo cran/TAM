@@ -11,76 +11,50 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 				 gamma.init = NULL , 
                  pweights = NULL , 
 			     userfct.variance = NULL , variance.Npars = NULL , 		
-				 item.elim=TRUE  , 		
+				 item.elim=TRUE  , 	verbose = TRUE , 	
 				 control = list() 
                  # control can be specified by the user 
-                 ){
+                 )
+{
   
-  #------------------------------------
-  # INPUT:
-  # Y ... matrix of regression predictors
-  # group ... group indicators
-  # formulaY ... a formula object for creating regression indicators
-  # dataY ... corresponding data frame for formula object of Y
-  # pid ... person ID
-  # xsi.fixed  matrix L * 2 where L<=np
-  #		1st column: xsi parameter label
-  #		2nd column: fixed item parameter value
-  # beta.fixed ... L*3 matrix
-  # 	1st column: beta parameter integer predictor in Y
-  #   2nd column: dimension
-  #   3rd column: which parameter should be fixed?
-  # B.fixed ... fixed B entries
-  #			first three columns are B entries, fourth entry is the value to be fixed
-  # est.variance ... should variance be estimated? Relevant for 2PL model
-  #  2PL ... default FALSE
-  # control:
-  #		control = list( nodes = seq(-6,6,len=15) , 
-  #		          			convD = .001 ,conv = .0001 , convM = .0001 , Msteps = 30 ,            
-  #                   maxiter = 1000 , progress = TRUE) 
-  # progress ... if TRUE, then display progress
-  #-------------------------------------
-   
-  s1 <- Sys.time()
-  CALL <- match.call()
-  # display
-  disp <- "....................................................\n"  
-  increment.factor <- progress <- nodes <- snodes <- ridge <- xsi.start0 <- QMC <- NULL
-  maxiter <- conv <- convD <- min.variance <- max.increment <- Msteps <- convM <- NULL 
-  R <- NULL
+	s1 <- Sys.time()
+	CALL <- match.call()
+	# display
+	disp <- "....................................................\n"  
+	increment.factor <- progress <- nodes <- snodes <- ridge <- xsi.start0 <- QMC <- NULL
+	maxiter <- conv <- convD <- min.variance <- max.increment <- Msteps <- convM <- NULL 
+	R <- trim_increment <- NULL
+	fac.oldxsi <- acceleration <- NULL
+	
+	#**** handle verbose argument
+	args_CALL <- as.list( sys.call() )
+	control$progress <- tam_args_CALL_search( args_CALL=args_CALL , variable="verbose" , 
+								default_value = TRUE )				
+	#*******  
   
-  if ( is.null(A)){ printxsi <- FALSE  } else { printxsi <- TRUE }  
-  # attach control elements
-  e1 <- environment()
-  con <- list( nodes = seq(-6,6,len=21) , snodes = 0 ,QMC=TRUE,
-               convD = .001 ,conv = .0001 , convM = .0001 , Msteps = 4 ,            
-               maxiter = 1000 , max.increment = 1 , 
-			   min.variance = .001 , progress = TRUE , ridge=0,seed=NULL,
-			   xsi.start0=FALSE , increment.factor=1 , fac.oldxsi=0 , acceleration="none" ,
-			   dev_crit = "absolute"  )  	
-  con[ names(control) ] <- control  
-  Lcon <- length(con)
-  con1a <- con1 <- con ; 
-  names(con1) <- NULL
-  for (cc in 1:Lcon ){
-    assign( names(con)[cc] , con1[[cc]] , envir = e1 ) 
-  }
-  if ( !is.null(con$seed)){ set.seed( con$seed )	 }
-  fac.oldxsi <- max( 0 , min( c( fac.oldxsi , .95 ) ) )
-  acceleration <- con$acceleration	
+	if ( is.null(A)){ printxsi <- FALSE  } else { printxsi <- TRUE }  
+
+  	#--- attach control elements
+    e1 <- environment()
+	tam_fct <- "tam.mml.2pl"
+	
+	res <- tam_mml_control_list_define(control=control, envir=e1, tam_fct=tam_fct)
+	con <- res$con
+	con1a <- res$con1a
+  
     resp <- as.matrix(resp)	
 	resp0 <- resp <- add.colnames.resp(resp)
   
-  if (progress){ 
-      cat(disp)	
-      cat("Processing Data     ", paste(Sys.time()) , "\n") ; utils::flush.console()
-				}     
-  if ( ! is.null(group) ){ 
-    con1a$QMC <- QMC <- FALSE
-	con1a$snodes <- snodes <- 0
-					}   
+	if (progress){ 
+		cat(disp)	
+		cat("Processing Data     ", paste(Sys.time()) , "\n") ; utils::flush.console()
+	}     
+	if ( ! is.null(group) ){ 
+		con1a$QMC <- QMC <- FALSE
+		con1a$snodes <- snodes <- 0
+	}   
   
-  nullY <- is.null(Y)
+	nullY <- is.null(Y)
   
   # define design matrix in case of PCM2
 #  if (( irtmodel=="PCM2" ) & (is.null(Q)) & ( is.null(A)) ){ 
@@ -90,26 +64,26 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
       A <- .A.PCM2( resp ) 
     }    
   
-  if ( ! is.null( variance.fixed ) ){
-			est.variance <- TRUE			
-				}
+	if ( ! is.null( variance.fixed ) ){
+		est.variance <- TRUE			
+	}
   
   
-  nitems <- ncol(resp)       # number of items
-  nstud <- nrow(resp)        # number of students
+	nitems <- ncol(resp)       # number of items
+	nstud <- nrow(resp)        # number of students
 
 	#*****
 	nstud100 <- sum(1*( rowSums( 1 - is.na(resp) ) > 0 ))
   
-  if ( is.null( pweights) ){
-    pweights <- rep(1,nstud) # weights of response pattern
-  }
+	if ( is.null( pweights) ){
+		pweights <- rep(1,nstud) # weights of response pattern
+	}
   
 	if (progress){ 
-	  cat("    * Response Data:" , nstud , "Persons and " , 
-			nitems , "Items \n" )  ;
-	  utils::flush.console()	  
-					}  	  
+		cat("    * Response Data:" , nstud , "Persons and " , 
+				nitems , "Items \n" )  ;
+		utils::flush.console()	  
+	}  	  
 					
   #!! check dim of person ID pid
   if ( is.null(pid) ){ pid <- seq(1,nstud) }
@@ -130,28 +104,12 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   nnodes <- length(nodes)^ndim
   if ( snodes > 0 ){ nnodes <- snodes }
   
-  #****
-  # display number of nodes
-  if (progress ){   
-	l1 <- paste0( "    * ")
-	if (snodes==0){ l1 <- paste0(l1 , "Numerical integration with ")}
-	  else{ 
-	    if (QMC){ 
-			l1 <- paste0(l1 , "Quasi Monte Carlo integration with ")
-				} else {
-				l1 <- paste0(l1 , "Monte Carlo integration with ")					
-						}
-					}
-    cat( paste0( l1 , nnodes , " nodes\n") )
-	if (nnodes > 8000){
-		cat("      @ Are you sure that you want so many nodes?\n")
-		cat("      @ Maybe you want to use Quasi Monte Carlo integration with fewer nodes.\n")		
-				}
-			}
-	#*********  
+	#--- print information about nodes
+	res <- tam_mml_progress_proc_nodes( progress=progress, snodes=snodes, nnodes=nnodes, 
+					skillspace="normal", QMC=QMC)  	
 
-  # maximum no. of categories per item. Assuming dichotomous
-  maxK <- max( resp , na.rm=TRUE ) + 1 
+	# maximum no. of categories per item. Assuming dichotomous
+	maxK <- max( resp , na.rm=TRUE ) + 1 
   
 	#****
 	# ARb 2015-12-08
@@ -227,7 +185,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
     Y <- stats::model.matrix( formulaY , dataY )[,-1]   # remove intercept
 	nullY <- FALSE	
   }
-  
+
 #  if ( ! is.null(Y) ){ 
   if (! nullY){  
     Y <- as.matrix(Y)
@@ -367,36 +325,16 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   beta.min.deviance <- beta
   variance.min.deviance <- variance
   
-  # nodes
-  if ( snodes == 0 ){ 
-    theta <- as.matrix( expand.grid( as.data.frame( matrix( rep(nodes, ndim) , ncol = ndim ) ) ) )
-    #we need this to compute sumsig2 for the variance
-#    theta2 <- matrix(theta.sq(theta), nrow=nrow(theta),ncol=ncol(theta)^2)            
-    theta2 <- matrix(theta.sq2(theta), nrow=nrow(theta),ncol=ncol(theta)^2)            
-    # grid width for calculating the deviance
-    thetawidth <- diff(theta[,1] )
-    thetawidth <- ( ( thetawidth[ thetawidth > 0 ])[1] )^ndim 
-    thetasamp.density <- NULL
-  } else {
-    # sampled theta values
-	if (QMC){			
-		r1 <- sfsmisc::QUnif(n=snodes, min = 0, max = 1, 
-					n.min = 1, p=ndim, leap = 409)
-		theta0.samp <- stats::qnorm( r1 )
-			} else {
-			theta0.samp <- matrix( MASS::mvrnorm( snodes , mu = rep(0,ndim) , 
-						Sigma = diag(1,ndim ) )	,
-                        nrow= snodes , ncol=ndim )			
-				}
-    thetawidth <- NULL
-  }
-  
-
- 
-  deviance <- 0  
-  deviance.history <- matrix( 0 , nrow=maxiter , ncol = 2)
-  colnames(deviance.history) <- c("iter" , "deviance")
-  deviance.history[,1] <- 1:maxiter
+	#--- create grid of nodes for numeric or stochastic integration
+	res <- tam_mml_create_nodes( snodes=snodes, nodes=nodes, ndim=ndim, theta=theta, QMC=QMC ) 
+	theta <- res$theta
+	theta2 <- res$theta2
+	thetawidth <- res$thetawidth
+	theta0.samp <- res$theta0.samp
+	thetasamp.density <- res$thetasamp.density
+   
+	deviance <- 0  
+	deviance.history <- tam_deviance_history_init(maxiter=maxiter)
   
   iter <- 0 
   a02 <- a1 <- 999	# item parameter change
@@ -441,37 +379,16 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
     if (  is.null(beta.fixed) ){ unidim_simplify <- FALSE }	
 	#@@@@ 
  
-	#@@@@AAAA@@@@@
-	# xsi acceleration
-	xsi_acceleration <- list( "acceleration" = acceleration , "w" = .35 ,
-							"w_max" = .95 , 
-							parm_history = cbind( xsi, xsi , xsi ) ,
-							"beta_new" = 0 ,
-							"beta_old" = 0 
-						)
-							
-	# add B acceleration here					
-	Bl <- as.vector(B)
-	B_acceleration <- list( "acceleration" = acceleration , "w" = .35 ,
-							"w_max" = .95 , 
-							parm_history = cbind( Bl, Bl , Bl ) ,
-							"beta_new" = 0 ,
-							"beta_old" = 0 
-						)						
-	if (irtmodel == "GPCM.design" ){
-				B_acceleration$acceleration <- "none"
-								}	
+	#--- acceleration
+	res <- tam_acceleration_inits(acceleration=acceleration, G=G, xsi=xsi, 
+				variance=variance, B=B , irtmodel=irtmodel )	
+	xsi_acceleration <- res$xsi_acceleration
+	variance_acceleration <- res$variance_acceleration	
+	B_acceleration <- res$B_acceleration	
 
-	v1 <- as.vector(variance)					
-	variance_acceleration <- list( "acceleration" = acceleration , "w" = .35 ,
-							"w_max" = .95 , 
-							parm_history = cbind( v1, v1 , v1) ,
-							"beta_new" = 0 ,
-							"beta_old" = 0 
-						)
-	if (G>1){  variance_acceleration$acceleration <- "none" }						
-	#@@@@AAAA@@@@@	
-  
+	#--- warning multiple group estimation
+	res <- tam_mml_warning_message_multiple_group_models( ndim=ndim, G=G)
+	
   ##**SE
 	se.xsi <- 0*xsi
 	se.B <- 0*B 
@@ -485,6 +402,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 		itemwt.min <- 0
 		se.xsi.min <- se.xsi
 		se.B.min <- se.B
+		B_change <- 0
 		
   # display
   disp <- "....................................................\n"
@@ -493,278 +411,122 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
     
   ##############################################################   
   #Start EM loop here
-  while ( ( (!betaConv | !varConv)  | ((a1 > conv) | (a4 > conv) | (a02 > convD)) )  & (iter < maxiter) ) { 
+	while ( ( (!betaConv | !varConv)  | ((a1 > conv) | (a4 > conv) | (a02 > convD)) )  & (iter < maxiter) ) { 
 
-# a0 <- Sys.time()
+		a0 <- Sys.time()
   
-    iter <- iter + 1
-    if (progress){ 
-      cat(disp)	
-      cat("Iteration" , iter , "   " , paste( Sys.time() ) )
-      cat("\nE Step\n") ; utils::flush.console()
-    }
-    # calculate nodes for Monte Carlo integration	
-    if ( snodes > 0){
-#      theta <- beta[ rep(1,snodes) , ] +  
-#				t ( t(chol(variance)) %*% t(theta0.samp) )
-      theta <- beta[ rep(1,snodes) , ] + theta0.samp %*% chol(variance) 
-
-      # calculate density for all nodes
-      thetasamp.density <- mvtnorm::dmvnorm( theta , mean = as.vector(beta[1,]) , sigma = variance )
-      # recalculate theta^2
-#      theta2 <- matrix( theta.sq(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
-      theta2 <- matrix( theta.sq2(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
-    }			
-    olddeviance <- deviance
-    # calculation of probabilities
-    res <- tam_mml_calc_prob(iIndex=1:nitems , A=A , AXsi=AXsi , B=B , xsi=xsi , theta=theta , 
-                        nnodes=nnodes , maxK=maxK , recalc=TRUE )	
-    rprobs <- res[["rprobs"]]
-    AXsi <- res[["AXsi"]]
+		iter <- iter + 1
+		#--- progress
+		res <- tam_mml_progress_em0(progress=progress, iter=iter, disp=disp)
+		# calculate nodes for Monte Carlo integration	
+		if ( snodes > 0){
+			res <- tam_mml_update_stochastic_nodes( theta0.samp=theta0.samp, variance=variance, 
+						snodes=snodes, beta=beta, theta=theta ) 
+			theta <- res$theta
+			theta2 <- res$theta2
+			thetasamp.density <- res$thetasamp.density  
+		}			
+		olddeviance <- deviance
+		#--- calculation of probabilities
+		res <- tam_mml_calc_prob( iIndex=1:nitems, A=A, AXsi=AXsi, B=B, xsi=xsi, theta=theta, 
+					nnodes=nnodes, maxK=maxK, recalc=TRUE ) 
+		rprobs <- res$rprobs
+		AXsi <- res$AXsi
 # cat("calc_prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
 	
-    # calculate student's prior distribution
-    gwt <- tam_stud_prior(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
-                         nnodes=nnodes , ndim=ndim,YSD=YSD , unidim_simplify=unidim_simplify,
-						 snodes = snodes )
+		#--- calculate student's prior distribution
+		gwt <- tam_stud_prior( theta=theta, Y=Y, beta=beta, variance=variance, nstud=nstud, 
+					nnodes=nnodes, ndim=ndim, YSD=YSD, unidim_simplify=unidim_simplify, 
+					snodes=snodes ) 
 # cat("stud prior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
 						 
-    # calculate student's likelihood
-    res.hwt <- tam_calc_posterior(rprobs=rprobs , gwt=gwt , resp=resp , nitems=nitems , 
-                                 resp.ind.list=resp.ind.list , normalization=TRUE , 
-                                 thetasamp.density=thetasamp.density , snodes=snodes ,
-						         resp.ind=resp.ind	, avoid.zerosum=TRUE )	
-    hwt <- res.hwt[["hwt"]]   
+		#--- calculate student's likelihood
+		res.hwt <- tam_calc_posterior( rprobs=rprobs, gwt=gwt, resp=resp, nitems=nitems, 
+						resp.ind.list=resp.ind.list, normalization=TRUE, 
+						thetasamp.density=thetasamp.density, snodes=snodes, 
+						resp.ind=resp.ind, avoid.zerosum=TRUE ) 
+		hwt <- res.hwt$hwt   	
+# cat("posterior v2") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1    
 
-# Revalpr("sum(is.na(hwt))")	
-	
-	
-# cat("posterior v2") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
-    
-    if (progress){ cat("M Step Intercepts   |"); utils::flush.console() }
-    # collect old values for convergence indication
-	oldxsi <- xsi
-    oldbeta <- beta
-    oldvariance <- variance 
    
-    # M step: estimation of beta and variance
-    resr <- mstep.regression( resp=resp , hwt=hwt , resp.ind=resp.ind , pweights=pweights , 
-                              pweightsM=pweightsM , Y=Y , theta=theta , theta2=theta2 , YYinv=YYinv , 
-                              ndim=ndim , nstud=nstud , beta.fixed=beta.fixed , variance=variance , 
-                              Variance.fixed=variance.fixed , group=group ,  G=G , snodes = snodes ,
-							  thetasamp.density=thetasamp.density,nomiss=nomiss)
-      
-    beta <- resr$beta
-# Revalpr("beta")	
-	
+		# M step: estimation of beta and variance
+		resr <- tam_mml_mstep_regression( resp=resp, hwt=hwt, resp.ind=resp.ind, 
+					pweights=pweights, pweightsM=pweightsM, Y=Y, theta=theta, theta2=theta2, 
+					YYinv=YYinv, ndim=ndim, nstud=nstud, beta.fixed=beta.fixed, variance=variance, 
+					Variance.fixed=variance.fixed, group=group, G=G, snodes=snodes, 
+					thetasamp.density=thetasamp.density, nomiss=nomiss, iter=iter, 
+					min.variance=min.variance, userfct.variance=userfct.variance, 
+					variance_acceleration=variance_acceleration, est.variance=est.variance, 
+					beta=beta )   
 # cat("m step regression") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
-	
-    variance <- resr$variance	
-	
-	if( ndim == 1 ){  # prevent negative variance
-			variance[ variance < min.variance ] <- min.variance 
-				}
-    itemwt <- resr$itemwt
-	
-    # constraint cases (the design matrix A has no constraint on items)
-    if ( max(abs(beta-oldbeta)) < conv){    
-      betaConv <- TRUE       # not include the constant as it is constrained
-    }
-  
-    if (G == 1){
-      diag(variance) <- diag(variance) + 10^(-10)
-      #		if( det(variance) < 10^(-20) ){
-      #		  stop("\n variance is close to singular or zero. Estimation cannot proceed")
-      #@@ARb: I would not prefer to stop the program but adding a small
-      #       constant in the diagonal.
-      #				} 
-    }
+				
+		beta <- resr$beta     
+		variance <- resr$variance	
+		itemwt <- resr$itemwt	  
+	    variance_acceleration <- resr$variance_acceleration
+		variance_change <- resr$variance_change
+		beta_change <- resr$beta_change
+		
+		if ( beta_change < conv){ betaConv <- TRUE }
+		if ( variance_change < conv){ varConv <- TRUE }	
 
-    #---2PL---
-    #compute sufficient statistics for 2PL slope parameters
-    if (irtmodel %in% c("2PL","GPCM","GPCM.design","2PL.groups")) {
-      thetabar <- hwt %*% theta
-#      cB_obs <- t(cResp*pweights)%*%(thetabar)
-      cB_obs <- crossprod( cResp*pweights , thetabar)
-      B_obs <- aperm(array(cB_obs,dim=c(maxK, nitems,ndim)),c(2,1,3))
- 
-      if ( ( is.matrix(variance) )  ){
-	    if (  ncol(variance) > 1 ){
-		diag(variance) <- diag(variance)+10^(-14)	  
-							}
-						}					
-      if ( ! est.variance ){ 
-		if ( G == 1 ){ 
-				variance <- stats::cov2cor(variance)  
-						} # fix variance at 1  
-		if ( G > 1 ){ 
-				variance[ group == 1 ] <- 1 
-						}     
-				# fix variance of first group to 1
-							}
-    }
-    #---end 2PL---
+		#--- sufficient statistics item slopes
+		res <- tam_mml_2pl_sufficient_statistics_item_slope( hwt=hwt, theta=theta, 
+					cResp=cResp, pweights=pweights, maxK=maxK, nitems=nitems, ndim=ndim ) 
+		thetabar <- res$thetabar
+		cB_obs <- res$cB_obs
+		B_obs <- res$B_obs								
 # cat("sufficient statistics 2PL") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
-
- 
 	
-	  # function for reducing the variance	  
-	  if ( ! is.null( userfct.variance ) ){  
-			variance <- do.call( userfct.variance , list(variance ) )			
-				}
-
-
-        #@@@@AAAA@@@@@
-		# variance acceleration
-		if ( variance_acceleration$acceleration != "none" ){		
-			variance_acceleration <- accelerate_parameters( xsi_acceleration=variance_acceleration , 
-							xsi=as.vector(variance) , iter=iter , itermin=3)
-			variance <- matrix( variance_acceleration$parm , nrow= nrow(variance) , ncol=ncol(variance) )
-								}
-	    #@@@@AAAA@@@@@					
-	
-	if (max(abs(variance-oldvariance)) < conv) varConv <- TRUE
-    
-    ######################################
-    #M-step
-    converge <- FALSE
-    Miter <- 1
-	old_increment <- rep( max.increment , np )
-	est.xsi.index <- est.xsi.index0
-    while (!converge & ( Miter <= Msteps ) ) {	
-#      xbar2 <- xxf <- xbar <- rep(0,np)
-      # Only compute probabilities for items contributing to param p
-      if (Miter > 1){ 
-        res.p <- calc_prob.v5( iIndex=1:nitems , A=A , AXsi=AXsi , B=B , 
-                               xsi=xsi , theta=theta , nnodes=nnodes, maxK=maxK)					
-        rprobs <- res.p[["rprobs"]]            
-      }
-
-		res <- tam_calc_exp( rprobs , A , np , est.xsi.index , itemwt ,
-			indexIP.no , indexIP.list2 , Avector )
-        xbar <- res$xbar
-		xbar2 <- res$xbar2
-		xxf <- res$xxf	      
-					
-      # Compute the difference between sufficient statistic and expectation
-      diff <- as.vector(ItemScore) - xbar
-      #Compute the Newton-Raphson derivative for the equation to be solved
-      deriv <- xbar2 - xxf 			
-      increment <- diff*abs(1/( deriv + 10^(-20) ) )
-	  	  
-      if ( !is.null( xsi.fixed) ){ increment[ xsi.fixed[,1] ] <- 0 } 
-	  #!!!	  necesessary to include statement to control increment?
-	  ci <- ceiling( abs(increment) / ( abs( old_increment) + 10^(-10) ) )
-      increment <- ifelse( abs( increment) > abs(old_increment)  , 
-								increment/(2*ci) , 
-								increment )
-		# Code from Margaret
-#    	for (p in est.xsi.index ) {
-#			 while (abs(increment[p]) > abs(old_increment[p])){
-#				increment[p] <- increment[p] / 2.0  #damping the increment
-#						}
-#						}
-
-	  old_increment <- increment
-	  
-	  
-	##**SE
-     se.xsi <- sqrt( 1 / abs(deriv) )
-     if ( ! is.null( xsi.fixed) ){ se.xsi[ xsi.fixed[,1] ] <- 0 } 
-	##**
-	  
-      xsi <- xsi+increment   # update parameter p
-#	  est.xsi.index <- which( abs(increment) > convM )
-      if ( max(abs(increment)) < convM ) { converge <- TRUE }
-      Miter <- Miter + 1						
-
-		# stabilizing the algorithm | ARb 2013-09-10
-		if (fac.oldxsi > 0 ){
-				xsi <-  (1-fac.oldxsi) * xsi + fac.oldxsi *oldxsi
-							}	  	  
-      
-      # progress bar
-      if (progress){ 
-#        cat( paste( rep("-" , sum( mpr == p ) ) , collapse="" ) )
-          cat("-") ; utils::flush.console()
-      }
-    } # end of all parameters loop
-  #******
-        #@@@@AAAA@@@@@
-		# acceleration
-		if ( xsi_acceleration$acceleration != "none" ){		
-			xsi_acceleration <- accelerate_parameters( xsi_acceleration=xsi_acceleration , 
-							xsi=xsi , iter=iter , itermin=3)
-			xsi <- xsi_acceleration$parm
-								}
-	    #@@@@AAAA@@@@@  
-  
-	
+		######################################
+		# M-step item intercepts
+		res <- tam_mml_mstep_intercept( A=A, xsi=xsi, AXsi=AXsi, B=B, theta=theta, 
+					nnodes=nnodes, maxK=maxK, Msteps=Msteps, rprobs=rprobs, np=np, 
+					est.xsi.index0=est.xsi.index0, itemwt=itemwt, indexIP.no=indexIP.no, 
+					indexIP.list2=indexIP.list2, Avector=Avector, max.increment=max.increment, 
+					xsi.fixed=xsi.fixed, fac.oldxsi=fac.oldxsi, ItemScore=ItemScore, 
+					convM=convM, progress=progress, nitems=nitems, iter=iter, 
+					increment.factor=increment.factor, xsi_acceleration=xsi_acceleration,
+					trim_increment=trim_increment ) 
+		xsi <- res$xsi
+		se.xsi <- res$se.xsi
+		max.increment <- res$max.increment
+		xsi_acceleration <- res$xsi_acceleration
+		xsi_change <- res$xsi_change	
+     	
 # cat("M steps intercepts") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
    
     #---2PL---
     if (irtmodel %in% c("2PL","GPCM","GPCM.design","2PL.groups") ) {
-     if (progress){ cat("\nM Step Slopes       |"); utils::flush.console() }
-      oldB <- B  
-      res <- Mstep_slope.v2(B_orig, B, B_obs, B.fixed , max.increment, nitems, A, 
-                     AXsi, xsi, theta, nnodes, maxK, itemwt, Msteps, ndim, convM,
-					 irtmodel ,  progress , est.slopegroups,E,basispar , se.B ,
-					 equal.categ )
-	  B <- res$B	  
-	  #**SE (standard error estimate)
-	  se.B <- res$se.B
- #	  max.increment <- max( abs( B - oldB ) )	  
-	  basispar <- res$basispar
-      a4 <- max( abs( B - oldB ))  
-  
-    }
-	
+		res <- tam_mml_2pl_mstep_slope( B_orig=B_orig, B=B, B_obs=B_obs, B.fixed=B.fixed, 
+					max.increment=max.increment, nitems=nitems, A=A, AXsi=AXsi, xsi=xsi, 
+					theta=theta, nnodes=nnodes, maxK=maxK, itemwt=itemwt, Msteps=Msteps, 
+					ndim=ndim, convM=convM, irtmodel=irtmodel, progress=progress, 
+					est.slopegroups=est.slopegroups, E=E, basispar=basispar, 
+					se.B=se.B, equal.categ=equal.categ, B_acceleration=B_acceleration, 
+					trim_increment=trim_increment, iter=iter ) 
+		B <- res$B	  
+	    se.B <- res$se.B
+		basispar <- res$basispar
+		B_acceleration <- res$B_acceleration
+		a4 <- B_change <- res$B_change
+    }	
     #---end 2PL---
-
-        #@@@@AAAA@@@@@
-		# acceleration
-		if ( B_acceleration$acceleration != "none" ){		
-			B_acceleration <- accelerate_parameters( xsi_acceleration=B_acceleration , 
-							xsi=as.vector(B) , iter=iter , itermin=3)							
-			B <- array( B_acceleration$parm , dim(B) ) 
-								}
-	    #@@@@AAAA@@@@@  	
-	
-	
 # cat("M steps slopes") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
 	
-	#***
-	# decrease increments in every iteration
-	if( increment.factor > 1){max.increment <-  1 / increment.factor^iter }
-    
-
-    # calculate deviance
-    if ( snodes == 0 ){ 
-      deviance <- - 2 * sum( pweights * log( res.hwt$rfx * thetawidth ) )
-    } else {
-		deviance <- - 2 * sum( pweights * log( res.hwt$rfx   ) )
-    #	deviance <- - 2 * sum( pweights * log( rowMeans( res.hwt$swt ) ) )
-    }
-    deviance.history[iter,2] <- deviance
-    a01 <- abs( ( deviance - olddeviance ) / deviance  )
-    a02 <- abs( ( deviance - olddeviance )  )	
+		#--- compute deviance
+		res <- tam_mml_compute_deviance( loglike_num=res.hwt$rfx, loglike_sto=res.hwt$rfx, 
+					snodes=snodes, thetawidth=thetawidth, pweights=pweights, deviance=deviance, 
+					deviance.history=deviance.history, iter=iter ) 			  
+		deviance <- res$deviance
+		deviance.history <- res$deviance.history
+		a01 <- rel_deviance_change <- res$rel_deviance_change
+		a02 <- deviance_change <- res$deviance_change
+	
     if (con$dev_crit == "relative" ){ a02 <- a01 }
  	
 	
-	if( deviance > deviance.min ){ 	
-#      if( ( deviance - olddeviance > 0 ) | ( iter == 1)  ){ 
-		xsi.min.deviance <- xsi.min.deviance 
-		beta.min.deviance <- beta.min.deviance
-		variance.min.deviance <- variance.min.deviance
-		hwt.min <- hwt.min
-		rprobs.min <- rprobs.min
-		AXsi.min <- AXsi.min
-		B.min <- B.min
-		deviance.min <- deviance.min
-		itemwt.min <- itemwt.min
-		se.xsi.min <- se.xsi.min
-		se.B.min <- se.B.min
-					}   else { 
+	if( deviance < deviance.min ){ 	
 		xsi.min.deviance <- xsi 
 		beta.min.deviance <- beta
 		variance.min.deviance <- variance	
@@ -776,37 +538,21 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 		se.xsi.min <- se.xsi
 		se.B.min <- se.B
 				}
-
 				
-    a1 <- max( abs( xsi - oldxsi ))	
-    a2 <- max( abs( beta - oldbeta ))	
-    a3 <- max( abs( variance - oldvariance ))
-    if (progress){ 
-      cat( paste( "\n  Deviance =" , round( deviance , 4 ) ))
-      devch <- -( deviance - olddeviance )
-	  cat( " | Deviance change:", round( devch  , 4 ) )
-	  cat( " | Relative deviance change:", round( a01  , 8 ) )	  
-	  if ( devch < 0 & iter > 1 ){ 
-			cat("\n!!! Deviance increases!                                        !!!!") 
-			cat("\n!!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!") 			
-					}
-      cat( "\n  Maximum intercept parameter change:" , round( a1 , 6 ) )
-	  if (irtmodel %in% c("GPCM","2PL","2PL.group") ){
-		cat( "\n  Maximum slope parameter change:" , round( a4 , 6 ) )
-							}
-      cat( "\n  Maximum regression parameter change:" , round( a2 , 6 ) )  
-      if ( G == 1 ){ 
-        cat( "\n  Variance: " , round( variance[ ! lower.tri(variance)] , 4 ) , " | Maximum change:" , round( a3 , 6 ) )  
-      } else {
-        cat( "\n  Variance: " , round( variance[var.indices] , 4 ) ,
-             " | Maximum change:" , round( a3 , 6 ) )  		
-      }					
-      cat( "\n  beta ",round(beta,4)  )
-      cat( "\n" )
-      utils::flush.console()
-    }
-  } # end of EM loop
-  #******************************************************
+		a1 <- xsi_change
+		a2 <- beta_change
+		a3 <- variance_change	
+	    devch <- - ( deviance - olddeviance )
+		
+		#** print progress
+		res <- tam_mml_progress_em( progress=progress, deviance=deviance, 
+					deviance_change=deviance_change, iter=iter, 
+					rel_deviance_change=rel_deviance_change, xsi_change=xsi_change, 
+					beta_change=beta_change, variance_change=variance_change, 
+					B_change=B_change, devch=devch ) 
+					
+	} # end of EM loop
+	#******************************************************
 
   		xsi.min.deviance -> xsi 
 		beta.min.deviance -> beta
@@ -825,93 +571,35 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 	xsi.fixed.estimated <- generate.xsi.fixed.estimated( xsi , A )
 	B.fixed.estimated <- generate.B.fixed.estimated(B)
 
-  ##**SE  
-  # standard errors of AXsi parameters
-  # check for missing entries in A
-	se.AXsi <- 0*AXsi
-	A1 <- A
-	A1[ is.na(A) ] <- 0
-#	se.xsiD <- diag( se.xsi^2 )
-	if ( length( se.xsi) > 1){
-			se.xsiD <- diag( se.xsi^2 )
-				} else {
-			se.xsiD <- matrix( se.xsi^2,1,1)
-						}	
-	
-	for (kk in 1:maxK){  # kk <- 1
-	# se.AXsi[,kk] <- sqrt( diag( A1[,kk,] %*% se.xsiD %*% t( A1[,kk,]) ) )
-	#**** bugfix
-	  dim_A1 <- dim(A1)
-      A1_kk <- A1[,kk,]
-      if ( is.vector(A1_kk) ){
-        A1_kk <- matrix( A1_kk , nrow=dim_A1[1] , ncol=dim_A1[3] )
-      }
-      se.AXsi[,kk] <- sqrt( diag( A1_kk %*% se.xsiD %*% t( A1_kk ) ) )		
-	#****		
-			}
+	#**** standard errors AXsi
+	se.AXsi <- tam_mml_se_AXsi( AXsi=AXsi, A=A, se.xsi=se.xsi, maxK=maxK )     
 
 	##*** Information criteria
-	ic <- .TAM.ic( nstud=nstud100 , deviance , xsi , xsi.fixed ,
-		beta , beta.fixed , ndim , variance.fixed , G ,
-		irtmodel ,B_orig=B_orig ,  B.fixed , E , est.variance , resp ,
-		est.slopegroups , variance.Npars=variance.Npars , group )
-
+	ic <- tam_mml_ic( nstud=nstud100, deviance=deviance, xsi=xsi, xsi.fixed=xsi.fixed, 
+				beta=beta, beta.fixed=beta.fixed, ndim=ndim, variance.fixed=variance.fixed, 
+				G=G, irtmodel=irtmodel, B_orig=B_orig, B.fixed=B.fixed, E=E, 
+				est.variance=est.variance, resp=resp, est.slopegroups=est.slopegroups, 
+				variance.Npars=variance.Npars, group=group ) 
+		
 	#***
 	# calculate counts
-	res <- .tam.calc.counts( resp, theta , resp.ind , 
-		group , maxK , pweights , hwt )
+	res <- tam_calc_counts( resp=resp, theta=theta, resp.ind=resp.ind, group=group, 
+				maxK=maxK, pweights=pweights, hwt=hwt ) 								
 	n.ik <- res$n.ik
 	pi.k <- res$pi.k 
 
 	#****
 	# collect item parameters
-	item1 <- .TAM.itempartable( resp , maxK , AXsi , B , ndim ,
-				 resp.ind , rprobs,n.ik,pi.k)
-	  
-  #####################################################
-  # post ... posterior distribution	
-  # create a data frame person	
-  person <- data.frame( "pid"=pid , "case" = 1:nstud , "pweight" = pweights )
-  person$score <- rowSums( resp * resp.ind )
-  # use maxKi here; from "design object"
-  nstudl <- rep(1,nstud)
-  person$max <- rowSums( outer( nstudl , apply( resp ,2 , max , na.rm=T) ) * resp.ind )
-  # calculate EAP
-  # EAPs are only computed in the unidimensional case for now,
-  # but can be easily adapted to the multidimensional case
-  if ( snodes == 0 ){ 
-    hwtE <- hwt 
-  } else { 	
-#		hwtE <- hwt / snodes 
-		hwtE <- hwt
-			}
-  if ( ndim == 1 ){
-    person$EAP <- rowSums( hwtE * outer( nstudl , theta[,1] ) )
-    person$SD.EAP <- sqrt( rowSums( hwtE * outer( nstudl , theta[,1]^2 ) ) - person$EAP^2)
-    #***
-    # calculate EAP reliability
-    # EAP variance
-    EAP.variance <- stats::weighted.mean( person$EAP^2 , pweights ) - ( stats::weighted.mean( person$EAP , pweights ) )^2
-    EAP.error <- stats::weighted.mean( person$SD.EAP^2 , pweights )
-    EAP.rel <- EAP.variance / ( EAP.variance + EAP.error )	
-  } else { 
-    EAP.rel <- rep(0,ndim)
-    names(EAP.rel) <- paste("Dim",1:ndim , sep="")
-    for ( dd in 1:ndim ){
-      #	dd <- 1  # dimension
-      person$EAP <- rowSums( hwtE * outer( nstudl , theta[,dd] ) )
-      person$SD.EAP <- sqrt(rowSums( hwtE * outer( nstudl , theta[,dd]^2 ) ) - person$EAP^2)	
-      #***
-      # calculate EAP reliability
-      # EAP variance
-      EAP.variance <- stats::weighted.mean( person$EAP^2 , pweights ) - ( stats::weighted.mean( person$EAP , pweights ) )^2
-      EAP.error <- stats::weighted.mean( person$SD.EAP^2 , pweights )
-      EAP.rel[dd] <- EAP.variance / ( EAP.variance + EAP.error )	
-      colnames(person)[ which( colnames(person) == "EAP" ) ] <- paste("EAP.Dim" , dd , sep="")
-      colnames(person)[ which( colnames(person) == "SD.EAP" ) ] <- paste("SD.EAP.Dim" , dd , sep="")				
-    }
-#	person <- data.frame( "pid" = pid , person )
-  }
+	item1 <- tam_itempartable( resp=resp, maxK=maxK, AXsi=AXsi, B=B, ndim=ndim, 
+				resp.ind=resp.ind, rprobs=rprobs, n.ik=n.ik, pi.k=pi.k ) 	
+
+	#**** collect all person statistics
+	res <- tam_mml_person_posterior( pid=pid, nstud=nstud, pweights=pweights, 
+				resp=resp, resp.ind=resp.ind, snodes=snodes, 
+				hwtE=hwt, hwt=hwt, ndim=ndim, theta=theta ) 
+	person <- res$person
+	EAP.rel <- res$EAP.rel				  
+  
   ############################################################
   s2 <- Sys.time()
   

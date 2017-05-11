@@ -6,7 +6,7 @@
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Test Analysis Modules (TAM)
-T. Kiefer, A. Robitzsch, & M. Wu
+A. Robitzsch, T. Kiefer, & M. Wu
 
                   ___           ___     
       ___        /  /\         /__/\    
@@ -39,6 +39,39 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
+
+-------------------------------------------------------------
+VERSIONS TAM 2.1  |  2017-05-10  |  Last: TAM 2.1-43
+-------------------------------------------------------------
+
+FEATURES:
+* ---
+ 
+BUG FIXES:
+* ---
+
+NOTES:
+* included argument 'verbose' in TAM functions which is 
+  frequently used in many other R functions
+* exported utility functions 'tam_args_CALL_search', 'tam_matrix2',
+  'tam_outer', 'tam_normalize_matrix_rows', 'tam_trim_increment',
+  'tam_difference_quotient', 'tam_assign_list_elements',
+  'tam_aggregate'
+* fixed bug in 'IRT.informationCurve' when only one item is used 
+  (thanks to Asghar Minaei)
+* changed the default of the argument 'est.variance' to TRUE in
+  'tam.mml' and 'tam.mml.mfr'
+* included optional control argument 'trim_increment' in 
+  argument list 'control' in 'tam_foo' functions which allows
+  the user to choose between two methods 'half' and 'cut' for 
+  reducing the size of increments
+* internal restructure of the main functions
+
+DATASETS INCLUDED OR MODIFIED:
+* ---
+
+EXAMPLES INCLUDED OR MODIFIED:
+* ---
 
 -------------------------------------------------------------
 VERSIONS TAM 2.0  |  2017-04-12  |  Last: TAM 2.0-37

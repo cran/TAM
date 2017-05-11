@@ -53,6 +53,7 @@ Matrix with plausible values
 
 
 \examples{
+\dontrun{
 #############################################################################
 # EXAMPLE 1: Plausible value imputation for Rasch model in sirt
 #############################################################################
@@ -65,6 +66,7 @@ dat <- data.read
 mod <- rasch.mml2(dat)
 # draw 10 plausible values
 pv1 <- TAM::IRT.drawPV(mod, NPV=10)
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

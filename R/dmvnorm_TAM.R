@@ -14,7 +14,6 @@ dmvnorm_TAM <- function( x , mean , sigma , log = FALSE ){
 		muM <- matrix( mu , nrow=n, ncol=d , byrow=TRUE) 
 	}
 	D <- ncol(muM)
-#	tmp <- forwardsolve(dec, t(x - muM), transpose = TRUE)
     tmp <- backsolve(dec, t(x - muM ), transpose = TRUE)
     rss <- colSums(tmp^2)
     logretval <- -sum(log(diag(dec))) - 0.5 * D * log(2 * pi) - 0.5 * rss

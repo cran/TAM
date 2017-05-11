@@ -34,10 +34,10 @@ tam(resp , irtmodel ="1PL" , formulaA=NULL, ...)
 tam.mml(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
     dataY = NULL, ndim = 1,  pid = NULL, xsi.fixed = NULL, xsi.inits = NULL, 
     beta.fixed = NULL, beta.inits = NULL, variance.fixed = NULL, 
-    variance.inits = NULL, est.variance = FALSE, constraint="cases" , A = NULL, 
+    variance.inits = NULL, est.variance = TRUE, constraint="cases" , A = NULL, 
     B = NULL, B.fixed = NULL,  Q = NULL,  est.slopegroups = NULL, E = NULL, 
     pweights = NULL, userfct.variance = NULL , variance.Npars = NULL , 
-    item.elim = TRUE , control = list() )
+    item.elim = TRUE , verbose = TRUE, control = list() )
 
 tam.mml.2pl(resp, Y = NULL, group = NULL, irtmodel = "2PL", formulaY = NULL, 
     dataY = NULL, ndim = 1, pid = NULL, xsi.fixed = NULL, xsi.inits = NULL,
@@ -45,15 +45,15 @@ tam.mml.2pl(resp, Y = NULL, group = NULL, irtmodel = "2PL", formulaY = NULL,
     variance.inits = NULL, est.variance = FALSE, A = NULL, B = NULL, 
     B.fixed = NULL, Q = NULL, est.slopegroups = NULL, E = NULL, gamma.init = NULL , 
     pweights = NULL, userfct.variance = NULL , variance.Npars = NULL , 
-    item.elim = TRUE , control = list() )
+    item.elim = TRUE, verbose = TRUE, control = list() )
             
 tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
     dataY = NULL, ndim = 1, pid = NULL, xsi.fixed = NULL, xsi.setnull = NULL,
     xsi.inits = NULL, beta.fixed = NULL, beta.inits = NULL, variance.fixed = NULL , 
-    variance.inits = NULL , est.variance = FALSE , formulaA=~item+item:step, 
+    variance.inits = NULL , est.variance = TRUE , formulaA=~item+item:step, 
     constraint="cases", A=NULL , B=NULL ,  B.fixed = NULL , Q=NULL , 
     facets=NULL, est.slopegroups=NULL , E = NULL , pweights = NULL , 
-    control = list() , delete.red.items=TRUE )
+    verbose = TRUE, control = list() , delete.red.items=TRUE )
     
 \method{summary}{tam}(object,file=NULL,\dots)
 
@@ -220,6 +220,9 @@ if a \code{userfct.variance} is provided.}
 \item{item.elim}{Optional logical indicating whether an item with has
     only zero entries should be removed from the analysis. The default
     is \code{TRUE}.}
+\item{verbose}{Logical indicating whether output should
+be printed during iterations. This argument replaces \code{control$progress}.
+}    
 \item{control}{
   A list of control arguments for the algorithm: \cr\cr
   \code{ list( nodes = seq(-6,6,len=21) , snodes = 0 , QMC=TRUE,}\cr
@@ -228,6 +231,7 @@ if a \code{userfct.variance} is provided.}
     \code{        min.variance = .001 , progress = TRUE , ridge=0 ,    }\cr
     \code{        seed = NULL , xsi.start0=0, , increment.factor=1 ,  }\cr
     \code{        fac.oldxsi=0 , acceleration = "none", dev_crit = "absolute" )  }\cr
+    \code{        trim_increment="half" )  }\cr    
     
 \code{nodes}: the discretized \eqn{\theta} nodes for numerical integration 
 
@@ -302,7 +306,11 @@ the default), the monoton overrelaxation method of \code{"Yu"} (Yu, 2012) and
 
 \code{dev_crit}: Criterion for convergence in deviance. \code{dev_crit="abolute"}
 refers to absolute differences in successive deviance values, while
-\code{dev_crit = "relative"} refers to relative differences. \cr
+\code{dev_crit = "relative"} refers to relative differences. 
+
+\code{trim_increment}: Type of method for trimming parameter increments in
+algorithm. Possible types are \code{"half"} or "\code{"cut"}.
+\cr
         
 
 }
@@ -451,7 +459,7 @@ are displayed.
 \item{like}{Individual likelihood}
 \item{ndim}{Number of dimensions}
 \item{xsi.fixed}{Fixed \eqn{\xi} parameters}
-\item{xsi.fixed.estimated}{Matrix of estimated \eqn{xi} parameters 
+\item{xsi.fixed.estimated}{Matrix of estimated \eqn{\xi} parameters 
 	in form of \code{xsi.fixed} which can 
 	be used for parameter fixing in subsequent estimations.}
 \item{B.fixed}{Fixed loading parameters (only applies to \code{tam.mml.2pl})}

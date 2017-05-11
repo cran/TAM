@@ -28,7 +28,7 @@ tam.mml.3pl(resp, Y = NULL, group = NULL, formulaY = NULL, dataY = NULL, ndim = 
   est.guess = NULL, guess = rep(0, ncol(resp)), 
   guess.prior = NULL, max.guess = 0.5, skillspace = "normal", theta.k = NULL, 
   delta.designmatrix = NULL, delta.fixed = NULL, delta.inits=NULL, pweights = NULL, 
-  item.elim = TRUE, control = list(), Edes=NULL )
+  item.elim = TRUE, verbose = TRUE, control = list(), Edes=NULL )
   
 \method{summary}{tam.mml.3pl}(object,file=NULL,\dots)
 
@@ -208,6 +208,9 @@ Optional vector of person weights.
 \item{item.elim}{Optional logical indicating whether an item with has
     only zero entries should be removed from the analysis. The default
     is \code{TRUE}.}
+\item{verbose}{Logical indicating whether output should
+be printed during iterations. This argument replaces \code{control$progress}.
+}    
   \item{control}{
 See \code{\link{tam.mml}} for more details.
 }

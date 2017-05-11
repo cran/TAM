@@ -23,7 +23,7 @@ application of \code{\link{tam.pv}} (see Example 1).
 tam.latreg(like, theta=NULL, Y = NULL, group = NULL, formulaY = NULL, dataY = NULL, 
    beta.fixed = NULL, beta.inits = NULL, variance.fixed = NULL, 
    variance.inits = NULL, est.variance = TRUE, pweights = NULL, pid = NULL, 
-   userfct.variance = NULL, variance.Npars = NULL, control = list())
+   userfct.variance = NULL, variance.Npars = NULL, verbose = TRUE, control = list())
    
 \method{summary}{tam.latreg}(object,file=NULL,\dots)
 
@@ -94,9 +94,12 @@ is automatically extracted as an attribute.
 \item{userfct.variance}{Optional user customized function for variance speicification
 (See Simulated Example 17).}
 \item{variance.Npars}{Number of estimated parameters of variance matrix
-if a \code{userfct.variance} is provided.} 
+if a \code{userfct.variance} is provided.}
+  \item{verbose}{
+Optional logical indicating whether iteration should be displayed.
+} 
 \item{control}{
-List of control parameters, see \code{\link{tam.mml}}.
+List of control parameters, see \code{\link{tam.mml}} fro details.
 }
   \item{object}{
 Object of class \code{tam.latreg}

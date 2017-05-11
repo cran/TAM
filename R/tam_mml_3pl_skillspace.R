@@ -3,12 +3,23 @@
 # reduced skillspace estimation
 tam_mml_3pl_skillspace <- function( Ngroup, pi.k , 
 			delta.designmatrix , G , delta , delta.fixed ,			
-			eps=1E-10 )
+			eps=1E-10, hwt, resp.ind , pweights, pweightsM,
+			group1.list, delta_acceleration, iter)
 {		
 	Z <- delta.designmatrix	
 	delta0 <- delta
 	ND <- nrow(delta)
 	covdelta <- list(1:G)
+	
+	itemwt <- crossprod( hwt , resp.ind * pweightsM  )	
+	
+	#-- group specific skill proportions
+	for (gg in 1:G){
+		ind.gg <- group1.list[[gg]]
+		pi.k[,gg] <- colSums( ( pweights*hwt )[ind.gg,] )
+		pi.k[,gg] <- pi.k[,gg] / sum( pi.k[,gg] )
+	}		
+	#-- skill space smoothing
 	for (gg in 1:G){
 		ntheta1 <- Ngroup[gg] * pi.k[,gg]
 		ntheta1 <- ntheta1 / sum(ntheta1 )	
@@ -29,9 +40,21 @@ tam_mml_3pl_skillspace <- function( Ngroup, pi.k ,
 		pi.k[,gg] <- pi.k[,gg] / sum( pi.k[,gg] )
 		delta[,gg] <- beta
 		covdelta[[gg]] <- covbeta
-	}									
+	}			
+	#----- delta acceleration
+	if ( delta_acceleration$acceleration != "none" ){		
+		delta_acceleration <- tam_accelerate_parameters( xsi_acceleration=delta_acceleration , 
+						xsi=delta , iter=iter , itermin=3)
+		delta <- matrix( delta_acceleration$parm , nrow=nrow(delta) , ncol=ncol(delta) )
+	}			
+	#---- delta parameter change
+	delta_change <- tam_parameter_change( delta , delta0 )
+	
+	#---- OUTPUT
 	res <- list( "pi.k"=pi.k , "delta"=delta , 
-			"covdelta" = covdelta )			
+			"covdelta" = covdelta, itemwt = itemwt , delta_acceleration=delta_acceleration,
+			delta_change = delta_change ,
+			varConv = TRUE, betaConv=TRUE)			
 	return(res)
 }
 

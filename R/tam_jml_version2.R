@@ -212,10 +212,8 @@ tam_jml_version2 <-
       
       
       #update theta, ability estimates
-      #    jmlAbility <- tam.jml.WLE ( resp , resp.ind, A, B, nstud, nitems, maxK, convM, 
-      #                                PersonScores, theta, xsi, Msteps, WLE=FALSE)
       theta_old <- theta
-      jmlAbility <- tam.jml.WLE( resp=resp , resp.ind=resp.ind[ rp3.sel$caseid,] , 
+      jmlAbility <- tam_jml_wle( resp=resp , resp.ind=resp.ind[ rp3.sel$caseid,] , 
                                   A=A, B=B, 
                                   nstud=nrow(rp3.sel) , 
                                   nitems=nitems, maxK=maxK, convM=convM, 
@@ -225,17 +223,16 @@ tam_jml_version2 <-
       theta <- jmlAbility$theta								
       theta <- theta[ rp3$theta.index , , drop=FALSE]
       
-      if (is.null( xsi.fixed))  theta <- theta - mean(theta)
+      if (is.null( xsi.fixed)){
+		theta <- theta - mean(theta)
+	  }
       meanChangeWLE <- jmlAbility$meanChangeWLE
       maxthetachange <- max( abs( theta - theta_old ) )
       errorMLE <- jmlAbility$errorWLE
 
       
       #update xsi, item parameters
-      #    jmlxsi0 <- tam.jml.xsi ( resp , resp.ind, A, B, nstud, nitems, maxK, convM, 
-      #                            ItemScore, theta, xsi, Msteps, pweightsM,
-      #                            est.xsi.index)   
-      jmlxsi <- tam.jml.xsi2( resp , resp.ind, A=A,A.0=A.0 ,  B=B, nstud, nitems, maxK, convM, 
+      jmlxsi <- tam_jml_version2_calc_xsi( resp , resp.ind, A=A,A.0=A.0 ,  B=B, nstud, nitems, maxK, convM, 
                               ItemScore, theta, xsi, Msteps, pweightsM,
                               est.xsi.index , rp3 , rp3.sel , rp3.pweightsM	)
       xsi[est.xsi.index] <- jmlxsi$xsi[est.xsi.index]
@@ -274,7 +271,7 @@ tam_jml_version2 <-
     
     s1 <- Sys.time()  
     #After convergence, compute final WLE (WLE set to TRUE)
-    jmlWLE <- tam.jml.WLE ( tamobj , resp , resp.ind[ rp3.sel$caseid,], A, B, 
+    jmlWLE <- tam_jml_wle( tamobj , resp , resp.ind[ rp3.sel$caseid,], A, B, 
                             nrow(rp3.sel) , nitems, maxK, convM, 
                             PersonScores[ rp3.sel$caseid ] , 
                             theta[ rp3.sel$caseid , , drop=FALSE] , xsi, Msteps, WLE=TRUE)					  
@@ -289,21 +286,6 @@ tam_jml_version2 <-
 	
     # varWLE <- stats::var(thetaWLE)
     # WLEreliability <- (varWLE - mean(errorWLE^2)) / varWLE
-    
-    if (progress){ cat("\n Item fit calculation \n") }  
-#     #Compute fit statistics
-#     fit <- tam.jml.fit ( tamobj , resp , resp.ind, A, B, nstud, nitems, maxK, 
-#                          ItemScore, theta, xsi, Msteps, pweightsM,
-#                          est.xsi.index)
-#     # cat("\n fit \n"); s2 <- Sys.time(); print(s2-s1) ; s1 <- s2    					   
-#     outfitPerson <- fit$outfitPerson
-#     outfitItem <- fit$outfitItem
-#     infitPerson <- fit$infitPerson
-#     infitItem <- fit$infitItem
-#     outfitPerson_t <- fit$outfitPerson_t
-#     outfitItem_t <- fit$outfitItem_t
-#     infitPerson_t <- fit$infitPerson_t
-#     infitItem_t <- fit$infitItem_t 
     
     #disattenuate
     if (disattenuate == TRUE) {
@@ -320,7 +302,6 @@ tam_jml_version2 <-
   item <- data.frame( "xsi.label" = dimnames(A)[[3]] ,
 		"xsi.index" = 1:( length(xsi) ) , "xsi" = xsi ,
 		"se.xsi" = errorP 
-#     , "outfit" = outfitItem ,		"infit"=infitItem 
     )
 	
     ############################################################
@@ -340,10 +321,6 @@ tam_jml_version2 <-
                  "WLEreliability" = WLEreliability ,
                  "PersonScores" = PersonScores , "ItemScore" = ItemScore ,             
                  "PersonMax" = PersonMaxB , "ItemMax" = ItemMax , 
-#                  "outfitPerson" = outfitPerson , "outfitItem" = outfitItem, 
-#                  "infitPerson" = infitPerson , "infitItem" = infitItem, 
-#                  "outfitPerson_t" = outfitPerson_t , "outfitItem_t" = outfitItem_t, 
-#                  "infitPerson_t" = infitPerson_t , "infitItem_t" = infitItem_t,
                  "deviance" = deviance, "deviance.history" = deviance.history, 
                  "resp" = resp , "resp.ind" = resp.ind , "group" = group ,
                  "pweights" = pweights , "A" = A , "B" = B  ,               

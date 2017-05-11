@@ -247,7 +247,7 @@ z0 <- tamcat( " --- .rename.items (A)" , z0 , tamcat_active )
                                           facet.list=facet.list , I=I )
 z0 <- tamcat( " --- .rename.items2aa (A)" , z0 , tamcat_active )  				     
     xsi.table <- xsi.constr$xsi.table
-    A <- .rename.items3a( matr=A , facet.list , I , cols=TRUE , xsi.table )	
+    A <- .rename.items3a( matr=A , facet.list=facet.list , I=I , cols=TRUE , xsi.table=xsi.table )	
 z0 <- tamcat( " --- .rename.items3a (A)" , z0 , tamcat_active )
 
 #    B <- .rename.items( matr=B , itemren )		

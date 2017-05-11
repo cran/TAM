@@ -394,30 +394,25 @@ v0 <- Sys.time()
 	RR <- length(rMsplit)
 	rMM <- matrix( unlist(rMsplit) , nrow=RR , byrow=TRUE)
 	rMM.ncol <- ncol(rMM)
-	FF <- length(facet.list)	
-	
-	
+	FF <- length(facet.list)		
 	rMM1 <- rMM	
 	NRM <- ncol(rMM1)
 	if (FF>0){
-	for (ff in 1:FF){
-		# ff <- 1  # facet ff
-		itemren <- facet.list[[ff]]
-		for (nn in 1:NRM){
-		   ind1 <- match( rMM1[,nn] , itemren[,2] )
-		   ind1 <- stats::na.omit(ind1)
-		   h1 <- paste(itemren[ ind1 , 1] )
-		   if ( length(h1) > 0 ){
-				rMM1[,nn] <- h1 
-						}
+		for (ff in 1:FF){
+			# ff <- 1  # facet ff			
+			itemren <- facet.list[[ff]]
+			for (nn in 1:NRM){
+				ind1 <- match( rMM1[,nn] , itemren[,2] )
+				ind1 <- stats::na.omit(ind1)
+				h1 <- paste(itemren[ ind1 , 1] )
+				if ( length(h1) > 0 ){
+					rMM1[,nn] <- h1 
 				}
-				}		
-			}		
+			}
+		}		
+	}		
 	rMM1 <- apply( rMM1 , 1 , FUN = function(ll){ paste0( ll , collapse="-") } )
-	rM <- rMM1		
-		
-		
-	
+	rM <- rMM1							
 	if ( cols){
 		rM <- colnames(matr)		
 		rMsplit <- unlist( strsplit( paste(rM) , split=":" ) )

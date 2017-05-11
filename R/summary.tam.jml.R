@@ -14,7 +14,10 @@ summary.tam.jml <- function( object , file = NULL , ...){
 	cat("Computation time:" , print( object$time[2] - object$time[1] ) , "\n\n")
     cat("Joint Maximum Likelihood Estimation in TAM \n\n")
 	irtmodel <- object$irtmodel
-	cat("IRT Model" , irtmodel , "\n")
+	cat("IRT Model" , irtmodel )
+
+	# print Call
+    tam_print_call(object$CALL)	
 	
 	cat("------------------------------------------------------------\n")
 	cat( "Number of iterations =" , object$iter , "\n" )

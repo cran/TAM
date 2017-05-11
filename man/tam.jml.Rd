@@ -17,7 +17,7 @@ item response models with joint maximum likelihood (JML,
 \usage{
 tam.jml(resp, group = NULL, adj = .3, disattenuate = FALSE, bias = TRUE, 
     xsi.fixed = NULL, xsi.inits = NULL, theta.fixed=NULL, A = NULL, B = NULL, Q = NULL, 
-    ndim = 1, pweights = NULL, control = list(), version = 2)
+    ndim = 1, pweights = NULL, verbose = TRUE, control = list(), version = 2)
 
 \method{summary}{tam.jml}(object, file=NULL, \dots)
 
@@ -83,6 +83,9 @@ the fixed value. This argument can only be applied for \code{version=1}.}
 }
   \item{pweights}{
    An optional vector of person weights.
+}
+\item{verbose}{Logical indicating whether output should
+be printed during iterations. This argument replaces \code{control$progress}.
 }
   \item{control}{
      A list of control arguments. See \code{\link{tam.mml}}
@@ -310,9 +313,9 @@ xsi.index2 <- cbind( c(1,2,3,6,13) , c(-2,-1,-1,-1.32 , -1 ) )
 xsi.index <- rbind( xsi.index1 , xsi.index2 )
 # fix some theta parameters of persons 1, 15 and 20
 theta.fixed <- cbind(  c(1,15,20) , c(0.4 , 1 , 0 ) )
-# estimate model
+# estimate model, theta.fixed only works for version=1
 mod2 <- TAM::tam.jml( resp=resp1 , A=A1 , xsi.fixed=xsi.fixed , theta.fixed=theta.fixed , 
-            control=list( Msteps=4 , maxiter=100 ) )                                
+            control=list( Msteps=4 , maxiter=100) )                                
 summary(mod2)
 cbind( mod2$WLE , mod2$errorWLE )
 }

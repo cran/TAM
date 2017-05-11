@@ -19,7 +19,7 @@ This function is simply a wrapper to \code{\link{tam.mml}} or
 
 \usage{
 tam.fa(resp, irtmodel, dims = NULL, nfactors = NULL, pid = NULL, 
-    pweights = NULL, control = list())
+    pweights = NULL, verbose = TRUE, control = list())
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -55,6 +55,9 @@ exploratory factor analysis.
 }
   \item{pweights}{
      An optional vector of person weights
+}
+\item{verbose}{Logical indicating whether output should
+be printed during iterations. This argument replaces \code{control$progress}.
 }
   \item{control}{
 See \code{\link{tam.mml}} for more details. Note that the default is

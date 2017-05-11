@@ -7,7 +7,7 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
 				variance.fixed = NULL , variance.inits = NULL , 
 				est.variance = TRUE , pweights = NULL , pid=NULL , 
 				userfct.variance = NULL , variance.Npars = NULL , 
-				control = list() 
+				verbose = TRUE , control = list() 
   ){
        
     s1 <- Sys.time()
@@ -17,29 +17,25 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
     increment.factor <- progress <- nodes <- snodes <- ridge <- xsi.start0 <- QMC <- NULL
     maxiter <- conv <- convD <- min.variance <- max.increment <- Msteps <- convM <- NULL 
     pweightsM <- R <- NULL
-    
-    # attach control elements
+	
+	#**** handle verbose argument
+	args_CALL <- as.list( sys.call() )
+	control$progress <- tam_args_CALL_search( args_CALL=args_CALL , variable="verbose" , 
+								default_value = TRUE )				
+	#*******
+  	#--- attach control elements
     e1 <- environment()
-    con <- list( convD = .001 ,conv = .0001 , snodes=0 , convM = .0001 , Msteps = 4 ,            
-                 maxiter = 1000 ,min.variance = .001 , progress = TRUE , ridge=0 ,
-                 seed = NULL )  	
-    #a0 <- Sys.time()			   
-    con[ names(control) ] <- control  
-    Lcon <- length(con)
-    con1a <- con1 <- con ; 
-    names(con1) <- NULL
-    for (cc in 1:Lcon ){
-      assign( names(con)[cc] , con1[[cc]] , envir = e1 ) 
-    }
-    
+	tam_fct <- "tam.latreg"	
+	res <- tam_mml_control_list_define(control=control, envir=e1, tam_fct=tam_fct)
+	con <- res$con
+	con1a <- res$con1a
+	
 	if ( is.null(theta) ){
 	   theta <- attr( like , "theta" )
-						}
-
+	}
 						
     nodes <- theta 
 	ndim <- ncol(theta)		 
-
 	
     if (progress){ 
       cat(disp)	
@@ -84,24 +80,9 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
 	
 	if ( snodes > 0 ){ nnodes <- snodes }
     
-    #****
-    # display number of nodes
-    if (progress ){   
-      l1 <- paste0( "    * ")
-      if (snodes==0){ l1 <- paste0(l1 , "Numerical integration with ")}
-      else{ 
-        if (QMC){ 
-          l1 <- paste0(l1 , "Quasi Monte Carlo integration with ")
-        } else {
-          l1 <- paste0(l1 , "Monte Carlo integration with ")					
-        }
-      }
-      cat( paste0( l1 , nnodes , " nodes\n") )
-      if (nnodes > 8000){
-        cat("      @ Are you sure that you want so many nodes?\n")
-        cat("      @ Maybe you want to use Quasi Monte Carlo integration with fewer nodes.\n")		
-      }
-    }
+	#--- print information about nodes
+	res <- tam_mml_progress_proc_nodes( progress=progress, snodes=snodes, nnodes=nnodes, 
+					skillspace="normal", QMC=QMC)  	
 	
     #*********
     # variance inits  
@@ -190,34 +171,16 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
     
     # cat("b200"); a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1  									  
     
-    # nodes
-    if ( snodes == 0 ){ 
-#      theta <- as.matrix( expand.grid( as.data.frame( matrix( rep(nodes, ndim) , ncol = ndim ) ) ) )
-      #we need this to compute sumsig2 for the variance
-      #    theta2 <- matrix(theta.sq(theta), nrow=nrow(theta),ncol=ncol(theta)^2)            
-      theta2 <- matrix(theta.sq2(theta), nrow=nrow(theta),ncol=ncol(theta)^2)            
-      # grid width for calculating the deviance
-      thetawidth <- diff(theta[,1] )
-      thetawidth <- ( ( thetawidth[ thetawidth > 0 ])[1] )^ndim 
-      thetasamp.density <- NULL
-    } else {
-      # sampled theta values
-      if (QMC){						
-        r1 <- sfsmisc::QUnif(n=snodes, min = 0, max = 1, n.min = 1, p=ndim, leap = 409)						
-        theta0.samp <- stats::qnorm( r1 )
-      } else {
-        theta0.samp <- matrix( MASS::mvrnorm( snodes , mu = rep(0,ndim) , 
-                                        Sigma = diag(1,ndim ) )	,
-                               nrow= snodes , ncol=ndim )			
-      }
-      thetawidth <- NULL
-    }
-    
+	#--- create grid of nodes for numeric or stochastic integration
+	res <- tam_mml_create_nodes( snodes=snodes, nodes=nodes, ndim=ndim, theta=theta, QMC=QMC ) 
+	theta <- res$theta
+	theta2 <- res$theta2
+	thetawidth <- res$thetawidth
+	theta0.samp <- res$theta0.samp
+	thetasamp.density <- res$thetasamp.density
     
     deviance <- 0  
-    deviance.history <- matrix( 0 , nrow=maxiter , ncol = 2)
-    colnames(deviance.history) <- c("iter" , "deviance")
-    deviance.history[,1] <- 1:maxiter
+	deviance.history <- tam_deviance_history_init(maxiter=maxiter)
     
     iter <- 0 
     a02 <- a1 <- 999	# item parameter change
@@ -229,6 +192,9 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
     # define progress bar for M step
 #    mpr <- round( seq( 1 , np , len = 10 ) )
     
+	#--- warning multiple group estimation
+	res <- tam_mml_warning_message_multiple_group_models( ndim=ndim, G=G)	
+	
     hwt.min <- 0
     deviance.min <- 1E100
     itemwt.min <- 0
@@ -241,134 +207,83 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
     #Start EM loop here
     while ( ( (!betaConv | !varConv)  | ((a1 > conv) | (a4 > conv) | (a02 > convD)) )  & (iter < maxiter) ) { 
       
-      iter <- iter + 1
-      if (progress){ 
-        cat(disp)	
-        cat("Iteration" , iter , "   " , paste( Sys.time() ) )
-        cat("\nE Step\n") ; 
-		utils::flush.console()
-      }
-      # calculate nodes for Monte Carlo integration	
-      if ( snodes > 0){
-        #      theta <- beta[ rep(1,snodes) , ] +  t ( t(chol(variance)) %*% t(theta0.samp) )
-        theta <- beta[ rep(1,snodes) , ] + theta0.samp %*% chol(variance) 
-        # calculate density for all nodes
-        thetasamp.density <- mvtnorm::dmvnorm( theta , mean = as.vector(beta[1,]) , sigma = variance )
-        # recalculate theta^2
-        #      theta2 <- matrix( theta.sq(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
-        theta2 <- matrix( theta.sq2(theta) , nrow=nrow(theta) , ncol=ncol(theta)^2 )   
-      }			
-      olddeviance <- deviance
+		iter <- iter + 1
+		#--- progress
+		res <- tam_mml_progress_em0(progress=progress, iter=iter, disp=disp)
+		#--- calculate nodes for Monte Carlo integration	
+		if ( snodes > 0){
+			res <- tam_mml_update_stochastic_nodes( theta0.samp=theta0.samp, variance=variance, 
+						snodes=snodes, beta=beta, theta=theta ) 
+			theta <- res$theta
+			theta2 <- res$theta2
+			thetasamp.density <- res$thetasamp.density  
+		}			
+		olddeviance <- deviance
 # a0 <- Sys.time()	
-      
-      #***	
-      # print(AXsi)	
-      # AXsi[ is.na(AXsi) ] <- 0
-      # print(AXsi)	
-      
+ 
       # cat("calc_prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
       
-      # calculate student's prior distribution
-      gwt <- tam_stud_prior(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
+		# calculate student's prior distribution
+		gwt <- tam_stud_prior(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
                            nnodes=nnodes , ndim=ndim,YSD=YSD, unidim_simplify=FALSE)
-	  # compute posterior	  
-	  hwt <- like * gwt
-	  res.hwt$rfx <- rowSums(hwt)
-	  hwt <- hwt / rowSums(hwt)	 
+	    hwt <- like * gwt
+		res.hwt$rfx <- rowSums(hwt)
+		hwt <- hwt / rowSums(hwt)	 
       # cat("calc_posterior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						 
-      
-     
-      if (progress){ 
-	       cat("M Step Intercepts   |")
+            
+		#-- M step: estimation of beta and variance
+		if (progress){ 
+	       cat("M Step Latent Regression")
 		   utils::flush.console() 
-			   }
-      oldbeta <- beta
-      oldvariance <- variance 
-  
-#	  cat("before mstep regression") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						           
-      # M step: estimation of beta and variance
-	  resr <- latreg.mstep.regression( hwt , 
-			pweights , pweightsM , Y , theta , theta2 , YYinv , ndim , 
-			nstud , beta.fixed , variance , Variance.fixed , group , G , 
-			snodes = snodes , thetasamp.density=thetasamp.density , nomiss=FALSE)
-  
+		}
+		oldbeta <- beta
+		oldvariance <- variance 				
+		resr <- tam_mml_mstep_regression( resp=NULL, hwt=hwt, resp.ind=NULL, 
+					pweights=pweights, pweightsM=pweightsM, Y=Y, theta=theta, theta2=theta2, 
+					YYinv=YYinv, ndim=ndim, nstud=nstud, beta.fixed=beta.fixed, variance=variance, 
+					Variance.fixed=variance.fixed, group=group, G=G, snodes=snodes, nomiss=nomiss, 
+					thetasamp.density=thetasamp.density, iter=iter, min.variance=min.variance, 
+					userfct.variance=userfct.variance, variance_acceleration=NULL, 
+					est.variance=est.variance, beta=beta, latreg_use=TRUE ) 	  
       # cat("mstep regression") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						       
-      beta <- resr$beta
-      
-      variance <- resr$variance	
-      if( ndim == 1 ){  # prevent negative variance
-        variance[ variance < min.variance ] <- min.variance 
-      }
-      itemwt <- resr$itemwt
-      
-      # constraint cases (the design matrix A has no constraint on items)
-      if ( max(abs(beta-oldbeta)) < conv){    
-        betaConv <- TRUE       # not include the constant as it is constrained
-      }
 
-      
-      if (G == 1){
-        diag(variance) <- diag(variance) + 10^(-10)
-			}
-      
-	    
-	  # function for reducing the variance	  
-	  if ( ! is.null( userfct.variance ) ){  
-			variance <- do.call( userfct.variance , list(variance ) )			
-				}	        
-      if (max(abs(variance-oldvariance)) < conv) varConv <- TRUE
-      
-
-      
-      # calculate deviance
-      if ( snodes == 0 ){ 
-        deviance <- - 2 * sum( pweights * log( res.hwt$rfx * thetawidth ) )
-#        deviance <- - 2 * sum( pweights * log( res.hwt$like * thetawidth ) )
-      } else {
-        #       deviance <- - 2 * sum( pweights * log( res.hwt$rfx ) )
-        deviance <- - 2 * sum( pweights * log( rowMeans( res.hwt$swt ) ) )	
-      }
-      deviance.history[iter,2] <- deviance
-      a01 <- abs( ( deviance - olddeviance ) / deviance  )
-      a02 <- abs( ( deviance - olddeviance )  )	
-      
-      if( deviance > deviance.min ){ 	 
-        beta.min.deviance <- beta.min.deviance
-        variance.min.deviance <- variance.min.deviance
-        hwt.min <- hwt.min
-        deviance.min <- deviance.min
-      }   else { 
+		beta <- resr$beta     
+		variance <- resr$variance	
+		variance_change <- resr$variance_change
+		beta_change <- resr$beta_change
+		
+		if ( beta_change < conv){ betaConv <- TRUE }
+		if ( variance_change < conv){ varConv <- TRUE }		  
+      	  
+		#--- compute deviance
+		res <- tam_mml_compute_deviance( loglike_num=res.hwt$rfx, 
+					loglike_sto=rowMeans(res.hwt$swt), snodes=snodes, 
+					thetawidth=thetawidth, pweights=pweights, deviance=deviance, 
+					deviance.history=deviance.history, iter=iter ) 			  
+		deviance <- res$deviance
+		deviance.history <- res$deviance.history
+		a01 <- rel_deviance_change <- res$rel_deviance_change
+		a02 <- deviance_change <- res$deviance_change	  
+	        
+      if( deviance < deviance.min ){ 	 
         beta.min.deviance <- beta
         variance.min.deviance <- variance	
         hwt.min <- hwt	
         deviance.min <- deviance
       }
       
-      a1 <- 0
-      a2 <- max( abs( beta - oldbeta ))	
-      a3 <- max( abs( variance - oldvariance ))
-      if (progress){ 
-        cat( paste( "\n  Deviance =" , round( deviance , 4 ) ))
-        devch <- -( deviance - olddeviance )
-        cat( " | Deviance change:", round( devch  , 4 ) )
-        if ( devch < 0 & iter > 1 ){ 
-          cat("\n!!! Deviance increases!                                        !!!!") 
-          cat("\n!!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!") 			
-        }
+		a1 <- 0
+		a2 <- beta_change
+		a3 <- variance_change		  
+		devch <- - ( deviance - olddeviance )
+		
+		#** print progress
+		res <- tam_mml_progress_em( progress=progress, deviance=deviance, 
+					deviance_change=deviance_change, iter=iter, 
+					rel_deviance_change=rel_deviance_change, xsi_change=0, 
+					beta_change=beta_change, variance_change=variance_change, B_change=0, 
+					is_latreg=TRUE, devch=devch ) 
         
-        
-        cat( "\n  Maximum regression parameter change:" , round( a2 , 6 ) )  
-        if ( G == 1 ){ 
-          cat( "\n  Variance: " , round( variance[ ! lower.tri(variance)] , 4 ) , " | Maximum change:" , round( a3 , 6 ) )  
-        } else {
-          cat( "\n  Variance: " , round( variance[var.indices] , 4 ) ,
-               " | Maximum change:" , round( a3 , 6 ) )  		
-        }					
-        cat( "\n  beta ",round(beta,4)  )
-        cat( "\n" )
-        utils::flush.console()
-      }
-      
       # cat("rest") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
       
       
@@ -380,56 +295,18 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
     hwt.min -> hwt	
     deviance.min -> deviance
 
-    ##*** Information criteria
-	ic <- latreg_TAM.ic( nstud , deviance , 
-				beta , beta.fixed , ndim , variance.fixed , G , 
-				est.variance , variance.Npars=NULL , group )
-
-			   
-    #####################################################
-    # post ... posterior distribution	
-    # create a data frame person	
-    person <- data.frame( "pid"=pid , "case" = 1:nstud , "pweight" = pweights )
-    # person$score <- rowSums( resp * resp.ind )		
-    # use maxKi here; from "design object"
-    nstudl <- rep(1,nstud)
-#    person$max <- rowSums( outer( nstudl , apply( resp ,2 , max , na.rm=TRUE) ) * resp.ind )
-    # calculate EAP
-    # EAPs are only computed in the unidimensional case for now,
-    # but can be easily adapted to the multidimensional case
-    if ( snodes == 0 ){ 
-      hwtE <- hwt 
-    } else { 	
-      # hwtE <- hwt / snodes 
-      hwtE <- hwt
-    }
-    if ( ndim == 1 ){
-      person$EAP <- rowSums( hwtE * outer( nstudl , theta[,1] ) )
-      person$SD.EAP <- sqrt( rowSums( hwtE * outer( nstudl , theta[,1]^2 ) ) - person$EAP^2)
-      #***
-      # calculate EAP reliability
-      # EAP variance
-      EAP.variance <- stats::weighted.mean( person$EAP^2 , pweights ) - ( stats::weighted.mean( person$EAP , pweights ) )^2
-      EAP.error <- stats::weighted.mean( person$SD.EAP^2 , pweights )
-      EAP.rel <- EAP.variance / ( EAP.variance + EAP.error )	
-    } else { 
-      EAP.rel <- rep(0,ndim)
-      names(EAP.rel) <- paste("Dim",1:ndim , sep="")
-      for ( dd in 1:ndim ){
-        #	dd <- 1  # dimension
-        person$EAP <- rowSums( hwtE * outer( nstudl , theta[,dd] ) )
-        person$SD.EAP <- sqrt(rowSums( hwtE * outer( nstudl , theta[,dd]^2 ) ) - person$EAP^2)	
-        #***
-        # calculate EAP reliability
-        # EAP variance
-        EAP.variance <- stats::weighted.mean( person$EAP^2 , pweights ) - ( stats::weighted.mean( person$EAP , pweights ) )^2
-        EAP.error <- stats::weighted.mean( person$SD.EAP^2 , pweights )
-        EAP.rel[dd] <- EAP.variance / ( EAP.variance + EAP.error )	
-        colnames(person)[ which( colnames(person) == "EAP" ) ] <- paste("EAP.Dim" , dd , sep="")
-        colnames(person)[ which( colnames(person) == "SD.EAP" ) ] <- paste("SD.EAP.Dim" , dd , sep="")				
-      }
-#      person <- data.frame( "pid" = pid , person )
-    }
+    ##*** information criteria
+	ic <- tam_latreg_ic( nstud=nstud, deviance=deviance, beta=beta, 
+				beta.fixed=beta.fixed, ndim=ndim, variance.fixed=variance.fixed, 
+				G=G, est.variance=est.variance, variance.Npars=NULL, group=group ) 
+				
+	#**** collect all person statistics
+	res <- tam_mml_person_posterior( pid=pid, nstud=nstud, pweights=pweights, 
+				resp=NULL, resp.ind=NULL, snodes=snodes, 
+				hwtE=hwt, hwt=hwt, ndim=ndim, theta=theta ) 
+	person <- res$person
+	EAP.rel <- res$EAP.rel		
+	
     #cat("person parameters") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1				  
     ############################################################
     s2 <- Sys.time()

@@ -5,11 +5,14 @@ tam_mml_3pl_mstep_regression <- function( resp , hwt ,  resp.ind ,
 		nstud , beta.fixed , variance , Variance.fixed , group , G , 
 		snodes = 0 , thetasamp.density=NULL , nomiss=FALSE , group_indices = NULL,
 		min.variance = 1E-5 , userfct.variance=NULL , variance_acceleration=NULL , 
-		ridge_eps=1E-10 , iter = NULL  )
+		ridge_eps=1E-10 ,  beta , iter )
 {
 	# calculate item weights
 	variance.fixed <- Variance.fixed
 #  a0 <- Sys.time()	
+	
+	beta0 <- beta
+	variance0 <- variance
 
 	#*****
 	# numerical integration	
@@ -104,7 +107,15 @@ tam_mml_3pl_mstep_regression <- function( resp , hwt ,  resp.ind ,
 	if ( ! is.null( userfct.variance ) ){  
 		variance <- do.call( userfct.variance , list(variance=variance) )			
 	}		
-
+	
+	#--- prevent small variance values
+	if (G == 1){
+		if( ndim == 1 ){  # prevent negative variance
+			variance[ variance < min.variance ] <- min.variance 
+		}			
+		diag(variance) <- diag(variance) + 1E-10
+	}				
+	
 	#--- variance acceleration
 	if (G==1){
 		if ( ! is.null( variance_acceleration) ){
@@ -115,8 +126,15 @@ tam_mml_3pl_mstep_regression <- function( resp , hwt ,  resp.ind ,
 			}
 		}
 	}	
+	
+	#--- parameter change
+	beta_change <- tam_parameter_change( beta , beta0 )
+	variance_change <- tam_parameter_change( variance , variance0 )
+	
 	#---- output
-    res <- list( "beta" = beta , "variance" = variance , "itemwt" = itemwt )
+    res <- list( "beta" = beta , "variance" = variance , "itemwt" = itemwt ,
+				variance_acceleration=variance_acceleration, beta_change=beta_change,
+				variance_change=variance_change)
 	return(res)
 }
 ############################################################################

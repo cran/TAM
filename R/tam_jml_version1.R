@@ -193,20 +193,19 @@ function( resp , group = NULL , adj=.3 , disattenuate = FALSE ,
 	#**********************
     #update theta, ability estimates
     
-#    jmlAbility <- tam.jml.WLE ( resp , resp.ind, A, B, nstud, nitems, maxK, convM, 
-#                                PersonScores, theta, xsi, Msteps, WLE=FALSE)
-
-	jmlAbility <- tam.jml.WLE( tamobj, resp , resp.ind, A, B, nstud, nitems, maxK, convM, 
+	jmlAbility <- tam_jml_wle( tamobj, resp , resp.ind, A, B, nstud, nitems, maxK, convM, 
 				 PersonScores, theta, xsi, Msteps, WLE=FALSE ,
 				 theta.fixed=theta.fixed)								
 															
     theta <- jmlAbility$theta
-    if (is.null( xsi.fixed))  theta <- theta - mean(theta)
+    if (is.null( xsi.fixed)){
+		theta <- theta - mean(theta)
+	}
     meanChangeWLE <- jmlAbility$meanChangeWLE
     errorMLE <- jmlAbility$errorWLE
     
     #update xsi, item parameters
-    jmlxsi <- tam.jml.xsi( resp , resp.ind, A, B, nstud, nitems, maxK, convM, 
+    jmlxsi <- tam_jml_version1_calc_xsi( resp , resp.ind, A, B, nstud, nitems, maxK, convM, 
                             ItemScore, theta, xsi, Msteps, pweightsM,
                             est.xsi.index)       
     xsi[est.xsi.index] <- jmlxsi$xsi[est.xsi.index]
@@ -245,7 +244,7 @@ function( resp , group = NULL , adj=.3 , disattenuate = FALSE ,
   
   #After convergence, compute final WLE (WLE set to TRUE)
   
-  jmlWLE <- tam.jml.WLE( tamobj , resp , resp.ind, A, B, nstud, nitems, maxK, convM, 
+  jmlWLE <- tam_jml_wle( tamobj , resp , resp.ind, A, B, nstud, nitems, maxK, convM, 
                           PersonScores, theta, xsi, Msteps, WLE=TRUE ,
 						  theta.fixed=theta.fixed )
 						  
@@ -257,21 +256,7 @@ function( resp , group = NULL , adj=.3 , disattenuate = FALSE ,
   #WLE person separation reliability
   varWLE <- stats::var(thetaWLE)
   WLEreliability <- (varWLE - mean(errorWLE^2)) / varWLE
-  
-
-#   #Compute fit statistics
-#   fit <- tam.jml.fit ( tamobj=NULL, resp , resp.ind, A, B, nstud, nitems, maxK, 
-#                        ItemScore, theta, xsi, Msteps, pweightsM,
-#                        est.xsi.index )
-#   outfitPerson <- fit$outfitPerson
-#   outfitItem <- fit$outfitItem
-#   infitPerson <- fit$infitPerson
-#   infitItem <- fit$infitItem
-#   outfitPerson_t <- fit$outfitPerson_t
-#   outfitItem_t <- fit$outfitItem_t
-#   infitPerson_t <- fit$infitPerson_t
-#   infitItem_t <- fit$infitItem_t 
-  
+    
   #disattenuate
   if (disattenuate) {
     thetaWLE <- sqrt(WLEreliability) * thetaWLE
@@ -288,8 +273,6 @@ function( resp , group = NULL , adj=.3 , disattenuate = FALSE ,
   item <- data.frame( "xsi.label" = dimnames(A)[[3]] ,
 		"xsi.index" = 1:( length(xsi) ) , "xsi" = xsi ,
 		"se.xsi" = errorP
-#     , "outfit" = outfitItem ,
-# 		"infit"=infitItem 
     )
   
   
@@ -311,10 +294,6 @@ function( resp , group = NULL , adj=.3 , disattenuate = FALSE ,
                "WLEreliability" = WLEreliability ,
                "PersonScores" = PersonScores , "ItemScore" = ItemScore ,             
                "PersonMax" = PersonMaxB , "ItemMax" = ItemMax , 
-#                "outfitPerson" = outfitPerson , "outfitItem" = outfitItem, 
-#                "infitPerson" = infitPerson , "infitItem" = infitItem, 
-#                "outfitPerson_t" = outfitPerson_t , "outfitItem_t" = outfitItem_t, 
-#                "infitPerson_t" = infitPerson_t , "infitItem_t" = infitItem_t,
                "deviance" = deviance, "deviance.history" = deviance.history, 
                "resp" = resp , "resp.ind" = resp.ind , "group" = group ,
                "pweights" = pweights , "A" = A , "B" = B  ,               

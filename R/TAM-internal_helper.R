@@ -1,7 +1,6 @@
 ###################################################################
 # Function for defining different response patterns
-resp.pattern3 <-
-function( x ){
+resp.pattern3 <- function( x ){
     n <- nrow(x)
     p <- ncol(x)
     mdp <- (x %*% (2^((1:ncol(x)) - 1))) + 1
@@ -9,7 +8,7 @@ function( x ){
     misspattern <- list( "miss.pattern" = mdp[,1] , 
                 "mp.index" = match( mdp[,1] , sort( unique(mdp[,1] ) ) ) )
     return( misspattern )
-        }
+}
 ####################################################################
 rowcumsums <-
   function(m1){
@@ -48,7 +47,7 @@ rowMaxs <-
     x <- as.vector(mat)
     x <- matrix(x[order(rep(1:n, p), x, na.last = !na.rm)], p, n)
     x[p , ]
-  }
+}
 
 #############################################################
 # rewrite theta.sq function into Rcpp
@@ -56,20 +55,11 @@ theta.sq <-
   function(theta){
     theta2 <- array(,dim = c(nrow(theta), ncol(theta) , ncol(theta) ) )
     for( qq in 1:nrow(theta) ){
-#		theta2[qq,,] <- theta[qq,] %*% t(theta[qq,])  
 		theta2[qq,,] <- tcrossprod( theta[qq,] )  		
 				}
     return("theta2" = theta2)
-  }
-#*******************************
-# faster Rcpp function  
-theta.sq2 <- function(theta){
-	D <- ncol(theta)
-	TP <- nrow(theta)
-	theta2 <- theta_sq_cpp( theta )
-    theta2 <- array(theta2 , dim=c(TP,D,D) )		
-    return("theta2" = theta2)
-  }  
+}
+
   
 #############################################################
 
