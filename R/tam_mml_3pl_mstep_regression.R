@@ -120,7 +120,7 @@ tam_mml_3pl_mstep_regression <- function( resp , hwt ,  resp.ind ,
 	if (G==1){
 		if ( ! is.null( variance_acceleration) ){
 			if ( variance_acceleration$acceleration != "none" ){		
-				variance_acceleration <- accelerate_parameters( xsi_acceleration=variance_acceleration , 
+				variance_acceleration <- tam_accelerate_parameters( xsi_acceleration=variance_acceleration , 
 								xsi=as.vector(variance) , iter=iter , itermin=3)
 				variance <- matrix( variance_acceleration$parm , nrow= nrow(variance) , ncol=ncol(variance) )
 			}

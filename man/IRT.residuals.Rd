@@ -75,7 +75,7 @@ factor analysis (see Example 1).
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-See also the \code{\link[eRm:residuals.ppar]{residuals}} (\pkg{eRm}) or
+See also the \code{eRm::residuals} (\pkg{eRm}) or
 \code{\link[mirt:residuals-method]{residuals}} (\pkg{mirt})
 functions.
 

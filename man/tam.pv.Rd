@@ -1,19 +1,36 @@
 \name{tam.pv}
 \alias{tam.pv}
+\alias{tam.pv.mcmc}
+\alias{summary.tam.pv.mcmc}
+\alias{plot.tam.pv.mcmc}
 
 \title{
 Plausible Value Imputation
 }
+
 \description{
 Plausible value imputation for objects of the classes \code{tam} and \code{tam.mml}
 (Adams & Wu, 2007). For converting generated plausible values into
 a list of multiply imputed datasets see \code{\link{tampv2datalist}}
 and the Examples 2 and 3 of this function.
+
+The function \code{tam.pv.mcmc} employs fully Bayesian estimation for drawing
+plausible values ans is recommended in cases when the latent regression model
+is unreliably estimated (multidimensional model with stochastic nodes). 
+Regression parameters are conditionally drawn by Bayesian bootstrap.
 }
 
 \usage{
 tam.pv(tamobj, nplausible = 10, ntheta = 2000, normal.approx = FALSE, 
-    samp.regr = FALSE, theta.model=FALSE, np.adj=8 )
+    samp.regr = FALSE, theta.model=FALSE, np.adj=8, na.grid = 5)
+    
+tam.pv.mcmc( tamobj, Y, group=NULL, beta_groups = TRUE, nplausible=10, level = .95, 
+    n.iter = 1000, n.burnin = 500, adj_MH = .5, adj_change_MH = .05, refresh_MH = 50,
+    accrate_bound_MH = c(.45, .55),	print_iter = 20, verbose = TRUE) 
+    
+\method{summary}{tam.pv.mcmc}(object, file=NULL, \dots)
+
+\method{plot}{tam.pv.mcmc}(x, \dots)     
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -22,7 +39,9 @@ tam.pv(tamobj, nplausible = 10, ntheta = 2000, normal.approx = FALSE,
 
 \arguments{
   \item{tamobj}{
-     Object of class \code{tam} or \code{tam.mml}
+     Object of class \code{tam} or \code{tam.mml}. For \code{tam.pv.mcmc}, it must not
+     be an object of this class but rather a list with (at least the) 
+     entries \code{AXsi}, \code{B}, \code{resp}.
 }
  \item{nplausible}{
      Number of plausible values to be drawn
@@ -61,8 +80,30 @@ tam.pv(tamobj, nplausible = 10, ntheta = 2000, normal.approx = FALSE,
      is simulated from a normal distribution with standard deviation
      \code{np.adj} times \eqn{s_{EAP}}.
         }
+\item{na.grid}{Range of the grid in normal approximation. Default is from
+-5 to 5.}
 \item{\dots}{Further arguments to be passed}	        
+\item{Y}{Matrix of regressors}
+\item{group}{Optional vector of group identifiers}
+\item{beta_groups}{Logical indicating whether group specific beta coefficients
+   shall be estimated.}
+\item{level}{Confidence level}
+\item{n.iter}{Number of iterations}
+\item{n.burnin}{Number of burnin-iterations}
+\item{adj_MH}{Adjustment factor for Metropolis-Hastings (MH) steps which controls
+    the variance of the proposal distribution for \eqn{\theta}}
+\item{adj_change_MH}{Allowed change for MH adjustment factor after refreshing}
+\item{refresh_MH}{Number of iterations after which the variance of the proposal
+ distribution should be updated}
+\item{accrate_bound_MH}{Bounds for target acceptance rates of sampled \eqn{\theta}
+   values.}
+\item{print_iter}{Print iteration progress every \code{print_iter}th iteration}   
+\item{verbose}{Logical indicating whether iteration progress should be displayed.}
+\item{object}{Object of class \code{tam.pv.mcmc}}           
+\item{x}{Object of class \code{tam.pv.mcmc}}
+\item{file}{A file name in which the summary output will be written}
 }
+
 
 %\details{
 %% For details about the implemented method see Adams and Wu (2007).
@@ -74,7 +115,7 @@ tam.pv(tamobj, nplausible = 10, ntheta = 2000, normal.approx = FALSE,
 
 
 \value{
-A list with following entries:
+The value of \code{tam.pv} is a list with following entries:
   \item{pv}{
     A data frame containing a person identifier (\code{pid})
     and plausible values denoted by \code{PVxx.Dimyy} which
@@ -86,6 +127,14 @@ A list with following entries:
     }
   \item{hwt1}{Cumulated individual posterior distribution}
   \item{theta}{Simulated ability nodes}
+  
+The value of \code{tam.pv.mcmc} is a list containing entries
+\item{pv}{Data frame containing plausible values}
+\item{parameter_samples}{Sampled regression parameters}
+\item{ic}{Information criteria}
+\item{beta}{Estimate of regression parameters \eqn{\bold{\beta}}}
+\item{variance}{Estimate of residual variance matrix \eqn{\bold{\Sigma}}}
+\item{\dots}{Further values}   
 }
 
 
@@ -113,7 +162,7 @@ A generalized form of the Rasch model. In M. von Davier & C. H. Carstensen (Eds.
 \seealso{
 See \code{\link{tam.latreg}} for further examples of 
 fitting latent regression models and drawing plausible values
-from models which provides asn individual likelihood as an input. 
+from models which provides an individual likelihood as an input. 
 }
 
 \examples{
@@ -141,6 +190,16 @@ hist(pv1a$pv$PV1.Dim1 )
 boxplot(pv1b$pv[ , 2:6 ] )
 
 \dontrun{
+# draw plausible values with tam.pv.mcmc function
+Y <- matrix(1, nrow=500, ncol=1)
+pv2 <- TAM::tam.pv.mcmc( tamobj=mod, Y=Y, nplausible=5 )
+str(pv2)
+
+# summary output
+summary(pv2)
+# assessing convergence with traceplots
+plot(pv2, ask=TRUE)
+
 #############################################################################
 # EXAMPLE 2: Unidimensional plausible value imputation with
 #            background variables; dataset data.pisaRead from sirt package
@@ -173,27 +232,27 @@ mod2b <- TAM::tam.mml( resp=dat[,items] , B=mod2a$B , xsi.fixed=xsi.fixed , Y=Y,
 # plausible value imputation with normality assumption
 # and ignoring uncertainty about regression coefficients
 #    -> the default is samp.regr=FALSE
-pv2c <- TAM::tam.pv( mod2b , nplausible=10 , ntheta=500 , normal.approx=TRUE )
+pv2c <- TAM::tam.pv( mod2b, nplausible=10, ntheta=500, normal.approx=TRUE )
 # sampling of regression coefficients
-pv2d <- TAM::tam.pv( mod2b , nplausible=10 , ntheta=500 , samp.regr=TRUE)
+pv2d <- TAM::tam.pv( mod2b, nplausible=10, ntheta=500, samp.regr=TRUE)
 # sampling of regression coefficients, normal approximation using the
 # theta grid from the model
-pv2e <- TAM::tam.pv( mod2b , samp.regr=TRUE , theta.model=TRUE , normal.approx=TRUE)
+pv2e <- TAM::tam.pv( mod2b, samp.regr=TRUE, theta.model=TRUE, normal.approx=TRUE)
 
 #--- create list of multiply imputed datasets with plausible values
 # define dataset with covariates to be matched
-Y <- dat[ , c("idstud" , "idschool" , "female" , "hisei" , "migra") ]
+Y <- dat[ , c("idstud", "idschool", "female", "hisei", "migra") ]
 
 # define plausible value names
 pvnames <- c("PVREAD")
 # create list of imputed datasets
-datlist1 <- TAM::tampv2datalist( pv2e , pvnames = pvnames , Y=Y , Y.pid="idstud")
+datlist1 <- TAM::tampv2datalist( pv2e, pvnames = pvnames , Y=Y , Y.pid="idstud")
 str(datlist1)
 
 # create a matrix of covariates with different set of students than in pv2e
 Y1 <- Y[ seq( 1 , 600 , 2 ) , ]
 # create list of multiply imputed datasets
-datlist2 <- TAM::tampv2datalist( pv2e , pvnames = c("PVREAD"), Y=Y1 , Y.pid="idstud")
+datlist2 <- TAM::tampv2datalist( pv2e, pvnames = c("PVREAD"), Y=Y1 , Y.pid="idstud")
 
 #--- fit some models in lavaan and semTools
 library(lavaan)
@@ -252,15 +311,15 @@ mod1c <- with( mids1 , stats::lm( PVREAD ~ migra + hisei ) )
 summary( mice::pool(mod1c) )
 
 #############################################################################
-# SIMULATED EXAMPLE 3: Multidimensional plausible value imputation
+# EXAMPLE 3: Multidimensional plausible value imputation
 #############################################################################
 
 # (1) simulate some data
 set.seed(6778)
 library(mvtnorm)
 N <- 1000      
-Y <- cbind( stats::rnorm( N ) , stats::rnorm(N) )
-theta <- mvtnorm::rmvnorm( N,mean=c(0,0), sigma=matrix( c(1,.5,.5,1) , 2 , 2 ))
+Y <- cbind( stats::rnorm(N) , stats::rnorm(N) )
+theta <- mvtnorm::rmvnorm( N, mean=c(0,0), sigma=matrix( c(1,.5,.5,1) , 2 , 2 ))
 theta[,1] <- theta[,1] + .4 * Y[,1] + .2 * Y[,2]  # latent regression model
 theta[,2] <- theta[,2] + .8 * Y[,1] + .5 * Y[,2]  # latent regression model
 I <- 20
@@ -276,10 +335,10 @@ Q <- array( 0 , dim = c( 2*I , 2 ))
 Q[cbind(1:(2*I), c( rep(1,I) , rep(2,I) ))] <- 1
 
 # (3) fit latent regression model
-mod <- TAM::tam.mml( resp=resp , Y=Y , Q=Q , control=list(maxiter=5) )
+mod <- TAM::tam.mml( resp=resp , Y=Y , Q=Q )
 
-# (4) draw plausible values with normal approximation using the orginal theta grid
-pv1 <- TAM::tam.pv( mod , normal.approx=TRUE , theta.model = TRUE )
+# (4) draw plausible values
+pv1 <- TAM::tam.pv( mod , theta.model = TRUE )
 
 # (5) convert plausible values to list of imputed datasets
 Y1 <- data.frame(Y)
@@ -299,9 +358,26 @@ lavmodel <- "
 mod1 <- semTools::lavaan.mi( lavmodel , data = datlist1 )        
 summary(mod1 , standardized=TRUE, rsquare=TRUE)
 
+# (7) draw plausible values with tam.pv.mcmc function
+Y1 <- cbind( 1, Y )
+pv2 <- TAM::tam.pv.mcmc( tamobj = mod , Y = Y1, n.iter=1000, n.burnin=200 )
+
+# (8) group-specific plausible values
+set.seed(908)  
+# create artificial grouping variable
+group <- sample( 1:3, N, replace=TRUE )
+pv3 <- TAM::tam.pv.mcmc( tamobj , Y = Y1, n.iter=1000, n.burnin=200, group=group )
+
+# (9) plausible values with no fitted object in TAM
+
+# fit IRT model without covariates
+mod4a <- TAM::tam.mml( resp=resp, Q=Q )
+# define input for tam.pv.mcmc
+tamobj1 <- list( AXsi=mod4a$AXsi , B=mod4a$B , resp=mod4a$resp )
+pmod4 <- TAM::tam.pv.mcmc( tamobj1 , Y = Y1 )
+
 #############################################################################
-# SIMULATED EXAMPLE 4: Plausible value imputation with measurement 
-#                      errors in covariates
+# EXAMPLE 4: Plausible value imputation with measurement errors in covariates
 #############################################################################
 
 library(sirt)

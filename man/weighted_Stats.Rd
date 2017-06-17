@@ -19,6 +19,8 @@ frequency tables. Missing values are automatically removed from
 the data.
 }
 \usage{
+weighted_mean(x, w = rep(1, length(x)) )
+
 weighted_var(x, w = rep(1, length(x)), method = "unbiased")
 
 weighted_sd(x, w = rep(1, length(x)), method = "unbiased")
@@ -49,7 +51,7 @@ Computation method (can be \code{"unbiased"} or \code{"ML"})), see
 7 can be used (see
 \code{\link[stats:quantile]{stats::quantile}}). 
 For weighted data, the quantile type \code{"i/n"}
-is used (see \code{\link[Hmisc:wtd.quantile]{Hmisc::wtd.quantile}})).
+is used (see \code{Hmisc::wtd.quantile})).
 }
 \item{props}{Logical indicating whether relative or abosolute
 frequencies should be calculated.}
@@ -83,7 +85,7 @@ See \code{\link[stats:var]{stats::var}} for computing
 unweighted variances.
 
 See \code{\link[stats:quantile]{stats::quantile}} and 
-\code{\link[Hmisc:wtd.quantile]{Hmisc::wtd.quantile}}) for quantiles.
+\code{Hmisc::wtd.quantile}) for quantiles.
 }
 
 \examples{

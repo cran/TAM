@@ -79,14 +79,13 @@ and infit}
 \seealso{
 See also \code{\link{tam.fit}} for simulation based assessment of item fit.
 
-See also \code{\link[eRm:itemfit]{eRm::itemfit}} or
-\code{\link[mirt:itemfit]{mirt::itemfit}}.
+See also \code{eRm::itemfit} or \code{\link[mirt:itemfit]{mirt::itemfit}}.
 }
 
 
 \examples{	
 #############################################################################
-# SIMULATED EXAMPLE 1: Simulated data Rasch model
+# EXAMPLE 1: Simulated data Rasch model
 ############################################################################# 	
 
 #*** simulate data

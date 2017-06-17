@@ -72,7 +72,7 @@ tam_mml_3pl_mstep_item_intercepts <-
 								xsi= xsi2 , theta=theta, nnodes=nnodes , guess=guess ,
 								n.ik=n.ik , eps=eps )
 			}
-			res <- tam_mml_3pl_difference_quotient( d0=ll0 , d0p=ll1p , d0m=ll1m , h=h)
+			res <- tam_difference_quotient( d0=ll0 , d0p=ll1p , d0m=ll1m , h=h)
 			diff <- res$d1
 			deriv <- res$d2
 		}
@@ -80,11 +80,11 @@ tam_mml_3pl_mstep_item_intercepts <-
 		#***********************
 		# xsi prior
 		  if ( ! is.null(xsi.prior) ){
-			  d0  <- log( stats::dnorm( xsi , mean=xsi.prior[,1] , 
+				d0  <- log( stats::dnorm( xsi , mean=xsi.prior[,1] , 
 						       sd=xsi.prior[,2] ) + eps)
-			  d0p  <- log( stats::dnorm( xsi + h , mean=xsi.prior[,1] , 
+				d0p  <- log( stats::dnorm( xsi + h , mean=xsi.prior[,1] , 
 						       sd=xsi.prior[,2] ) + eps)
-			  d0m  <- log( stats::dnorm( xsi - h , mean=xsi.prior[,1] , 
+				d0m  <- log( stats::dnorm( xsi - h , mean=xsi.prior[,1] , 
 						       sd=xsi.prior[,2] ) + eps)
 			  # d1 <- ( d0p - d0 ) / h
 			  # d2 <- ( ( d0p - d0 ) - ( d0 - d0m ) ) / h^2		

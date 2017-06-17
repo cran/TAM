@@ -1,6 +1,7 @@
 
 tam_outer <- function(x,y, op="*")
 {
+	Z <- NULL
 	N1 <- length(x)
 	N2 <- length(y)
 	xM <- matrix(x, nrow=N1 , ncol=N2)

@@ -5,10 +5,20 @@
 tam_mml_ic <- function( nstud , deviance , xsi , xsi.fixed ,
 	beta , beta.fixed , ndim , variance.fixed , G , irtmodel ,
 	B_orig=NULL , B.fixed , E , est.variance , resp ,
-		est.slopegroups=NULL , variance.Npars=NULL , group ){
+	est.slopegroups=NULL , variance.Npars=NULL , group, penalty_xsi=0 )
+{
 
+	#--- log likelihood and log prior
+	deviance <- deviance - penalty_xsi
+	loglike <- - deviance / 2
+	logprior <- - penalty_xsi / 2
+	logpost <- loglike + logprior 
+	
 	#***Model parameters
 	ic <- data.frame("n" = nstud , "deviance" = deviance )
+	ic$loglike <- loglike
+	ic$logprior <- logprior
+	ic$logpost <- logpost	
 	dev <- deviance
 	# xsi parameters
 	ic$Nparsxsi <- length(xsi)
@@ -57,19 +67,11 @@ tam_mml_ic <- function( nstud , deviance , xsi , xsi.fixed ,
 	}
 	# total number of parameters
 	ic$Npars <- ic$np <- ic$Nparsxsi + ic$NparsB + ic$Nparsbeta + ic$Nparscov
-    # AIC
-    ic$AIC <- dev + 2*ic$np
-	# AIC3
-	ic$AIC3 <- dev + 3*ic$np
-    # BIC
-    ic$BIC <- dev + ( log(ic$n) )*ic$np
-	# adjusted BIC 
-	ic$aBIC <- dev + ( log( ( ic$n -2 ) / 24 ) )*ic$np
-    # CAIC (consistent AIC)
-    ic$CAIC <- dev + ( log(ic$n) + 1 )*ic$np
-	# corrected AIC
-    ic$AICc <- ic$AIC + 2*ic$np * ( ic$np + 1 ) / ( ic$n - ic$np - 1 )	  
-		
+	
+	#--- calculate all criteria
+	ic <- tam_mml_ic_criteria(ic=ic)
+	
+	#--- OUTPUT
 	return(ic)
 }
 

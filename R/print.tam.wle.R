@@ -1,42 +1,21 @@
 
 #############################################
 # print method for tam.wle objects
-print.tam.wle <- function(x, digits = 3 , ...){
+print.tam.wle <- function(x, digits = 3 , ...)
+{
 	ndim <- attr(x,"ndim")
 	nobs <- attr(x,"nobs")
     CALL <- attr(x,"call")
 	WLE.rel <- attr(x,"WLE.rel")
-	#*** print general informations
-	print_tam_wle_general( ndim , nobs, CALL )		
-    #*** print reliabilities	
-    print_tam_wle_WLErel( WLE.rel, ndim , digits )	
+	M_sq_error <- attr(x,"M_sq_error")
+	WLEvar <- attr(x,"WLEvar")
+	WLEM <- attr(x,"WLEM")
+	#--- print general informations
+	res <- tam_wle_print_general( ndim=ndim, nobs=nobs, CALL=CALL )		
+    #--- print reliabilities	
+    res <- tam_wle_print_WLErel( WLE.rel=WLE.rel, ndim=ndim, digits=digits,
+				M_sq_error=M_sq_error, WLEvar=WLEvar, WLEM=WLEM) 
 }
 ##############################################
 
 
-#**********************************************************************
-print_tam_wle_general <- function( ndim , nobs, CALL ){
-	#*** print output with general informations
-    cat("Object of class 'tam.wle'\nCall: ")
-    print( CALL ) 
-    # cat("\n")	
-	if (ndim==1){ D0 <- ""} else { D0 <- "s" }
-    v1 <- paste0("  WLEs for ", nobs , " observations and " ,
-		    ndim , " dimension" , D0 , "\n")
-	cat(v1)
-		}
-#**********************************************************************		
-print_tam_wle_WLErel <- function( WLE.rel, ndim , digits ){		
-	if (ndim==1){
-		v1 <- paste0("  WLE Reliability = " , round(WLE.rel,digits=digits) , "\n")
-		cat(v1)
-		}
-	if (ndim>1){
-	   for (dd in 1:ndim){
-		v1 <- paste0("  WLE Reliability (Dimension " , dd , 
-					") = " , round(WLE.rel[dd],digits=digits) , "\n")
-		cat(v1)	   
-				}
-		}		
-	}
-#**********************************************************************	

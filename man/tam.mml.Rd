@@ -8,7 +8,7 @@
 \alias{summary.tam.mml}
 \alias{print.tam}
 \alias{print.tam.mml}
-
+\alias{prior_list_include}
 
 \title{
 Test Analysis Modules: Marginal Maximum Likelihood Estimation
@@ -36,8 +36,8 @@ tam.mml(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
     beta.fixed = NULL, beta.inits = NULL, variance.fixed = NULL, 
     variance.inits = NULL, est.variance = TRUE, constraint="cases" , A = NULL, 
     B = NULL, B.fixed = NULL,  Q = NULL,  est.slopegroups = NULL, E = NULL, 
-    pweights = NULL, userfct.variance = NULL , variance.Npars = NULL , 
-    item.elim = TRUE , verbose = TRUE, control = list() )
+    pweights = NULL, userfct.variance = NULL , 
+    variance.Npars = NULL , item.elim = TRUE , verbose = TRUE, control = list() )
 
 tam.mml.2pl(resp, Y = NULL, group = NULL, irtmodel = "2PL", formulaY = NULL, 
     dataY = NULL, ndim = 1, pid = NULL, xsi.fixed = NULL, xsi.inits = NULL,
@@ -52,18 +52,21 @@ tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
     xsi.inits = NULL, beta.fixed = NULL, beta.inits = NULL, variance.fixed = NULL , 
     variance.inits = NULL , est.variance = TRUE , formulaA=~item+item:step, 
     constraint="cases", A=NULL , B=NULL ,  B.fixed = NULL , Q=NULL , 
-    facets=NULL, est.slopegroups=NULL , E = NULL , pweights = NULL , 
-    verbose = TRUE, control = list() , delete.red.items=TRUE )
+    facets=NULL, est.slopegroups=NULL , E = NULL ,  
+    pweights = NULL , verbose = TRUE, control = list() , delete.red.items=TRUE )
     
-\method{summary}{tam}(object,file=NULL,\dots)
+\method{summary}{tam}(object, file=NULL, \dots)
 
-\method{summary}{tam.mml}(object,file=NULL,\dots)
+\method{summary}{tam.mml}(object, file=NULL, \dots)
 
 \method{print}{tam}(x, \dots)
 
 \method{print}{tam.mml}(x, \dots)    
 
 }
+
+% ## specification of prior distributions
+% prior_list_include( prior_list , prior , index )
 
 
 %% USAGE
@@ -199,7 +202,7 @@ tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
 \item{E}{
   An optional design matrix for estimating item slopes
   in the generalized partial credit model (\code{irtmodel="GPCM.design"})
-}
+}	
 \item{gamma.init}{Optional initial \eqn{gamma} parameter vector
 (\code{irtmodel="GPCM.design"}).
 }
@@ -328,10 +331,16 @@ A file name in which the summary output will be written
 \item{\dots}{
 	Further arguments to be passed
 	}   
-\item{x}{Object of class \code{tam} or \code{tam.mml}}	
+\item{x}{Object of class \code{tam} or \code{tam.mml}}
 }
 
+% \item{prior_list_xsi}{Optional list of prior distributions. See Example 1.4
+% for specification and the function \code{prior_list_include}
+% for convenient specification.}
 
+%\item{prior_list}{List with prior distributions}
+%\item{prior}{Univariate prior distribution}
+%\item{index}{Parameter for which \code{prior} should be chosen}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% DETAILS
@@ -787,7 +796,7 @@ mod3tC <- TAM::tamaan( tammodel , data.sim.rasch)
 summary(mod3tC)
 
 #############################################################################
-# SIMULATED EXAMPLE 2: Unidimensional calibration with latent regressors
+# EXAMPLE 2: Unidimensional calibration with latent regressors
 #############################################################################
 
 # (1) simulate data
@@ -831,7 +840,7 @@ summary(mod2_5)
 mod2_6 <- TAM::tam.mml(resp=resp , Y=Y , beta.fixed=FALSE )
 
 #############################################################################
-# SIMULATED EXAMPLE 3: Multiple group estimation
+# EXAMPLE 3: Multiple group estimation
 #############################################################################
 
 # (1) simulate data
@@ -849,7 +858,7 @@ mod3_1 <- TAM::tam.mml( resp ,  group = group )
 summary(mod3_1)
 
 #############################################################################
-# SIMULATED EXAMPLE 4: Multidimensional estimation
+# EXAMPLE 4: Multidimensional estimation
 # with two dimensional theta's - simulate some bivariate data, 
 # and regressors
 # 40 items: first 20 items load on dimension 1, 
@@ -963,7 +972,7 @@ mod4_6t <- TAM::tamaan( tammodel , resp , Y=Y )
 summary(mod4_6t)
 
 #############################################################################
-# SIMULATED EXAMPLE 5: 2-dimensional estimation with within item dimensionality
+# EXAMPLE 5: 2-dimensional estimation with within item dimensionality
 #############################################################################
 library(mvtnorm)
 # (1) simulate data
@@ -1183,8 +1192,7 @@ summary(mod6_10b)
 mod6_10b$B[,,]   
 
 #############################################################################
-# SIMULATED EXAMPLE 7: design matrix for slopes for the
-#            generalized partial credit model
+# EXAMPLE 7: design matrix for slopes for the generalized partial credit model
 #############################################################################
 
 # (1) simulate data from a model with a (item slope) design matrix E
@@ -1288,7 +1296,9 @@ summary(mod8b)
 #############################################################################
 # EXAMPLE 9: Multifaceted Rasch Model
 #############################################################################
-data(data.sim.mfr) ; data(data.sim.facets)
+
+data(data.sim.mfr)
+data(data.sim.facets)
 
 # two way interaction item and rater
 formulaA <- ~item+item:step + item*rater
@@ -1708,7 +1718,7 @@ difxsi <- xsi1[ intersect( grep("cnt",rownames(xsi1)),
     # this is the DIF effect of the remaining item
 
 #############################################################################
-# SIMULATED EXAMPLE 17: Several multidimensional and subdimension models
+# EXAMPLE 17: Several multidimensional and subdimension models
 #############################################################################
 
 library(mirt)

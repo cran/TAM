@@ -5,9 +5,16 @@ tam_latreg_ic <- function( nstud , deviance ,
 	beta , beta.fixed , ndim , variance.fixed , G , 
 	est.variance , variance.Npars=NULL , group ){
 
-  #***Model parameters
-  ic <- data.frame("n" = nstud , "deviance" = deviance )
-  dev <- deviance
+	#***Model parameters
+	ic <- data.frame("n" = nstud , "deviance" = deviance )
+	loglike <- - deviance / 2
+	logprior <- 0
+	logpost <- loglike  
+	ic$loglike <- loglike
+	ic$logprior <- logprior
+	ic$logpost <- logpost	
+  
+	dev <- deviance
 	# xsi parameters
 	ic$Nparsxsi <- 0
 	# B slopes

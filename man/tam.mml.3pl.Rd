@@ -503,7 +503,7 @@ mod3 <- TAM::tam.mml.3pl(resp=dat, gammaslope.des = "2PL" , Q=Q )
 summary(mod3)
 
 #############################################################################
-# SIMULATED EXAMPLE 3: Dichotomous data with guessing
+# EXAMPLE 3: Dichotomous data with guessing
 #############################################################################
 
 #*** simulate data
@@ -541,7 +541,7 @@ mod2 <- TAM::tam.mml.3pl(resp= dat , guess = guess , est.guess = est.guess ,
 summary(mod2)
 
 #############################################################################
-# SIMULATED EXAMPLE 4: Latent class model with two classes
+# EXAMPLE 4: Latent class model with two classes
 #      See slca Simulated Example 2 in the CDM package
 #############################################################################
 
@@ -605,7 +605,7 @@ logLik(mod1)
 logLik(mod1b)
 
 #############################################################################
-# SIMULATED EXAMPLE 5: Located latent class model, Rasch model
+# EXAMPLE 5: Located latent class model, Rasch model
 #      See slca Simulated Example 4 in the CDM package
 #############################################################################
 
@@ -662,7 +662,7 @@ mod1b <- TAM::tamaan( tammodel , resp=dat )
 summary(mod1b)
 
 #############################################################################
-# SIMULATED EXAMPLE 6: DINA model with two skills
+# EXAMPLE 6: DINA model with two skills
 #      See slca Simulated Example 5 in the CDM package
 #############################################################################
 
@@ -721,7 +721,7 @@ cbind( mod1$rprobs[,2,1] , guess )
 cbind( 1 - mod1$rprobs[,2,4] , slip )
 
 #############################################################################
-# SIMULATED EXAMPLE 7: Mixed Rasch model with two classes
+# EXAMPLE 7: Mixed Rasch model with two classes
 #      See slca Simulated Example 3 in the CDM package
 #############################################################################
 
@@ -845,7 +845,7 @@ mod1b <- TAM::tamaan( tammodel , resp=dat )
 summary(mod1b)
 
 #############################################################################
-# SIMULATED EXAMPLE 8: 2PL mixture distribution model
+# EXAMPLE 8: 2PL mixture distribution model
 #############################################################################
 
 #*** simulate data

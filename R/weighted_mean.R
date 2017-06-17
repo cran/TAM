@@ -1,8 +1,10 @@
 ############################################
 # weighted mean
-# wrapper to weighted.mean
 weighted_mean <- function( x , w=rep(1,length(x)) ){
-	res <- stats::weighted.mean(x=x , w=w , na.rm=TRUE )
+	ind <- ! is.na(x)
+	x <- x[ind]
+	w <- w[ind]
+	res <- sum( x * w ) / sum(w)
 	return(res)
 }
 ###############################################

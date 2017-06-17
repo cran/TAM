@@ -113,6 +113,10 @@ tam_q3_calc_residM <- function(rprobs, resp, I, TP, maxK, maxKi, hwt) {
     .Call('TAM_tam_q3_calc_residM', PACKAGE = 'TAM', rprobs, resp, I, TP, maxK, maxKi, hwt)
 }
 
+tam_pv_mcmc_likelihood_Rcpp <- function(probs, resp, resp_ind, maxK, nstud, nitems) {
+    .Call('TAM_tam_pv_mcmc_likelihood_Rcpp', PACKAGE = 'TAM', probs, resp, resp_ind, maxK, nstud, nitems)
+}
+
 tam_wle_Bs <- function(RPROBS, RESPIND, CBL, CBB, CBBB, cndim, cnitems, cmaxK, cnstud) {
     .Call('TAM_tam_wle_Bs', PACKAGE = 'TAM', RPROBS, RESPIND, CBL, CBB, CBBB, cndim, cnitems, cmaxK, cnstud)
 }

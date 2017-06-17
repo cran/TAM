@@ -1,6 +1,6 @@
 
 ##########################################################################
-dmvnorm_TAM <- function( x , mean , sigma , log = FALSE ){
+tam_dmvnorm <- function( x , mean , sigma , log = FALSE ){
 	# copied and slightly extended from the mvtnorm::dmvnorm function
 	mu <- mean
 	dec <- chol(sigma)
@@ -21,3 +21,5 @@ dmvnorm_TAM <- function( x , mean , sigma , log = FALSE ){
 	return(logretval)
 }
 ##########################################################################		
+
+dmvnorm_TAM <- tam_dmvnorm

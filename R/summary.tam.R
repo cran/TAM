@@ -46,9 +46,12 @@ function( object , file = NULL , ...){
 			cat("Monte Carlo integration with" , dim(object$theta)[1] , "integration points\n")
 						}						
 					}					
-    cat( "\nDeviance = " , round( object$deviance , 2 ) , " | " )
-    cat( "Log Likelihood = " , round( -object$deviance/2 , 2 ) , "\n" )	
-    cat( "Number of persons = " , object$nstud , "\n" )    
+    cat( "\nDeviance = " , round( object$deviance , 2 ) , "\n" )
+    cat( "   Log likelihood = " , round( object$ic$loglike , 2 ) , "\n" )	
+	# cat( "   Log prior = " , round( object$ic$logprior , 2 ) , "\n" )	
+	# cat( "   Log posterior = " , round( object$ic$logpost , 2 ) , "\n\n" )		    
+	
+	cat( "Number of persons = " , object$nstud , "\n" )    
     cat( "Number of persons used = " , object$ic$n , "\n" )  
 	
 	if( ! is.null( object$formulaA)  ){	

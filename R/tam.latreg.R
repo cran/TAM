@@ -46,9 +46,7 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
     if ( ! is.null(group) ){ 
       con1a$QMC <- QMC <- FALSE
       con1a$snodes <- snodes <- 0
-    }
-
-    
+    }   
     
     if ( !is.null(con$seed)){ set.seed( con$seed )	 }
     nullY <- is.null(Y)
@@ -84,95 +82,37 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
 	res <- tam_mml_progress_proc_nodes( progress=progress, snodes=snodes, nnodes=nnodes, 
 					skillspace="normal", QMC=QMC)  	
 	
-    #*********
-    # variance inits  
-    # initialise conditional variance 
-    if ( !is.null( variance.inits ) ){
-      variance <- variance.inits
-    } else variance <- diag( ndim ) 
-    if ( !is.null(variance.fixed) ){
-      variance[ variance.fixed[,1:2 ,drop=FALSE] ] <- variance.fixed[,3]
-      variance[ variance.fixed[,c(2,1) ,drop=FALSE] ] <- variance.fixed[,3]	
-    }
-    # group indicators for variance matrix
-    if ( ! is.null(group) ){ 
-      groups <- sort(unique(group))
-      G <- length(groups)
-      group <- match( group , groups )
-      var.indices <- rep(1,G)
-      for (gg in 1:G){
-        var.indices[gg] <- which( group == gg )[1]				
-      }
-    } else { 
-      G <- 1 
-      groups <- NULL
-    }  
-    # beta inits
-    # (Y'Y)
-    if ( ! is.null( formulaY ) ){
-      formulaY <- stats::as.formula( formulaY )
-      Y <- stats::model.matrix( formulaY , dataY )[,-1]   # remove intercept
-      nullY <- FALSE
-    }
-    
-    
-    #  if ( ! is.null(Y) ){ 
-    if (! nullY){
-      Y <- as.matrix(Y)
-      nreg <- ncol(Y)
-      if ( is.null( colnames(Y) ) ){
-        colnames(Y) <- paste("Y" , 1:nreg , sep="")
-      }
-      if ( ! nullY ){ 		
-        Y <- cbind(1,Y)          #add a "1" column for the Intercept
-        colnames(Y)[1] <- "Intercept"
-      }
-    } else 
-    {
-      Y <- matrix( 1 , nrow=nstud , ncol=1 ) 
-      nreg <- 0
-    }
-    if ( G > 1 & nullY ){	
-      Y <- matrix( 0 , nstud , G )
-      #		colnames(Y) <- paste("group" , 1:G , sep="")
-      colnames(Y) <- paste("group" , groups , sep="")
-      for (gg in 1:G){ Y[,gg] <- 1*(group==gg) }
-      nreg <- G - 1
-    }
-    
-    # W <- t(Y * pweights) %*% Y
-	W <- crossprod(Y * pweights ,  Y )
-    if (ridge > 0){ diag(W) <- diag(W) + ridge }
-    YYinv <- solve( W )
-    
-    #initialise regressors
-#    if ( is.null(beta.fixed)  ){
-#      beta.fixed <- matrix( c(1,1,0) , nrow= 1) 
-#      if (  ndim > 1){ 
-#        for ( dd in 2:ndim){
-#          beta.fixed <- rbind( beta.fixed , c( 1 , dd , 0 ) )
-#        }}}
-    
-    #****
-    if( ! is.matrix(beta.fixed) ){
-      if ( ! is.null(beta.fixed) ){
-        if ( ! beta.fixed   ){ beta.fixed <- NULL }
-      }
-    }
-    #****
-    
-    beta <- matrix(0, nrow = nreg+1 , ncol = ndim)  
-    if ( ! is.null( beta.inits ) ){ 
-      beta[ beta.inits[,1:2] ] <- beta.inits[,3]
-    }	
-	   
+	#--- inits variance
+	res <- tam_mml_inits_variance( variance.inits=variance.inits, ndim=ndim, variance.fixed=variance.fixed ) 
+	variance <- res$variance
+	
+	#--- inits group
+	res <- tam_mml_inits_groups( group=group )
+	G <- res$G 
+	groups <- res$groups
+	group <- res$group
+	var.indices <- res$var.indices
+	
+	#--- inits beta regression coefficients
+	res <- tam_mml_inits_beta( Y=Y, formulaY=formulaY, dataY=dataY, G=G, group=group, 
+				groups=groups, nstud=nstud, pweights=pweights, ridge=ridge, beta.fixed=beta.fixed, 
+				xsi.fixed=NULL, constraint="cases", ndim=ndim, beta.inits=beta.inits )
+	Y <- res$Y
+	nullY <- res$nullY
+	formulaY <- res$formulaY
+	nreg <- res$nreg
+	W <- res$W
+	YYinv <- res$YYinv
+	beta.fixed <- res$beta.fixed
+	beta <- res$beta  
+		   
     beta.min.deviance <- beta
     variance.min.deviance <- variance
     
     # cat("b200"); a1 <- Sys.time() ; print(a1-a0) ; a0 <- a1  									  
     
 	#--- create grid of nodes for numeric or stochastic integration
-	res <- tam_mml_create_nodes( snodes=snodes, nodes=nodes, ndim=ndim, theta=theta, QMC=QMC ) 
+	res <- tam_mml_create_nodes( snodes=snodes, nodes=nodes, ndim=ndim, QMC=QMC ) 
 	theta <- res$theta
 	theta2 <- res$theta2
 	thetawidth <- res$thetawidth
@@ -186,8 +126,10 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
     a02 <- a1 <- 999	# item parameter change
     a4 <- 0
     
-    YSD <- max( apply( Y , 2 , stats::sd ) )
-    if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }
+	#--- create unidim_simplify
+	res <- tam_mml_proc_unidim_simplify( Y=Y, A=0, G=G, beta.fixed=NULL ) 
+	unidim_simplify <- res$unidim_simplify
+	YSD <- res$YSD
     
     # define progress bar for M step
 #    mpr <- round( seq( 1 , np , len = 10 ) )

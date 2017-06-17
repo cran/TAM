@@ -413,6 +413,22 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// tam_pv_mcmc_likelihood_Rcpp
+Rcpp::NumericVector tam_pv_mcmc_likelihood_Rcpp(Rcpp::NumericMatrix probs, Rcpp::NumericMatrix resp, Rcpp::IntegerMatrix resp_ind, int maxK, int nstud, int nitems);
+RcppExport SEXP TAM_tam_pv_mcmc_likelihood_Rcpp(SEXP probsSEXP, SEXP respSEXP, SEXP resp_indSEXP, SEXP maxKSEXP, SEXP nstudSEXP, SEXP nitemsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type probs(probsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type resp(respSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerMatrix >::type resp_ind(resp_indSEXP);
+    Rcpp::traits::input_parameter< int >::type maxK(maxKSEXP);
+    Rcpp::traits::input_parameter< int >::type nstud(nstudSEXP);
+    Rcpp::traits::input_parameter< int >::type nitems(nitemsSEXP);
+    __result = Rcpp::wrap(tam_pv_mcmc_likelihood_Rcpp(probs, resp, resp_ind, maxK, nstud, nitems));
+    return __result;
+END_RCPP
+}
 // tam_wle_Bs
 Rcpp::List tam_wle_Bs(Rcpp::NumericMatrix RPROBS, Rcpp::NumericMatrix RESPIND, Rcpp::NumericMatrix CBL, Rcpp::NumericMatrix CBB, Rcpp::NumericMatrix CBBB, int cndim, int cnitems, int cmaxK, int cnstud);
 RcppExport SEXP TAM_tam_wle_Bs(SEXP RPROBSSEXP, SEXP RESPINDSEXP, SEXP CBLSEXP, SEXP CBBSEXP, SEXP CBBBSEXP, SEXP cndimSEXP, SEXP cnitemsSEXP, SEXP cmaxKSEXP, SEXP cnstudSEXP) {

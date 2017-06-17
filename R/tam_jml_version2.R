@@ -150,12 +150,11 @@ tam_jml_version2 <-
     
     #Initialise xsi
     xsi[est.xsi.index] <- - log(abs(ItemScore[est.xsi.index]/(ItemMax[est.xsi.index]-ItemScore[est.xsi.index])))  #log of odds ratio of raw scores
-
     
     #Compute person sufficient statistics (total score on each dimension)
     PersonScores <- cResp %*% cB
     # define response pattern
-    rp3 <- as.data.frame( resp.pattern3( resp.ind ) )
+    rp3 <- as.data.frame( tam_01_pattern( resp.ind ) )
     rp3$caseid <- 1:nstud
     #rp3 <- as.data.frame( rp3 )
     rp3$PersonScores <- PersonScores

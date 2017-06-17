@@ -75,6 +75,6 @@ tam_mml_3pl_ic <- function( nstud , deviance , xsi , xsi.fixed ,
 	ic$Npars <- ic$np <- ic$Nparsxsi + ic$NparsB + ic$Nparsbeta + ic$Nparscov + 
 		          ic$Nguess + ic$Ndelta	- ic$Ngamma.nonactive
 	#---- include information criteria
-	ic <- tam_mml_3pl_ic_compute_criteria(ic=ic)
+	ic <- tam_mml_ic_criteria(ic=ic)
 	return(ic)
 }

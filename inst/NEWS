@@ -39,6 +39,47 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
+-------------------------------------------------------------
+VERSIONS TAM 2.2  |  2017-06-17  |  Last: TAM 2.2-49
+-------------------------------------------------------------
+
+FEATURES:
+* included function 'tam.pv.mcmc' which allows drawing plausible
+  values based on fully Bayesian estimation. A recommendation for
+  using 'tam.pv.mcmc' in case of stochastic nodes is now 
+  displayed in 'tam.pv'. TAM now depends on the coda package for
+  analyzing the MCMC output.
+* included linking methods Stocking-Lord and Haebara in the
+  functions 'tam.linking' and 'tam_linking_2studies' 
+
+BUG FIXES:
+* fixed a recently introduced bug in estimating models with
+  stochastic nodes in TAM functions 
+  (thanks to Boris Girnat, Steffen Wild and Reg Allen)
+
+NOTES:
+* exported utility functions 'tam_interval_index' and
+  'tam_rowCumsums'
+* disabled argument 'normal.approx' for multidimensional models
+  in 'tam.pv' because it is not properly working
+* allowed nonnumeric person identifiers for matching
+  in 'tampv2datlist' function (thanks to Stefan Behrendt)
+* restructured 'tam.mml.wle' and 'tam.mml.wle2' functions. Now,
+  WLEs can also be estimated without fitting the model in TAM
+  (see Example 1 in ?tam.wle).
+* included a summary method for 'tam.wle'. In addition, more
+  descriptive output is computed as values in 'attr(object, ...)' 
+  in 'tam.wle'.
+* exported functions 'weighted_mean', 'tam_irf_3pl',
+  'tam_NA_pattern', 'tam_01_pattern', 'tam_normalize_vector',
+  'tam_remove_missings', 'tam_AXsi_compute', 'tam_AXsi_fit'
+
+DATASETS INCLUDED OR MODIFIED:
+* data.ex16, data.ex17
+
+EXAMPLES INCLUDED OR MODIFIED:
+* tam.pv (1,3), tam.wle (1), tam_irf_3pl (1), tam_NA_pattern (1,2),
+  tam.linking (1,2)
 
 -------------------------------------------------------------
 VERSIONS TAM 2.1  |  2017-05-10  |  Last: TAM 2.1-43

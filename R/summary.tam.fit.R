@@ -7,7 +7,7 @@ summary.tam.fit <- function( object , ... ){
 	obji <- object[ , - ind ]
 	for ( vv in seq(2,ncol(obji) ) ){
 		obji[,vv] <- round( obji[,vv] , 3 )
-					}
+	}
 	return(obji)
-		}
+}
 ###################################################

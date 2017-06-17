@@ -8,6 +8,8 @@
 \alias{data.ex14}
 \alias{data.ex15}
 \alias{data.exJ03}
+\alias{data.ex16}
+\alias{data.ex17}
 
 
 \docType{data}
@@ -138,6 +140,61 @@ has the following format:
 \code{  ..$ leader: int [1:40] 1 2 1 2 1 2 1 2 1 2 ...} 
 
 It is a rating dataset (a subset of a dataset provided by Matt Barney). \cr
+
+%% Example data.ex16
+
+\item Data \code{data.ex16} contains dichotomous item response data from
+three studies corresponding to three grades.
+
+\code{'data.frame':   3235 obs. of  25 variables:} \cr
+\code{ $ idstud: num  1e+05 1e+05 1e+05 1e+05 1e+05 ...} \cr
+\code{ $ grade : num  1 1 1 1 1 1 1 1 1 1 ...} \cr
+\code{ $ A1    : int  1 1 1 1 1 1 1 1 1 1 ...} \cr
+\code{ $ B1    : int  1 1 1 1 1 1 1 1 1 1 ...} \cr
+\code{ $ C1    : int  1 1 1 1 1 1 1 1 1 1 ...} \cr
+\code{ $ D1    : int  1 1 1 1 1 1 1 1 1 1 ...} \cr
+\code{ $ E1    : int  0 0 1 0 1 1 1 0 1 1 ...} \cr
+\code{ $ E2    : int  1 1 1 1 1 1 1 0 1 1 ...} \cr
+\code{ $ E3    : int  1 1 1 1 1 1 1 0 1 1 ...} \cr
+\code{ $ F1    : int  1 0 1 1 0 0 1 0 1 1 ...} \cr
+\code{ $ G1    : int  0 1 1 1 1 0 1 0 1 1 ...} \cr
+\code{ $ G2    : int  1 1 1 1 1 0 0 0 1 1 ...} \cr
+\code{ $ G3    : int  1 0 1 1 1 0 0 0 1 1 ...} \cr
+\code{ $ H1    : int  1 0 1 1 1 0 0 0 1 1 ...} \cr
+\code{ $ H2    : int  1 0 1 1 1 0 0 0 1 1 ...} \cr
+\code{ $ I1    : int  1 0 1 0 1 0 0 0 1 1 ...} \cr
+\code{ $ I2    : int  1 0 1 0 1 0 0 0 1 1 ...} \cr
+\code{ $ J1    : int  NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{ $ K1    : int  NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{ $ L1    : int  NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{ $ L2    : int  NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{ $ L3    : int  NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{ $ M1    : int  NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{ $ M2    : int  NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{ $ M3    : int  NA NA NA NA NA NA NA NA NA NA ...} \cr
+
+
+%% Example data.ex17
+
+\item Data \code{data.ex17} contains polytomous item response data from
+three studies corresponding to three grades.
+
+\code{'data.frame':   3235 obs. of  15 variables:} \cr
+\code{ $ idstud: num  1e+05 1e+05 1e+05 1e+05 1e+05 ...} \cr
+\code{ $ grade : num  1 1 1 1 1 1 1 1 1 1 ...} \cr
+\code{ $ A     : int  1 1 1 1 1 1 1 1 1 1 ...} \cr
+\code{ $ B     : int  1 1 1 1 1 1 1 1 1 1 ...} \cr
+\code{ $ C     : int  1 1 1 1 1 1 1 1 1 1 ...} \cr
+\code{ $ D     : int  1 1 1 1 1 1 1 1 1 1 ...} \cr
+\code{ $ E     : num  2 2 3 2 3 3 3 0 3 3 ...} \cr
+\code{ $ F     : int  1 0 1 1 0 0 1 0 1 1 ...} \cr
+\code{ $ G     : num  2 2 3 3 3 0 1 0 3 3 ...} \cr
+\code{ $ H     : num  2 0 2 2 2 0 0 0 2 2 ...} \cr
+\code{ $ I     : num  2 0 2 0 2 0 0 0 2 2 ...} \cr
+\code{ $ J     : int  NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{ $ K     : int  NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{ $ L     : num  NA NA NA NA NA NA NA NA NA NA ...} \cr
+\code{ $ M     : num  NA NA NA NA NA NA NA NA NA NA ...} \cr
 
 } %% end itemize
 }

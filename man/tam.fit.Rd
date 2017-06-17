@@ -163,10 +163,10 @@ fit1a <- sirt::pcm.fit(b=b1 , theta=wle$theta , dat)
 fit1a$item
 
 #############################################################################
-# SIMULATED EXAMPLE 3: Fit statistic testing for local independence
+# EXAMPLE 3: Fit statistic testing for local independence
 #############################################################################
 
-#generate data with local DEPENDENCE and User-defined fit statistics
+# generate data with local dependence and User-defined fit statistics
 set.seed(4888)
 I <- 40		# 40 items
 N <- 1000       # 1000 persons
@@ -202,7 +202,7 @@ fit <- TAM::tam.fit(mod1, FitMatrix=F)
 summary(fit)
 
 #############################################################################
-# SIMULATED EXAMPLE 4: Fit statistic testing for items with differing slopes
+# EXAMPLE 4: Fit statistic testing for items with differing slopes
 #############################################################################
 
 #*** simulate data

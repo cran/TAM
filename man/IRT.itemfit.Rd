@@ -106,7 +106,7 @@ summary( fmod1$rmsea )
 summary( fmod2$rmsea )
 
 #############################################################################
-# SIMULATED EXAMPLE 2: Simulated 2PL data and fit of 1PL model
+# EXAMPLE 2: Simulated 2PL data and fit of 1PL model
 #############################################################################
 
 set.seed(987)

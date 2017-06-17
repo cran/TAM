@@ -53,9 +53,7 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 		con1a$QMC <- QMC <- FALSE
 		con1a$snodes <- snodes <- 0
 	}   
-  
-	nullY <- is.null(Y)
-  
+    
   # define design matrix in case of PCM2
 #  if (( irtmodel=="PCM2" ) & (is.null(Q)) & ( is.null(A)) ){ 
 #			A <- .A.PCM2( resp ) 
@@ -139,194 +137,75 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
   # number of parameters
   np <- dim(A)[[3]]
   
-  # xsi inits
-  if ( ! is.null(xsi.inits) ){
-#    xsi <- xsi.inits 
-	xsi <- rep(0,np)
-	xsi[ xsi.inits[,1] ] <- xsi.inits[,2]	
-  } else { xsi <- rep(0,np)   } 
-  if ( ! is.null( xsi.fixed ) ){
-    xsi[ xsi.fixed[,1] ] <- xsi.fixed[,2]
-    est.xsi.index <- setdiff( 1:np , xsi.fixed[,1] )
-  } else { est.xsi.index <- 1:np }
-  est.xsi.index -> est.xsi.index0
-  # variance inits  
-  # initialise conditional variance 
-  if ( !is.null( variance.inits ) ){
-    variance <- variance.inits
-  } else variance <- diag( ndim ) 
-  if ( !is.null(variance.fixed) ){
-    variance[ variance.fixed[,1:2 ,drop=FALSE] ] <- variance.fixed[,3]
-    variance[ variance.fixed[,c(2,1) ,drop=FALSE] ] <- variance.fixed[,3]	
-  }
+	#--- xsi parameter index
+	res <- tam_mml_proc_est_xsi_index(A, xsi.inits, xsi.fixed)
+	np <- res$np
+	xsi <- res$xsi
+	est.xsi.index0 <- est.xsi.index <- res$est.xsi.index
 
-  # group indicators for variance matrix
-  if ( ! is.null(group) ){ 
-    groups <- sort(unique(group))
-    G <- length(groups)
-	group <- match( group , groups )
-    # user must label groups from 1, ... , G
-#    if ( length( setdiff( 1:G , groups)  ) > 0 ){
-#      stop("Label groups from 1, ...,G\n")
-#				}							
-	var.indices <- rep(1,G)
-	for (gg in 1:G){
-       var.indices[gg] <- which( group == gg )[1]				
-				}
-				  } else { 
-				  G <- 1 
-				  groups <- NULL
-				  } 
+	#--- inits variance
+	res <- tam_mml_inits_variance( variance.inits=variance.inits, ndim=ndim, variance.fixed=variance.fixed ) 
+	variance <- res$variance
   
-  # beta inits
-  # (Y'Y)
-  if ( ! is.null( formulaY ) ){
-    formulaY <- stats::as.formula( formulaY )
-    Y <- stats::model.matrix( formulaY , dataY )[,-1]   # remove intercept
-	nullY <- FALSE	
-  }
-
-#  if ( ! is.null(Y) ){ 
-  if (! nullY){  
-    Y <- as.matrix(Y)
-    nreg <- ncol(Y)
-    if ( is.null( colnames(Y) ) ){
-      colnames(Y) <- paste("Y" , 1:nreg , sep="")
-					}
-	if ( ! nullY ){ 		
-		Y <- cbind(1,Y)          #add a "1" column for the Intercept
-		colnames(Y)[1] <- "Intercept"
-					}
-		} else 
-			{ 
-    Y <- matrix( 1 , nrow=nstud , ncol=1 ) 
-    nreg <- 0
-	}
-	if ( G > 1 & nullY ){	
-		Y <- matrix( 0 , nstud , G )
-		colnames(Y) <- paste("group" , groups , sep="")
-		for (gg in 1:G){ Y[,gg] <- 1*(group==gg) }
-		nreg <- G - 1
-			}
-
-	
-			
-  W <- t(Y * pweights) %*% Y
-  if (ridge > 0){ diag(W) <- diag(W) + ridge }
-  YYinv <- solve( W )
-   
-  #initialise regressors
-  if ( is.null(beta.fixed) & (  is.null(xsi.fixed) ) ){
-    beta.fixed <- matrix( c(1,1,0) , nrow= 1) 
-    if ( ndim > 1){ 
-      for ( dd in 2:ndim){
-        beta.fixed <- rbind( beta.fixed , c( 1 , dd , 0 ) )
-  }}}  
+	#--- inits group
+	res <- tam_mml_inits_groups( group=group )
+	G <- res$G 
+	groups <- res$groups
+	group <- res$group
+	var.indices <- res$var.indices
   
-	#****
-	# ARb 2013-08-20: Handling of no beta constraints	
-    # ARb 2013-08-24: correction	
-	if( ! is.matrix(beta.fixed) ){
-      if ( ! is.null(beta.fixed) ){
-		if ( ! beta.fixed   ){ beta.fixed <- NULL }
-							}
-				}
-	#*****
-  
-	beta <- matrix(0, nrow = nreg+1 , ncol = ndim)  
-	if ( ! is.null( beta.inits ) ){ 
-		beta[ beta.inits[,1:2] ] <- beta.inits[,3]
-							}
+	#--- inits beta regression coefficients
+	res <-  tam_mml_inits_beta( Y=Y, formulaY=formulaY, dataY=dataY, G=G, group=group, 
+				groups=groups, nstud=nstud, pweights=pweights, ridge=ridge, beta.fixed=beta.fixed, 
+				xsi.fixed=xsi.fixed, constraint="cases", ndim=ndim, beta.inits=beta.inits )
+	Y <- res$Y
+	nullY <- res$nullY
+	formulaY <- res$formulaY
+	nreg <- res$nreg
+	W <- res$W
+	YYinv <- res$YYinv
+	beta.fixed <- res$beta.fixed
+	beta <- res$beta  
  
-  # define response indicator matrix for missings
-  resp.ind <- 1 - is.na(resp)
-#  nomiss <- sum( is.na(resp) == 0 )  	#*** included nomiss in M step regression  
-  nomiss <- sum( is.na(resp) ) == 0
-  resp.ind.list <- list( 1:nitems )
-  for (i in 1:nitems){ resp.ind.list[[i]] <- which( resp.ind[,i] == 1)  }
-  resp[ is.na(resp) ] <- 0 	# set all missings to zero
+    #--- response indicators
+	res <- tam_mml_proc_response_indicators( resp=resp, nitems=nitems )
+	resp <- res$resp
+	resp.ind <- res$resp.ind
+	resp.ind.list <- res$resp.ind.list
+	nomiss <- res$nomiss
   
-  #@@ ARb:Include Starting values for xsi??
-  #       xsi <- - qnorm( colMeans( resp ) )
-  AXsi <- matrix(0,nrow=nitems,ncol=maxK )  #A times xsi
+    #-- AXsi
+	AXsi <- matrix(0,nrow=nitems,ncol=maxK )  #A times xsi
   
-  # Create an index linking items and parameters
-  indexIP <- colSums(aperm(A, c(2,1,3)) != 0, na.rm = TRUE)
-  # define list of elements for item parameters
-  indexIP.list <- list( 1:np )
-  for ( kk in 1:np ){
-    indexIP.list[[kk]] <- which( indexIP[,kk] > 0 )
-  }
-  lipl <- cumsum( sapply( indexIP.list , FUN = function(ll){ length(ll) } ) )
-  indexIP.list2 <- unlist(indexIP.list)
-  indexIP.no <- as.matrix( cbind( c(1 , lipl[-length(lipl)]+1 ) , lipl ) )  
+	#--- parameter indices xsi parameters
+	res <- tam_mml_proc_xsi_parameter_index_A(A=A, np=np)
+    indexIP <- res$indexIP 
+	indexIP.list <- res$indexIP.list 
+	indexIP.list2 <- res$indexIP.list2
+	indexIP.no <- res$indexIP.no 
   
-  # These sufficient statistics must be changed
-  # to make it more general
-  # First extension:  pweights and dependent on A; needs to be further 
-  # extended (e.g., different number of categories)
-  # Second extension: multiple category option    
-  #   -> resp \in 0:maxKi (see method definition calc_posterior_TK)
-  #                                               
-  #   -> length(ItemScore) = np (see diff computation in M Step)
-  #                   multiple category option Bugfix
-  #                                                  -> dim(cResp) = (nstud, nitems*maxK)
-  #                                               -> adapt dim(A) to dim(cResp) 
-  #							for sufficient statistic (cf. print.designMatrices)
-  
-  #**************************************************	
-  # ARb 2013-04-29
-  # more efficient calculation of sufficient statistics
-  col.index <- rep( 1:nitems , each = maxK )
-#  cResp <- (resp[ , col.index  ]+1) *resp.ind[ , col.index ]
-#  cResp <- 1 * t( t(cResp) == rep(1:(maxK), nitems) ) 
-  cResp <- (resp +1) *resp.ind
-  cResp <- cResp[ , col.index  ]
-  cResp <- 1 * ( cResp == matrix( rep(1:(maxK), nitems) , nrow(cResp) , 
-		    		ncol(cResp) , byrow=TRUE ) )  
-  if ( stats::sd(pweights) > 0 ){ 
-	ItemScore <- as.vector( t( colSums( cResp * pweights ) ) %*% cA )
-			} else { 
-	ItemScore <- as.vector( t( colSums( cResp) ) %*% cA )			
-				   }
-  #**************************************************
-
-  if (progress){ 
-      cat("    * Calculated Sufficient Statistics   (", 
-			paste(Sys.time()) , ")\n") ; utils::flush.console()	  
-				}  
+	#--- sufficient statistics for item parameters
+	res <- tam_mml_sufficient_statistics( nitems=nitems, maxK=maxK, resp=resp, resp.ind=resp.ind, 
+				pweights=pweights, cA=cA, progress=progress )
+	ItemScore <- res$ItemScore
+	cResp <- res$cResp		
+	col.index <- res$col.index				
 				
-  # starting values for xsi
-  maxAi <-  - (apply(-(A) , 3 , rowMaxs , na.rm=TRUE))  
-  personMaxA <- resp.ind %*% maxAi
-  #ItemMax <- personMaxA %t*% pweights  
-  ItemMax <- crossprod( personMaxA , pweights )
-  
-  # maximum score in resp, equal categories?  
-  maxscore.resp <- apply( resp , 2 , max )
-  if ( ncol(resp)>1){ 
-	sd.maxscore.resp <- stats::sd(maxscore.resp)
-			} else { sd.maxscore.resp <- 0 }
-  
-  equal.categ <- if( sd.maxscore.resp > .00001 ){ FALSE } else { TRUE  }
-#  xsi[est.xsi.index] <- - log(abs(ItemScore[est.xsi.index]/(ItemMax[est.xsi.index]-
-#      ItemScore[est.xsi.index])))  #log of odds ratio of raw scores  
-  xsi[est.xsi.index] <- - log(abs(( ItemScore[est.xsi.index]+.5)/
-				(ItemMax[est.xsi.index]-ItemScore[est.xsi.index]+.5) ) )
-  # starting values of zero
-  if( xsi.start0 ){ xsi <- 0*xsi }				
-  if ( ! is.null(xsi.inits) ){   
-#		xsi <- xsi.inits  
-		xsi[ xsi.inits[,1] ] <- xsi.inits[,2]
-			}
-  if ( ! is.null( xsi.fixed ) ){   xsi[ xsi.fixed[,1] ] <- xsi.fixed[,2] }
+	#--- inits xsi
+	res <- tam_mml_inits_xsi( A=A, resp.ind=resp.ind, ItemScore=ItemScore, xsi.inits=xsi.inits, 
+				xsi.fixed=xsi.fixed, est.xsi.index=est.xsi.index, pweights=pweights, 
+				xsi.start0=xsi.start0, xsi=xsi, resp=resp )
+	xsi <- res$xsi
+	personMaxA <- res$personMaxA
+	ItemMax <- res$ItemMax
+	equal.categ <- res$equal.categ  
 
-  xsi.min.deviance <- xsi
-  beta.min.deviance <- beta
-  variance.min.deviance <- variance
+	xsi.min.deviance <- xsi
+	beta.min.deviance <- beta
+	variance.min.deviance <- variance
   
 	#--- create grid of nodes for numeric or stochastic integration
-	res <- tam_mml_create_nodes( snodes=snodes, nodes=nodes, ndim=ndim, theta=theta, QMC=QMC ) 
+	res <- tam_mml_create_nodes( snodes=snodes, nodes=nodes, ndim=ndim, QMC=QMC ) 
 	theta <- res$theta
 	theta2 <- res$theta2
 	thetawidth <- res$thetawidth
@@ -367,17 +246,11 @@ function( resp , Y=NULL , group = NULL ,  irtmodel ="2PL" ,
 						
   #---end 2PL---
  
-	#*****
-	#@@@@ 2015-06-26
-	Avector <- as.vector(A)
-	Avector[ is.na(Avector) ] <- 0
-	unidim_simplify <- TRUE
-	if (G > 1){ unidim_simplify <- FALSE }
-	YSD <- max( apply( Y , 2 , stats::sd ) )
-	if (YSD > 10^(-15) ){ YSD <- TRUE } else { YSD <- FALSE }		
-	if (  YSD){ unidim_simplify <- FALSE }	
-    if (  is.null(beta.fixed) ){ unidim_simplify <- FALSE }	
-	#@@@@ 
+	#--- create unidim_simplify
+	res <- tam_mml_proc_unidim_simplify( Y=Y, A=A, G=G, beta.fixed=beta.fixed ) 
+	unidim_simplify <- res$unidim_simplify
+	YSD <- res$YSD
+	Avector <- res$Avector
  
 	#--- acceleration
 	res <- tam_acceleration_inits(acceleration=acceleration, G=G, xsi=xsi, 

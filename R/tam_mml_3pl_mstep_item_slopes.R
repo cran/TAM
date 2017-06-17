@@ -24,7 +24,7 @@ tam_mml_3pl_mstep_item_slopes <- function( max.increment , np ,
 	  	  		  
 	while( ( iter <= msteps ) & ( parchange > convM)  ){		
 	    Xlambda0 <- gammaslope <- Xlambda		
-		B <- .mml.3pl.computeB.v2( Edes , gammaslope , E )
+		B <- tam_mml_3pl_computeB( Edes , gammaslope , E )
 # cat(" +++ compute B") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1		
 
 		# calculate probabilities
@@ -43,32 +43,34 @@ tam_mml_3pl_mstep_item_slopes <- function( max.increment , np ,
 # cat(" +++ calc slca deriv") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1					
 		# prior distribution for gammaslope
 		if ( ! is.null(gammaslope.prior) ){
-			  h <- 1E-4	
-			  if ( ncol(gammaslope.prior) == 2 ){
-				  d0  <- log( stats::dnorm( Xlambda , mean=gammaslope.prior[,1] , 
+			h <- 1E-4	
+			if ( ncol(gammaslope.prior) == 2 ){
+				d0  <- log( stats::dnorm( Xlambda , mean=gammaslope.prior[,1] , 
 								   sd=gammaslope.prior[,2] ) + eps)
-				  d0p  <- log( stats::dnorm( Xlambda + h , mean=gammaslope.prior[,1] , 
+				d0p  <- log( stats::dnorm( Xlambda + h , mean=gammaslope.prior[,1] , 
 								   sd=gammaslope.prior[,2] ) + eps)
-				  d0m  <- log( stats::dnorm( Xlambda - h , mean=gammaslope.prior[,1] , 
+				d0m  <- log( stats::dnorm( Xlambda - h , mean=gammaslope.prior[,1] , 
 								   sd=gammaslope.prior[,2] ) + eps)
-											}
-			  if ( ncol(gammaslope.prior) == 4 ){
-				  d0  <- log( tam_dtnorm( Xlambda , mean=gammaslope.prior[,1] , 
+			}
+			if ( ncol(gammaslope.prior) == 4 ){
+				d0  <- log( tam_dtnorm( Xlambda , mean=gammaslope.prior[,1] , 
 								   sd=gammaslope.prior[,2] , lower=gammaslope.prior[,3] ,
 								   upper=gammaslope.prior[,4] ) + eps)
-				  d0p  <- log( tam_dtnorm( Xlambda + h , mean=gammaslope.prior[,1] , 
+				d0p  <- log( tam_dtnorm( Xlambda + h , mean=gammaslope.prior[,1] , 
 								   sd=gammaslope.prior[,2] , lower=gammaslope.prior[,3] ,
 								   upper=gammaslope.prior[,4] ) + eps)
-				  d0m  <- log( tam_dtnorm( Xlambda - h , mean=gammaslope.prior[,1] , 
+				d0m  <- log( tam_dtnorm( Xlambda - h , mean=gammaslope.prior[,1] , 
 								   sd=gammaslope.prior[,2] , lower=gammaslope.prior[,3] ,
 								   upper=gammaslope.prior[,4] ) + eps)
-											}			  
-			  
-			  d1 <- ( d0p - d0 ) / h
-			  d2 <- ( ( d0p - d0 ) - ( d0 - d0m ) ) / h^2		
-              d1.b <- d1.b + d1
-              d2.b <- d2.b + d2			  
-								}						
+			}			  
+			res <- tam_difference_quotient( d0=d0 , d0p=d0p , d0m=d0m , h=h)			  
+			d1 <- res$d1
+			d2 <- res$d2  
+			#  d1 <- ( d0p - d0 ) / h
+			#  d2 <- ( ( d0p - d0 ) - ( d0 - d0m ) ) / h^2		
+            d1.b <- d1.b + d1
+            d2.b <- d2.b + d2			  
+		}						
 		increment <-   d1.b / ( abs( d2.b + eps ) )
 		increment[ is.na(increment) ] <- 0		
 

@@ -2,11 +2,13 @@
 
 ##################################################################
 tampv2datalist <- function( tam.pv.object , pvnames = NULL , Y = NULL ,
-			Y.pid = "pid" ){
+			Y.pid = "pid" )
+{
 	pv <- tam.pv.object$pv
 	ndim <- tam.pv.object$ndim
 	nplausible <- tam.pv.object$nplausible
-	Y00 <- data.frame( "pid" = tam.pv.object$pid , "pweights" = tam.pv.object$pweights )
+	Y00 <- data.frame( "pid" = tam.pv.object$pid , "pweights" = tam.pv.object$pweights,
+				stringsAsFactors = FALSE )
 	if ( ! is.null(Y) ){ 
 		Y <- as.data.frame(Y)
 		if(  sum( colnames(Y) %in% Y.pid ) == 0 ){

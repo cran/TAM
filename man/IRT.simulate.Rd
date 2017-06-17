@@ -108,7 +108,7 @@ sim.dat <- TAM::IRT.simulate(mod2)
 mod.sim.dat <- TAM::tam.mml.2pl(resp = sim.dat, irtmodel = "2PL") 
 
 #############################################################################
-# SIMULATED EXAMPLE 3: Simulate multiple group model
+# EXAMPLE 3: Simulate multiple group model
 #############################################################################
 
 # Multi-Group ----
@@ -132,7 +132,7 @@ sim.dat <- rbind( sim.dat.g1 , sim.dat.g2)
 mod3s <- TAM::tam.mml( sim.dat , group = group)
 
 #############################################################################
-# SIMULATED EXAMPLE 4: Multidimensional model and latent regression
+# EXAMPLE 4: Multidimensional model and latent regression
 #############################################################################
 
 set.seed(6778)

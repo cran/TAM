@@ -52,7 +52,7 @@ Object of class \code{IRT.likelihood}
 
 \examples{
 #############################################################################
-# SIMULATED EXAMPLE 1: Individual likelihood and latent regression in CTT
+# EXAMPLE 1: Individual likelihood and latent regression in CTT
 #############################################################################
 
 set.seed(75)

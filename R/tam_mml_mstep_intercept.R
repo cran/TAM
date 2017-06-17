@@ -3,10 +3,11 @@ tam_mml_mstep_intercept <- function( A, xsi, AXsi, B, theta , nnodes , maxK,
 		Msteps, rprobs, np , est.xsi.index0, itemwt, indexIP.no , indexIP.list2 , 
 		Avector, max.increment, xsi.fixed, fac.oldxsi, ItemScore, convM,
 		progress, nitems, iter, increment.factor, xsi_acceleration, 
-		trim_increment = "cut" , eps = 1E-20)
+		trim_increment = "cut" , prior_list_xsi=NULL, eps = 1E-20)
 {	  
     converge <- FALSE
     Miter <- 1
+		
     old_increment <- rep( max.increment , np )
     est.xsi.index <- est.xsi.index0
 	oldxsi <- old_xsi <- xsi
@@ -15,7 +16,6 @@ tam_mml_mstep_intercept <- function( A, xsi, AXsi, B, theta , nnodes , maxK,
 		cat("M Step Intercepts   |")
 		utils::flush.console() 
 	}	
-	
 	#----------------------------------------------------
 	# begin algorithm M-step
     while ( ! converge & ( Miter <= Msteps ) ) {	       
@@ -24,12 +24,10 @@ tam_mml_mstep_intercept <- function( A, xsi, AXsi, B, theta , nnodes , maxK,
                                  xsi=xsi , theta=theta , nnodes=nnodes, maxK=maxK)					
 			rprobs <- res.p[["rprobs"]]            
         }
-# cat("calc prob") ; z1 <- Sys.time(); print(z1-z0) ; z0 <- z1		
 
 		res <- tam_calc_exp( rprobs=rprobs, A=A, np=np, est.xsi.index=est.xsi.index, 
 					itemwt=itemwt, indexIP.no=indexIP.no, indexIP.list2=indexIP.list2, 
 					Avector=Avector ) 						 
-# cat("calc_exp") ; z1 <- Sys.time(); print(z1-z0) ; z0 <- z1									 
         xbar <- res$xbar
         xbar2 <- res$xbar2
         xxf <- res$xxf	        
@@ -37,8 +35,18 @@ tam_mml_mstep_intercept <- function( A, xsi, AXsi, B, theta , nnodes , maxK,
         # Compute the difference between sufficient statistic and expectation
         diff <- as.vector(ItemScore) - xbar
         #Compute the Newton-Raphson derivative for the equation to be solved
-        deriv <- xbar2 - xxf 			
-        increment <- diff*abs(1/( deriv + eps ) )
+        deriv <- xbar2 - xxf
+		
+		#-- include prior distributions
+		res <- tam_evaluate_prior( prior_list = prior_list_xsi , parameter = xsi )
+		d1 <- res$d1
+		d2 <- res$d2
+		logprior_xsi <- res$d0
+		
+		diff <- diff + d1
+		deriv <- abs(deriv) + abs( d2 )		
+		#-- define increments
+        increment <- diff*abs( 1/( deriv + eps ) )
         if ( ! is.null( xsi.fixed) ){ 
 			increment[ xsi.fixed[,1] ] <- 0 
 		} 
@@ -52,10 +60,9 @@ tam_mml_mstep_intercept <- function( A, xsi, AXsi, B, theta , nnodes , maxK,
 			se.xsi[ xsi.fixed[,1] ] <- 0 
 		} 
         ##**	        
-        xsi <- xsi+increment   # update parameter p
-        #	est.xsi.index <- which( abs(increment) > convM )	
+        xsi <- xsi+increment
 
-		max_change <- max(abs(increment))
+		max_change <- max(abs(increment))				
 		increments_msteps[Miter] <- max_change		
         if ( max_change < convM ){ converge <- TRUE }
 
@@ -69,7 +76,6 @@ tam_mml_mstep_intercept <- function( A, xsi, AXsi, B, theta , nnodes , maxK,
 			cat("-")
 			utils::flush.console()
         }
-# cat("rest") ; z1 <- Sys.time(); print(z1-z0) ; z0 <- z1			
     } # end of all parameters loop
 	#--------------------------------------
     #*** decrease increments in every iteration
@@ -88,7 +94,7 @@ tam_mml_mstep_intercept <- function( A, xsi, AXsi, B, theta , nnodes , maxK,
 	# OUTPUT
 	res <- list(xsi=xsi, max.increment = max.increment, se.xsi = se.xsi, Miter=Miter,
 				xsi_acceleration=xsi_acceleration, xsi_change = xsi_change,
-				Miter=Miter, increments_msteps=increments_msteps )
+				Miter=Miter, increments_msteps=increments_msteps, logprior_xsi=logprior_xsi )
 	return(res)	
 }
 

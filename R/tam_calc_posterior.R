@@ -12,6 +12,7 @@ tam_calc_posterior <-
 # a0 <- Sys.time()		   
 
 	fx <- gwt
+	tsd <- NULL
 	# calculate individual 'sampling weight'
     if ( snodes > 0 ){               
 	  nstud <- nrow(gwt)
@@ -50,6 +51,7 @@ tam_calc_posterior <-
 		res[["swt" ]] <- fx
 		res$gwt <- gwt
 	}
+	res$tsd <- tsd
 	#--- output
     return(res)
 }

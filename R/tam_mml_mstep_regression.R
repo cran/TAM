@@ -6,7 +6,7 @@ tam_mml_mstep_regression <- function( resp , hwt ,  resp.ind ,
 	snodes = 0 , thetasamp.density=NULL , nomiss=FALSE, iter= 1E9,
 	min.variance = 0, userfct.variance = NULL ,
 	variance_acceleration = NULL, est.variance=TRUE, beta = NULL,
-	latreg_use = FALSE )
+	latreg_use = FALSE, gwt=NULL, importance_sampling=FALSE )
 {
 	variance.fixed <- Variance.fixed
 	beta_old <- beta
@@ -29,14 +29,24 @@ tam_mml_mstep_regression <- function( resp , hwt ,  resp.ind ,
 	}
 	#----- Monte Carlo integration	
 	if ( snodes > 0 ){
-		hwtS <- hwt
-		if ( ! latreg_use){
-			hwtS <- hwtS / rowSums( hwtS )   # maybe this can be fastened
-			itemwt <- crossprod( hwtS , resp.ind*pweightsM  )
+		if (importance_sampling){
+			hwt0 <- hwt / gwt	# likelihood
+			TP <- length(thetasamp.density)
+			tsd <- tam_matrix2( thetasamp.density , nrow=nstud , ncol=TP)
+			rej_prob <- gwt / tsd
+			rnm <- tam_matrix2( stats::runif(TP) , nrow=nstud , ncol=TP )
+			hwt_acc <- 1 * ( rej_prob > rnm	)
+			# hwt <- tam_normalize_matrix_rows( hwt0 * hwt_acc )
+			hwt <- tam_normalize_matrix_rows( hwt0 * tsd * hwt_acc )
 		}
-		thetabar <- hwtS %*% theta
+	
+		if ( ! latreg_use){
+			hwt <- hwt / rowSums( hwt )   # maybe this can be fastened
+			itemwt <- crossprod( hwt , resp.ind*pweightsM  )
+		}
+		thetabar <- hwt %*% theta
 		sumbeta <- crossprod( Y,  thetabar*pweights )
-		sumsig2 <- as.vector( crossprod( colSums( pweights * hwtS ) , theta2 ) )
+		sumsig2 <- as.vector( crossprod( colSums( pweights * hwt ) , theta2 ) )
 	}					
 	#----------------------------------------
 	# calculation of variance and regression coefficients					
@@ -122,7 +132,7 @@ tam_mml_mstep_regression <- function( resp , hwt ,  resp.ind ,
 	beta_change <- max( abs( beta - beta_old ) )
 	variance_change <- max( abs( as.vector( variance - variance_old ) ) )
 	#----- OUTPUT
-    res <- list( "beta" = beta , "variance" = variance , "itemwt" = itemwt ,
+    res <- list( beta = beta , variance = variance , itemwt = itemwt ,
 				variance_acceleration=variance_acceleration, beta_change=beta_change,
 				variance_change=variance_change )
 	return(res)

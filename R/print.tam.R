@@ -1,14 +1,9 @@
 
 ##############################################
 # print method for TAM
-print_tam <- function( x , ...){
-	
+print_tam <- function( x , ...){	
 	object <- x
-
-    d1 <- utils::packageDescription("TAM")
-	cat( paste( d1$Package , " " , d1$Version , " (" , d1$Date , ")" , sep="") , 
-			"" )		
-
+	cat( tam_packageinfo("TAM") , "\n" )	
 	# print Call
     tam_print_call(object$CALL)	
 
@@ -25,7 +20,7 @@ print_tam <- function( x , ...){
     cat( "AIC  = " , round( object$ic$AIC , 0 ) , "\n" )    
     cat( "BIC  = " , round( object$ic$BIC , 0 ) , "\n" ) 	
 	
-		}
+}
 #########################################################################		
 
 print.tam.mml <- print_tam

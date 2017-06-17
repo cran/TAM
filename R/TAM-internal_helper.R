@@ -1,14 +1,4 @@
-###################################################################
-# Function for defining different response patterns
-resp.pattern3 <- function( x ){
-    n <- nrow(x)
-    p <- ncol(x)
-    mdp <- (x %*% (2^((1:ncol(x)) - 1))) + 1
-    misspattern <- mdp[,1]
-    misspattern <- list( "miss.pattern" = mdp[,1] , 
-                "mp.index" = match( mdp[,1] , sort( unique(mdp[,1] ) ) ) )
-    return( misspattern )
-}
+
 ####################################################################
 rowcumsums <-
   function(m1){
@@ -20,19 +10,7 @@ rowcumsums <-
     return(g1)
   }
 
-###################################################################
-rowCumsums.TAM <- function(matr){ 
-	rowCumsums2_source( matr )
-}
-###################################################################					
-#****					
-# 'interval_index' searches an index when a frequency is exceeded
-# -> used in plausible value imputation
-interval_index <- function(matr,rn){ 
-	res <- interval_index_C( matr , rn )
-	res <- res + 1
-	return(res)
-}					
+			
 #############################################################
 # search the maximum in each matrix row
 rowMaxs <-

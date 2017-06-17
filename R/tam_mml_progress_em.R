@@ -2,14 +2,19 @@
 tam_mml_progress_em <- function(progress, deviance, deviance_change , iter,
 		rel_deviance_change, xsi_change, beta_change, variance_change, B_change ,
 		is_latreg = FALSE , is_mml_3pl = FALSE, guess_change = 0 ,
-		skillspace="normal", delta_change = 0, digits_pars = 6, devch )
+		skillspace="normal", delta_change = 0, digits_pars = 6, devch,
+		penalty_xsi=0 )
 {
 	if (progress){	
+		disp_fct <- "Deviance"
+		if ( penalty_xsi != 0 ){
+			disp_fct <- "Log posterior"	
+		}		
 		#----- display deviance
-        cat( paste( "\n  Deviance =" , round( deviance , 4 ) ))        
+        cat( paste( "\n ", disp_fct , " =" , round( deviance , 4 ) ))        
 		if (iter > 1){
-			cat( " | Deviance change:", round( devch , 4 ) )
-			cat( " | Relative deviance change:", round( rel_deviance_change  , 8 ) )
+			cat( " | Absolute change:", round( devch , 4 ) )
+			cat( " | Relative change:", round( rel_deviance_change  , 8 ) )
 			if ( devch < 0 & iter > 1 ){ 
 				cat("\n!!! Deviance increases!                                        !!!!") 
 				cat("\n!!! Choose maybe fac.oldxsi > 0 and/or increment.factor > 1    !!!!") 			
