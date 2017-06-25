@@ -35,7 +35,7 @@ tam_mml_3pl_mstep_item_slopes <- function( max.increment , np ,
 # cat(" +++ calc prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1				
 		# init derivatives		
 		d2.b <- d1.b <- rep(eps,Nlam)		
-		res <- mml3_slca_deriv(XdesM=FdesM, dimXdes=dimFdes , Xlambda=gammaslope , 
+		res <- tam_mml_3pl_slca_deriv(XdesM=FdesM, dimXdes=dimFdes , Xlambda=gammaslope , 
 					probs=as.vector(rprobs), nik=as.vector(n.ik), Nik=as.vector(N.ik), 
 					guess=guess, probs0=as.vector(rprobs0) )   
 		d1.b <- res$d1b
@@ -85,9 +85,9 @@ tam_mml_3pl_mstep_item_slopes <- function( max.increment , np ,
 		Xlambda <- ifelse( Xlambda < - maxgamma , - maxgamma , Xlambda )
 		if ( ! is.null(gammaslope.prior) ){
 			if ( ncol(gammaslope.prior) == 4 ){
-					  Xlambda <- ifelse( Xlambda < gammaslope.prior[,3] ,
+				Xlambda <- ifelse( Xlambda < gammaslope.prior[,3] ,
 										gammaslope.prior[,3] + 1.3* h , Xlambda )
-					  Xlambda <- ifelse( Xlambda > gammaslope.prior[,4] ,
+				 Xlambda <- ifelse( Xlambda > gammaslope.prior[,4] ,
 										gammaslope.prior[,4] - 1.3* h , Xlambda )
 			}
 		}

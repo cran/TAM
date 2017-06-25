@@ -39,6 +39,30 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
+
+-------------------------------------------------------------
+VERSIONS TAM 2.3  |  2017-06-25  |  Last: TAM 2.3-18
+-------------------------------------------------------------
+
+FEATURES:
+* included S3 method 'IRT.frequencies' for computing univariate
+  and bivariate observed and expected frequencies (thanks to a
+  suggestion by Rudolf Debelak)
+ 
+BUG FIXES:
+* fixed a bug in 'tam.linking' (thanks to Sandra Preusser)
+
+NOTES:
+* set argument 'beta.fixed' to FALSE as the default in 'tam.latreg'
+* added 'print' method for 'tam.linking'
+
+DATASETS INCLUDED OR MODIFIED:
+* ---
+
+EXAMPLES INCLUDED OR MODIFIED:
+* IRT.frequencies (1), tam.linking (3)
+
+
 -------------------------------------------------------------
 VERSIONS TAM 2.2  |  2017-06-17  |  Last: TAM 2.2-49
 -------------------------------------------------------------

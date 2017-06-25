@@ -3,6 +3,8 @@
 \alias{summary.tam.linking}
 \alias{tam_linking_2studies}
 \alias{summary.tam_linking_2studies}
+\alias{print.tam.linking}
+\alias{print.tam_linking_2studies}
 %- Also NEED an '\alias' for EACH other topic documented here.
 
 \title{
@@ -24,10 +26,14 @@ tam.linking(tamobj_list, type = "SL", theta = NULL, wgt = NULL, fix.slope = FALS
 
 \method{summary}{tam.linking}(object, file=NULL, \dots)  
 
+\method{print}{tam.linking}(x, \dots) 
+
 tam_linking_2studies( B1, AXsi1, guess1, B2, AXsi2, guess2, theta, wgt, type, 
     M1=0, SD1=1, M2=0, SD2=1, fix.slope=FALSE)
    
-\method{summary}{tam_linking_2studies}(object, file=NULL, \dots)   
+\method{summary}{tam_linking_2studies}(object, file=NULL, \dots)
+
+\method{print}{tam_linking_2studies}(x, \dots)    
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -52,6 +58,7 @@ Logical indicating whether the slope transformation constant is fixed to 1.
 Logical indicating progress of linking computation
 }
 \item{object}{Object of class \code{tam.linking} or \code{tam_linking_2studies}.}
+\item{x}{Object of class \code{tam.linking} or \code{tam_linking_2studies}.}
 \item{file}{A file name in which the summary output will be written}
 \item{\dots}{Further arguments to be passed}
 \item{B1}{Array \eqn{B} for first study}
@@ -128,17 +135,17 @@ items <- colnames(dat)[-c(1,2)]
 
 # fit grade 1
 rdat1 <- TAM::tam_remove_missings( dat[ dat$grade == 1 , ], items=items )
-mod1 <- TAM::tam.mml.2pl( resp= rdat1$resp[, rdat1$items] , pid = rdat1$idstud )
+mod1 <- TAM::tam.mml.2pl( resp= rdat1$resp[, rdat1$items] , pid = rdat1$dat$idstud )
 summary(mod1)
 
 # fit grade 2
 rdat2 <- TAM::tam_remove_missings( dat[ dat$grade == 2 , ], items=items )
-mod2 <- TAM::tam.mml.2pl( resp= rdat2$resp[, rdat2$items] , pid = rdat2$idstud )
+mod2 <- TAM::tam.mml.2pl( resp= rdat2$resp[, rdat2$items] , pid = rdat2$dat$idstud )
 summary(mod2)
 
 # fit grade 3
 rdat3 <- TAM::tam_remove_missings( dat[ dat$grade == 3 , ], items=items )
-mod3 <- TAM::tam.mml.2pl( resp= rdat3$resp[, rdat3$items] , pid = rdat3$idstud )
+mod3 <- TAM::tam.mml.2pl( resp= rdat3$resp[, rdat3$items] , pid = rdat3$dat$idstud )
 summary(mod3)
 
 # define list of fitted models
@@ -174,17 +181,17 @@ items <- colnames(dat)[-c(1,2)]
 
 # fit grade 1
 rdat1 <- TAM::tam_remove_missings( dat[ dat$grade == 1 , ], items=items )
-mod1 <- TAM::tam.mml.2pl( resp= rdat1$resp[, rdat1$items] , pid = rdat1$idstud )
+mod1 <- TAM::tam.mml.2pl( resp= rdat1$resp[, rdat1$items] , pid = rdat1$dat$idstud )
 summary(mod1)
 
 # fit grade 2
 rdat2 <- TAM::tam_remove_missings( dat[ dat$grade == 2 , ], items=items )
-mod2 <- TAM::tam.mml.2pl( resp= rdat2$resp[, rdat2$items] , pid = rdat2$idstud )
+mod2 <- TAM::tam.mml.2pl( resp= rdat2$resp[, rdat2$items] , pid = rdat2$dat$idstud )
 summary(mod2)
 
 # fit grade 3
 rdat3 <- TAM::tam_remove_missings( dat[ dat$grade == 3 , ], items=items )
-mod3 <- TAM::tam.mml.2pl( resp= rdat3$resp[, rdat3$items] , pid = rdat3$idstud )
+mod3 <- TAM::tam.mml.2pl( resp= rdat3$resp[, rdat3$items] , pid = rdat3$dat$idstud )
 summary(mod3)
 
 # list of fitted TAM models
@@ -195,6 +202,38 @@ lmod <- TAM::tam.linking( tamobj_list, fix.slope=TRUE)
 summary(lmod)
 
 # WLEs can be estimated in the same way as in Example 1.
+
+#############################################################################
+# EXAMPLE 3: Linking dichotomous data with the multiple group 2PL models
+#############################################################################
+
+data(data.ex16)
+dat <- data.ex16
+items <- colnames(dat)[-c(1,2)]
+
+# fit grade 1
+rdat1 <- TAM::tam_remove_missings( dat[ dat$grade == 1 , ], items=items )
+# create some grouping variable
+group <- ( seq( 1 , nrow( rdat1$dat ) ) \%\%\ 3 ) + 1
+mod1 <- TAM::tam.mml.2pl( resp= rdat1$resp[, rdat1$items] , pid = rdat1$dat$idstud, group=group)
+summary(mod1)
+
+# fit grade 2
+rdat2 <- TAM::tam_remove_missings( dat[ dat$grade == 2 , ], items=items )
+group <- 1*(rdat2$dat$dat$idstud > 500)
+mod2 <- TAM::tam.mml.2pl( resp=rdat2$resp[, rdat2$items], pid=rdat2$dat$dat$idstud, group=group)
+summary(mod2)
+
+# fit grade 3
+rdat3 <- TAM::tam_remove_missings( dat[ dat$grade == 3, ], items=items )
+mod3 <- TAM::tam.mml.2pl( resp= rdat3$resp[, rdat3$items], pid = rdat3$dat$idstud )
+summary(mod3)
+
+# define list of fitted models
+tamobj_list <- list( mod1, mod2 , mod3 )
+
+#-- link item response models
+lmod <- TAM::tam.linking( tamobj_list)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

@@ -24,15 +24,15 @@ tam_linking_2studies <- function( B1 , AXsi1 , guess1, B2 , AXsi2, guess2, theta
 		#-- define Haebara criterion function
 		if (type=="Hae"){
 			for (kk in 1:K){
-				crit <- crit + sum( ( probs1[,,kk] - probs2[,,kk] )^2 * wgt )
+				crit <- crit + sum( ( probs1[,,kk,drop=FALSE] - probs2[,,kk,drop=FALSE] )^2 * wgt )
 			}
 		}
 		#-- define Stocking-Lord criterion function
 		if (type=="SL"){
 			vcrit <- 0
 			for (kk in 1:K){
-				vcrit <- vcrit + (kk-1)*( probs1[,,kk] - probs2[,,kk] )
-			}
+				vcrit <- vcrit + (kk-1)*( probs1[,,kk,drop=FALSE] - probs2[,,kk,drop=FALSE] )
+			}		
 			vcrit <- rowSums( vcrit )
 			crit <- sum( vcrit^2 * wgt )
 		}
@@ -52,13 +52,10 @@ tam_linking_2studies <- function( B1 , AXsi1 , guess1, B2 , AXsi2, guess2, theta
 	names(trafo_items) <- c("a","b")
 	trafo_persons <- 1 / trafo_items
 	trafo_persons["b"] <- - trafo_items["b"] / trafo_items["a"]	
+	
 	#--- transformed distribution
-	M_SD <- matrix( c(M1, M2 , SD1 , SD2 ) , nrow=2 , ncol=2 )
-	colnames(M_SD) <- c("M", "SD")
-	M_SD <- as.data.frame(M_SD)
-	rownames(M_SD) <- c("study1" , "study2")
-	M_SD["study2","SD"] <- M_SD["study2","SD"] * trafo_persons["a"]
-	M_SD["study2","M"] <- M_SD["study2","M"] * trafo_persons["a"] + trafo_persons["b"]	
+	M_SD <- tam_linking_2studies_create_M_SD( M1=M1, SD1=SD1, M2=M2, SD2=SD2, 
+					trafo_persons=trafo_persons ) 
 	#--- transformations of item parameters
 		# X=0: 0
 		# X=1: B_i1 * (a*TH + b) + Axsi1_i

@@ -8,7 +8,7 @@ using namespace Rcpp;
 ///********************************************************************
 ///** mml3_calc_Fdes
 // [[Rcpp::export]]           
-Rcpp::List mml3_calc_Fdes( Rcpp::NumericVector XDES , Rcpp::NumericVector dimXdes ){
+Rcpp::List tam_mml_3pl_calc_Fdes( Rcpp::NumericVector XDES , Rcpp::NumericVector dimXdes ){
 
      int I= dimXdes[0] ;  
      int maxK= dimXdes[1] ;  
@@ -55,7 +55,7 @@ Rcpp::List mml3_calc_Fdes( Rcpp::NumericVector XDES , Rcpp::NumericVector dimXde
 ///********************************************************************
 ///** mml3_slca_deriv
 // [[Rcpp::export]]           
-Rcpp::List mml3_slca_deriv( Rcpp::NumericMatrix XdesM, 
+Rcpp::List tam_mml_3pl_slca_deriv( Rcpp::NumericMatrix XdesM, 
 	Rcpp::NumericVector dimXdes, Rcpp::NumericVector Xlambda, 
 	Rcpp::NumericVector probs, 
 	Rcpp::NumericVector nik, Rcpp::NumericVector Nik, 
@@ -173,7 +173,7 @@ Rcpp::List mml3_slca_deriv( Rcpp::NumericMatrix XdesM,
 ///********************************************************************
 ///** mml3pl_tam_calcexp
 // [[Rcpp::export]]           
-Rcpp::List mml3pl_tam_calcexp( int NP , 
+Rcpp::List tam_mml_3pl_calcexp( int NP , 
 	Rcpp::NumericMatrix rprobs, Rcpp::NumericMatrix A, 
 	Rcpp::NumericMatrix INDEXIPNO, Rcpp::NumericVector INDEXIPLIST2, 
 	Rcpp::NumericVector ESTXSIINDEX, int C, 
@@ -260,8 +260,8 @@ Rcpp::List mml3pl_tam_calcexp( int NP ,
           ///////////// O U T P U T   ///////////////////////////    
           return Rcpp::List::create(  
           	     	Rcpp::_["xbar"]=XBAR , 
-                        Rcpp::_["xbar2"]=XBAR2 , 
-                        Rcpp::_["xxf"]=XXF ,  
+                    Rcpp::_["xbar2"]=XBAR2 , 
+                    Rcpp::_["xxf"]=XXF ,  
           	     	Rcpp::_["iscore"] = iscore  
           	     	);   
 }
@@ -269,7 +269,7 @@ Rcpp::List mml3pl_tam_calcexp( int NP ,
 ///********************************************************************
 ///** mml_3pl_compute_B_rcpp
 // [[Rcpp::export]]           
-Rcpp::List mml_3pl_compute_B_rcpp( Rcpp::NumericMatrix Edes, 
+Rcpp::List tam_mml_3pl_compute_B_rcpp( Rcpp::NumericMatrix Edes, 
 	Rcpp::NumericVector gammaslope, Rcpp::NumericVector dimE ){
 
      int NE=Edes.nrow();  
@@ -305,7 +305,7 @@ Rcpp::List mml_3pl_compute_B_rcpp( Rcpp::NumericMatrix Edes,
 ///********************************************************************
 ///** mml_3pl_nonzero_entries
 // [[Rcpp::export]]           
-Rcpp::List mml_3pl_nonzero_entries( Rcpp::NumericVector E, 
+Rcpp::List tam_mml_3pl_nonzero_entries( Rcpp::NumericVector E, 
 	Rcpp::NumericVector dimE ){
      
      int NE = E.size();   

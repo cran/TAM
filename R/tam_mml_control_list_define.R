@@ -1,5 +1,6 @@
 
-tam_mml_control_list_define <- function(control, envir, tam_fct)
+tam_mml_control_list_define <- function(control, envir, tam_fct,
+		prior_list_xsi)
 {
 	con <- list()
 	
@@ -36,6 +37,13 @@ tam_mml_control_list_define <- function(control, envir, tam_fct)
 	#* maxgamma
 	if ( tam_fct %in% c("tam.mml.3pl")){
 		con$maxgamma <- 9.99
+	}
+	#* mstep_intercept_method
+	if ( tam_fct %in% c("tam.mml" , "tam.mml.mfr")){
+		con$mstep_intercept_method <- "R"
+		if ( ! is.null( prior_list_xsi) ){
+			con$mstep_intercept_method <- "optim"
+		}
 	}
 	
 	#-- overwrite default values if supplied by the user

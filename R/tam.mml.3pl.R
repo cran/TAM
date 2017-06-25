@@ -78,7 +78,7 @@ tam.mml.3pl <- function( resp , Y=NULL , group = NULL ,
 			gammaslope[ gammaslope.fixed[,1] ] <- gammaslope.fixed[,2]			  	  
 	}
 	if ( is.null(Edes) ){			
-		Edes <- mml_3pl_nonzero_entries( E=as.vector(E) , dimE=dim(E) )$E_design
+		Edes <- tam_mml_3pl_nonzero_entries( E=as.vector(E) , dimE=dim(E) )$E_design
 	}											
 	B <- tam_mml_3pl_computeB( Edes=Edes , gammaslope=gammaslope , E=E )
 	 
@@ -375,7 +375,7 @@ tam.mml.3pl <- function( resp , Y=NULL , group = NULL ,
 	Fdes <- tam_mml_3pl_compute_Fdes( E , gammaslope , theta )	  
     # use simplified design for F
 	dimFdes <- dim(Fdes) 
-	res <- mml3_calc_Fdes( XDES=as.vector(Fdes) , dimXdes=dimFdes )
+	res <- tam_mml_3pl_calc_Fdes( XDES=as.vector(Fdes) , dimXdes=dimFdes )
 	FdesM <- res$FdesM[ 1:res$NFdesM , ]
 	
 	# **** AXsi parameters

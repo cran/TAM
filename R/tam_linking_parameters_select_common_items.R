@@ -13,7 +13,7 @@ tam_linking_parameters_select_common_items <- function(out, items_sel, names_suf
 	#-- guess
 	guess <- out$guess
 	if ( ! is.null(guess) ){
-		guess[ items_sel ] <- guess
+		guess <- guess[ items_sel ]
 	}
 	#-- distribution
 	M <- out$M

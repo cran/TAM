@@ -3,31 +3,30 @@
 #######################################################
 # generate interactions										
 .generate.interactions2 <- function(X , facets , formulaA , mm ){	
-	d1 <- d0 <- X	
-	h1 <- sapply( colnames(d1) , FUN = function(vv){
+  d1 <- d0 <- X	
+  h1 <- sapply( colnames(d1) , FUN = function(vv){
 				length(grep( vv , paste(formulaA) )) } )
-	h1 <- colnames(d1)[ h1 == 0 ]
-	d0 <- d0[ , ! ( colnames(d1) %in% h1 ) , drop=FALSE]
-	M2 <- stats::model.matrix( #object= 
-         formulaA , data= d1 , 
+  h1 <- colnames(d1)[ h1 == 0 ]
+  d0 <- d0[ , ! ( colnames(d1) %in% h1 ) , drop=FALSE]
+  M2 <- stats::model.matrix( formulaA , data= d1 , 
 			contrasts.arg = lapply( d0 , stats::contrasts, contrasts=FALSE) )
-	h2 <- colnames(M2)
-	h1 <- colnames(mm)
-	# extract facets
-	xsi.table <- data.frame( "parameter" = h2 )
-	xsi.split <- sapply( xsi.table$parameter , FUN = function(ll){ 
-		l1 <- as.vector( unlist( strsplit( paste(ll) , split=":" ) ) )
-		v1 <- l1
-		for (ii in 1:length(l1) ){
-			for (cc in colnames(X) ){ 
-				kk <- grep( cc , l1[ii] )
-				if (length(kk)>0){ v1[ii] <- cc }
-								}
-						} 
-		v1 <- paste0( v1 , collapse=":" )
-		return(v1)		
-					} )
-	xsi.table$facet <- unlist(xsi.split)
+  h2 <- colnames(M2)
+  h1 <- colnames(mm)
+  # extract facets
+  xsi.table <- data.frame( "parameter" = h2 )
+  xsi.split <- sapply( xsi.table$parameter , FUN = function(ll){ 
+    l1 <- as.vector( unlist( strsplit( paste(ll) , split=":" ) ) )
+    v1 <- l1
+    for (ii in 1:length(l1) ){
+      for (cc in colnames(X) ){ 
+        kk <- grep( cc , l1[ii] )
+        if (length(kk)>0){ v1[ii] <- cc }
+      }
+    } 
+    v1 <- paste0( v1 , collapse=":" )
+    return(v1)
+  } )
+  xsi.table$facet <- unlist(xsi.split)
 	xsi.table$facet.order <- sapply( xsi.table$parameter , FUN = function(ll){ 
 		length( as.vector( unlist( strsplit( paste(ll) , split=":" ) ) ) ) } )
 	xsi.table$constraint <- 1 - 1*(xsi.table$parameter %in% h1)

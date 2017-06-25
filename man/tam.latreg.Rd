@@ -21,7 +21,7 @@ application of \code{\link{tam.pv}} (see Example 1).
 
 \usage{
 tam.latreg(like, theta=NULL, Y = NULL, group = NULL, formulaY = NULL, dataY = NULL, 
-   beta.fixed = NULL, beta.inits = NULL, variance.fixed = NULL, 
+   beta.fixed = FALSE, beta.inits = NULL, variance.fixed = NULL, 
    variance.inits = NULL, est.variance = TRUE, pweights = NULL, pid = NULL, 
    userfct.variance = NULL, variance.Npars = NULL, verbose = TRUE, control = list())
    
@@ -62,7 +62,8 @@ is automatically extracted as an attribute.
      1st column: Index of \eqn{Y} value, 2nd column: dimension,
      3rd column: fixed \eqn{\beta} value. \cr
      If no constraints should be inposed on \eqn{\beta}, then
-     set \code{beta.fixed=FALSE} (see Example 2, Model \code{2_4}).
+     set \code{beta.fixed=FALSE} (see Example 2, Model \code{2_4})
+     which is the default.
 }
   \item{beta.inits}{
      A matrix (same format as in \code{beta.fixed}) 

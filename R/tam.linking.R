@@ -17,7 +17,6 @@ tam.linking <- function( tamobj_list , type = "SL", theta=NULL, wgt=NULL, fix.sl
 	for (mm in 1:NM){
 		parameters_list[[mm]] <- tam_linking_extract_parameters( tamobj=tamobj_list[[mm]] )
 	}
-	
 	#**** LINKING
 	linking_list <- list()
 	linking_args <- list( theta=theta , wgt=wgt , type=type, fix.slope=fix.slope)	
@@ -43,16 +42,21 @@ tam.linking <- function( tamobj_list , type = "SL", theta=NULL, wgt=NULL, fix.sl
 		linking_list_mm$common_items <- items_sel
 		linking_list_mm$linking_results <- link_mm
 		linking_list[[mm]] <- linking_list_mm
-		parameters_list[[mm+1]][["M"]] <- link_mm$M_SD[2,"M"]
-		parameters_list[[mm+1]][["SD"]] <- link_mm$M_SD[2,"SD"]	
+		M_SD <- link_mm$M_SD
+		N_groups <- attr(M_SD , "N_groups")
+		ind <- N_groups[1] + seq(1,N_groups[2])
+		M_SD <- M_SD[ ind , , drop=FALSE ]
+		rownames(M_SD) <- paste0("group", 1:N_groups[2])
+		parameters_list[[mm+1]][["M"]] <- M_SD[ ,"M"]
+		parameters_list[[mm+1]][["SD"]] <- M_SD[ ,"SD"]	
 		parm_mm <- parameters_list[[mm+1]]
 		res <- tam_linking_transform_item_parameters( B = parm_mm$B , AXsi = parm_mm$AXsi , A = parm_mm$A , 
-						trafo_items= link_mm$trafo_items )
+						trafo_items=link_mm$trafo_items )
 		parm_mm <- tam_linking_include_list( list1=parm_mm, list2=res )					
-		parameters_list[[mm+1]] <- parm_mm		
+		parameters_list[[mm+1]] <- parm_mm	
 	}
 	#--- organize output
-	res <- tam_linking_output_summary( parameters_list=parameters_list, linking_list=linking_list , NM=NM )
+	res <- tam_linking_output_summary( parameters_list=parameters_list, linking_list=linking_list )
 	M_SD <- res$M_SD
 	trafo_persons <- res$trafo_persons
 	trafo_items <- res$trafo_items

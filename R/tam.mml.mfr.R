@@ -8,7 +8,7 @@ tam.mml.mfr <-
             variance.fixed = NULL , variance.inits = NULL , 
             est.variance = TRUE , formulaA=~item+item:step, constraint="cases",
             A=NULL , B=NULL , B.fixed = NULL , 
-            Q=NULL , facets=NULL, est.slopegroups=NULL , E = NULL , 
+            Q=NULL , facets=NULL, est.slopegroups=NULL , E = NULL ,
             pweights = NULL , verbose = TRUE , control = list() ,
             delete.red.items=TRUE
             # control can be specified by the user 
@@ -17,9 +17,9 @@ tam.mml.mfr <-
 	CALL <- match.call()
     a0 <- Sys.time()    
     s1 <- Sys.time()
-	
-	#*** priors
-	prior_list_xsi = NULL	
+
+	prior_list_xsi = NULL 
+	mstep_intercept_method <- "R"	
 	
     # display
     disp <- "....................................................\n"
@@ -38,7 +38,8 @@ tam.mml.mfr <-
   	#--- attach control elements
     e1 <- environment()
 	tam_fct <- "tam.mml.mfr"	
-	res <- tam_mml_control_list_define(control=control, envir=e1, tam_fct=tam_fct)
+	res <- tam_mml_control_list_define(control=control, envir=e1, tam_fct=tam_fct,
+				prior_list_xsi=prior_list_xsi)
 	con <- res$con
 	con1a <- res$con1a
 
@@ -367,6 +368,11 @@ tam.mml.mfr <-
 		if ( variance_change < conv){ varConv <- TRUE }						
 						
 		#--- M-step item intercepts
+		if (mstep_intercept_method=="optim"){
+			res <- tam_calc_counts( resp=gresp.noStep, theta=theta, resp.ind=gresp.noStep.ind, group=group, 
+						maxK=maxK, pweights=pweights, hwt=hwt )
+			n.ik <- res$n.ik		
+		}				
 		res <- tam_mml_mstep_intercept( A=A, xsi=xsi, AXsi=AXsi, B=B, theta=theta, 
 					nnodes=nnodes, maxK=maxK, Msteps=Msteps, rprobs=rprobs, np=np, 
 					est.xsi.index0=est.xsi.index0, itemwt=itemwt, indexIP.no=indexIP.no, 
@@ -374,7 +380,8 @@ tam.mml.mfr <-
 					xsi.fixed=xsi.fixed, fac.oldxsi=fac.oldxsi, ItemScore=ItemScore, 
 					convM=convM, progress=progress, nitems=nitems, iter=iter, 
 					increment.factor=increment.factor, xsi_acceleration=xsi_acceleration,
-					trim_increment=trim_increment, prior_list_xsi=prior_list_xsi ) 
+					trim_increment=trim_increment, prior_list_xsi=prior_list_xsi,
+					mstep_intercept_method=mstep_intercept_method, n.ik=n.ik ) 
 		xsi <- res$xsi
 		se.xsi <- res$se.xsi
 		max.increment <- res$max.increment

@@ -1,9 +1,10 @@
 
-tam_evaluate_prior <- function( prior_list , parameter , derivatives=TRUE, h = 1E-4, eps=1E-10)
+tam_evaluate_prior <- function( prior_list , parameter , derivatives=TRUE, 
+		h = 1E-4)
 {
 	#-- extract parameters from prior list
 	NP <- length(parameter)
-	d0m <- d0p <- d0 <- rep( 0 , NP )
+	d2 <- d1 <- d0 <- rep( 0 , NP )
 	if ( ! is.null(prior_list) ){
 		is_prior <- attr( prior_list , "is_prior" )
 		prior_entries <- attr( prior_list , "prior_entries" )
@@ -17,20 +18,23 @@ tam_evaluate_prior <- function( prior_list , parameter , derivatives=TRUE, h = 1
 				args_pp <- prior_pp[[2]]
 				parameter_pp <- parameter[pp]
 				d0[entry_pp] <- tam_prior_eval_log_density_one_parameter( density_pp=density_pp, 
-										args_pp=args_pp , parameter_pp=parameter_pp, eps=eps )
+										args_pp=args_pp , parameter_pp=parameter_pp )								
 				if (derivatives){
-					d0p[entry_pp] <- tam_prior_eval_log_density_one_parameter( density_pp=density_pp, 
-											args_pp=args_pp , parameter_pp=parameter_pp + h , eps=eps)
-					d0m[entry_pp] <- tam_prior_eval_log_density_one_parameter( density_pp=density_pp, 
-											args_pp=args_pp , parameter_pp=parameter_pp - h, eps=eps )
+					d1[entry_pp] <- tam_prior_eval_log_density_one_parameter( density_pp=density_pp, 
+											args_pp=args_pp , parameter_pp=parameter_pp + h,
+											deriv=1 )
+					d2[entry_pp] <- tam_prior_eval_log_density_one_parameter( density_pp=density_pp, 
+											args_pp=args_pp , parameter_pp=parameter_pp - h,
+											deriv=2)
 				}
 			}
 		}
 	}
 	#-- evaluate difference quotient
-	res <- tam_difference_quotient( d0=d0 , d0p=d0p , d0m=d0m , h=h)
-	d1 <- res$d1
-	d2 <- res$d2	
+	# res <- tam_difference_quotient( d0=d0 , d0p=d0p , d0m=d0m , h=h)
+	# d1 <- res$d1
+	# d2 <- res$d2
+
 	#--- OUTPUT
 	res <- list(d0=d0, d1=d1, d2=d2)
 	return(res)

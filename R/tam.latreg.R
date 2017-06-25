@@ -3,7 +3,7 @@
 # latent regression
 tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL , 
 				formulaY = NULL , dataY = NULL , 
-				beta.fixed = NULL , beta.inits = NULL , 
+				beta.fixed = FALSE , beta.inits = NULL , 
 				variance.fixed = NULL , variance.inits = NULL , 
 				est.variance = TRUE , pweights = NULL , pid=NULL , 
 				userfct.variance = NULL , variance.Npars = NULL , 
@@ -161,9 +161,6 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
 			thetasamp.density <- res$thetasamp.density  
 		}			
 		olddeviance <- deviance
-# a0 <- Sys.time()	
- 
-      # cat("calc_prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
       
 		# calculate student's prior distribution
 		gwt <- tam_stud_prior(theta=theta , Y=Y , beta=beta , variance=variance , nstud=nstud , 
@@ -171,7 +168,6 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
 	    hwt <- like * gwt
 		res.hwt$rfx <- rowSums(hwt)
 		hwt <- hwt / rowSums(hwt)	 
-      # cat("calc_posterior") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						 
             
 		#-- M step: estimation of beta and variance
 		if (progress){ 
@@ -179,7 +175,7 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
 		   utils::flush.console() 
 		}
 		oldbeta <- beta
-		oldvariance <- variance 				
+		oldvariance <- variance 
 		resr <- tam_mml_mstep_regression( resp=NULL, hwt=hwt, resp.ind=NULL, 
 					pweights=pweights, pweightsM=pweightsM, Y=Y, theta=theta, theta2=theta2, 
 					YYinv=YYinv, ndim=ndim, nstud=nstud, beta.fixed=beta.fixed, variance=variance, 
@@ -187,8 +183,6 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
 					thetasamp.density=thetasamp.density, iter=iter, min.variance=min.variance, 
 					userfct.variance=userfct.variance, variance_acceleration=NULL, 
 					est.variance=est.variance, beta=beta, latreg_use=TRUE ) 	  
-      # cat("mstep regression") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1						       
-
 		beta <- resr$beta     
 		variance <- resr$variance	
 		variance_change <- resr$variance_change
@@ -207,12 +201,12 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
 		a01 <- rel_deviance_change <- res$rel_deviance_change
 		a02 <- deviance_change <- res$deviance_change	  
 	        
-      if( deviance < deviance.min ){ 	 
-        beta.min.deviance <- beta
-        variance.min.deviance <- variance	
-        hwt.min <- hwt	
-        deviance.min <- deviance
-      }
+		if( deviance < deviance.min ){ 	 
+			beta.min.deviance <- beta
+			variance.min.deviance <- variance	
+			hwt.min <- hwt	
+			deviance.min <- deviance
+		}
       
 		a1 <- 0
 		a2 <- beta_change
@@ -225,10 +219,7 @@ tam.latreg <- function( like , theta=NULL , Y=NULL , group=NULL ,
 					rel_deviance_change=rel_deviance_change, xsi_change=0, 
 					beta_change=beta_change, variance_change=variance_change, B_change=0, 
 					is_latreg=TRUE, devch=devch ) 
-        
-      # cat("rest") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1	
-      
-      
+              
     } # end of EM loop
     #******************************************************
 

@@ -27,6 +27,7 @@ tam_mml_compute_deviance <- function( loglike_num , loglike_sto , snodes,
 	if ( ! is.null(deviance.history) ){
 		deviance.history[iter,2] <- deviance		
 	}
+	
 	#----- OUTPUT
 	res <- list( deviance = deviance, deviance_change=deviance_change ,
 				rel_deviance_change=rel_deviance_change, 

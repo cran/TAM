@@ -16,11 +16,6 @@ extern SEXP TAM_gresp_extend(SEXP, SEXP);
 extern SEXP TAM_gresp_na_facets(SEXP, SEXP, SEXP);
 extern SEXP TAM_interval_index_C(SEXP, SEXP);
 extern SEXP TAM_irt_likelihood_cfa2(SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP TAM_mml_3pl_compute_B_rcpp(SEXP, SEXP, SEXP);
-extern SEXP TAM_mml_3pl_nonzero_entries(SEXP, SEXP);
-extern SEXP TAM_mml3_calc_Fdes(SEXP, SEXP);
-extern SEXP TAM_mml3_slca_deriv(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP TAM_mml3pl_tam_calcexp(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP TAM_msq_itemfit(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP TAM_msq_itemfit2(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP TAM_prior_normal_density_C(SEXP, SEXP, SEXP, SEXP);
@@ -32,6 +27,11 @@ extern SEXP TAM_TAM_CALCEXP(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP TAM_TAM_CALCEXP2(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP TAM_tam_ctt_C(SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP TAM_tam_fit_simul(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP TAM_tam_mml_3pl_calc_Fdes(SEXP, SEXP);
+extern SEXP TAM_tam_mml_3pl_calcexp(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP TAM_tam_mml_3pl_compute_B_rcpp(SEXP, SEXP, SEXP);
+extern SEXP TAM_tam_mml_3pl_nonzero_entries(SEXP, SEXP);
+extern SEXP TAM_tam_mml_3pl_slca_deriv(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP TAM_tam_pv_mcmc_likelihood_Rcpp(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP TAM_tam_q3_calc_residM(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP TAM_tam_q3_calc_V2counts(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
@@ -50,11 +50,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"TAM_gresp_na_facets",             (DL_FUNC) &TAM_gresp_na_facets,              3},
     {"TAM_interval_index_C",            (DL_FUNC) &TAM_interval_index_C,             2},
     {"TAM_irt_likelihood_cfa2",         (DL_FUNC) &TAM_irt_likelihood_cfa2,          5},
-    {"TAM_mml_3pl_compute_B_rcpp",      (DL_FUNC) &TAM_mml_3pl_compute_B_rcpp,       3},
-    {"TAM_mml_3pl_nonzero_entries",     (DL_FUNC) &TAM_mml_3pl_nonzero_entries,      2},
-    {"TAM_mml3_calc_Fdes",              (DL_FUNC) &TAM_mml3_calc_Fdes,               2},
-    {"TAM_mml3_slca_deriv",             (DL_FUNC) &TAM_mml3_slca_deriv,              8},
-    {"TAM_mml3pl_tam_calcexp",          (DL_FUNC) &TAM_mml3pl_tam_calcexp,          12},
     {"TAM_msq_itemfit",                 (DL_FUNC) &TAM_msq_itemfit,                  7},
     {"TAM_msq_itemfit2",                (DL_FUNC) &TAM_msq_itemfit2,                 7},
     {"TAM_prior_normal_density_C",      (DL_FUNC) &TAM_prior_normal_density_C,       4},
@@ -66,6 +61,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"TAM_TAM_CALCEXP2",                (DL_FUNC) &TAM_TAM_CALCEXP2,                10},
     {"TAM_tam_ctt_C",                   (DL_FUNC) &TAM_tam_ctt_C,                    5},
     {"TAM_tam_fit_simul",               (DL_FUNC) &TAM_tam_fit_simul,                9},
+    {"TAM_tam_mml_3pl_calc_Fdes",       (DL_FUNC) &TAM_tam_mml_3pl_calc_Fdes,        2},
+    {"TAM_tam_mml_3pl_calcexp",         (DL_FUNC) &TAM_tam_mml_3pl_calcexp,         12},
+    {"TAM_tam_mml_3pl_compute_B_rcpp",  (DL_FUNC) &TAM_tam_mml_3pl_compute_B_rcpp,   3},
+    {"TAM_tam_mml_3pl_nonzero_entries", (DL_FUNC) &TAM_tam_mml_3pl_nonzero_entries,  2},
+    {"TAM_tam_mml_3pl_slca_deriv",      (DL_FUNC) &TAM_tam_mml_3pl_slca_deriv,       8},
     {"TAM_tam_pv_mcmc_likelihood_Rcpp", (DL_FUNC) &TAM_tam_pv_mcmc_likelihood_Rcpp,  6},
     {"TAM_tam_q3_calc_residM",          (DL_FUNC) &TAM_tam_q3_calc_residM,           7},
     {"TAM_tam_q3_calc_V2counts",        (DL_FUNC) &TAM_tam_q3_calc_V2counts,         6},

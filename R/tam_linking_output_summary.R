@@ -1,22 +1,32 @@
 
-tam_linking_output_summary <- function( parameters_list, linking_list , NM )
+tam_linking_output_summary <- function( parameters_list, linking_list)
 {
+	NM <- length(parameters_list)
 	#--- means and SDs
-	M_SD <- matrix( 0 , nrow=NM , ncol=2)
-	colnames(M_SD) <- c("M", "SD")
-	rownames(M_SD) <- paste0( "study",1:NM)
-	M_SD <- as.data.frame(M_SD)
+	M_SD <- NULL
 	for (mm in 1:NM){
-		M_SD[mm, "M"] <- parameters_list[[mm]]$M
-		M_SD[mm, "SD"] <- parameters_list[[mm]]$SD		
+		M <- parameters_list[[mm]]$M
+		SD <- parameters_list[[mm]]$SD
+		dfr <- data.frame( M=M, SD=SD)
+		G <- length(M)
+		if (G==1){
+			row_names <- paste0("study",mm)
+		} else {
+			row_names <- paste0("study",mm, "-group" , 1:G)
+		}
+		rownames(dfr) <- row_names
+		M_SD <- rbind(M_SD, dfr)		
 	}
 	#--- transformation item parameters
-	trafo_items <- 0*M_SD
+	trafo_items <- matrix( 0 , nrow=NM , ncol=2)
+	rownames(trafo_items) <- paste0( "study",1:NM)
 	colnames(trafo_items) <- c("a","b")
-	trafo_items$a <- 1
+	trafo_items <- as.data.frame(trafo_items)
+	trafo_items$a <- 1	
 	for (mm in 1:(NM-1) ){
-		trafo_items[mm+1,] <- linking_list[[mm]]$linking_results$trafo_items
-	}
+		trafo_mm <- linking_list[[mm]]$linking_results$trafo_items
+		trafo_items[mm+1,] <- trafo_mm
+	}	
 	#--- transformation person parameters
 	trafo_persons <- trafo_items
 	for (mm in 1:(NM-1) ){
