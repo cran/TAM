@@ -1,5 +1,5 @@
-50efeb237b1c6d3d09119750dd28720c *DESCRIPTION
-3471628dcb68f1da6a18ec1208c978dc *NAMESPACE
+001a2bce4231b81bf0e9ea7c7efff81d *DESCRIPTION
+0d1947efa5ecae50e9cc743f75bee75a *NAMESPACE
 b1d98dfe664447ad2990ffbe8dab627f *R/DescribeBy.R
 73ed0cc2ebd0d5f2ea1910142afcede0 *R/EAPrel.R
 a5148f5ca185ec1298d83a001c915647 *R/IRT.WrightMap.R
@@ -20,7 +20,7 @@ dcf0ba79d84270a696392d0aba652cc6 *R/IRT.residuals.R
 663cd7a13de9193da7546cab8060040f *R/IRT.truescore.R
 255e26e506d1c0f7ad248c2b7d3c4676 *R/IRTLikelihood.cfa.R
 323287aeefb9f571aeff1f4ced0f7e9e *R/IRTLikelihood.ctt.R
-4a67c5bec9fc361dab3c6a4e671a6236 *R/RcppExports.R
+95517688feda901014fcfa3f7a8a877d *R/RcppExports.R
 1e39cd7df10fbe4fec325cca92a5361d *R/Scale.R
 c2f93c267ac25f50d84064fe917a9f1a *R/TAM-internal_helper.R
 99af4019f0fd72837870b480e2a7231a *R/WLErel.R
@@ -93,11 +93,11 @@ b04de383cfc216ce0beb0fe23681acbb *R/tam.mml.3pl.R
 8e68afdb861efb00411f9a87033fba49 *R/tam.mml.R
 b2af11e20c3cd6f7c01b4c9d1c8ce199 *R/tam.mml.mfr.R
 1ea61f9aa3990deebb14854306fe49c5 *R/tam.mml.wle.R
-70759d9f71531c3ce67dcca42833436c *R/tam.mml.wle2.R
+3854ca3a7dce432af9c02f6400ce3642 *R/tam.mml.wle2.R
 47ff64c14414e7c5bba0b90dd16a81a3 *R/tam.modelfit.R
 aa98c72f601f8a1fbc156460f424a225 *R/tam.modelfit.func.R
 faea537336e3040eadfc61fd70832ddc *R/tam.parameterfix.defaults.R
-03fba8200d5cae172d12e53d7bd967f2 *R/tam.pv.R
+4cc08ab03f13a975403e7d71e32debf1 *R/tam.pv.R
 5e3c417717a1e394952bad7437dce092 *R/tam.pv.mcmc.R
 2b2524a77be2b43019cf0f4cd99e2529 *R/tam.q3.aux.R
 f0db02302309112f6780f1f28daa7f64 *R/tam.se.R
@@ -229,6 +229,7 @@ cc31763abf95803144ed6dc0e01d022d *R/tam_outer.R
 287334be3312310df4ebddb05149ad20 *R/tam_prior_eval_log_density_one_parameter.R
 19a1cd26e4c5a5ecd56a6a9448de3b74 *R/tam_pv_draw_pv_nonparametric.R
 ed3780eca32bcc19f1bb9826bb8d4469 *R/tam_pv_draw_pv_normal_approximation_1dim.R
+abbbe5a112151a51dfe588ffdba520f6 *R/tam_pv_draw_pv_normal_approximation_multidim.R
 680f33805afec5567e407a81a9d5c4b4 *R/tam_pv_mcmc_compute_marginal_likelihood.R
 600e2c8aafa6286c3f449f06466b5cf6 *R/tam_pv_mcmc_evaluate_likelihood.R
 571165f8d7498ebce28c52e60f43cb23 *R/tam_pv_mcmc_inits_MH_sampling_objects.R
@@ -255,7 +256,7 @@ fdb30124f01408c857a769ab3da9332f *R/tam_pv_mcmc_sample_beta_variance.R
 739a91ea68a3e396f45bafb0ba1ceff3 *R/tam_pv_mcmc_update_plausible_values.R
 4514927efe9c86be245cc36de01cf03c *R/tam_pv_recommend_tam_pv_mcmc.R
 235fc3395a74537231c131da0804853a *R/tam_pv_sampling_beta.R
-c9ab94c1b4e51216b937afc7d73f5534 *R/tam_pv_sampling_theta.R
+a462c104780000bf5da75d893999043d *R/tam_pv_sampling_theta.R
 d3430cd7523895fb1cfb479008f832df *R/tam_rbind_twomatrices.R
 34ac426ce59e1a3311a331bccd538807 *R/tam_remove_missings.R
 f089352a3047fd4cb52acb99eada6268 *R/tam_rowCumsums.R
@@ -339,7 +340,7 @@ ec09f2e0e996bda9a9033473c2bdc136 *data/data.sim.rasch.rda
 b968f7283b53705c09edb59332d279ac *data/data.timssAusTwn.rda
 c57c3f98a88af02b5f25cfc9a2c66470 *data/data.timssAusTwn.scored.rda
 5176fde400413d0a2fca78ae97790878 *inst/CITATION
-2917b0fd837acc4ef505cba683181e27 *inst/NEWS
+7bb11fdb82fb2fbf12c3515874941e6f *inst/NEWS
 990d8392a8f4f11951caba931f6388da *man/DescribeBy.Rd
 9819b76c467ea3f9c3919fcb2c91c2a0 *man/IRT.WrightMap.Rd
 939f658c4803016dfb01be56101e5576 *man/IRT.data.tam.Rd
@@ -396,7 +397,7 @@ e05e70c13711e1fd5c6631c7cc24f3ad *man/tam.mml.3pl.Rd
 da0c6c7667fc7d7d6f8590caf1bf4fb5 *man/tam.pv.Rd
 29d320fc7594de6c6e31bb855deaf90c *man/tam.se.Rd
 68b5b085907697044a2bd5972bc1937b *man/tam.threshold.Rd
-3b5472f5956eef38bfe3a6510139c227 *man/tam.wle.Rd
+9f81b551acc644fc6044a95675c69ab9 *man/tam.wle.Rd
 5c71c80a1b0053869ad02c84788581b8 *man/tam_NA_pattern.Rd
 cc492628fc560c9c3a83fd381cc3704a *man/tam_irf_3pl.Rd
 7ae2e1c578dfc148e1a4322622771931 *man/tamaan.Rd
@@ -405,8 +406,8 @@ fb654e262b38f2b95b3f5fde8109eda9 *man/tampv2datalist.Rd
 23ce79647b9c4ea578a0f904c150715a *man/weighted_Stats.Rd
 489b262d4f81136a32f0bb09936fe53e *src/Makevars
 a73031cbe7d6aaf0bd22e20f6526977d *src/Makevars.win
-25ac063b640615ac5c565fac2fb5c4b5 *src/RcppExports.cpp
-39adc2ad7be02bd629586d1d5da71251 *src/init.c
+efbabf97600ba6f0da2745318c20c4a7 *src/RcppExports.cpp
+0999159ab74f0af1d42442d14a3f1dff *src/init.c
 c301b55aed19b5a29ee3bda7270e3f03 *src/irt_likelihood_cfa2.cpp
 8bfbfb3f3dfb9ab67176cda880e0cab6 *src/msq_itemfit.cpp
 a78635aee2ea76593f5fa6ad72d8040f *src/prior_normal_density_c.cpp
@@ -420,4 +421,5 @@ b463ae8c941ca53a37f0fe65a80687e9 *src/tam_ctt_c.cpp
 8bdbaeff18ad4bb41bf5812fdadce113 *src/tam_mml_mfr_helper.cpp
 63ae16eb3c8524d2a7435b097c728532 *src/tam_modelfit_aux.cpp
 eda5fd58840131e0077b511183577829 *src/tam_pv_mcmc.cpp
+6e81e6a0aee07fa7f5056e167e304170 *src/tam_pv_multivariate_normal_approximation.cpp
 68fcdd1118b2d222d5d853eef07a2cb9 *src/tamwle_helper_ccode.cpp

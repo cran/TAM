@@ -39,6 +39,28 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
+-------------------------------------------------------------
+VERSIONS TAM 2.4  |  2017-06-30  |  Last: TAM 2.4-9
+-------------------------------------------------------------
+
+FEATURES:
+* included multidimensional plausible value imputation with
+  multivariate normal approximation of the posterior distribution
+ 
+BUG FIXES:
+* fixed a recently introduced in 'tam.wle' since TAM 2.2
+  (thanks to Mark Dulherty). The function 'tam.mml.wle' is not
+  exported anymore.
+
+NOTES:
+* ---
+
+DATASETS INCLUDED OR MODIFIED:
+* ---
+
+EXAMPLES INCLUDED OR MODIFIED:
+* ---
+
 
 -------------------------------------------------------------
 VERSIONS TAM 2.3  |  2017-06-25  |  Last: TAM 2.3-18
@@ -61,7 +83,6 @@ DATASETS INCLUDED OR MODIFIED:
 
 EXAMPLES INCLUDED OR MODIFIED:
 * IRT.frequencies (1), tam.linking (3)
-
 
 -------------------------------------------------------------
 VERSIONS TAM 2.2  |  2017-06-17  |  Last: TAM 2.2-49
