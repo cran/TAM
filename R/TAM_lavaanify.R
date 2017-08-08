@@ -2,8 +2,9 @@
 
 
 ###################################################################
-lavaanify.sirt.v1 <- function( lavmodel ){
- z0 <- Sys.time()
+TAM_lavaanify <- function( lavmodel )
+{
+	require_namespace_msg("lavaan")
 	syn <- lavmodel
 	syn <- strsplit( syn , " " )[[1]]
 	syn <- syn[ syn != "" ]
@@ -43,23 +44,15 @@ lavaanify.sirt.v1 <- function( lavmodel ){
 	
 	lavpartable1 <- lavaan::lavaanify( as.character(lavmodel1 ) , warn = FALSE , debug=FALSE ,
 						fixed.x=FALSE)
-						
-    # lavpartable1 <- lavaanify_in_sirt( as.character(lavmodel1 ) , warn = FALSE , debug=FALSE )	
 	res1 <- change.grep.lavpartable( lavpartable1 )
 		
-# cat("**** change grep") ; z1 <- Sys.time(); print(z1-z0) ; z0 <- z1		
 	# create a new model syntax here!!!
     if ( res1$changed ){
-	   syn0 <- lavpartable2lavsyntax( res1$lavpartable )	   
-	   
-# cat("**** lavpartable2lavsyntax") ; z1 <- Sys.time(); print(z1-z0) ; z0 <- z1			   
-	   lavpartable1 <- lavaan::lavaanify( as.character( syn0 ) , warn = FALSE , debug=FALSE ,
+		syn0 <- lavpartable2lavsyntax( res1$lavpartable )	   	   
+		lavpartable1 <- lavaan::lavaanify( as.character( syn0 ) , warn = FALSE , debug=FALSE ,
 						    fixed.x = FALSE)
- 
-#  cat("**** lavaanify changed sirt.v1") ; z1 <- Sys.time(); print(z1-z0) ; z0 <- z1		   
-						}
+	}
 	
-
 	# create lavaan parameter table for guessing/slipping parameters
 	dfr2 <- dfr1[ dfr1$guess_slip == 1 , ]
 	ug <- unique( dfr2$eqind)
@@ -87,16 +80,11 @@ lavaanify.sirt.v1 <- function( lavmodel ){
 		h0 <- h1
 		h1$free <- h1$free + max(lavpartable1$free)
 		h1$free[ h0$free == 0 ] <- 0
-#		h1$eq.id <- h1$eq.id + max(lavpartable1$eq.id)
-#		h1$eq.id[ h0$eq.id == 0 ] <- 0
-#		h1$unco <- h1$unco + max(lavpartable1$unco)
-#		h1$unco[ h0$unco == 0 ] <- 0
 		h1$id <- h1$id + max(lavpartable1$id)	
 		lavpartable1 <- rbind( lavpartable1 , h1 )
-				}	
+	}	
 					
-#cat("**** guess / slip") ; z1 <- Sys.time(); print(z1-z0) ; z0 <- z1	
 	res <- list("lavpartable" = lavpartable1 , "lavaan.syntax"=syn0 )			
 	return(res)	
-			}
+}
 ##################################################################			

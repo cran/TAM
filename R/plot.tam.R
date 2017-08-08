@@ -7,22 +7,25 @@ plot.tam <- function(x, items=1:x$nitems, type="expected" ,
                      export.args=list(), observed=TRUE, overlay=FALSE , 
                      ask=FALSE, package="lattice" , 
 					 fix.devices=FALSE , ...) {
-#  requireNamespace("plyr")
+	if ( package=="lattice"){
+		require_namespace_msg("lattice")
+	}
+
 time1 <- NULL
 if ( fix.devices ){
-  old.opt.dev <- getOption("device")
-  old.opt.err <- c( getOption("show.error.messages"))
-  old.par.ask <- graphics::par("ask")
-  # remember new pars' values
-  old.par.xpd <- graphics::par("xpd")
-  old.par.mar <- graphics::par("mar")
+	old.opt.dev <- getOption("device")
+	old.opt.err <- c( getOption("show.error.messages"))
+	old.par.ask <- graphics::par("ask")
+	# remember new pars' values
+	old.par.xpd <- graphics::par("xpd")
+	old.par.mar <- graphics::par("mar")
   
-  on.exit( options("device"=old.opt.dev))
-  on.exit( options("show.error.messages"=old.opt.err), add=TRUE)
-  on.exit( graphics::par("ask"=old.par.ask), add=TRUE)
-  # restore new pars' values
-  on.exit( graphics::par("xpd"=old.par.xpd), add=TRUE)
-  on.exit( graphics::par("mar"=old.par.mar), add=TRUE)
+	on.exit( options("device"=old.opt.dev))
+	on.exit( options("show.error.messages"=old.opt.err), add=TRUE)
+	on.exit( graphics::par("ask"=old.par.ask), add=TRUE)
+	# restore new pars' values
+	on.exit( graphics::par("xpd"=old.par.xpd), add=TRUE)
+	on.exit( graphics::par("mar"=old.par.mar), add=TRUE)
 }  
   
   tamobj <- x
@@ -96,8 +99,11 @@ if ( fix.devices ){
     d2 <- d1[-1]
     obScore <- apply(d2,2, function(x) stats::aggregate(x, list(groupnumber), mean, na.rm=TRUE))
   }
+  
+  #----------------------------------------------------
   # adds observed score for type="items"
   if (type == "items") {
+  	require_namespace_msg("plyr")
     if (is.null(wle)) {
       if (tammodel == "mml") {
         wleobj <- tam.wle(tamobj)
@@ -145,7 +151,6 @@ if ( fix.devices ){
       if (i==1 || !overlay) {
         ylim2 <- c(0,max( tamobj$resp[,i] , na.rm=TRUE ) )
         graphics::plot(theta, expScore[,i], ,col=12, type="l", lwd=3, las=1, ylab="Score", xlab="Ability",
-             #         main=paste("Expected Scores Curve - Item ", i)
              main=paste("Expected Scores Curve - Item ", colnames(tamobj$resp)[i] )	 ,
              ylim=ylim2 , ...
         )

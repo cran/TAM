@@ -1,8 +1,8 @@
 Package: TAM
 Type: Package
 Title: Test Analysis Modules
-Version: 2.4-9
-Date: 2017-06-30 10:02:25
+Version: 2.5-14
+Date: 2017-08-08 15:00:55
 Author: 
     Alexander Robitzsch [aut, cre], Thomas Kiefer [aut], Margaret Wu [aut]
 Maintainer: Alexander Robitzsch <robitzsch@ipn.uni-kiel.de>
@@ -16,16 +16,16 @@ Description:
     from the Rasch family. 
     Latent regression models and plausible value imputation are 
     also supported.
-Depends: R (>= 2.15.1), CDM (>= 5.7-3)
-Imports: coda, GPArotation, graphics, grDevices, lavaan, lattice, MASS,
-        methods, mvtnorm, plyr, psych, Rcpp, sfsmisc, stats, utils,
-        WrightMap
-Suggests: miceadds, sirt
+Depends: R (>= 2.15.1), CDM (>= 5.8-5)
+Imports: coda, graphics, grDevices, methods, mvtnorm, Rcpp, sfsmisc,
+        stats, utils
+Suggests: GPArotation, lattice, lavaan, LSAmitR, miceadds, plyr, psych,
+        sirt, WrightMap
 LinkingTo: Rcpp, RcppArmadillo
 License: GPL (>= 2)
 URL: http://www.edmeasurementsurveys.com/TAM/Tutorials/,
         https://github.com/alexanderrobitzsch/TAM
 NeedsCompilation: yes
-Packaged: 2017-06-30 08:03:04 UTC; sunpn563
+Packaged: 2017-08-08 13:01:39 UTC; sunpn563
 Repository: CRAN
-Date/Publication: 2017-06-30 22:19:50 UTC
+Date/Publication: 2017-08-08 15:55:30 UTC
