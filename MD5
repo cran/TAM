@@ -1,4 +1,4 @@
-3aee6574c0e4fedf75fb120f44bfa091 *DESCRIPTION
+8b9e0ce21f300aa437fc3eca934e4367 *DESCRIPTION
 0087d0b1dc10532d515eceec9fad9433 *NAMESPACE
 b1d98dfe664447ad2990ffbe8dab627f *R/DescribeBy.R
 73ed0cc2ebd0d5f2ea1910142afcede0 *R/EAPrel.R
@@ -343,7 +343,7 @@ b968f7283b53705c09edb59332d279ac *data/data.timssAusTwn.rda
 c57c3f98a88af02b5f25cfc9a2c66470 *data/data.timssAusTwn.scored.rda
 1455f66955acfc6db2438810970a4e1a *data/datalist
 5176fde400413d0a2fca78ae97790878 *inst/CITATION
-96b7798dd1898b6c5ea9d08cf51027de *inst/NEWS
+59baf4d3d5a29aa1557be472c8a017ad *inst/NEWS
 990d8392a8f4f11951caba931f6388da *man/DescribeBy.Rd
 9819b76c467ea3f9c3919fcb2c91c2a0 *man/IRT.WrightMap.Rd
 939f658c4803016dfb01be56101e5576 *man/IRT.data.tam.Rd
@@ -392,7 +392,7 @@ b0096d3a44ddc795218a9be0757a1a3e *man/tam.ctt.Rd
 4295aa3c81d67070a36a43926d59275e *man/tam.fa.Rd
 9211ceea2d369f1744d5a6ce978c179a *man/tam.fit.Rd
 cb75d2bd935d3cd0ace1d7e0d92dea7a *man/tam.jml.Rd
-583ff2d5c20f8e790ac9a50cfad02d83 *man/tam.latreg.Rd
+26e6f3aa488cc5309bac269253a902b8 *man/tam.latreg.Rd
 93e25546176ac6928ec43d66f106d60d *man/tam.linking.Rd
 e05e70c13711e1fd5c6631c7cc24f3ad *man/tam.mml.3pl.Rd
 6a71980c69708611b8347cd61a89b6d7 *man/tam.mml.Rd
