@@ -1,20 +1,12 @@
-################################################################
-################################################################
-################################################################
-tam.mml.wle2 <-
-  function( tamobj, score.resp=NULL , WLE=TRUE , adj=.3 , Msteps=20 , 
-            convM = .0001 , progress=TRUE , output.prob=FALSE ){
-    #########################################################
-    # INPUT:
-    # tamobj ... result from tam analysis
-    # (WLE = TRUE) will produce WLE. Otherwise it will be MLE
-    # 
-    #########################################################
-    #  adj <- 0.3
-    #  Msteps <- 20
-    #  convM <- .0001
-	CALL <- match.call()
+## File Name: tam.mml.wle2.R
+## File Version: 0.44
+## File Last Change: 2017-09-19 16:06:11
 
+################################################################
+tam.mml.wle2 <- function( tamobj, score.resp=NULL , WLE=TRUE , adj=.3 , Msteps=20 , 
+            convM = .0001 , progress=TRUE , output.prob=FALSE, pid = NULL )
+{
+	CALL <- match.call()
 	#--- process input data
 	res <- tam_mml_wle_proc_input_data( tamobj=tamobj, score.resp=score.resp ) 
 	AXsi <- res$AXsi
@@ -26,7 +18,13 @@ tam.mml.wle2 <-
 	ndim <- res$ndim
 	maxK <- res$maxK
 	pweights <- res$pweights
-	pid <- res$pid
+	if ( is.null(pid)){
+		pid <- res$pid
+		if ( ! is.null(score.resp)){
+			pid <- rep(NA, nrow(score.resp) )
+		}
+	}
+	
 	A <- res$A
 	xsi <- res$xsi
 
@@ -44,7 +42,7 @@ tam.mml.wle2 <-
     PersonScores <- cResp %*% cB
     
     #Compute possible maximum score for each item on each dimension
-    maxBi <- apply(B , 3 , rowMaxs , na.rm = TRUE)
+    maxBi <- apply(B , 3 , tam_rowMaxs , na.rm = TRUE)
     
     #Compute possible maximum score for each person on each dimension
     PersonMax <- resp.ind %*% maxBi
@@ -172,11 +170,10 @@ tam.mml.wle2 <-
 					}
     }  # end of Newton-Raphson
 
-
 	res <- tam_mml_wle_postproc( ndim=ndim, err_inv=err_inv, theta=theta, pid=pid, 
 				resp.ind=resp.ind, PersonScores=PersonScores, PersonMax=PersonMax, 
 				adj=adj, WLE=WLE, rprobsWLE=rprobsWLE, output.prob=output.prob, progress=progress, 
-				pweights=pweights, CALL=CALL, B=B )
+				pweights=pweights, CALL=CALL, B=B, score.resp=score.resp )
 	
     #  res <- list( "PersonScores" = PersonScores, "PersonMax" = PersonMax, "theta" = theta , "error" =  error )
     return(res)

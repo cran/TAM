@@ -1,7 +1,16 @@
+## File Name: EAPrel.R
+## File Version: 9.04
+## File Last Change: 2017-10-09 10:25:13
 
 #######################################################	
-EAPrel <- function( theta , error , w = rep(1,length(theta) ))
+EAPrel <- function( theta , error , w = rep(1,length(theta) ), select=NULL )
 {
+	#--- select cases
+	if ( ! is.null(select) ){
+		theta <- theta[ select ]
+		error <- error[ select ]
+		w <- w[ select ]
+	}
 	res <- WLErel_exclude_missings(theta=theta, error=error, w=w)
 	theta <- res$theta
 	error <- res$error

@@ -1,3 +1,6 @@
+## File Name: tam_pv_mcmc_proc_input.R
+## File Version: 0.09
+## File Last Change: 2017-08-17 17:23:17
 
 tam_pv_mcmc_proc_input <- function( tamobj, group, Y )
 {
@@ -10,6 +13,7 @@ tam_pv_mcmc_proc_input <- function( tamobj, group, Y )
 	#** extract some elements
 	person <- tamobj$person
 	AXsi <- tamobj$AXsi
+	AXsi[ is.na(AXsi ) ] <- -99	
 	B <- tamobj$B
 	guess <- tamobj$guess
 	resp <- tamobj$resp
@@ -59,6 +63,9 @@ tam_pv_mcmc_proc_input <- function( tamobj, group, Y )
 	dfr <- data.frame("start"=c(1 , c2[-G] + 1 ), "end" = c2 )
 	attr(group_index,"N_groups_cumsum") <- dfr
 
+	if ( is.null(Y) ){
+		Y <- matrix(1 , nrow=nstud, ncol=1)
+	}	
 	Y <- as.matrix(Y)
 	
 	#--- OUTPUT

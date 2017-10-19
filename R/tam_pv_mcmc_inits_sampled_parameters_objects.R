@@ -1,3 +1,6 @@
+## File Name: tam_pv_mcmc_inits_sampled_parameters_objects.R
+## File Version: 0.09
+## File Last Change: 2017-08-15 15:17:06
 
 tam_pv_mcmc_inits_sampled_parameters_objects <- function( n.burnin, n.iter,
 	beta , variance , G, Y, beta_groups)
@@ -43,11 +46,11 @@ tam_pv_mcmc_inits_sampled_parameters_objects <- function( n.burnin, n.iter,
 		v1[[gg]] <- ( gg-1)*ND + 1:ND
 	}
 	attr(variance_samples,"variance_index") <- v1
-	attr(variance_samples,"variance_select") <- ! lower.tri( variance[[gg]] )
+	attr(variance_samples,"variance_select") <- ! upper.tri( variance[[gg]] )
 	v0 <- NULL
 	for (dd in 1:D){
 		for (ee in dd:D){
-			v0 <- c( v0 , paste0("Sigma[" , dd, "," , ee, "]") )
+			v0 <- c( v0 , paste0("Sigma[" , ee, "," , dd, "]") )
 		}
 	}
 	v1 <- v0

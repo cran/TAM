@@ -1,3 +1,6 @@
+## File Name: tam_jml_version2.R
+## File Version: 9.37
+## File Last Change: 2017-09-15 17:32:16
 
 ##################################################################
 ##################################################################
@@ -139,7 +142,7 @@ tam_jml_version2 <-
 	ItemScore <- crossprod(cResp %*% cA , pweights )
     
     # Computer possible maximum parameter score for each person
-    maxAi <-  - (apply(-(A) , 3 , rowMaxs , na.rm=TRUE))  
+    maxAi <-  - (apply(-(A) , 3 , tam_rowMaxs , na.rm=TRUE))  
     personMaxA <- resp.ind %*% maxAi
     # ItemMax <- personMaxA %t*% pweights
 	ItemMax <- crossprod( personMaxA , pweights )

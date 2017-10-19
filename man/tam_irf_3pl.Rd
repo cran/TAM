@@ -1,3 +1,7 @@
+%% File Name: tam_irf_3pl.Rd
+%% File Version: 0.11
+%% File Last Change: 2017-08-16 18:16:37
+
 \name{tam_irf_3pl}
 \alias{tam_irf_3pl}
 %- Also NEED an '\alias' for EACH other topic documented here.
@@ -12,7 +16,7 @@ package.
 }
 
 \usage{
-tam_irf_3pl(theta, AXsi, B, guess=NULL)
+tam_irf_3pl(theta, AXsi, B, guess=NULL, subtract_max=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -22,6 +26,8 @@ Matrix or vector of \eqn{\bold{\theta}} values
 \item{AXsi}{Matrix of item-category parameters}
 \item{B}{Array containing item-category loadings} 
 \item{guess}{Optional parameter of guessing parameters}
+\item{subtract_max}{Logical indicating whether numerical underflow in 
+probabilities should be explicitly avoided}
 }
 
 

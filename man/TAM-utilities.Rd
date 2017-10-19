@@ -1,3 +1,7 @@
+%% File Name: TAM-utilities.Rd
+%% File Version: 0.53
+%% File Last Change: 2017-09-19 14:27:08
+
 \name{TAM-utilities}
 \alias{TAM-utilities}
 \alias{tam_packageinfo}
@@ -19,6 +23,16 @@
 \alias{tam_AXsi_fit}
 \alias{require_namespace_msg}
 \alias{tam_dmvnorm}
+\alias{add.lead}
+\alias{tam_bayesian_bootstrap}
+\alias{tam_cov_wt}
+\alias{tam_cor_wt}
+\alias{tam_round_data_frame}
+\alias{tam_round_data_frame_print}
+\alias{tam_osink}
+\alias{tam_csink}
+\alias{tam_ginv}
+
 
 \title{Utility Functions in \pkg{TAM}}
 
@@ -37,7 +51,17 @@ tam_rsessinfo()
 tam_args_CALL_search(args_CALL, variable, default_value)
 ## requireNamespace with message of needed installation
 require_namespace_msg(pkg)
-
+## add leading zeroes
+add.lead(x, width=max(nchar(x)))
+## round some columns in a data frame
+tam_round_data_frame(obji, from=1, to=ncol(obji), digits=3, rownames_null=FALSE)
+## round some columns in a data frame and print this data frame
+tam_round_data_frame_print(obji, from=1, to=ncol(obji), digits=3, rownames_null=FALSE)
+## copy of CDM::osink
+tam_osink(file, suffix="__SUMMARY.Rout")                          
+## copy of CDM::csink
+tam_csink(file)                          
+                          
 ## base::matrix function with argument value byrow=TRUE
 tam_matrix2(x, nrow=NULL, ncol=NULL)
 ## more efficient base::outer functions for operations "*", "+" and "-"
@@ -54,6 +78,14 @@ tam_interval_index(matr, rn)
 tam_rowCumsums(matr)
 ## extension of mvtnorm::dmvnorm to matrix entries of mean
 tam_dmvnorm(x, mean, sigma, log = FALSE )
+## Bayesian bootstrap in TAM (used in tam.pv.mcmc)
+tam_bayesian_bootstrap(N, sample_integers=FALSE, do_boot=TRUE)
+## weighted covariance matrix
+tam_cov_wt(x, wt=NULL, method="ML")
+## weighted correlation matrix
+tam_cor_wt(x, wt=NULL, method="ML")
+## generalized inverse
+tam_ginv(x, eps=.05)
 
 ## remove items or persons with complete missing entries
 tam_remove_missings( dat, items, elim_items=TRUE, elim_persons=TRUE )
@@ -79,6 +111,14 @@ tam_assign_list_elements(x, envir)
 \item{default_value}{Default value of a variable}
 \item{pkg}{String}
 \item{x}{Vector or matrix or list}
+\item{width}{Number of zeroes before decimal}
+\item{obji}{Data frame or vector}
+\item{from}{Integer}
+\item{to}{Integer}
+\item{digits}{Integer}
+\item{rownames_null}{Logical}
+\item{file}{File name}
+\item{suffix}{Suffix for file name of summary output}
 \item{nrow}{Number of rows}
 \item{ncol}{Number of columns}
 \item{y}{Vector}
@@ -90,6 +130,12 @@ vector or matrix}
 \item{matr}{Matrix}
 \item{sigma}{Matrix}
 \item{log}{Logical}
+\item{N}{Integer}
+\item{sample_integers}{Logical indicating whether weights for complete cases
+should be sampled in bootstrap}
+\item{do_boot}{Logical}
+\item{wt}{Optional vector containing weights}
+\item{method}{Method, see \code{\link[stats:cov.wt]{stats::cov.wt}} }
 \item{rn}{Vector}
 \item{dat}{Data frame}
 \item{items}{Vector}

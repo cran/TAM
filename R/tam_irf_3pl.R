@@ -1,5 +1,8 @@
+## File Name: tam_irf_3pl.R
+## File Version: 0.05
+## File Last Change: 2017-08-16 18:07:25
 
-tam_irf_3pl <- function(theta, AXsi, B, guess=NULL)
+tam_irf_3pl <- function(theta, AXsi, B, guess=NULL, subtract_max=TRUE)
 {	
 	if ( is.vector(theta) ){
 		theta <- matrix( theta , ncol=1 )
@@ -12,7 +15,8 @@ tam_irf_3pl <- function(theta, AXsi, B, guess=NULL)
 	}
 	#--- compute probabilities
 	probs <- tam_mml_3pl_calc_prob(iIndex=1:nitems, A=NULL, AXsi=AXsi, B=B, xsi=NULL, 
-					theta=theta, nnodes=nnodes, maxK=maxK, recalc=FALSE , guess=guess)$rprobs
+					theta=theta, nnodes=nnodes, maxK=maxK, recalc=FALSE , guess=guess,
+					subtract_max=subtract_max)$rprobs
 	probs <- aperm( probs , c(3,1,2) )
 	#--- OUTPUT
 	return(probs)

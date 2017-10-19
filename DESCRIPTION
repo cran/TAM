@@ -1,21 +1,24 @@
 Package: TAM
 Type: Package
 Title: Test Analysis Modules
-Version: 2.6-2
-Date: 2017-08-10 11:07:46
+Version: 2.7-56
+Date: 2017-10-19 18:49:06
 Author: 
     Alexander Robitzsch [aut, cre], Thomas Kiefer [aut], Margaret Wu [aut]
 Maintainer: Alexander Robitzsch <robitzsch@ipn.uni-kiel.de>
 Description: 
-    Includes marginal maximum likelihood estimation of uni- and 
-    multidimensional item response models (Rasch, 2PL, 3PL, 
-    Generalized Partial Credit, Multi Facets,
-    Nominal Item Response, Structured Latent Class Analysis,
-    Mixture Distribution IRT Models, Located Latent Class Models)
-    and joint maximum likelihood estimation for models
-    from the Rasch family. 
-    Latent regression models and plausible value imputation are 
-    also supported.
+    Includes marginal maximum likelihood estimation and joint maximum
+    likelihood estimation for unidimensional and multidimensional 
+    item response models. The package functionality covers the 
+    Rasch model, 2PL model, 3PL model, generalized partial credit model, 
+    multi-faceted Rasch model, nominal item response model, 
+    structured latent class model, mixture distribution IRT models, 
+    and located latent class models. Latent regression models and 
+    plausible value imputation are also supported. For details see
+    Adams, Wilson, and Wang, 1997, <doi:10.1177/0146621697211001>,
+    Adams, Wilson, and Wu, 1997, <doi:10.3102/10769986022001047>,
+    Formann, 1982, <doi:10.1002/bimj.4710240209>,
+    Formann, 1992, <doi:10.1080/01621459.1992.10475229>.
 Depends: R (>= 2.15.1), CDM (>= 5.8-5)
 Imports: coda, graphics, grDevices, methods, mvtnorm, Rcpp, sfsmisc,
         stats, utils
@@ -26,6 +29,6 @@ License: GPL (>= 2)
 URL: http://www.edmeasurementsurveys.com/TAM/Tutorials/,
         https://github.com/alexanderrobitzsch/TAM
 NeedsCompilation: yes
-Packaged: 2017-08-10 09:08:36 UTC; sunpn563
+Packaged: 2017-10-19 16:50:23 UTC; sunpn563
 Repository: CRAN
-Date/Publication: 2017-08-13 05:32:25 UTC
+Date/Publication: 2017-10-19 19:53:16 UTC
