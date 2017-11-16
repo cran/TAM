@@ -1,6 +1,5 @@
 ## File Name: tam.mml.3pl.R
-## File Version: 9.791
-## File Last Change: 2017-09-14 19:41:39
+## File Version: 9.823
 tam.mml.3pl <- function( resp , Y=NULL , group = NULL ,  
             formulaY = NULL , dataY = NULL , 
             ndim = 1 , pid = NULL ,
@@ -102,7 +101,11 @@ tam.mml.3pl <- function( resp , Y=NULL , group = NULL ,
       cat(disp)	
       cat("Processing Data     ", paste(Sys.time()) , "\n") ; flush.console()
     }     
-    if ( ! is.null(group) ){ 
+	
+	#-- activate stochastic/QMC integration in case of multiple groups
+	#-- if requested
+    # if ( ! is.null(group) ){
+	if (FALSE){
       con1a$QMC <- QMC <- FALSE
       con1a$snodes <- snodes <- 0
     }   
@@ -169,7 +172,7 @@ tam.mml.3pl <- function( resp , Y=NULL , group = NULL ,
 	#--- print information about nodes
 	res <- tam_mml_progress_proc_nodes( progress=progress, snodes=snodes, nnodes=nnodes, 
 					skillspace= skillspace, QMC=QMC )  		
-    
+					
     # maximum no. of categories per item. Assuming dichotomous
     maxK <- max( resp , na.rm=TRUE ) + 1 
 	  
@@ -275,7 +278,7 @@ tam.mml.3pl <- function( resp , Y=NULL , group = NULL ,
     xsi.min.deviance <- xsi
     beta.min.deviance <- beta
     variance.min.deviance <- variance
-	
+
 	#--- create grid of nodes for numeric or stochastic integration	
 	res <- tam_mml_create_nodes( snodes=snodes, nodes=nodes, ndim=ndim, QMC=QMC,
 				skillspace=skillspace, theta.k=theta.k) 
@@ -286,6 +289,7 @@ tam.mml.3pl <- function( resp , Y=NULL , group = NULL ,
 	thetasamp.density <- res$thetasamp.density
 	nnodes <- res$nnodes	
 	snodes <- res$snodes
+	ntheta <- res$ntheta
     deviance <- 0  
 	deviance.history <- tam_deviance_history_init(maxiter=maxiter)
 	
@@ -295,12 +299,12 @@ tam.mml.3pl <- function( resp , Y=NULL , group = NULL ,
     # a4 <- 999   
     basispar <- NULL
     #		} else{  a4 <- 0 }
-        
+	
 	#*************************
 	# skill space
-	if ( ! is.null(theta ) ){ 
-			ntheta <- nrow(theta)
-	} 															
+	if ( ! is.null(theta) ){ 
+		ntheta <- nrow(theta)
+	} 				
 	fulldesign <- FALSE
 	if ( skillspace != "normal" ){	    
 		gwt <- hwt <- matrix( 1/ntheta , nrow=nstud , ncol=ntheta)				 						
@@ -320,17 +324,17 @@ tam.mml.3pl <- function( resp , Y=NULL , group = NULL ,
 		
 		# design matrix		
 		if ( is.null( delta.designmatrix) ){
-		    delta.designmatrix <- diag( ntheta )
+		    delta.designmatrix <- diag(ntheta )
 			fulldesign <- TRUE
 		}
         delta <- matrix( 0 , nrow= ncol(delta.designmatrix) , ncol=G)	
 	}
 	gwt1 <- matrix( 1 , nrow=nstud , ncol=ntheta )	
-
+	
 	#***** inits for delta
 	if ( ! is.null(delta.inits) ){
 		delta <- delta.inits 
-				}
+	}
 	
 	#****** indicator matrices
 	datindw <- list(1:maxK)
@@ -461,7 +465,7 @@ tam.mml.3pl <- function( resp , Y=NULL , group = NULL ,
 	#--- speed gains, further auxiliary objects, 2015-06-26
 	unidim_simplify <- TRUE
 	if (G > 1){ unidim_simplify <- FALSE }
-	if ( YSD){ unidim_simplify <- FALSE }																		
+	if (YSD){ unidim_simplify <- FALSE }																		
 							
 	##############################################################
 	##############################################################
@@ -488,8 +492,8 @@ tam.mml.3pl <- function( resp , Y=NULL , group = NULL ,
 					theta=theta, nnodes=nnodes, maxK=maxK, recalc=TRUE, guess=guess ) 
 		rprobs <- res$rprobs
 		rprobs0 <- res$rprobs0
-		AXsi <- res$AXsi
- 	
+		AXsi <- res$AXsi	
+
 # cat("calc_prob") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
     
 		#***********************************
@@ -690,9 +694,6 @@ tam.mml.3pl <- function( resp , Y=NULL , group = NULL ,
 					
     } # end of EM algorithm loop
     ############################################################################
-    ############################################################################
-    ############################################################################
-# stop("check here")  
 
     xsi.min.deviance -> xsi 
     beta.min.deviance -> beta
@@ -722,7 +723,7 @@ tam.mml.3pl <- function( resp , Y=NULL , group = NULL ,
 				gammaslope.constr.V=gammaslope.constr.V, gammaslope.constr.Npars=gammaslope.constr.Npars,
 				gammaslope.center.index=gammaslope.center.index, gammaslope.prior=gammaslope.prior, 
 				numdiff.parm=5*1E-4 ) 				   
-# cat("q200\n")
+
     #***
     # calculate counts
 	res <- tam_calc_counts( resp=resp, theta=theta, resp.ind=resp.ind, group=group, 
@@ -737,7 +738,6 @@ tam.mml.3pl <- function( resp , Y=NULL , group = NULL ,
     item1 <- tam_mml_3pl_itempartable( resp=resp , maxK=maxK , AXsi=AXsi , 
 					B=B, ndim=ndim, resp.ind=resp.ind, rprobs=rprobs, 
 					n.ik=n.ik, pi.k=pi.k, guess=guess , est.guess=est.guess )
-# cat("q300\n")
 								
 	# distribution moments
 	if ( skillspace != "normal" ){
@@ -768,8 +768,7 @@ tam.mml.3pl <- function( resp , Y=NULL , group = NULL ,
       item2 <- item
       item2[,"est"] <- round( item2[,"est"] , 4 )
       print(item2)
-	  #*****
-	  # skillspace == normal
+	  #**** skillspace == normal
 	  if (skillspace=="normal"){	
 		  cat("...................................\n")
 		  cat("Regression Coefficients\n")
@@ -796,7 +795,7 @@ tam.mml.3pl <- function( resp , Y=NULL , group = NULL ,
                   " with deviance " , round(deviance.history[ devmin , 2 ],3) , sep="") , "\n")
         cat("The corresponding estimates are\n")
         cat("  xsi.min.deviance\n  beta.min.deviance \n  variance.min.deviance\n\n")
-			}
+      }
       cat( "\nStart: " , paste(s1))
       cat( "\nEnd: " , paste(s2),"\n")
       print(s2-s1)

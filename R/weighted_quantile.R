@@ -1,6 +1,5 @@
 ## File Name: weighted_quantile.R
 ## File Version: 9.04
-## File Last Change: 2017-09-19 15:42:44
 
 #####################################################
 # weighted_quantile

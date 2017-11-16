@@ -1,6 +1,5 @@
 ## File Name: summary.msq.itemfitWLE.R
-## File Version: 9.09
-## File Last Change: 2017-09-16 13:43:23
+## File Version: 9.11
 
 ###################################################
 # summary for objects of class msq.itemfitWLE
@@ -11,7 +10,7 @@ summary.msq.itemfitWLE <- function( object , file=NULL, ... ){
 	cat("------------------------------------------------------------\n")
 
 	#- package and R session
-    tam_print_package_rsession(pack="TAM")			
+	tam_print_package_rsession(pack="TAM")			
 	#- computation time
 	tam_print_computation_time(object=object)	
 

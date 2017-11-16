@@ -1,6 +1,5 @@
 ## File Name: summary.tamaan.R
 ## File Version: 9.06
-## File Last Change: 2017-09-16 13:22:51
 
 ###############################################
 # summary tamaan

@@ -42,6 +42,41 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 
 -------------------------------------------------------------
+VERSIONS TAM 2.8  |  2017-11-16  |  Last: TAM 2.8-21
+-------------------------------------------------------------
+
+FEATURES:
+* include individual class probabilities as an output value 
+  'ind_classprobs' in 'tamaan' (thanks to Rudolf Debelak)
+ 
+BUG FIXES:
+* fixed a bug in 'tam.mml.3pl' for models with stochastic
+  nodes (thanks to Bodo Eickhorst and Hansjoerg Plieninger)
+* fixed a bug with 'verbose' input of 'T' or 'F'
+  (thanks to Hansjoerg Plieninger)
+* fixed a bug in 'tamaan' with latent classes estimation
+  which was recently introduced due to other bug fixes
+* fixed a problem causing a warning message in multiple
+  group models (thanks to Hon-Jang Yang)
+
+NOTES:
+* added an example ('tam.mml', Example 20, Model 2) for 
+  conversion of design matrices of multidimensional partial 
+  credit models from 'tam.mml' into 'tam.mml.3pl' 
+  (created by Hansjoerg Plieninger)
+* allowed stochastic integration and Quasi Monte Carlo
+  integration for multiple group models in 'tam.mml.3pl'
+  (suggested by Hansjoerg Plieninger)
+
+DATASETS INCLUDED OR MODIFIED:
+* ---
+
+EXAMPLES INCLUDED OR MODIFIED:
+* tam.mml (20.2)
+
+
+
+-------------------------------------------------------------
 VERSIONS TAM 2.7  |  2017-10-19  |  Last: TAM 2.7-56
 -------------------------------------------------------------
 

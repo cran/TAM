@@ -1,6 +1,5 @@
 ## File Name: summary.tam_linking_2studies.R
-## File Version: 0.06
-## File Last Change: 2017-09-16 13:43:58
+## File Version: 0.07
 
 summary.tam_linking_2studies <- function( object , file = NULL , ...)
 {
@@ -10,7 +9,7 @@ summary.tam_linking_2studies <- function( object , file = NULL , ...)
 	cat("------------------------------------------------------------\n")	
 
 	#- package and R session
-    tam_print_package_rsession(pack="TAM")			
+	tam_print_package_rsession(pack="TAM")			
 	
     cat("Linking of Two Studies")
     tam_print_call(object$CALL)	
