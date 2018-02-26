@@ -39,7 +39,35 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
+-------------------------------------------------------------
+VERSIONS TAM 2.9  |  2018-02-26  |  Last: TAM 2.9-35
+-------------------------------------------------------------
 
+NOTE  * columns with NAs are now omitted from tam.ctt() 
+        (thanks to Hiroyuki Yamada)
+NOTE  * compute pseudoinverse matrix of covariates in latent
+        regression model to allow estimation in case of 
+        multicollinearity
+NOTE  * avoided error in tam.pv() when the prior only has zeroes
+        in a row
+NOTE  * included class-specific item averages in summary output
+        of tamaan() function for methods LCA, LOCLCA and OLCA
+NOTE  * compute correct number of parameters with non-identified
+        located latent class models (LOCLCA) in tamaan(). The estimation
+        is conducted without constraints, but one non-identified parameter
+        will be subtracted.
+ADDED * included standardized regression coefficients and explained
+        variance in output for functions tam.mml(), tam.mml.2pl(),
+        tam.mml.mfr() and tam.latreg() with value 'latreg_stand'
+        (suggested by Jana Gross Ophoff)
+NOTE  * renamed tam.mml.se() into tam_mml_se_quick()
+NOTE  * included argument 'item_pars' in tam.se() which indicates whether
+        standard errors should be computed for item parameters
+        (suggested by Karoline Sachse)
+NOTE  * included argument 'stringsAsFactors' in tampv2datalist()
+
+DATA  * included/modified datasets: ---
+EXAMP * included/modified examples: ---
 
 -------------------------------------------------------------
 VERSIONS TAM 2.8  |  2017-11-16  |  Last: TAM 2.8-21
@@ -47,25 +75,25 @@ VERSIONS TAM 2.8  |  2017-11-16  |  Last: TAM 2.8-21
 
 FEATURES:
 * include individual class probabilities as an output value 
-  'ind_classprobs' in 'tamaan' (thanks to Rudolf Debelak)
+  'ind_classprobs' in tamaan() (thanks to Rudolf Debelak)
  
 BUG FIXES:
-* fixed a bug in 'tam.mml.3pl' for models with stochastic
+* fixed a bug in tam.mml.3pl() for models with stochastic
   nodes (thanks to Bodo Eickhorst and Hansjoerg Plieninger)
 * fixed a bug with 'verbose' input of 'T' or 'F'
   (thanks to Hansjoerg Plieninger)
-* fixed a bug in 'tamaan' with latent classes estimation
+* fixed a bug in tamaan() with latent classes estimation
   which was recently introduced due to other bug fixes
 * fixed a problem causing a warning message in multiple
   group models (thanks to Hon-Jang Yang)
 
 NOTES:
-* added an example ('tam.mml', Example 20, Model 2) for 
+* added an example (tam.mml(), Example 20, Model 2) for 
   conversion of design matrices of multidimensional partial 
-  credit models from 'tam.mml' into 'tam.mml.3pl' 
+  credit models from tam.mml() into tam.mml.3pl() 
   (created by Hansjoerg Plieninger)
 * allowed stochastic integration and Quasi Monte Carlo
-  integration for multiple group models in 'tam.mml.3pl'
+  integration for multiple group models in tam.mml.3pl()
   (suggested by Hansjoerg Plieninger)
 
 DATASETS INCLUDED OR MODIFIED:
@@ -74,50 +102,48 @@ DATASETS INCLUDED OR MODIFIED:
 EXAMPLES INCLUDED OR MODIFIED:
 * tam.mml (20.2)
 
-
-
 -------------------------------------------------------------
 VERSIONS TAM 2.7  |  2017-10-19  |  Last: TAM 2.7-56
 -------------------------------------------------------------
 
 FEATURES:
 * included option for providing initial theta values in 
-  'tam.pv.mcmc'
+  tam.pv.mcmc()
  
 BUG FIXES:
-* fixed a bug in 'tam.pv.mcmc' which was recently introduced
+* fixed a bug in tam.pv.mcmc() which was recently introduced
   with an updated version of the CDM package
-* fixed a bug in 'tam.pv.mcmc' which caused a crash when only
+* fixed a bug in tam.pv.mcmc() which caused a crash when only
   one plausible values is requested
-* fixed a bug in output of variance matrices in 'tam.pv.mcmc'
+* fixed a bug in output of variance matrices in tam.pv.mcmc()
 * included residual correlation matrices in output of
-  'tam.pv.mcmc'
-* fixed a bug in 'tam.latreg' caused by subfunction
-  'tam_mml_create_nodes' (thanks to Tom Benton)
-* fixed a bug in 'tamaan' (and 'tam.mml.3pl') caused by
-  'tam_mml_create_nodes' (thanks to Markus Buehner)
-* fixed a bug in 'tam.mml.wle2' when submitting a new dataset
+  tam.pv.mcmc()
+* fixed a bug in tam.latreg() caused by subfunction
+  tam_mml_create_nodes() (thanks to Tom Benton)
+* fixed a bug in tamaan() (and tam.mml.3pl()) caused by
+  tam_mml_create_nodes() (thanks to Markus Buehner)
+* fixed a bug in tam.mml.wle2() when submitting a new dataset
   (thanks to Plamen Mirazchiyski)
 
 NOTES:
 * included residual variances and correlations in summary
-  output of 'tam.pv.mcmc' 
-* added argument 'subtract_max' in 'tam_irf_3pl'
-* calculation of item response probabilities for 'tam.pv.mcmc'
+  output of tam.pv.mcmc()
+* added argument 'subtract_max' in tam_irf_3pl()
+* calculation of item response probabilities for tam.pv.mcmc()
   now takes place in Rcpp, some speed improvement
-* exported utility function 'add.lead', 'tam_bayesian_bootstrap',
-  'tam_cov_wt' and 'tam_cor_wt'
+* exported utility functions add.lead(), tam_bayesian_bootstrap(),
+  tam_cov_wt() and tam_cor_wt()
 * included two options for Bayesian bootstrap (Rubin, 1981) in
-  'tam.pv.mcmc': sampling of case of probabilities and sampling
+  tam.pv.mcmc(): sampling of case of probabilities and sampling
   of cases (which corresponds to sampling of integers)
-* exported utility functions 'tam_round_data_frame',
-  'tam_round_data_frame_print', 'tam_osink', 'tam_csink' and
-  'tam_ginv'
-* included argument 'file' in 'summary.msq.itemfit'
+* exported utility functions tam_round_data_frame(),
+  tam_round_data_frame_print(), tam_osink(), tam_csink() and
+  tam_ginv()
+* included argument 'file' in summary.msq.itemfit()
 * included argument 'select' for weighted statistics (e.g., in
-  'weighted_mean', 'weighted_sd', ...)
-* included argument 'verbose' in 'tam.pv'  
-* included argument 'as_mids' in 'tam.pv' which allows to convert
+  weighted_mean(), weighted_sd(), ...)
+* included argument 'verbose' in tam.pv()
+* included argument 'as_mids' in tam.pv() which allows to convert
   the set of plausible values into an object of class mids for
   analysis in the mice package.
 
@@ -879,7 +905,7 @@ Bug fixes:
 
 Notes:
 * added item types 'PCM(kk)' and 'GPCM(kk)' for smoothing
-  item intercepts in tamaan function
+  item intercepts in tamaan() function
 * included a summary method for 'tam.fit'  
 * included 'MEASERR' convenience method for single indicators
   with measurement errors in 'lavaanify.IRT'

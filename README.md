@@ -19,6 +19,5 @@ The version hosted [here](https://github.com/alexanderrobitzsch/TAM) is the deve
 The GitHub version can be installed using `devtools` as:
 
 ```r
-utils::install.packages("devtools")
 devtools::install_github("alexanderrobitzsch/TAM")
 ```

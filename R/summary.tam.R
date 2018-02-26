@@ -1,11 +1,9 @@
 ## File Name: summary.tam.R
-## File Version: 9.28
-#*******************************************************
-# Summary for tam object                               *
-summary.tam.mml <- summary.tam.2pl <- summary.tam.mfr <- summary.tam <- 
-   summary.tam.latreg <- function( object , file = NULL , ...)
-{
+## File Version: 9.38
 
+#****** summary for tam object                              
+summary.tam <- function( object , file = NULL , ...)
+{
 	tam_osink( file = file)
 						
 	latreg <- FALSE
@@ -16,17 +14,16 @@ summary.tam.mml <- summary.tam.2pl <- summary.tam.mfr <- summary.tam <-
 
 	cat("------------------------------------------------------------\n")
 	
-	#- package and R session
+	#--- package and R session
 	tam_print_package_rsession(pack="TAM")			
-	#- computation time
+	#--- computation time
 	tam_print_computation_time(object=object)
 	
     cat("Multidimensional Item Response Model in TAM \n\n")
-	irtmodel <- object$irtmodel
-	
+	irtmodel <- object$irtmodel	
 	cat("IRT Model" , irtmodel )
 	
-	# print call
+	#--- print call
     tam_print_call(object$CALL)	
 	
 	cat("------------------------------------------------------------\n")
@@ -78,7 +75,7 @@ summary.tam.mml <- summary.tam.2pl <- summary.tam.mfr <- summary.tam <-
 	cat("------------------------------------------------------------\n")
 	cat("Covariances and Variances\n")
 	if ( object$G >1){
-		a1 <- aggregate( object$variance , list( object$group ) , mean )
+		a1 <- stats::aggregate( object$variance , list( object$group ) , mean )
 		object$variance <- a1[,2]
 	}
 	obji <- round( object$variance , 3 )
@@ -98,16 +95,20 @@ summary.tam.mml <- summary.tam.2pl <- summary.tam.mfr <- summary.tam <-
 		names(obji) <- paste0("Group" , object$groups )			
 	}		
 	tam_round_data_frame_print(obji=obji, digits=3)		
-
+				
 	cat("------------------------------------------------------------\n")
     cat("Regression Coefficients\n")
 	tam_round_data_frame_print(obji=object$beta, digits=5)		
-		
+	
+	#--- print standardized regression coefficients
+	summary_tam_print_latreg_stand(object=object, digits_stand=4)
+	
 	if ( ! latreg ){		
 		cat("------------------------------------------------------------\n")		
 		cat("Item Parameters -A*Xsi\n")
 		obji <- object$item
-		tam_round_data_frame_print(obji=obji, from=2, to=ncol(obji), digits=3)		
+		tam_round_data_frame_print(obji=obji, from=2, to=ncol(obji), digits=3, rownames_null=FALSE)	
+		
 		# print xsi parameters if 
 		if( ! is.null( object$formulaA)  ){
 			cat("\nItem Facet Parameters Xsi\n")
@@ -163,3 +164,8 @@ summary.tam.mml <- summary.tam.2pl <- summary.tam.mfr <- summary.tam <-
 	tam_csink(file=file)
 }
 #*******************************************************
+
+summary.tam.mml <- summary.tam
+summary.tam.2pl <- summary.tam
+summary.tam.mfr <- summary.tam
+summary.tam.latreg <- summary.tam

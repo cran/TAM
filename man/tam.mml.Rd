@@ -1,5 +1,5 @@
 %% File Name: tam.mml.Rd
-%% File Version: 2.9821
+%% File Version: 2.9823
 
 \name{tam.mml}
 
@@ -126,7 +126,7 @@ tam.mml.mfr(resp, Y = NULL, group = NULL, irtmodel = "1PL", formulaY = NULL,
 }
   \item{dataY}{
      An optional data frame with possible covariates \eqn{Y} in latent regression.
-     This data frame will be used if an \R formula in \code{formulaY}
+     This data frame is used if an \R formula in \code{formulaY}
      is specified.
 }
   \item{ndim}{
@@ -328,7 +328,7 @@ Object of class \code{tam} or \code{tam.mml} (only for \code{summary.tam}
 functions)
 }
 \item{file}{
-A file name in which the summary output will be written 
+A file name in which the summary output should be written 
 (only for \code{summary.tam} functions)
     }
 \item{\dots}{
@@ -495,6 +495,7 @@ credit model (only applies to \code{tam.mml.2pl} in case of
 \item{ic}{Vector with information criteria}
 \item{deviance.history}{Deviance history in iterations}
 \item{control}{List of control arguments}
+\item{latreg_stand}{List containing standardized regression coefficients}
 \item{\dots}{Further values}
 }
 
