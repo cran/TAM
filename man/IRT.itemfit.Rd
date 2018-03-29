@@ -1,5 +1,5 @@
 %% File Name: IRT.itemfit.Rd
-%% File Version: 0.10
+%% File Version: 0.17
 
 \name{IRT.itemfit.tam}
 
@@ -10,27 +10,28 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 
 \title{
-RMSEA Item Fit Statistics for \pkg{TAM} Objects
+RMSD Item Fit Statistics for \pkg{TAM} Objects
 }
 
 \description{
-Computes the RMSEA item fit statistic for fitted objects in the
+Computes the RMSD item fit statistic (formerly labeled as RMSEA;
+Yamamoto, Khorramdel, & von Davier, 2013) for fitted objects in the
 \pkg{TAM} package, see 
 \code{\link[CDM:IRT.itemfit]{CDM::IRT.itemfit}} and
-\code{\link[CDM:itemfit.rmsea]{CDM::itemfit.rmsea}}.
+\code{\link[CDM:IRT.RMSD]{CDM::IRT.RMSD}}.
 }
 
 
 
 
 \usage{
-\method{IRT.itemfit}{tam.mml}(object, method="rmsea", \dots)
+\method{IRT.itemfit}{tam.mml}(object, method="RMSD", \dots)
 
-\method{IRT.itemfit}{tam.mml.2pl}(object, method="rmsea", \dots)
+\method{IRT.itemfit}{tam.mml.2pl}(object, method="RMSD", \dots)
 
-\method{IRT.itemfit}{tam.mml.mfr}(object, method="rmsea", \dots)
+\method{IRT.itemfit}{tam.mml.mfr}(object, method="RMSD", \dots)
 
-\method{IRT.itemfit}{tam.mml.3pl}(object, method="rmsea", \dots)
+\method{IRT.itemfit}{tam.mml.3pl}(object, method="RMSD", \dots)
 }
 
 
@@ -43,7 +44,8 @@ Object of class \code{tam.mml}, \code{tam.mml.2pl}, \code{tam.mml.mfr}
 or \code{tam.mml.3pl}.
 }
 \item{method}{Requested method for item fit calculation. Currently,
-only the RMSEA fit statistic (\code{\link[CDM:itemfit.rmsea]{CDM::itemfit.rmsea}}) 
+only the RMSD fit statistic (formerly labelled as the RMSEA statistic,
+see \code{\link[CDM:IRT.RMSD]{CDM::IRT.RMSD}}) 
 can be used.
 }
 \item{\dots}{
@@ -68,9 +70,11 @@ Further arguments to be passed.
 
 
 
-%\references{
-%% ~put references to the literature/web site here ~
-%}
+\references{
+Yamamoto, K., Khorramdel, L., & von Davier, M. (2013). Scaling PIAAC cognitive data. 
+In OECD (Eds.). \emph{Technical Report of the Survey of Adults Skills (PIAAC)} (Ch. 17). 
+Paris: OECD. 
+}
 
 
 %\note{		
@@ -80,13 +84,13 @@ Further arguments to be passed.
 
 \seealso{
 \code{\link[CDM:IRT.itemfit]{CDM::IRT.itemfit}}, 
-\code{\link[CDM:itemfit.rmsea]{CDM::itemfit.rmsea}}
+\code{\link[CDM:IRT.RMSD]{CDM::IRT.RMSD}}
 }
 
 \examples{
 \dontrun{
 #############################################################################
-# EXAMPLE 1: RMSEA item fit statistic data.read
+# EXAMPLE 1: RMSD item fit statistic data.read
 #############################################################################
 
 library(sirt)
@@ -105,8 +109,8 @@ summary(mod2)
 fmod1 <- IRT.itemfit(mod1)
 fmod2 <- IRT.itemfit(mod2)
 # summary of fit statistics
-summary( fmod1$rmsea )
-summary( fmod2$rmsea )
+summary( fmod1 )
+summary( fmod2 )
 
 #############################################################################
 # EXAMPLE 2: Simulated 2PL data and fit of 1PL model
@@ -127,7 +131,7 @@ mod <- TAM::tam.mml( dat )
 
 # RMSEA item fit
 fmod <- IRT.itemfit(mod)
-round( fmod$rmsea , 3 )
+round( fmod, 3 )
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
