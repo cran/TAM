@@ -41,6 +41,26 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 
 -------------------------------------------------------------
+VERSIONS TAM 2.11  |  2018-05-02  |  Last: TAM 2.11-9x-93
+-------------------------------------------------------------
+
+FIXED * fixed a bug in tam.pv.mcmc() when almost singular
+        predictor matrices are used (thanks to Florian Keller)
+NOTE  * included argument 'calc_ic' in tam.pv.mcmc()
+NOTE  * included argument 'groups_by_item' in plot.tam()
+        function (thanks to Laura Helbling)
+NOTE  * changed behavior of 'verbose' argument in tam.mml(),
+        tam.mml.2pl(), ... functions when it is called in
+        other functions (thanks to Hansjoerg Plieninger)
+NOTE  * moved some parts of the M-step computations in
+        tam.mml.2pl() and calculation of probabilities to Rcpp
+
+DATA  * included/modified datasets: ---
+EXAMP * included/modified examples: tamaan (3)
+
+
+
+-------------------------------------------------------------
 VERSIONS TAM 2.10  |  2018-03-29  |  Last: TAM 2.10-24
 -------------------------------------------------------------
 
@@ -62,8 +82,6 @@ NOTE  * included ECV statistic in tam.fa() function
 DATA  * included/modified datasets: ---
 EXAMP * included/modified examples: tam.mml (25), tam.jml (1),
         tam.personfit (1)
-
-
 
 -------------------------------------------------------------
 VERSIONS TAM 2.9  |  2018-02-26  |  Last: TAM 2.9-35

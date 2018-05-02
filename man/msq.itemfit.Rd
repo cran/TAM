@@ -1,5 +1,5 @@
 %% File Name: msq.itemfit.Rd
-%% File Version: 0.32
+%% File Version: 0.34
 
 \name{msq.itemfit}
 
@@ -15,10 +15,10 @@ Mean Squared Residual Based Item Fit Statistics (Infit, Outfit)
 
 
 \description{
-The function \code{msq.itemfit} computes computed the outfit and infit statistic 
-for items or item groups. Contrary to \code{\link{tam.fit}}, the function 
+The function \code{msq.itemfit} computes computed the outfit and infit statistic
+for items or item groups. Contrary to \code{\link{tam.fit}}, the function
 \code{msq.itemfit} is not based on simulation from individual posterior distributions
-but rather on evaluating the individual posterior. 
+but rather on evaluating the individual posterior.
 
 The function \code{msq.itemfit} also computes the outfit and infit statistics
 but these are based on weighted likelihood estimates obtained from
@@ -27,7 +27,7 @@ but these are based on weighted likelihood estimates obtained from
 
 
 \usage{
-msq.itemfit( object , fitindices=NULL, version=2 )
+msq.itemfit( object , fitindices=NULL)
 
 \method{summary}{msq.itemfit}(object, file=NULL, ... )
 
@@ -40,13 +40,10 @@ msq.itemfitWLE( tamobj , fitindices=NULL , ... )
 
 \arguments{
   \item{object}{
-Object for which the classes \code{IRT.data}, 
+Object for which the classes \code{IRT.data},
   \code{IRT.posterior} and \code{predict} are defined.}
 \item{fitindices}{Vector with parameter labels defining the item groups for
 which the fit should be evaluated.}
-\item{version}{The \pkg{Rcpp} function used for calculation. \code{version=1}
-provides results compatible with \pkg{TAM} version \eqn{\le}1.99-6.
-A pure \R routine can be requested by \code{version=3}.}
 \item{tamobj}{Object of class \code{tam.mml}, \code{tam.mml.2pl}
   or \code{tam.mml.mfr}.
 }
@@ -61,7 +58,7 @@ A pure \R routine can be requested by \code{version=3}.}
 
 
 \value{
-List with following entries	
+List with following entries
 \item{itemfit}{Data frame with outfit and infit statistics.}
 \item{summary_itemfit}{Summary statistics of outfit
 and infit}
@@ -87,10 +84,10 @@ See also \code{eRm::itemfit} or \code{\link[mirt:itemfit]{mirt::itemfit}}.
 }
 
 
-\examples{	
+\examples{
 #############################################################################
 # EXAMPLE 1: Simulated data Rasch model
-############################################################################# 	
+#############################################################################
 
 #*** simulate data
 library(sirt)
@@ -104,7 +101,7 @@ a[c(1,3)] <- c(.5 , 1.5 )
 # simulate data
 dat <- sirt::sim.raschtype( rnorm(N) , b=b , fixed.a=a )
 #*** estimate Rasch model
-mod1 <- TAM::tam.mml(resp=dat) 
+mod1 <- TAM::tam.mml(resp=dat)
 # compute WLEs
 wmod1 <- TAM::tam.wle(mod1)$theta
 
@@ -150,11 +147,11 @@ summary(fit2)
 # using WLEs
 fit2b <- TAM::msq.itemfitWLE( mod1 , fitindices )
 summary(fit2b)
-}	
+}
 
 #############################################################################
 # EXAMPLE 2: data.read | fit statistics assessed for testlets
-############################################################################# 
+#############################################################################
 
 library(sirt)
 data(data.read,package="sirt")
@@ -184,14 +181,14 @@ summary(res2)
 \dontrun{
 #############################################################################
 # EXAMPLE 3: Fit statistics for rater models
-############################################################################# 
+#############################################################################
 
 library(sirt)
 data(data.ratings2, package="sirt")
 dat <- data.ratings2
 
 # fit rater model "~ item*step + rater"
-mod <- TAM::tam.mml.mfr( resp= dat[ , paste0( "k",1:5) ] , 
+mod <- TAM::tam.mml.mfr( resp= dat[ , paste0( "k",1:5) ] ,
             facets= dat[ , "rater" , drop=FALSE] ,
             pid= dat$pid , formulaA = ~ item*step + rater )
 
@@ -218,7 +215,7 @@ res3a <- TAM::msq.itemfit( mod , rater_parm )
 res3b <- TAM::msq.itemfitWLE( mod , rater_parm )
 summary(res3a)
 summary(res3b)
-}	
+}
 }
 
 

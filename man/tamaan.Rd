@@ -1,5 +1,5 @@
 %% File Name: tamaan.Rd
-%% File Version: 0.45
+%% File Version: 0.47
 
 \name{tamaan}
 \alias{tamaan}
@@ -12,8 +12,8 @@ Wrapper Function for \pkg{TAM} Language
 }
 
 \description{
-This function is a convenience wrapper function for 
-several item response models in \pkg{TAM}. Using the 
+This function is a convenience wrapper function for
+several item response models in \pkg{TAM}. Using the
 \code{\link{tamaanify}} framework, multidimensional item response models,
 latent class models, located and ordered latent class models
 and mixture item response models can be estimated.
@@ -40,11 +40,11 @@ One of the \pkg{TAM} methods \code{tam.mml}, \code{tam.mml.2pl}
 or \code{tam.mml.3pl}.
 }
   \item{control}{
-List with control arguments. See \code{\link{tam.mml}}. 
+List with control arguments. See \code{\link{tam.mml}}.
 }
 \item{doparse}{Optional logical indicating whether \code{lavmodel}
 should be parsed for \code{DO} statements, see \code{\link{doparse}}.
-} 
+}
   \item{\dots}{
 Further arguments to be passed to
 \code{tam.mml}, \code{tam.mml.2pl}
@@ -54,9 +54,9 @@ or \code{tam.mml.3pl}.
 Object of class \code{tamaan}
 }
 \item{file}{
-A file name in which the summary output will be written 
+A file name in which the summary output will be written
     }
-\item{x}{Object of class \code{tamaan}}    
+\item{x}{Object of class \code{tamaan}}
 }
 
 %\details{
@@ -70,12 +70,12 @@ or \code{tam.mml.3pl}. In addition, the list also contains the (optional) entrie
 \item{tamaanify}{Output produced by \code{\link{tamaanify}}}
 \item{lcaprobs}{Matrix with probabilities for latent class models}
 \item{locs}{Matrix with cluster locations (for \code{TYPE="LOCLCA"})
-			}
+            }
 \item{probs_MIXTURE}{Class probabilities (for \code{TYPE="MIXTURE"})}
 \item{moments_MIXTURE}{Distribution parameters (for \code{TYPE="MIXTURE"})}
 \item{itempartable_MIXTURE}{Item parameters (for \code{TYPE="MIXTURE"})}
 \item{ind_classprobs}{Individual posterior probabilities for
-  latent classes (for \code{TYPE="MIXTURE"})}						
+  latent classes (for \code{TYPE="MIXTURE"})}
 }
 
 
@@ -118,14 +118,14 @@ LAVAAN MODEL:
   F1 ~~ F1
 ITEM TYPE:
   ALL(Rasch);
-    " 
-# estimate model  
+    "
+# estimate model
 mod1 <- TAM::tamaan( tammodel , resp=dat)
 summary(mod1)
 
 \dontrun{
 #*********************************************************************
-#*** Model 2: 2PL model with some selected items	
+#*** Model 2: 2PL model with some selected items
 
 tammodel <- "
 LAVAAN MODEL:
@@ -135,8 +135,8 @@ LAVAAN MODEL:
 mod2 <- TAM::tamaan( tammodel , resp=dat)
 summary(mod2)
 
-#*********************************************************************	
-#*** Model 3: Multidimensional IRT model  	
+#*********************************************************************
+#*** Model 3: Multidimensional IRT model
 
 tammodel <- "
 LAVAAN MODEL:
@@ -145,7 +145,7 @@ LAVAAN MODEL:
   F2 =~ C1__C4
   F1 ~~ F2
   # specify fixed entries in covariance matrix
-  F1 ~~ 1*F1  
+  F1 ~~ 1*F1
   F2 ~~ 1*F2
   G  ~~ 0*F1
   G  ~~ 0.3*F2
@@ -155,7 +155,7 @@ mod3 <- TAM::tamaan( tammodel , resp=dat , control=list(maxiter=30))
 summary(mod3)
 
 #*********************************************************************
-#*** Model 4: Some linear constraints for item slopes and intercepts 
+#*** Model 4: Some linear constraints for item slopes and intercepts
 
 tammodel <- "
 LAVAAN MODEL:
@@ -188,7 +188,7 @@ mod4 <- TAM::tamaan( tammodel , resp=dat , control=list(maxiter=5) )
 summary(mod4)
 
 #*********************************************************************
-#*** Model 5: Latent class analysis with three classes  
+#*** Model 5: Latent class analysis with three classes
 
 tammodel <- "
 ANALYSIS:
@@ -197,12 +197,12 @@ ANALYSIS:
   NSTARTS(5,20); # 5 random starts with 20 iterations
 LAVAAN MODEL:
   F =~ A1__C4
-    "    
+    "
 mod5 <- TAM::tamaan( tammodel , resp=dat , control=list(maxiter=100)  )
 summary(mod5)
 
 #*********************************************************************
-#*** Model 6: Ordered latent class analysis with three classes  
+#*** Model 6: Ordered latent class analysis with three classes
 
 tammodel <- "
 ANALYSIS:
@@ -211,8 +211,8 @@ ANALYSIS:
   NSTARTS(20,40); # 20 random starts with 40 iterations
 LAVAAN MODEL:
   F =~ A1__C4
-    "       
-mod6 <- TAM::tamaan( tammodel , dat )  
+    "
+mod6 <- TAM::tamaan( tammodel , dat )
 summary(mod6)
 
 #*********************************************************************
@@ -231,7 +231,7 @@ mod7 <- TAM::tamaan( tammodel , resp=dat)
 summary(mod7)
 
 #*********************************************************************
-#*** Model 8: Two-dimensional located latent class analysis with some 
+#*** Model 8: Two-dimensional located latent class analysis with some
 #             priors and equality constraints among thresholds
 
 tammodel <- "
@@ -270,7 +270,7 @@ LAVAAN MODEL:
   B1 | c*t1
   A2 | .7*t1
     "
-# estimate model    
+# estimate model
 mod9 <- TAM::tamaan( tammodel , resp=dat , control=list(maxiter=30) )
 summary(mod9)
 
@@ -282,7 +282,7 @@ library(CDM)
 data( data.Students , package="CDM")
 dat <- data.Students[,3:13]
   ##   > colnames(dat)
-  ##    [1] "act1" "act2" "act3" "act4" "act5" "sc1"  "sc2"  "sc3"  "sc4"  "mj1"  "mj2" 
+  ##    [1] "act1" "act2" "act3" "act4" "act5" "sc1"  "sc2"  "sc3"  "sc4"  "mj1"  "mj2"
 
 #*********************************************************************
 #*** Model 1: Two-dimensional generalized partial credit model
@@ -295,7 +295,7 @@ LAVAAN MODEL:
   FS ~~ 1*FS
   FA ~~ FS
     "
-# estimate model    
+# estimate model
 mod1 <- TAM::tamaan( tammodel , dat , control=list(maxiter=10)  )
 summary(mod1)
 
@@ -308,9 +308,9 @@ LAVAAN MODEL:
   FS =~ 1*sc1 + sc2__sc4
   FA ~~ FA
   FS ~~ FS
-  FA ~~ FS  
+  FA ~~ FS
   # some equality constraints
-  act1 + act3 | a13_t1 * t1 
+  act1 + act3 | a13_t1 * t1
   act1 + act3 | a13_t2 * t2
     "
 # only create design matrices with tamaanify
@@ -330,9 +330,9 @@ LAVAAN MODEL:
   FA ~~ 1*FA
   FA ~~ FS
   FS ~~ 1*FS
-  act1 + act3 | a13_t1 * t1 
+  act1 + act3 | a13_t1 * t1
   act1 + act3 | a13_t2 * t2
-MODEL CONSTRAINT:  
+MODEL CONSTRAINT:
   a1 == q0
   a2 == q0
   a3 == q0    + q1
@@ -374,10 +374,10 @@ tammodel <- "
       act\% | b\%_2 * t2
     DOEND
   MODEL CONSTRAINT:
-    DO(1,5,1) 
+    DO(1,5,1)
       b\%_1 == delta\% + tau\%_1
       b\%_2 == 2*delta\%
-    DOEND  
+    DOEND
   ITEM TYPE:
     ALL(PCM)
   "
@@ -407,11 +407,11 @@ tammodel <- "
       sc\% | b\%_3 * t3
     DOEND
   MODEL CONSTRAINT:
-    DO(1,4,1) 
+    DO(1,4,1)
       b\%_1 == delta\% + step1
       b\%_2 == 2*delta\% + step1 + step2
-      b\%_3 == 3*delta\%      
-    DOEND  
+      b\%_3 == 3*delta\%
+    DOEND
   ITEM TYPE:
     ALL(PCM)
   "
@@ -437,13 +437,73 @@ ITEM TYPE:
   mj2(PCM,3)
   mj3(PCM)
   mj4(PCM,1)
-   " 
+   "
 # estimate model
 mod7 <- TAM::tamaan( tammodel , dat )
 summary(mod7)
 # -> This function can also be applied for the generalized partial credit
-#    model (GPCM). 
-}	
+#    model (GPCM).
+
+#############################################################################
+# EXAMPLE 3: Rasch model and mixture Rasch model (Geiser & Eid, 2010)
+#############################################################################
+
+data(data.geiser, package="TAM")
+dat <- data.geiser
+
+#*********************************************************************
+#*** Model 1: Rasch model
+tammodel <- "
+LAVAAN MODEL:
+  F =~ mrt1__mrt6
+  F ~~ F
+ITEM TYPE:
+  ALL(Rasch);
+    "
+mod1 <- TAM::tamaan( tammodel , resp=dat  )
+summary(mod1)
+
+#*********************************************************************
+#*** Model 2: Mixed Rasch model with two classes
+tammodel <- "
+ANALYSIS:
+  TYPE=MIXTURE ;
+  NCLASSES(2);
+  NSTARTS(20,25);
+LAVAAN MODEL:
+  F =~ mrt1__mrt6
+  F ~~ F
+ITEM TYPE:
+  ALL(Rasch);
+    "
+mod2 <- TAM::tamaan( tammodel , resp=dat  )
+summary(mod2)
+
+# plot item parameters
+ipars <- mod2$itempartable_MIXTURE[ 1:6 , ]
+plot( 1:6 , ipars[,3] , type="o" , ylim=c(-3,2) , pch=16 ,
+        xlab="Item" , ylab="Item difficulty")
+lines( 1:6 , ipars[,4] , type="l", col=2 , lty=2)
+points( 1:6 , ipars[,4] ,  col=2 , pch=2)
+
+# extract individual posterior distribution
+post2 <- IRT.posterior(mod2)
+str(post2)
+# num [1:519, 1:30] 0.000105 0.000105 0.000105 0.000105 0.000105 ...
+# - attr(*, "theta")= num [1:30, 1:30] 1 0 0 0 0 0 0 0 0 0 ...
+# - attr(*, "prob.theta")= num [1:30, 1] 1.21e-05 2.20e-04 2.29e-03 1.37e-02 4.68e-02 ...
+# - attr(*, "G")= num 1
+
+# There are 2 classes and 15 theta grid points for each class
+# The loadings of the theta grid on items are as follows
+mod2$E[1,2,,"mrt1_F_load_Cl1"]
+mod2$E[1,2,,"mrt1_F_load_Cl2"]
+
+# compute individual posterior probability for class 1 (first 15 columns)
+round( rowSums( post2[ , 1:15] ) , 3 )
+# columns 16 to 30 refer to class 2
+
+}
 }
 
 

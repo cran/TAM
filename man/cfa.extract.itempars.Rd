@@ -1,5 +1,5 @@
 %% File Name: cfa.extract.itempars.Rd
-%% File Version: 0.16
+%% File Version: 0.19
 
 \name{cfa.extract.itempars}
 \alias{cfa.extract.itempars}
@@ -38,7 +38,7 @@ List with following entries
 \item{nu}{Vector of item intercepts}
 \item{psi}{Residual covariance matrix}
 \item{Sigma}{Covariance matrix of latent variables}
-\item{nu}{Vcetor of means of latent variables}
+\item{nu}{Vector of means of latent variables}
 \item{\dots}{Further values}
 }
 
@@ -113,7 +113,7 @@ summary(mod3, standardized=TRUE , rsquare=TRUE )
 res3 <- TAM::cfa.extract.itempars( mod3 )
 
 #*** Model 4: Two-dimensional CFA with scales mj and sc
-dat2 <- dat[ , c(paste0("mj",1:4), paste0("sc",1:4)) ] 
+dat2 <- dat[ , c(paste0("mj",1:4), paste0("sc",1:4)) ]
 # lavaan model with shortage "__" operator
 lavmodel <- "
    mj =~ mj1__mj4
