@@ -1,5 +1,5 @@
 ## File Name: tam_mml_calc_prob.R
-## File Version: 9.385
+## File Version: 9.393
 
 #####################################################################
 # calc_prob: Calculation of probabilities
@@ -18,6 +18,7 @@ tam_mml_calc_prob <- function(iIndex, A, AXsi, B, xsi, theta,
         AXsi <- res$AXsi
     } else {
         #-- Rcpp function
+
         res <- tam_rcpp_calc_prob( A=as.vector(A), dimA=dim(A), xsi=xsi,
                         maxcat=maxcat, AXsi0=AXsi, iIndex=iIndex, theta=theta, B=as.vector(B) )
         LI <- length(iIndex)
@@ -25,7 +26,7 @@ tam_mml_calc_prob <- function(iIndex, A, AXsi, B, xsi, theta,
         AXsi <- res$AXsi
     }
     #---- output
-    res <- list("rprobs" = rprobs, "AXsi" = AXsi)
+    res <- list("rprobs"=rprobs, "AXsi"=AXsi)
     return(res)
 }
 ########################################################################

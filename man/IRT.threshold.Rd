@@ -1,5 +1,5 @@
 %% File Name: IRT.threshold.Rd
-%% File Version: 1.35
+%% File Version: 1.42
 
 \name{IRT.threshold}
 \alias{IRT.threshold}
@@ -29,7 +29,7 @@ on objects of class \code{\link{IRT.threshold}}.
 \usage{
 IRT.threshold(object, prob.lvl=.5, type="category")
 
-\method{print}{IRT.threshold}(x , \dots)
+\method{print}{IRT.threshold}(x, \dots)
 
 IRT.WrightMap(object, \dots)
 
@@ -92,20 +92,20 @@ The \code{IRT.WrightMap} function is based on the
 in the \pkg{\link[WrightMap:WrightMap]{WrightMap}} package.
 }
 
-\note{
-See \url{http://wrightmap.org/post/107431190622/wrightmap-multifaceted-models}
-for creating Wright maps for multi-faceted models.
-}
+%\note{
+%See \url{http://wrightmap.org/post/107431190622/wrightmap-multifaceted-models}
+%for creating Wright maps for multi-faceted models.
+%}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
 See the \code{\link[WrightMap:wrightMap]{WrightMap::wrightMap}} function in
 the \pkg{WrightMap} package.
-
-See \url{http://wrightmap.org/WrightMap} fur tutorials
-of the \pkg{WrightMap} package.
 }
+
+%See \url{http://wrightmap.org/WrightMap} fur tutorials
+%of the \pkg{WrightMap} package.
 
 \examples{
 \dontrun{
@@ -117,13 +117,13 @@ data(data.Students)
 dat <- data.Students
 
 # select part of the dataset
-resp <- dat[ , paste0("sc",1:4) ]
-resp[ paste(resp[,1]) == 3 ,1] <-  2
+resp <- dat[, paste0("sc",1:4) ]
+resp[ paste(resp[,1])==3,1] <-  2
 psych::describe(resp)
 
 # Model 1: Partial credit model in gdm
-theta.k <- seq( -5 , 5 , len=21 )   # discretized ability
-mod1 <- CDM::gdm( dat = resp , irtmodel="1PL" , theta.k=theta.k , skillspace="normal" ,
+theta.k <- seq( -5, 5, len=21 )   # discretized ability
+mod1 <- CDM::gdm( dat=resp, irtmodel="1PL", theta.k=theta.k, skillspace="normal",
               centered.latent=TRUE)
 
 # compute thresholds
@@ -140,9 +140,9 @@ dat <- data.fraction2$data
 Qmatrix <- data.fraction2$q.matrix3
 
 # Model 1: 3-dimensional Rasch Model (normal distribution)
-theta.k <- seq( -4 , 4 , len=11 )   # discretized ability
-mod1 <- CDM::gdm( dat , irtmodel="1PL" , theta.k=theta.k , Qmatrix=Qmatrix ,
-              centered.latent=TRUE , maxiter=10 )
+theta.k <- seq( -4, 4, len=11 )   # discretized ability
+mod1 <- CDM::gdm( dat, irtmodel="1PL", theta.k=theta.k, Qmatrix=Qmatrix,
+              centered.latent=TRUE, maxiter=10 )
 summary(mod1)
 
 # compute thresholds
@@ -155,7 +155,7 @@ print(thresh1)
 
 data(data.timssAusTwn.scored)
 dat <- data.timssAusTwn.scored
-dat <- dat[ , grep("M03" , colnames(dat) ) ]
+dat <- dat[, grep("M03", colnames(dat) ) ]
 summary(dat)
 
 # fit partial credit model
@@ -167,7 +167,7 @@ t1mod
 t2mod <- TAM::IRT.threshold( mod )
 t2mod
 # compute item-wise thresholds
-t3mod <- TAM::IRT.threshold( mod , type="item")
+t3mod <- TAM::IRT.threshold( mod, type="item")
 t3mod
 }
 }

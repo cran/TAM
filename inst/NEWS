@@ -41,7 +41,23 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 
 -------------------------------------------------------------
-VERSIONS TAM 2.11  |  2018-05-02  |  Last: TAM 2.11-9x-93
+VERSIONS TAM 2.12  |  2018-05-25  |  Last: TAM 2.12-18
+-------------------------------------------------------------
+
+ADDED * added "quick" standard error computation method for
+        fitted TAM models of class 'tam.latreg' in tam.se()
+        using helper function tam_latreg_se_quick()
+        (thanks to Yuan-Ling Linda Liaw)
+FIXED * fixed a bug in tam.wle() which was introduced due to
+        changes in TAM 2.11 (thanks to Anna Scharl)
+NOTE  * added utility functions tam_max_abs() and
+        tam_max_abs_list()
+
+DATA  * included/modified datasets: ---
+EXAMP * included/modified examples: ---
+
+-------------------------------------------------------------
+VERSIONS TAM 2.11  |  2018-05-02  |  Last: TAM 2.11-93
 -------------------------------------------------------------
 
 FIXED * fixed a bug in tam.pv.mcmc() when almost singular
@@ -57,8 +73,6 @@ NOTE  * moved some parts of the M-step computations in
 
 DATA  * included/modified datasets: ---
 EXAMP * included/modified examples: tamaan (3)
-
-
 
 -------------------------------------------------------------
 VERSIONS TAM 2.10  |  2018-03-29  |  Last: TAM 2.10-24

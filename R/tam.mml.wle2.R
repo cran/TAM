@@ -1,9 +1,9 @@
 ## File Name: tam.mml.wle2.R
-## File Version: 0.65
+## File Version: 0.842
 
 ################################################################
-tam.mml.wle2 <- function( tamobj, score.resp=NULL , WLE=TRUE , adj=.3 , Msteps=20 ,
-            convM = .0001 , progress=TRUE , output.prob=FALSE, pid = NULL )
+tam.mml.wle2 <- function( tamobj, score.resp=NULL, WLE=TRUE, adj=.3, Msteps=20,
+            convM=.0001, progress=TRUE, output.prob=FALSE, pid=NULL )
 {
     CALL <- match.call()
     #--- process input data
@@ -12,7 +12,7 @@ tam.mml.wle2 <- function( tamobj, score.resp=NULL , WLE=TRUE , adj=.3 , Msteps=2
     B <- res$B
     resp <- res$resp
     resp.ind <- res$resp.ind
-    resp_ind_bool <- resp.ind == 1
+    resp_ind_bool <- resp.ind==1
     nitems <- res$nitems
     nstud <- res$nstud
     ndim <- res$ndim
@@ -33,20 +33,20 @@ tam.mml.wle2 <- function( tamobj, score.resp=NULL , WLE=TRUE , adj=.3 , Msteps=2
         adj <- 0
     }
 
-    col.index <- rep( 1:nitems , each = maxK )
-    cResp <- resp[ , col.index  ]*resp.ind[ , col.index ]
-    cResp <- 1 * t( t(cResp) == rep(0:(maxK-1), nitems) )
-    cB <- t( matrix( aperm( B , c(2,1,3) ) , nrow = dim(B)[3] , byrow = TRUE ) )
+    col.index <- rep( 1:nitems, each=maxK )
+    cResp <- resp[, col.index  ]*resp.ind[, col.index ]
+    cResp <- 1 * t( t(cResp)==rep(0:(maxK-1), nitems) )
+    cB <- t( matrix( aperm( B, c(2,1,3) ), nrow=dim(B)[3], byrow=TRUE ) )
     cB[is.na(cB)] <- 0
     #Compute person sufficient statistics (total score on each dimension)
     PersonScores <- cResp %*% cB
 
     #Compute possible maximum score for each item on each dimension
-    maxBi <- apply(B , 3 , tam_rowMaxs , na.rm = TRUE)
+    maxBi <- apply(B, 3, tam_rowMaxs, na.rm=TRUE)
 
     #Compute possible maximum score for each person on each dimension
     PersonMax <- resp.ind %*% maxBi
-    PersonMax[ PersonMax == 0 ] <- 2 * adj
+    PersonMax[ PersonMax==0 ] <- 2 * adj
 
     #Adjust perfect scores for each person on each dimension
     PersonScores[PersonScores==PersonMax] <- PersonScores[PersonScores==PersonMax] - adj
@@ -84,22 +84,18 @@ tam.mml.wle2 <- function( tamobj, score.resp=NULL , WLE=TRUE , adj=.3 , Msteps=2
     increment <- array(0, dim=c(nstud,ndim))
     old_increment <- 3 + increment
 
-
     # Begin iterations
-    while (!converge & ( Miter <= Msteps ) ) {
-
-        # tam_mml_calc_prob <- function(iIndex, A, AXsi, B, xsi, theta,
-        #           nnodes, maxK, recalc=TRUE)
+    while (!converge & ( Miter <=Msteps ) ) {
 
         resWLE <- tam_mml_calc_prob( iIndex=1:nitems, A=A, AXsi=AXsi, B=B,
-                    xsi=xsi, theta=theta, nnodes=nstud, maxK=maxK, recalc=FALSE )
+                    xsi=xsi, theta=theta, nnodes=nstud, maxK=maxK, recalc=FALSE,
+                    use_rcpp=FALSE, maxcat=max(maxK) )
       rprobsWLE <- resWLE$rprobs
       rprobsWLEL <- matrix(rprobsWLE, nitems*maxK, nstud )
-
       rprobsWLEL[is.na(rprobsWLEL)] <- 0
         resB <- tam_rcpp_wle_suffstat( RPROBS=rprobsWLEL, CBL=BL, CBB=BBL,
                     CBBB=BBBL, cndim=ndim, cnitems=nitems, cmaxK=maxK, cnstud=nstud,
-                    resp_ind_bool=resp_ind_bool )
+                    resp_ind=resp.ind )
       B_bari <- array(resB$B_bari, dim=c(nstud, nitems,ndim))
       BB_bari <- array(resB$BB_bari, dim=c(nstud, nitems, ndim, ndim))
       BBB_bari <- array(resB$BBB_bari, dim=c(nstud, nitems, ndim))
@@ -107,15 +103,14 @@ tam.mml.wle2 <- function( tamobj, score.resp=NULL , WLE=TRUE , adj=.3 , Msteps=2
       B_Sq <- array(resB$B_Sq,dim=c(nstud, nitems, ndim, ndim))
       B2_B <- array(resB$B2_B,dim=c(nstud, nitems, ndim))
       B_Cube <- array(resB$B_Cube,dim=c(nstud, nitems, ndim))
-
       expected <- colSums(aperm(B_bari,c(2,1,3)))
       err <- colSums(aperm(BB_bari,c(2,1,3,4))) - colSums(aperm(B_Sq, c(2,1,3,4)))  #sum over the items
 
-      if (ndim == 1) {
+      if (ndim==1) {
         # err_inv <- apply(err,1,function(x) 1/x )
         err_inv <- 1 / err
       } else {
-        ## diag err_i= forall i
+        ## diag err_i=forall i
         diag_ind <- cbind(rep(1:nstud, each=ndim), 1:ndim, 1:ndim)
         err[diag_ind] <- err[diag_ind]+1E-15
         errl <- matrix(err, nrow=nstud, ncol=ndim*ndim)
@@ -147,16 +142,16 @@ tam.mml.wle2 <- function( tamobj, score.resp=NULL , WLE=TRUE , adj=.3 , Msteps=2
 
       # dampening the increment
       for ( d1 in 1:ndim){
-        #       increment[,d1] <- ifelse( abs(increment[,d1]) > 3 , sign( increment[,d1] )*3 , increment[,d1] )
+        #       increment[,d1] <- ifelse( abs(increment[,d1]) > 3, sign( increment[,d1] )*3, increment[,d1] )
         ci <- ceiling( abs(increment[,d1]) / ( abs( old_increment[,d1]) + 10^(-10) ) )
-        increment[,d1] <- ifelse( abs( increment[,d1]) > abs(old_increment[,d1])  ,
-                                  increment[,d1]/(2*ci) ,
+        increment[,d1] <- ifelse( abs( increment[,d1]) > abs(old_increment[,d1]),
+                                  increment[,d1]/(2*ci),
                                   increment[,d1] )
 #        old_increment[,d1] <- increment[,d1]
         old_increment[,d1] <- .95 * old_increment[,d1]
         #***
         # avoid NaNs in increment
-        increment[,d1] <- ifelse( is.na(increment[,d1] ) , 0 , increment[,d1] )
+        increment[,d1] <- ifelse( is.na(increment[,d1] ), 0, increment[,d1] )
         # increment[abs(increment)>3] <- sign(increment[abs(increment)>3])*3
       }
 
@@ -169,7 +164,7 @@ tam.mml.wle2 <- function( tamobj, score.resp=NULL , WLE=TRUE , adj=.3 , Msteps=2
 
       if (progress){
           cat( paste( "Iteration in WLE/MLE estimation ", Miter,
-                      "  | Maximal change " , round( max(abs(increment)) , 4) , "\n" )  )
+                      "  | Maximal change ", round( max(abs(increment)), 4), "\n" )  )
           utils::flush.console()
                     }
     }  # end of Newton-Raphson
@@ -178,7 +173,5 @@ tam.mml.wle2 <- function( tamobj, score.resp=NULL , WLE=TRUE , adj=.3 , Msteps=2
                 resp.ind=resp.ind, PersonScores=PersonScores, PersonMax=PersonMax,
                 adj=adj, WLE=WLE, rprobsWLE=rprobsWLE, output.prob=output.prob, progress=progress,
                 pweights=pweights, CALL=CALL, B=B, score.resp=score.resp )
-
-    #  res <- list( "PersonScores" = PersonScores, "PersonMax" = PersonMax, "theta" = theta , "error" =  error )
     return(res)
-  }
+}

@@ -1,5 +1,5 @@
 ## File Name: tam_mml_wle_proc_input_data.R
-## File Version: 0.04
+## File Version: 0.08
 
 tam_mml_wle_proc_input_data <- function(tamobj, score.resp)
 {

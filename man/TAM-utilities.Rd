@@ -1,5 +1,5 @@
 %% File Name: TAM-utilities.Rd
-%% File Version: 0.54
+%% File Version: 0.58
 
 \name{TAM-utilities}
 \alias{TAM-utilities}
@@ -31,6 +31,8 @@
 \alias{tam_osink}
 \alias{tam_csink}
 \alias{tam_ginv}
+\alias{tam_max_abs}
+\alias{tam_max_abs_list}
 
 
 \title{Utility Functions in \pkg{TAM}}
@@ -76,7 +78,7 @@ tam_interval_index(matr, rn)
 ## cumulative sum of row entries in a matrix
 tam_rowCumsums(matr)
 ## extension of mvtnorm::dmvnorm to matrix entries of mean
-tam_dmvnorm(x, mean, sigma, log = FALSE )
+tam_dmvnorm(x, mean, sigma, log=FALSE )
 ## Bayesian bootstrap in TAM (used in tam.pv.mcmc)
 tam_bayesian_bootstrap(N, sample_integers=FALSE, do_boot=TRUE)
 ## weighted covariance matrix
@@ -93,9 +95,13 @@ tam_AXsi_compute(A, xsi)
 ## fit xsi given A and AXsi
 tam_AXsi_fit(A, AXsi)
 
+## maximum absolute difference between objects
+tam_max_abs( list1, list2, label )
+tam_max_abs_list( list1, list2)
+
 ## trimming increments in iterations
 tam_trim_increment(increment, max.increment, trim_increment="cut",
-     trim_incr_factor = 2, eps = 1E-10, avoid_na = FALSE)
+     trim_incr_factor=2, eps=1E-10, avoid_na=FALSE)
 ## numerical differentiation by central difference
 tam_difference_quotient(d0, d0p, d0m, h)
 ## assign elements of a list in an environment
@@ -154,6 +160,9 @@ should be sampled in bootstrap}
 \item{d0m}{Vector}
 \item{h}{Vector}
 \item{envir}{Environment variable}
+\item{list1}{List}
+\item{list2}{List}
+\item{label}{Element of a list}
 }
 
 %\details{
