@@ -1,8 +1,8 @@
 Package: TAM
 Type: Package
 Title: Test Analysis Modules
-Version: 2.12-18
-Date: 2018-05-25 11:14:38
+Version: 2.13-15
+Date: 2018-09-30 14:35:48
 Author: 
     Alexander Robitzsch [aut, cre], Thomas Kiefer [aut], Margaret Wu [aut]
 Maintainer: Alexander Robitzsch <robitzsch@ipn.uni-kiel.de>
@@ -19,7 +19,7 @@ Description:
     Adams, Wilson and Wu, 1997 <doi:10.3102/10769986022001047>,
     Formann, 1982 <doi:10.1002/bimj.4710240209>,
     Formann, 1992 <doi:10.1080/01621459.1992.10475229>.
-Depends: R (>= 2.15.1), CDM (>= 5.8-5)
+Depends: R (>= 2.15.1), CDM (>= 6.4-19)
 Imports: coda, graphics, grDevices, MASS, methods, mvtnorm, Rcpp,
         sfsmisc, stats, utils
 Suggests: GPArotation, lattice, lavaan, LSAmitR, miceadds, plyr, psych,
@@ -27,8 +27,9 @@ Suggests: GPArotation, lattice, lavaan, LSAmitR, miceadds, plyr, psych,
 LinkingTo: Rcpp, RcppArmadillo
 License: GPL (>= 2)
 URL: http://www.edmeasurementsurveys.com/TAM/Tutorials/,
-        https://github.com/alexanderrobitzsch/TAM
+        https://github.com/alexanderrobitzsch/TAM,
+        https://sites.google.com/site/alexanderrobitzsch2/software
 NeedsCompilation: yes
-Packaged: 2018-05-25 09:16:42 UTC; sunpn563
+Packaged: 2018-09-30 12:37:58 UTC; sunpn563
 Repository: CRAN
-Date/Publication: 2018-05-25 11:47:53 UTC
+Date/Publication: 2018-09-30 13:20:03 UTC
