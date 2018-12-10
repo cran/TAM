@@ -7,7 +7,7 @@ If you use `TAM` and have suggestions for improvement or have found bugs, please
 #### CRAN version
 
 <!---
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/TAM)](https://cran.r-project.org/package=TAM)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version-last-release/TAM)](https://cran.r-project.org/package=TAM)
 &#160;&#160;
 -->
 

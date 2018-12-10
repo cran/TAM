@@ -1,7 +1,8 @@
 ## File Name: summary.tam.jml.R
-## File Version: 9.16
-#*******************************************************
-# Summary for tam object                 *
+## File Version: 9.22
+
+
+#***** summary for tam object
 summary.tam.jml <- function( object, file=NULL, ...)
 {
     if ( ! is.null( file ) ){
@@ -23,9 +24,9 @@ summary.tam.jml <- function( object, file=NULL, ...)
     tam_print_call(object$CALL)
 
     cat("------------------------------------------------------------\n")
-    cat( "Number of iterations=", object$iter, "\n" )
+    cat( "Number of iterations=", object$iter, "\n\n" )
 
-    cat( "\nDeviance=", round( object$deviance, 2 ), " | " )
+    cat( "Deviance=", round( object$deviance, 2 ), " | " )
     cat( "Log Likelihood=", round( -object$deviance/2, 2 ), "\n" )
     cat( "Number of persons=", object$nstud, "\n" )
 
@@ -38,8 +39,8 @@ summary.tam.jml <- function( object, file=NULL, ...)
 
     #    cat( "Number of estimated parameters=", object$ic$Npars, "\n" )
     #    cat( "    Item threshold parameters=", object$ic$Nparsxsi, "\n" )
-    #    cat( "    Item slope parameters  =", object$ic$NparsB, "\n" )
-    #    cat( "    Regression parameters  =", object$ic$Nparsbeta, "\n" )
+    #    cat( "    Item slope parameters=", object$ic$NparsB, "\n" )
+    #    cat( "    Regression parameters=", object$ic$Nparsbeta, "\n" )
     #    cat( "    (Co)Variance parameters=", object$ic$Nparscov, "\n\n" )
 
     #    cat( "AIC=", round( object$ic$AIC, 2 ), " | penalty=", round( object$ic$AIC - object$ic$deviance,2 ),
@@ -114,4 +115,3 @@ summary.tam.jml <- function( object, file=NULL, ...)
         sink()
     }
 }
-#*******************************************************
