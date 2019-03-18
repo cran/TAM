@@ -1,5 +1,6 @@
 ## File Name: tam.mml.R
-## File Version: 9.777
+## File Version: 9.789
+
 tam.mml <- function( resp, Y=NULL, group=NULL,  irtmodel="1PL",
             formulaY=NULL, dataY=NULL,
             ndim=1, pid=NULL,
@@ -46,6 +47,8 @@ tam.mml <- function( resp, Y=NULL, group=NULL,  irtmodel="1PL",
                 prior_list_xsi=prior_list_xsi)
     con <- res$con
     con1a <- res$con1a
+    #- check constraint
+    constraint <- tam_mml_constraint_check(constraint=constraint)
 
     resp <- as.matrix(resp)
     resp0 <- resp <- add.colnames.resp(resp)
@@ -63,10 +66,11 @@ tam.mml <- function( resp, Y=NULL, group=NULL,  irtmodel="1PL",
 #    if (( irtmodel=="PCM2" ) & (is.null(Q)) & ( is.null(A)) ){
 #      A <- .A.PCM2( resp )
 #    }
-    #**** constraints
+
+    #-- handle constraints
     if ( constraint=="items" ){
         irtmodel <- "PCM2"
-                        }
+    }
 
 
     if (( irtmodel=="PCM2" ) & ( is.null(A)) ){
@@ -396,10 +400,9 @@ tam.mml <- function( resp, Y=NULL, group=NULL,  irtmodel="1PL",
     #*** include NAs in AXsi
     AXsi <- tam_mml_include_NA_AXsi(AXsi=AXsi, maxcat=maxcat)
 
-    #******
-    # generate input for fixed parameters
-    xsi.fixed.estimated <- generate.xsi.fixed.estimated( xsi=xsi, A=A )
-    B.fixed.estimated <- generate.B.fixed.estimated( B=B )
+    #--- generate input for fixed parameters
+    xsi.fixed.estimated <- tam_generate_xsi_fixed_estimated( xsi=xsi, A=A )
+    B.fixed.estimated <- tam_generate_B_fixed_estimated(B=B)
 
     #**** standard errors AXsi
     se.AXsi <- tam_mml_se_AXsi( AXsi=AXsi, A=A, se.xsi=se.xsi, maxK=maxK )
@@ -418,10 +421,13 @@ tam.mml <- function( resp, Y=NULL, group=NULL,  irtmodel="1PL",
     n.ik <- res$n.ik
     pi.k <- res$pi.k
 
-    #****
-    # collect item parameters
+    #*** collect item parameters
     item1 <- tam_itempartable( resp=resp, maxK=maxK, AXsi=AXsi, B=B, ndim=ndim,
                     resp.ind=resp.ind, rprobs=rprobs, n.ik=n.ik, pi.k=pi.k )
+
+    #*** IRT parameterization
+    item_irt <- tam_irt_parameterization(resp=resp, maxK=maxK, B=B, AXsi=AXsi,
+                    irtmodel=irtmodel, tam_function="tam.mml")
 
     #**** collect all person statistics
     res <- tam_mml_person_posterior( pid=pid, nstud=nstud, pweights=pweights,
@@ -492,7 +498,7 @@ tam.mml <- function( resp, Y=NULL, group=NULL,  irtmodel="1PL",
     deviance.history <- deviance.history[ 1:iter, ]
     res <- list( "xsi"=xsi,
                  "beta"=beta, "variance"=variance,
-                 "item"=item1,
+                 "item"=item1, item_irt=item_irt,
                  "person"=person, pid=pid, "EAP.rel"=EAP.rel,
                  "post"=hwt,  "rprobs"=rprobs, "itemweight"=itemwt,
                  "theta"=theta,
@@ -526,8 +532,5 @@ tam.mml <- function( resp, Y=NULL, group=NULL,  irtmodel="1PL",
                  prior_list_xsi=prior_list_xsi, penalty_xsi=penalty_xsi         )
     class(res) <- "tam.mml"
     return(res)
-  }
+}
 
-
-# tam.mml.output <- function(){
-#     }

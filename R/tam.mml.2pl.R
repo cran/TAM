@@ -1,5 +1,5 @@
 ## File Name: tam.mml.2pl.R
-## File Version: 9.560
+## File Version: 9.572
 
 tam.mml.2pl <- function( resp, Y=NULL, group=NULL,  irtmodel="2PL",
                  formulaY=NULL, dataY=NULL,
@@ -449,8 +449,8 @@ tam.mml.2pl <- function( resp, Y=NULL, group=NULL,  irtmodel="2PL",
 
     #******
     # generate input for fixed parameters
-    xsi.fixed.estimated <- generate.xsi.fixed.estimated( xsi, A )
-    B.fixed.estimated <- generate.B.fixed.estimated(B)
+    xsi.fixed.estimated <- tam_generate_xsi_fixed_estimated( xsi=xsi, A=A )
+    B.fixed.estimated <- tam_generate_B_fixed_estimated(B=B)
 
     #**** standard errors AXsi
     se.AXsi <- tam_mml_se_AXsi( AXsi=AXsi, A=A, se.xsi=se.xsi, maxK=maxK )
@@ -462,17 +462,19 @@ tam.mml.2pl <- function( resp, Y=NULL, group=NULL,  irtmodel="2PL",
                 est.variance=est.variance, resp=resp, est.slopegroups=est.slopegroups,
                 variance.Npars=variance.Npars, group=group )
 
-    #***
-    # calculate counts
+    #*** calculate counts
     res <- tam_calc_counts( resp=resp, theta=theta, resp.ind=resp.ind, group=group,
                 maxK=maxK, pweights=pweights, hwt=hwt )
     n.ik <- res$n.ik
     pi.k <- res$pi.k
 
-    #****
-    # collect item parameters
+    #*** collect item parameters
     item1 <- tam_itempartable( resp=resp, maxK=maxK, AXsi=AXsi, B=B, ndim=ndim,
                 resp.ind=resp.ind, rprobs=rprobs, n.ik=n.ik, pi.k=pi.k )
+
+    #*** IRT parameterization
+    item_irt <- tam_irt_parameterization(resp=resp, maxK=maxK, B=B, AXsi=AXsi,
+                    irtmodel=irtmodel, tam_function="tam.mml.2pl")
 
     #**** collect all person statistics
     res <- tam_mml_person_posterior( pid=pid, nstud=nstud, pweights=pweights,
@@ -543,7 +545,7 @@ tam.mml.2pl <- function( resp, Y=NULL, group=NULL,  irtmodel="2PL",
   deviance.history <- deviance.history[ 1:iter, ]
   res <- list( "xsi"=xsi,
                "beta"=beta, "variance"=variance,
-               "item"=item1,
+               "item"=item1, item_irt=item_irt,
                "person"=person, pid=pid, "EAP.rel"=EAP.rel,
                "post"=hwt,  "rprobs"=rprobs, "itemweight"=itemwt,
                "theta"=theta,
