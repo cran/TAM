@@ -4,6 +4,10 @@
 
 If you use `TAM` and have suggestions for improvement or have found bugs, please email me at robitzsch@ipn.uni-kiel.de.
 
+#### Manual
+
+The manual may be found here [https://alexanderrobitzsch.github.io/TAM/](https://alexanderrobitzsch.github.io/TAM/) 
+
 #### CRAN version
 
 <!---
