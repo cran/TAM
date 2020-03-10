@@ -1,5 +1,5 @@
 %% File Name: tam.fa.Rd
-%% File Version: 2.21
+%% File Version: 2.236
 
 \name{tam.fa}
 \alias{tam.fa}
@@ -134,21 +134,26 @@ loadings form the Schmid-Leimann solution of the \pkg{psych} package.}
 Green, S. B., & Yang, Y. (2009). Reliability of summed item
 scores using structural equation modeling: An alternative to
 coefficient alpha. \emph{Psychometrika, 74}, 155-167.
+\doi{10.1007/s11336-008-9099-3}
 
 Reise, S. P. (2012). The rediscovery of bifactor measurement models.
-\emph{Multivariate Behavioral Research, 47}, 667-696.
+\emph{Multivariate Behavioral Research, 47}(5), 667-696.
+\doi{10.1080/00273171.2012.715555}
 
 Reise, S. P., Moore, T. M., & Haviland, M. G.  (2010).
 Bifactor models and rotations: Exploring the extent to which
-multidimensional data yield univocal scale scores,
-\emph{Journal of Personality Assessment, 92}, 544-559.
+multidimensional data yield univocal scale scores.
+\emph{Journal of Personality Assessment, 92}(6), 544-559.
+\doi{10.1080/00223891.2010.496477}
 
 Revelle, W., & Zinbarg, R. E. (2009).
 Coefficients alpha, beta, omega and the glb: Comments on Sijtsma.
-\emph{Psychometrika, 74}, 145-154.
+\emph{Psychometrika, 74}(1), 145-154.
+\doi{10.1007/s11336-008-9102-z}
 
 Wang, W.-C., & Wilson, M. (2005). The Rasch testlet model.
-\emph{Applied Psychological Measurement, 29}, 126-149.
+\emph{Applied Psychological Measurement, 29}(2), 126-149.
+\doi{10.1177/0146621604271053}
 }
 
 %\author{
@@ -217,6 +222,25 @@ dims1 <- dims
 dims1[c(3,5)] <- NA
 mod1d <- TAM::tam.fa( resp=resp, irtmodel="bifactor2", dims=dims1 )
 summary(mod1d)
+
+#############################################################################
+# EXAMPLE 2: Polytomous data
+#############################################################################
+
+data(data.timssAusTwn.scored, package="TAM")
+dat <- data.timssAusTwn.scored
+resp <- dat[, grep("M0", colnames(dat))]
+
+#***
+# Model 1a: Rasch testlet model with 2 testlets
+dims <- c( rep(1,5), rep(2,6))
+mod1a <- TAM::tam.fa( resp=resp, irtmodel="bifactor1", dims=dims )
+summary(mod1a)
+
+#***
+# Model 1b: Bifactor model
+mod1b <- TAM::tam.fa( resp=resp, irtmodel="bifactor2", dims=dims )
+summary(mod1b)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

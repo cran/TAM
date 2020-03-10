@@ -1,13 +1,13 @@
 ## File Name: tam_mml_ic.R
-## File Version: 9.182
+## File Version: 9.1992
 
 
-##################################
-# Information criteria
+#--- information criteria
 tam_mml_ic <- function( nstud, deviance, xsi, xsi.fixed,
     beta, beta.fixed, ndim, variance.fixed, G, irtmodel,
     B_orig=NULL, B.fixed, E, est.variance, resp,
-    est.slopegroups=NULL, variance.Npars=NULL, group, penalty_xsi=0 )
+    est.slopegroups=NULL, variance.Npars=NULL, group, penalty_xsi=0,
+    AXsi=NULL, pweights=NULL, resp.ind=NULL)
 {
 
     #--- log likelihood and log prior
@@ -27,13 +27,22 @@ tam_mml_ic <- function( nstud, deviance, xsi, xsi.fixed,
     if ( ! is.null( xsi.fixed) ){
         ic$Nparsxsi <- ic$Nparsxsi - nrow(xsi.fixed )
     }
-    # B slopes
+    #-- B slopes
+    if (!is.null(AXsi)){
+        maxKi <- rowSums( ! is.na(AXsi) ) - 1
+        NB <- dim(B_orig)[3]
+        NparsB <- 0
+        for (dd in 1:NB){
+            NparsB <- NparsB + sum( maxKi*(rowSums(B_orig[,,dd]) > 0) )
+        }
+    }
+
     ic$NparsB <- 0
     if ( irtmodel=="2PL" ){
         ic$NparsB <- sum( B_orig !=0 )
     }
     if ( irtmodel=="GPCM" ){
-        ic$NparsB <- ncol(resp)
+        ic$NparsB <- NparsB
     }
     if ( irtmodel=="GPCM.design" ){
         ic$NparsB <- ncol(E)
@@ -48,7 +57,7 @@ tam_mml_ic <- function( nstud, deviance, xsi, xsi.fixed,
         if ( irtmodel=="GPCM" ){
             nB <- length(B.fixed[ B.fixed[,2]==2,1])
         }
-        ic$NparsB <- ic$NparsB - nB
+        ic$NparsB <- max(ic$NparsB - nB, 0)
     }
 
     # beta regression parameters
@@ -61,7 +70,7 @@ tam_mml_ic <- function( nstud, deviance, xsi, xsi.fixed,
     if ( ! est.variance ){
         ic$Nparscov <- ic$Nparscov - ndim
     }
-    if ( ! is.null( variance.fixed) ){
+    if ( ! is.null(variance.fixed) ){
         ic$Nparscov <- max(0, ic$Nparscov - nrow(variance.fixed ) )
     }
 
@@ -73,6 +82,9 @@ tam_mml_ic <- function( nstud, deviance, xsi, xsi.fixed,
     }
     # total number of parameters
     ic$Npars <- ic$np <- ic$Nparsxsi + ic$NparsB + ic$Nparsbeta + ic$Nparscov
+
+    #- compute total number of observations
+    ic$ghp_obs <- tam_ghp_number_informations(pweights=pweights, resp.ind=resp.ind)
 
     #--- calculate all criteria
     ic <- tam_mml_ic_criteria(ic=ic)
