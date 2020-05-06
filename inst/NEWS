@@ -42,6 +42,29 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 
 -------------------------------------------------------------
+VERSIONS TAM 3.5  |  2020-05-05  |  Last: TAM 3.5-19
+-------------------------------------------------------------
+
+FIXED * fixed a bug in plot.tam() function that was introduced
+        in TAM 3.4 (thanks to @sda030; issue #12)
+NOTE  * included arguments 'eps_rob_hae' and 'par_init' 
+        in tam.linking()
+FIXED * fixed a bug in tam.jml.fit()
+        (thanks to Jess Mazengarb)
+FIXED * now use Fisher z correlation for computation in
+        maximum residual correlation in tam.modelfit()
+        (thanks to Hyeon-Ah Kang)
+FIXED * fixed recently occuring error in CRAN checks with 
+        computation of computation times (since R 4.0; 
+        thanks to Kurt Hornik)
+FIXED * fixed a bug in tam.mml.mfr() with multiple rows by person
+        when group or Y arguments are provided
+        (thanks to Laura Helbling)
+
+DATA  * included/modified datasets: ---
+EXAMP * included/modified examples: tam.linking (1)
+
+-------------------------------------------------------------
 VERSIONS TAM 3.4  |  2020-03-10  |  Last: TAM 3.4-26
 -------------------------------------------------------------
 
@@ -62,14 +85,9 @@ NOTE  * included argument 'constraint' in tam.jml() for
 NOTE  * included Gilula-Haberman log penalty statistic that
         is labeled as 'GHP' in mod$ic and summary output
 
-
 DATA  * included/modified datasets: ---
 EXAMP * included/modified examples: tam.fa (2), tam.mml (6),
         plot.tam (1), tam_downcode(1), tam.jml (1)
-
-
-
-
 
 -------------------------------------------------------------
 VERSIONS TAM 3.3  |  2019-08-23  |  Last: TAM 3.3-10
