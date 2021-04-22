@@ -1,5 +1,5 @@
 %% File Name: tam.jml.Rd
-%% File Version: 2.397
+%% File Version: 2.405
 
 \name{tam.jml}
 
@@ -20,7 +20,7 @@ item response models with joint maximum likelihood (JML,
 \usage{
 tam.jml(resp, group=NULL, adj=.3, disattenuate=FALSE, bias=TRUE,
     xsi.fixed=NULL, xsi.inits=NULL, theta.fixed=NULL, A=NULL, B=NULL, Q=NULL,
-    ndim=1, pweights=NULL, constraint="cases", verbose=TRUE, control=list(), version=2)
+    ndim=1, pweights=NULL, constraint="cases", verbose=TRUE, control=list(), version=3)
 
 \method{summary}{tam.jml}(object, file=NULL, \dots)
 
@@ -47,7 +47,7 @@ tam.jml(resp, group=NULL, adj=.3, disattenuate=FALSE, bias=TRUE,
     The disattenuation is conducted by applying the Kelley formula.
 }
 \item{adj}{Adjustment constant which is subtracted or added to extreme
-scores (score of zero or maximum score. The default is a value of 0.3}
+scores (score of zero or maximum score). The default is a value of 0.3}
   \item{bias}{
      A logical which indicates if JML bias should be reduced
      by multiplying item parameters by the adjustment factor
@@ -99,7 +99,10 @@ be printed during iterations. This argument replaces \code{control$progress}.
      for more details.
 }
 \item{version}{Version function which should be used. \code{version=2}
-is the former \code{tam.jml2} function in \pkg{TAM} (<2.0).}
+is the former \code{tam.jml2} function in \pkg{TAM} (<2.0).
+The default \code{version=3} allows efficient handling in case of missing
+data.
+}
   \item{object}{
 Object of class \code{tam.jml} (only for \code{summary.tam}
 function)
@@ -125,7 +128,7 @@ A file name in which the summary output will be written
 
 \value{
 A list with following entries
-\item{item}{Data frame with item parameters}
+\item{item1}{Data frame with item parameters}
 \item{xsi}{Vector of item parameters \eqn{\xi}}
 \item{errorP}{Standard error of item parameters \eqn{\xi}}
 \item{theta}{MLE in final step}
@@ -150,7 +153,7 @@ A list with following entries
 \item{resp.ind.list}{Like \code{resp.ind}, only in the format of a list}
 \item{xsi.fixed}{Fixed \eqn{\xi} item parameters}
 \item{control}{Control list}
-\item{item1}{Extended data frame of item parameters}
+\item{item}{Extended data frame of item parameters}
 \item{theta_summary}{Summary of person parameters}
 \item{\dots}{}
 }
@@ -181,7 +184,7 @@ Chicago: MESA Press.
 \note{
 This joint maximum likelihood estimation procedure should be
 compatible with Winsteps and Facets software, see also
-\url{http://www.rasch.org/software.htm}.
+\emph{http://www.rasch.org/software.htm}.
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
@@ -259,16 +262,24 @@ cbind( mod1g$WLE, mod1g$errorWLE )[ind.person,]
 # EXAMPLE 2: Partial credit model
 #############################################################################
 
-data(data.gpcm)
+data(data.gpcm, package="TAM")
+dat <- data.gpcm
+
 # JML estimation
-mod2 <- TAM::tam.jml(resp=data.gpcm)
+mod2 <- TAM::tam.jml(resp=dat)
 mod2$xsi     # extract item parameters
 summary(mod2)
-tam.fit(mod2)    # item and person infit/outfit statistic
+TAM::tam.fit(mod2)    # item and person infit/outfit statistic
+
+#* estimate rating scale model
+A <- TAM::designMatrices(resp=dat, modeltype="RSM")$A
+#* estimate model with design matrix A
+mod3 <- TAM::tam.jml(dat, A=A)
+summary(mod3)
 
 #############################################################################
 # EXAMPLE 3: Facet model estimation using joint maximum likelihood
-#            data.ex10; see also Example 10 in tam.mml
+#            data.ex10; see also Example 10 in ?tam.mml
 #############################################################################
 
 data(data.ex10)

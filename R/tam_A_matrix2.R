@@ -1,11 +1,10 @@
-## File Name: designMatrices_aux2.R
-## File Version: 9.167
+## File Name: tam_A_matrix2.R
+## File Version: 9.168
 
 
 ## function tam_A_matrix2
-.A.matrix2 <- function( resp, formulaA=~ item + item*step, facets=NULL,
-            constraint=c("cases", "items"), progress=FALSE,
-            maxKi=NULL, Q=Q )
+tam_A_matrix2 <- function( resp, formulaA=~ item + item*step, facets=NULL,
+        constraint=c("cases", "items"), progress=FALSE, maxKi=NULL, Q=Q )
 {
     z0 <- Sys.time()
     ### redefine facets matrix
@@ -295,4 +294,4 @@
 
 
 
-.A.matrix2 -> tam_A_matrix2
+# .A.matrix2 <- tam_A_matrix2

@@ -1,5 +1,5 @@
 //// File Name: init.c
-//// File Version: 3.005019
+//// File Version: 3.006045
 #include <R.h>
 #include <Rinternals.h>
 #include <stdlib.h> // for NULL
@@ -15,7 +15,7 @@ extern SEXP _TAM_tam_rcpp_tam_mml_calc_prob_R_outer_Btheta(SEXP, SEXP, SEXP, SEX
 extern SEXP _TAM_tam_rcpp_tam_mml_calc_prob_R_normalize_rprobs(SEXP, SEXP);
 extern SEXP _TAM_tam_rcpp_calc_suff_stat(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _TAM_tam_rcpp_ctt2(SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _TAM_tam_rcpp_ctt3(SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _TAM_tam_rcpp_ctt3(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _TAM_tam_rcpp_fit_simul(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _TAM_tam_rcpp_theta_sq(SEXP);
 extern SEXP _TAM_tam_rcpp_interval_index(SEXP, SEXP);
@@ -42,6 +42,9 @@ extern SEXP _TAM_tam_rcpp_pv_mcmc_likelihood(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP)
 extern SEXP _TAM_tam_rcpp_pv_mcmc_calc_probs_irf_3pl(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _TAM_tam_rcpp_pv_sample_theta_multidim(SEXP, SEXP);
 extern SEXP _TAM_tam_rcpp_rowCumsums(SEXP);
+extern SEXP _TAM_tam_rcpp_tam_jml_calc_probs(SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _TAM_tam_rcpp_tam_jml_wle_bbari(SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _TAM_tam_rcpp_tam_jml_calc_xsi_rr(SEXP, SEXP, SEXP, SEXP);
 extern SEXP _TAM_tam_rcpp_tam_np_posterior(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _TAM_tam_rcpp_wle_suffstat(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _TAM_tam_rcpp_wle_errinv(SEXP, SEXP, SEXP);
@@ -57,7 +60,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_TAM_tam_rcpp_tam_mml_calc_prob_R_normalize_rprobs", (DL_FUNC) &_TAM_tam_rcpp_tam_mml_calc_prob_R_normalize_rprobs, 2},
     {"_TAM_tam_rcpp_calc_suff_stat", (DL_FUNC) &_TAM_tam_rcpp_calc_suff_stat, 6},
     {"_TAM_tam_rcpp_ctt2", (DL_FUNC) &_TAM_tam_rcpp_ctt2, 5},
-    {"_TAM_tam_rcpp_ctt3", (DL_FUNC) &_TAM_tam_rcpp_ctt3, 5},
+    {"_TAM_tam_rcpp_ctt3", (DL_FUNC) &_TAM_tam_rcpp_ctt3, 6},
     {"_TAM_tam_rcpp_fit_simul", (DL_FUNC) &_TAM_tam_rcpp_fit_simul, 9},
     {"_TAM_tam_rcpp_theta_sq", (DL_FUNC) &_TAM_tam_rcpp_theta_sq, 1},
     {"_TAM_tam_rcpp_interval_index", (DL_FUNC) &_TAM_tam_rcpp_interval_index, 2},
@@ -84,6 +87,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_TAM_tam_rcpp_pv_mcmc_calc_probs_irf_3pl", (DL_FUNC) &_TAM_tam_rcpp_pv_mcmc_calc_probs_irf_3pl, 6},
     {"_TAM_tam_rcpp_pv_sample_theta_multidim", (DL_FUNC) &_TAM_tam_rcpp_pv_sample_theta_multidim, 2},
     {"_TAM_tam_rcpp_rowCumsums", (DL_FUNC) &_TAM_tam_rcpp_rowCumsums, 1},
+    {"_TAM_tam_rcpp_tam_jml_calc_probs", (DL_FUNC) &_TAM_tam_rcpp_tam_jml_calc_probs, 5},
+    {"_TAM_tam_rcpp_tam_jml_wle_bbari", (DL_FUNC) &_TAM_tam_rcpp_tam_jml_wle_bbari, 5},
+    {"_TAM_tam_rcpp_tam_jml_calc_xsi_rr", (DL_FUNC) &_TAM_tam_rcpp_tam_jml_calc_xsi_rr, 4},
     {"_TAM_tam_rcpp_tam_np_posterior", (DL_FUNC) &_TAM_tam_rcpp_tam_np_posterior, 6},
     {"_TAM_tam_rcpp_wle_suffstat", (DL_FUNC) &_TAM_tam_rcpp_wle_suffstat, 9},
     {"_TAM_tam_rcpp_wle_errinv", (DL_FUNC) &_TAM_tam_rcpp_wle_errinv, 3},

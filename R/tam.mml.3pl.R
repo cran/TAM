@@ -1,5 +1,5 @@
 ## File Name: tam.mml.3pl.R
-## File Version: 9.857
+## File Version: 9.877
 
 tam.mml.3pl <- function( resp, Y=NULL, group=NULL,
             formulaY=NULL, dataY=NULL,
@@ -12,7 +12,7 @@ tam.mml.3pl <- function( resp, Y=NULL, group=NULL,
             Q.fixed=NULL,
             E=NULL, gammaslope.des="2PL",
             gammaslope=NULL, gammaslope.fixed=NULL,
-            est.some.slopes=TRUE,
+            est.some.slopes=TRUE, gammaslope.max=9.99,
             gammaslope.constr.V=NULL, gammaslope.constr.c=NULL,
             gammaslope.center.index=NULL,  gammaslope.center.value=NULL,
             gammaslope.prior=NULL,  userfct.gammaslope=NULL,
@@ -33,17 +33,18 @@ tam.mml.3pl <- function( resp, Y=NULL, group=NULL,
     # display
     disp <- "....................................................\n"
     increment.factor <- progress <- nodes <- snodes <- ridge <- xsi.start0 <- QMC <- NULL
-    maxgamma <- maxiter <- conv <- convD <- min.variance <- max.increment <- Msteps <- convM <- NULL
+    maxiter <- conv <- convD <- min.variance <- max.increment <- Msteps <- convM <- NULL
     delta <- R <- NULL
     B <- NULL ; B.fixed <- NULL ; theta <- NULL
     fac.oldxsi <- acceleration <- NULL
     irtmodel <- "2PL"
     est.slopegroups <- NULL
     init.gammaslope <- ( ! is.null( gammaslope ) )
+    maxgamma <- gammaslope.max
 
     #**** handle verbose argument
     args_CALL <- as.list( sys.call() )
-    if ( ! tam_in_names_list( list=control, variable="progress" )     ){
+    if ( ! tam_in_names_list( list=control, variable="progress" ) ){
         control$progress <- verbose
     }
     #*******
@@ -51,9 +52,10 @@ tam.mml.3pl <- function( resp, Y=NULL, group=NULL,
     resp <- as.matrix(resp)
     resp0 <- resp <- add.colnames.resp(resp)
 
-    #********************
-    # create E design matrix from different input matrices
-    res0 <- tam_mml_3pl_create_E( resp, E, Q, gammaslope.des, Q.fixed )
+    #--- create E design matrix from different input matrices
+    E_null <- is.null(E)
+    res0 <- tam_mml_3pl_create_E( resp=resp, E=E, Q=Q,
+                    gammaslope.des=gammaslope.des, Q.fixed=Q.fixed )
     E <- res0$E
     if ( is.null(gammaslope.fixed ) ){
         gammaslope.fixed <- res0$gammaslope.fixed
@@ -85,6 +87,7 @@ tam.mml.3pl <- function( resp, Y=NULL, group=NULL,
         Edes <- tam_rcpp_mml_3pl_nonzero_entries( E=as.vector(E), dimE=dim(E) )$E_design
     }
     B <- tam_mml_3pl_computeB( Edes=Edes, gammaslope=gammaslope, E=E )
+
 
     #***********************
     if ( is.null(A)){ printxsi <- FALSE  } else { printxsi <- TRUE }
@@ -170,8 +173,8 @@ tam.mml.3pl <- function( resp, Y=NULL, group=NULL,
     if ( snodes > 0 ){ nnodes <- snodes }
 
     #--- print information about nodes
-    res <- tam_mml_progress_proc_nodes( progress=progress, snodes=snodes, nnodes=nnodes,
-                    skillspace=skillspace, QMC=QMC )
+    res <- tam_mml_progress_proc_nodes( progress=progress, snodes=snodes,
+                    nnodes=nnodes, skillspace=skillspace, QMC=QMC )
 
     # maximum no. of categories per item. Assuming dichotomous
     maxK <- max( resp, na.rm=TRUE ) + 1
@@ -355,6 +358,7 @@ tam.mml.3pl <- function( resp, Y=NULL, group=NULL,
       gammaslope <- .mml.3pl.gammaslope.center( gammaslope, gammaslope.center.index,
                          gammaslope.center.value  )
 
+
     #******
     # prior distribution guessing parameter
     if ( ! is.null(guess.prior) ){
@@ -363,8 +367,8 @@ tam.mml.3pl <- function( resp, Y=NULL, group=NULL,
         guess[ i1 ] <- guess.mean[i1]
         guess.prior[ guess.prior==0 ] <- 1E-3
     }
-    #******
-    # prior distribution slope parameter
+
+    #---- prior distribution slope parameter
     if ( ( ! is.null(gammaslope.prior) ) & ( ! init.gammaslope) ){
         i1 <- which( gammaslope.prior[,2] < 10 )
         gammaslope[ i1 ] <- gammaslope.prior[i1,1]
@@ -396,9 +400,9 @@ tam.mml.3pl <- function( resp, Y=NULL, group=NULL,
     }
     AXsi[iIndex,] <- AXsi.tmp[,,1]
 
-    #****
-    # compute B matrix
-    B <- tam_mml_3pl_computeB( Edes=Edes, gammaslope=gammaslope, E=E )
+    #--- compute B matrix
+    B <- tam_mml_3pl_computeB( Edes=Edes, gammaslope=gammaslope, E=E, B=B,
+                    skip_B=FALSE)
 
     ##**SE
     se.xsi <- 0*xsi
@@ -560,7 +564,8 @@ tam.mml.3pl <- function( resp, Y=NULL, group=NULL,
         if ( skillspace !="normal" ){
             res <- tam_mml_3pl_skillspace( Ngroup=Ngroup, pi.k=pi.k,
                         delta.designmatrix=delta.designmatrix, G=G, delta=delta,
-                        delta.fixed=delta.fixed, hwt=hwt, resp.ind=resp.ind, pweightsM=pweightsM,
+                        delta.fixed=delta.fixed, hwt=hwt, resp.ind=resp.ind,
+                        pweightsM=pweightsM,
                         pweights=pweights, group1.list=group1.list,
                         delta_acceleration=delta_acceleration, iter=iter )
             pi.k <- res$pi.k
@@ -575,8 +580,8 @@ tam.mml.3pl <- function( resp, Y=NULL, group=NULL,
 
         #******
         # generate input for fixed parameters
-    xsi.fixed.estimated <- tam_generate_xsi_fixed_estimated( xsi=xsi, A=A )
-    B.fixed.estimated <- tam_generate_B_fixed_estimated(B=B)
+        xsi.fixed.estimated <- tam_generate_xsi_fixed_estimated( xsi=xsi, A=A )
+        B.fixed.estimated <- tam_generate_B_fixed_estimated(B=B)
 
         ######################################
         # calculation of expected counts
@@ -604,22 +609,26 @@ tam.mml.3pl <- function( resp, Y=NULL, group=NULL,
 
 # cat("\nM steps intercepts") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
 
-      ###############################################
-      # M-step item slopes
+
+        ###############################################
+        # M-step item slopes
         if ( est.some.slopes){
             oldgamma <- gammaslope
-            res <- tam_mml_3pl_mstep_item_slopes( max.increment=max.increment, np=np,
-                        Msteps=Msteps, nitems=nitems, A=A, AXsi=AXsi, B=B, xsi=xsi, guess=guess,
-                        theta=theta, nnodes=nnodes, maxK=maxK, progress=progress, ItemScore=ItemScore,
-                        fac.oldxsi=fac.oldxsi, rprobs=rprobs, xsi.fixed=xsi.fixed, convM=convM,
-                        rprobs0=rprobs0, n.ik=n.ik, N.ik=N.ik, gammaslope=gammaslope, E=E,
-                        FdesM=FdesM, dimFdes=dimFdes, gammaslope.fixed=gammaslope.fixed,
-                        gammaslope.prior=gammaslope.prior, maxgamma=maxgamma, Edes=Edes,
-                        gammaslope.constr.V=gammaslope.constr.V, V1=V1, e2=e2,
-                        gammaslope.center.index=gammaslope.center.index,
+            res <- tam_mml_3pl_mstep_item_slopes( max.increment=max.increment,
+                        np=np, Msteps=Msteps, nitems=nitems, A=A, AXsi=AXsi, B=B,
+                        xsi=xsi, guess=guess, theta=theta, nnodes=nnodes,
+                        maxK=maxK, progress=progress, ItemScore=ItemScore,
+                        fac.oldxsi=fac.oldxsi, rprobs=rprobs, xsi.fixed=xsi.fixed,
+                        convM=convM, rprobs0=rprobs0, n.ik=n.ik, N.ik=N.ik,
+                        gammaslope=gammaslope, E=E, FdesM=FdesM, dimFdes=dimFdes,
+                        gammaslope.fixed=gammaslope.fixed,
+                        gammaslope.prior=gammaslope.prior, maxgamma=maxgamma,
+                        Edes=Edes, gammaslope.constr.V=gammaslope.constr.V, V1=V1,
+                        e2=e2, gammaslope.center.index=gammaslope.center.index,
                         gammaslope.center.value=gammaslope.center.value,
                         userfct.gammaslope=userfct.gammaslope,
-                        gammaslope_acceleration=gammaslope_acceleration, V=V )
+                        gammaslope_acceleration=gammaslope_acceleration, V=V,
+                        skip_B=FALSE)
             gammaslope <- res$gammaslope
             se.gammaslope <- res$se.gammaslope
             gammaslope.change <- res$gammachange
@@ -628,8 +637,8 @@ tam.mml.3pl <- function( resp, Y=NULL, group=NULL,
             B <- res$B
         }
 
-# cat("\nM steps slopes") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
 
+# cat("\nM steps slopes") ; a1 <- Sys.time(); print(a1-a0) ; a0 <- a1
 
         #--- guessing parameter estimation
         if ( est.some.guess ){
