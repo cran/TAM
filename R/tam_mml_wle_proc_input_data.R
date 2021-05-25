@@ -21,6 +21,7 @@ tam_mml_wle_proc_input_data <- function(tamobj, score.resp)
     if ( ! is.null( score.resp) ){
         resp <- score.resp
         new_input <- TRUE
+        pweights <- NULL
     }
     #--- input via resp with missings
     if ( is.null(resp.ind) | new_input ){
