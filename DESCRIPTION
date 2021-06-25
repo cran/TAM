@@ -1,8 +1,8 @@
 Package: TAM
 Type: Package
 Title: Test Analysis Modules
-Version: 3.6-45
-Date: 2021-04-22 14:35:52
+Version: 3.7-16
+Date: 2021-06-24 14:31:37
 Author: 
     Alexander Robitzsch [aut,cre] (<https://orcid.org/0000-0002-8226-3132>),
     Thomas Kiefer [aut], 
@@ -33,6 +33,6 @@ URL: http://www.edmeasurementsurveys.com/TAM/Tutorials/,
         https://github.com/alexanderrobitzsch/TAM,
         https://sites.google.com/site/alexanderrobitzsch2/software
 NeedsCompilation: yes
-Packaged: 2021-04-22 12:41:02 UTC; sunpn563
+Packaged: 2021-06-24 12:37:18 UTC; sunpn563
 Repository: CRAN
-Date/Publication: 2021-04-22 13:40:02 UTC
+Date/Publication: 2021-06-25 11:10:13 UTC
