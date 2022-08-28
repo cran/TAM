@@ -41,6 +41,15 @@ http://www.edmeasurementsurveys.com/TAM/Tutorials/
 
 
 
+-------------------------------------------------------------
+VERSIONS TAM 4.1  |  2022-08-28  |  Last: TAM 4.1-4
+-------------------------------------------------------------
+
+FIXED * fixed issues in handling constraints in tamaan() and
+        tam.mml.3pl()
+
+DATA  * included/modified datasets: ---
+EXAMP * included/modified examples: ---
 
 -------------------------------------------------------------
 VERSIONS TAM 4.0  |  2022-05-13  |  Last: TAM 4.0-16
