@@ -1,5 +1,5 @@
 %% File Name: IRT.threshold.Rd
-%% File Version: 1.441
+%% File Version: 1.451
 
 \name{IRT.threshold}
 \alias{IRT.threshold}
@@ -12,15 +12,17 @@
 Thurstonian Thresholds and Wright Map for Item Response Models
 }
 
+%% \code{\link[lavaan:cfa]{lavaan::cfa}}
+
 \description{
 The function \code{IRT.threshold} computes Thurstonian thresholds
 for item response models. It is only based on fitted models
-for which the \code{\link{IRT.irfprob}} does exist.
+for which the \link[CDM]{IRT.irfprob} class does exist.
 
 The function \code{IRT.WrightMap} creates a Wright map and works as a wrapper to the
-\code{\link[WrightMap:wrightMap]{WrightMap::wrightMap}} function in
+\link[WrightMap]{wrightMap} function in
 the \pkg{WrightMap} package. Wright maps operate
-on objects of class \code{\link{IRT.threshold}}.
+on objects of class \link{IRT.threshold}.
 }
 
 
@@ -42,7 +44,8 @@ IRT.WrightMap(object, \dots)
 
 \arguments{
 \item{object}{
-Object of fitted models for which \code{\link{IRT.irfprob}} exists.
+Object of fitted models for which \link[CDM]{IRT.irfprob}
+ exists.
 }
 \item{prob.lvl}{Requested probability level of thresholds.}
 \item{type}{Type of thresholds to be calculated. The default is
@@ -89,8 +92,8 @@ Report No. RR-15-20). Princeton, NJ: Educational Testing Service.
 
 \author{
 The \code{IRT.WrightMap} function is based on the
-\code{\link[WrightMap:wrightMap]{WrightMap::wrightMap}} function
-in the \pkg{\link[WrightMap:WrightMap]{WrightMap}} package.
+\link[WrightMap]{wrightMap} function
+in the \pkg{WrightMap} package.
 }
 
 %\note{
@@ -101,7 +104,7 @@ in the \pkg{\link[WrightMap:WrightMap]{WrightMap}} package.
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-See the \code{\link[WrightMap:wrightMap]{WrightMap::wrightMap}} function in
+See the \link[WrightMap]{wrightMap} function in
 the \pkg{WrightMap} package.
 }
 

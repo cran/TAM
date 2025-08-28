@@ -1,5 +1,5 @@
 %% File Name: tam.jml.Rd
-%% File Version: 2.405
+%% File Version: 2.414
 
 \name{tam.jml}
 
@@ -20,7 +20,8 @@ item response models with joint maximum likelihood (JML,
 \usage{
 tam.jml(resp, group=NULL, adj=.3, disattenuate=FALSE, bias=TRUE,
     xsi.fixed=NULL, xsi.inits=NULL, theta.fixed=NULL, A=NULL, B=NULL, Q=NULL,
-    ndim=1, pweights=NULL, constraint="cases", verbose=TRUE, control=list(), version=3)
+    ndim=1, pweights=NULL, constraint="cases", theta_proc=NULL,
+    verbose=TRUE, control=list(), version=3)
 
 \method{summary}{tam.jml}(object, file=NULL, \dots)
 
@@ -90,6 +91,9 @@ the fixed value. This argument can only be applied for \code{version=1}.}
 \item{constraint}{Type of constraint for means. Either \code{"cases"}
 (set mean of person parameters to zero)
 or \code{"items"} (set mean of item parameters to zero).
+}
+\item{theta_proc}{Function for processing \code{theta} within iterations. Can only
+be applied for \code{version=1}.
 }
 \item{verbose}{Logical indicating whether output should
 be printed during iterations. This argument replaces \code{control$progress}.
@@ -346,6 +350,40 @@ mod2 <- TAM::tam.jml( resp=resp1, A=A1, xsi.fixed=xsi.fixed, theta.fixed=theta.f
             control=list( Msteps=4, maxiter=100) )
 summary(mod2)
 cbind( mod2$WLE, mod2$errorWLE )
+
+#############################################################################
+# EXAMPLE 5: Disconnected item design
+#############################################################################
+
+# define a disconnected design with two item sets,
+# bit random allocation of persons to item sets
+
+set.seed(878)
+ind1 <- 1:1000      # indices persons group 1
+ind2 <- 1001:3000   # indices persons group 2
+
+I <- 10   # number of items
+# simulate item responses
+dat1 <- sirt::sim.raschtype( rnorm( length(ind1)), b=seq(-2,2,len=I) )
+colnames(dat1) <- paste0("A", 100+1:I)
+dat2 <- sirt::sim.raschtype( rnorm( length(ind2)), b=seq(-1,3,len=I) )
+colnames(dat2) <- paste0("B", 100+1:I)
+# merge datasets
+dat <- plyr::rbind.fill(dat1, dat2)
+summary(dat)
+
+# define theta processing function
+theta_proc <- function(theta){
+    theta[ind1,1] <- theta[ind1,1] - mean( theta[ind1,1] )
+    theta[ind2,1] <- theta[ind2,1] - mean( theta[ind2,1] )
+    return(theta)
+}
+
+# JML estimation
+res <- TAM::tam.jml( dat, theta_proc=theta_proc )
+# check means
+group <- c( rep(1,length(ind1)), rep(1,length(ind2)) )
+stats::aggregate( res$theta, list(group), mean )
 }
 }
 
